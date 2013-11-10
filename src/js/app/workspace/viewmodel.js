@@ -31,53 +31,53 @@
         return needElemValue;
     }
 
-    function isValueInteger(checkedValue) {
-        return (/^\d+$/).test(checkedValue);
-    }
+    ////function isValueInteger(checkedValue) {
+    ////    return (/^\d+$/).test(checkedValue);
+    ////}
 
-    function getChoosedIdFromHash() {
-        var choosedObj = {
-            regionId: null,
-            fieldId: null,
-            groupId: null,
-            wellId: null,
-            sectionId: null
-        };
+    ////function getChoosedIdFromHash() {
+    ////    var choosedObj = {
+    ////        regionId: null,
+    ////        fieldId: null,
+    ////        groupId: null,
+    ////        wellId: null,
+    ////        sectionId: null
+    ////    };
 
-        var hashParamList = window.location.hash.substr(1).split('/');
+    ////    var hashParamList = window.location.hash.substr(1).split('/');
 
-        if (hashParamList[0] === 'region') {
-            if (isValueInteger(hashParamList[1])) {
-                choosedObj.regionId = parseInt(hashParamList[1]);
+    ////    if (hashParamList[0] === 'region') {
+    ////        if (isValueInteger(hashParamList[1])) {
+    ////            choosedObj.regionId = parseInt(hashParamList[1]);
 
-                if (hashParamList[2] === 'field') {
-                    if (isValueInteger(hashParamList[3])) {
-                        choosedObj.fieldId = parseInt(hashParamList[3]);
+    ////            if (hashParamList[2] === 'field') {
+    ////                if (isValueInteger(hashParamList[3])) {
+    ////                    choosedObj.fieldId = parseInt(hashParamList[3]);
 
-                        if (hashParamList[4] === 'group') {
-                            if (isValueInteger(hashParamList[5])) {
-                                choosedObj.groupId = parseInt(hashParamList[5]);
+    ////                    if (hashParamList[4] === 'group') {
+    ////                        if (isValueInteger(hashParamList[5])) {
+    ////                            choosedObj.groupId = parseInt(hashParamList[5]);
 
-                                if (hashParamList[6] === 'well') {
-                                    if (isValueInteger(hashParamList[7])) {
-                                        choosedObj.wellId = parseInt(hashParamList[7]);
+    ////                            if (hashParamList[6] === 'well') {
+    ////                                if (isValueInteger(hashParamList[7])) {
+    ////                                    choosedObj.wellId = parseInt(hashParamList[7]);
 
-                                        if (hashParamList[8] === 'section') {
-                                            choosedObj.sectionId = hashParamList[9];
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+    ////                                    if (hashParamList[8] === 'section') {
+    ////                                        choosedObj.sectionId = hashParamList[9];
+    ////                                    }
+    ////                                }
+    ////                            }
+    ////                        }
+    ////                    }
+    ////                }
+    ////            }
+    ////        }
+    ////    }
 
-        return choosedObj;
-    }
+    ////    return choosedObj;
+    ////}
 
-    function AppViewModel(companyId, isEditable) {
+    function AppViewModel(companyId, isEditable, choosedObj) {
         var self = this;
 
         // Test company Id with Guid format (this checks retry server check in WorkSpace view of Home controller
@@ -179,7 +179,7 @@
                 self.wellRegionList(mappedStructure);
 
                 // route region/id/field/id/group/id/well/id
-                var choosedObj = getChoosedIdFromHash();
+                ////var choosedObj = getChoosedIdFromHash();
                 console.log(choosedObj);
                 var tmpRegion = getElementByPropertyValue(self.wellRegionList(), 'Id', choosedObj.regionId);
                 if (tmpRegion) {

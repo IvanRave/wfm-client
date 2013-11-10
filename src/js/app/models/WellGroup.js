@@ -210,7 +210,13 @@
             return self === self.getWellField().selectedWellGroup();
         });
 
-        self.afterRenderPartial = function () {
+        self.selectItem = function () {
+            self.isOpenItem(true);
+            var parentWellRegion = self.getWellField().getWellRegion();
+            parentWellRegion.clearSetSelectedWellRegion();
+            parentWellRegion.selectedWellField(self.getWellField());
+            parentWellRegion.selectedWellField().selectedWellGroup(self);
+
             // get last approved scopes of every well (one request)
             // insert in every well
             // get all test data for every with total
@@ -237,14 +243,6 @@
                     });
                 });
             });
-        };
-
-        self.selectItem = function () {
-            self.isOpenItem(true);
-            var parentWellRegion = self.getWellField().getWellRegion();
-            parentWellRegion.clearSetSelectedWellRegion();
-            parentWellRegion.selectedWellField(self.getWellField());
-            parentWellRegion.selectedWellField().selectedWellGroup(self);            
         };
 
         self.toPlainJson = function () {

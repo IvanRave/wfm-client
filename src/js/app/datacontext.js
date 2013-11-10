@@ -38,7 +38,7 @@
         return '{{conf.requrl}}/api/wellhistoryfile/' + (uqp ? ('?' + $.param(uqp)) : '');
     }
     function fileManagerUrl() {
-        return '/wfm-template/workspace/file-manager.html';
+        return 'wfm-template/workspace/file-manager.html';
     }
     function userProfileUrl(uqp) {
         return '{{conf.requrl}}/api/userprofile/' + (uqp ? ('?' + $.param(uqp)) : '');

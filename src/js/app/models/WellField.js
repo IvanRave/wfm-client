@@ -79,7 +79,13 @@
             return self === self.getWellRegion().selectedWellField();
         });
 
-        self.afterRenderPartial = function () {
+        self.selectItem = function () {
+            self.isOpenItem(true);
+            self.selectedWellFieldMap(null);
+
+            self.getWellRegion().clearSetSelectedWellRegion();
+            self.getWellRegion().selectedWellField(self);
+
             // get all maps from this field
             self.getWellFieldMaps(function () {
                 var arr = self.WellFieldMaps();
@@ -89,14 +95,8 @@
             });
 
             self.initMapFileUpload();
-        };
 
-        self.selectItem = function () {
-            self.isOpenItem(true);
-            self.selectedWellFieldMap(null);
-
-            self.getWellRegion().clearSetSelectedWellRegion();
-            self.getWellRegion().selectedWellField(self);
+            window.location.hash = '#/companies/9cf09ba5-c049-4148-8e5f-869c1e26c330?region=' + self.getWellRegion().Id + '&field=' + self.Id;
         };
 
         self.getHashPath = function () {

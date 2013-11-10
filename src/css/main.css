@@ -90,6 +90,22 @@ footer {
                 color: #fff;
             }
 
+        .wfm-list ul > li .wfm-menu-item {
+            padding: 4px;
+            display: block;
+            cursor: pointer;
+            background-color: #444;
+            color: #fcfcfc;
+            margin-left: 22px;
+            white-space: nowrap;
+        }
+
+            .wfm-list ul > li .wfm-menu-item:hover {
+                background-color: #888;
+                color: #fcfcfc;
+                text-decoration: none;
+            }
+
         .wfm-list ul > li a {
             padding: 4px;
             display: block;

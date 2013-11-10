@@ -59,9 +59,9 @@ layout: false
                             </button>
                             <ul class="dropdown-menu">
                                 <!-- ko if:  (Purpose === 'log') -->
-                                <li data-bind="visible: getExt() === 'las'"><a href="#" data-bind="    click: importWellFileToLog">Import to log image</a></li>
-                                <li data-bind="visible: getExt() === 'png'"><a href="#" data-bind="    click: function (data, event) { downloadAsExt('jpeg') }">Download as JPEG</a></li>
-                                <li data-bind="visible: getExt() === 'png'"><a href="#" data-bind="    click: function (data, event) { downloadAsExt('tiff') }">Download as TIFF</a></li>
+                                <li data-bind="visible: getExt() === 'las'"><a href="#" data-bind="click: importWellFileToLog">Import to log image</a></li>
+                                <li data-bind="visible: getExt() === 'png'"><a href="#" data-bind="click: function (data, event) { downloadAsExt('jpeg') }">Download as JPEG</a></li>
+                                <li data-bind="visible: getExt() === 'png'"><a href="#" data-bind="click: function (data, event) { downloadAsExt('tiff') }">Download as TIFF</a></li>
                                 <!-- /ko -->
                                 <!-- ko if: (Purpose === 'pd') -->
                                 <li><a href="#" data-bind="click: importToProductionData">Import to PD</a></li>

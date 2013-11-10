@@ -5,18 +5,22 @@
 define(['angular', 'angular-route', 'app/cabinet/controllers'], function (angular) {
     'use strict';
 
+    var tplFolder = 'wfm-template/';
+
     return angular.module('ang-cabinet-project', ['ngRoute', 'ang-cabinet-controllers'])
         .config(['$routeProvider', '$httpProvider', '$interpolateProvider', function (rpr, angHttpProvider, angInterpolateProvider) {
-            rpr.when('/all', { controller: 'CompanyUserCtrl', templateUrl: '/wfm-template/cabinet/company-list.html' })
-                .when('/create', { controller: 'CompanyCreateCtrl', templateUrl: '/wfm-template/cabinet/company-create.html' })
-                .when('/:id/manage/info', { controller: 'CompanyManageInfoCtrl', templateUrl: '/wfm-template/cabinet/manage-info.html' })
-                .when('/:id/manage/user', { controller: 'CompanyManageUserCtrl', templateUrl: '/wfm-template/cabinet/manage-user.html' })
-                .when('/{{syst.logonUrl}}', { controller: 'AccountLogonCtrl', templateUrl: '/wfm-template/{{syst.logonUrl}}.html' })
-                .when('/{{syst.logoffUrl}}', { controller: 'AccountLogoffCtrl', templateUrl: '/wfm-template/{{syst.logoffUrl}}.html' })
-                .when('/{{syst.registerUrl}}', { controller: 'AccountRegisterCtrl', templateUrl: '/wfm-template/{{syst.registerUrl}}.html' })
-                .when('/{{syst.registerConfirmationUrl}}', { controller: 'AccountRegisterConfirmationCtrl', templateUrl: '/wfm-template/{{syst.registerConfirmationUrl}}.html' })
-                .when('/workspace', { controller: 'WorkspaceCtrl', templateUrl: '/wfm-template/workspace.html' })
-                .otherwise({ redirectTo: '/all' });
+            rpr.when('/{{syst.logonUrl}}', { controller: 'AccountLogonCtrl', templateUrl: tplFolder + '{{syst.logonUrl}}.html' })
+                .when('/{{syst.logoffUrl}}', { controller: 'AccountLogoffCtrl', templateUrl: tplFolder + '{{syst.logoffUrl}}.html' })
+                .when('/{{syst.registerUrl}}', { controller: 'AccountRegisterCtrl', templateUrl: tplFolder + '{{syst.registerUrl}}.html' })
+                .when('/{{syst.registerConfirmationUrl}}', { controller: 'AccountRegisterConfirmationCtrl', templateUrl: tplFolder + '{{syst.registerConfirmationUrl}}.html' })
+                .when('/{{syst.companyListUrl}}', { controller: 'CompanyUserCtrl', templateUrl: tplFolder + 'cabinet/company-list.html' })
+                .when('/{{syst.companyListUrl}}/create', { controller: 'CompanyCreateCtrl', templateUrl: tplFolder + 'cabinet/company-create.html' })
+                .when('/{{syst.companyListUrl}}/:companyId/manage-info', { controller: 'CompanyManageInfoCtrl', templateUrl: tplFolder + 'cabinet/manage-info.html' })
+                .when('/{{syst.companyListUrl}}/:companyId/manage-users', { controller: 'CompanyManageUserCtrl', templateUrl: tplFolder + 'cabinet/manage-user.html' })
+                .when('/{{syst.companyListUrl}}/:companyId', { controller: 'WorkspaceCtrl', templateUrl: tplFolder + 'workspace.html', reloadOnSearch: false })
+                .when('/{{syst.companyListUrl}}/:companyId/manage', { controller: 'WorkspaceManageCtrl', templateUrl: tplFolder + 'workspace.html', reloadOnSearch: false })
+                //.when('/{{syst.companyListUrl}}/:companyId/regions/:regionId', { controller: 'WorkspaceCtrl', templateUrl: tplFolder + 'workspace.html', reloadOnSearch: false })
+                .otherwise({ redirectTo: '/{{syst.companyListUrl}}' });
 
             // Turn in CORS cookie support
             angHttpProvider.defaults.withCredentials = true;
