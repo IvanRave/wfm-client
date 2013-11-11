@@ -96,7 +96,10 @@
 
             self.initMapFileUpload();
 
-            window.location.hash = '#/companies/9cf09ba5-c049-4148-8e5f-869c1e26c330?region=' + self.getWellRegion().Id + '&field=' + self.Id;
+            window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
+                region: self.getWellRegion().Id,
+                field: self.Id
+            });
         };
 
         self.getHashPath = function () {

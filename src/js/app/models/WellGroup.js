@@ -211,6 +211,12 @@
         });
 
         self.selectItem = function () {
+            window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
+                region: self.getWellField().getWellRegion().Id,
+                field: self.getWellField().Id,
+                group: self.Id
+            });
+
             self.isOpenItem(true);
             var parentWellRegion = self.getWellField().getWellRegion();
             parentWellRegion.clearSetSelectedWellRegion();

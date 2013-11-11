@@ -306,26 +306,27 @@ footer {
     background-color: #222;
 }
 
-    .wfm-workspace-well-tab .nav-pills > li > a {
+    .wfm-workspace-well-tab .nav-pills > li > div {
         border-radius: 0;
         padding: 0;
         color: #a1a1a1;
         width: 68px;
         /*height:48px;*/
         text-align: center;
+        cursor: pointer;
     }
 
-        .wfm-workspace-well-tab .nav-pills > li > a:focus {
+        .wfm-workspace-well-tab .nav-pills > li > div:focus {
             background-color: #000;
             color: #c0c0c0;
         }
 
-        .wfm-workspace-well-tab .nav-pills > li > a:hover {
+        .wfm-workspace-well-tab .nav-pills > li > div:hover {
             background-color: #111;
             color: #c8c8c8;
         }
 
-        .wfm-workspace-well-tab .nav-pills > li > a .caret {
+        .wfm-workspace-well-tab .nav-pills > li > div .caret {
             position: absolute;
             bottom: 4px;
             right: 4px;
@@ -333,15 +334,15 @@ footer {
             border-bottom-color: #ccc;
         }
 
-        .wfm-workspace-well-tab .nav-pills > li > a > span {
+        .wfm-workspace-well-tab .nav-pills > li > div > span {
             font-size: 70%;
         }
 
-        .wfm-workspace-well-tab .nav-pills > li > a > i {
+        .wfm-workspace-well-tab .nav-pills > li > div > i {
             font-size: 150%;
         }
 
-    .wfm-workspace-well-tab .nav-pills > li.active > a {
+    .wfm-workspace-well-tab .nav-pills > li.active > div {
         background-color: #000;
         color: #c0c0c0;
     }
@@ -608,3 +609,21 @@ footer {
     background: url(../img/orderedList3.png) no-repeat center;
     height: 30px;
 }
+
+.dropdown-menu > li > div {
+    display: block;
+    padding: 3px 20px;
+    clear: both;
+    font-weight: normal;
+    line-height: 1.428571429;
+    color: #333333;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+    .dropdown-menu > li > div:hover,
+    .dropdown-menu > li > div:focus {
+        color: #262626;
+        text-decoration: none;
+        background-color: #f5f5f5;
+    }

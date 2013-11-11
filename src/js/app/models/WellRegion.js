@@ -63,11 +63,11 @@
                 // Set to null all children
                 self.isOpenItem(true);
                 self.clearSetSelectedWellRegion();
-                window.location.hash = '#/companies/9cf09ba5-c049-4148-8e5f-869c1e26c330?region=' + self.Id;
+                window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({ region: self.Id });
             };
 
             self.getHashPath = function () {
-                return '#region/' + self.Id;
+                return window.location.hash.split('?')[0] + '?' + $.param({ region: self.Id });
             };
 
             self.deleteWellField = function () {

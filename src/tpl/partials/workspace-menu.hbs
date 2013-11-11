@@ -21,7 +21,7 @@
           <li>
             <div class="clearfix">
               <i class="glyphicon" data-bind="css:{ 'glyphicon-circle-arrow-down' : isOpenItem, 'glyphicon-circle-arrow-right' : !isOpenItem() }, click: toggleItem"></i>
-              <a href="#" data-bind="click: selectItem">
+              <div class="wfm-menu-item" data-bind="click: selectItem">
                 <div class="pull-right">
                   <small>
                     <i class="glyphicon glyphicon-home"></i>
@@ -30,14 +30,14 @@
                 <div>
                   <span data-bind="text: Name, attr: {title: Name}"></span>
                 </div>
-              </a>
+              </div>
             </div>
             <ul class="list-unstyled wfm-child" data-bind="visible: isOpenItem">
               <!-- ko foreach: WellGroups -->
               <li>
                 <div class="clearfix">
                   <i class="glyphicon" data-bind="css:{ 'glyphicon-circle-arrow-down' : isOpenItem, 'glyphicon-circle-arrow-right' : !isOpenItem() }, click: toggleItem"></i>
-                  <a href="#" data-bind="click: selectItem">
+                  <div class="wfm-menu-item" data-bind="click: selectItem">
                     <div class="pull-right">
                       <small>
                         <i class="glyphicon glyphicon-list"></i>
@@ -46,13 +46,13 @@
                     <div>
                       <span data-bind="text: Name, attr: {title: Name}"></span>
                     </div>
-                  </a>
+                  </div>
                 </div>
                 <ul class="list-unstyled wfm-child" data-bind="visible: isOpenItem">
                   <!-- ko foreach: Wells -->
                   <li>
                     <div class="clearfix">
-                      <a href="#" data-bind="click: selectItem">
+                      <div class="wfm-menu-item" data-bind="click: selectItem">
                         <div class="pull-right">
                           <small>
                             <i class="glyphicon glyphicon-leaf"></i>
@@ -61,7 +61,7 @@
                         <div>
                           <span data-bind="text: Name, attr: {title: Name}"></span>
                         </div>
-                      </a>
+                      </div>
                     </div>
                   </li>
                   <!-- /ko -->

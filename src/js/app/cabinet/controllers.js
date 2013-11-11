@@ -319,19 +319,16 @@ define(['jquery',
                         // This function is called once the DOM is ready.
                         // It will be safe to query the DOM and manipulate DOM nodes in this function.
                         $(function () {
-                            var choosedObj = {
-                                regionId: parseInt(angRouteParams.region),
-                                fieldId: parseInt(angRouteParams.field),
-                                groupId: parseInt(angRouteParams.group),
-                                wellId: parseInt(angRouteParams.well),
-                                sectionId: parseInt(angRouteParams.section)
-                            };
-
-                            console.log('chosersef', choosedObj);
 
                             // Get company Id
                             ////'9cf09ba5-c049-4148-8e5f-869c1e26c330';
-                            var wfmAppViewModel = new AppViewModel(angRouteParams.companyId, false, choosedObj);
+                            var wfmAppViewModel = new AppViewModel(angRouteParams.companyId, angRouteParams['editable'] ? true : false, {
+                                regionId: parseInt(angRouteParams['region']),
+                                fieldId: parseInt(angRouteParams['field']),
+                                groupId: parseInt(angRouteParams['group']),
+                                wellId: parseInt(angRouteParams['well']),
+                                sectionId: parseInt(angRouteParams['section'])
+                            });
                             ko.applyBindings(wfmAppViewModel, document.getElementById('workspace-project'));
                             var jqrWindow = $(window);
                             jqrWindow.resize(function () {
@@ -341,38 +338,5 @@ define(['jquery',
                         });
                     });
             });
-
-        }])
-        .controller('WorkspaceManageCtrl', ['$scope', '$routeParams', function (angScope, angRouteParams) {
-            // Edit workspace
-            require(['compability-fix'], function () {
-                // {{#if conf.isProd}}
-                ////require(['app/workspace/project-bundle-{{package.version}}.min']);
-                // {{else}}
-                ////require(['app/workspace/project']);
-                // {{/if}}
-
-                require(['jquery',
-                    'knockout',
-                    'app/workspace/viewmodel',
-                    'app/bindings',
-                    'ko-external-template-engine'], function ($, ko, AppViewModel) {
-
-                        // This function is called once the DOM is ready.
-                        // It will be safe to query the DOM and manipulate DOM nodes in this function.
-                        $(function () {
-                            // Get company Id
-                            ////'9cf09ba5-c049-4148-8e5f-869c1e26c330';
-                            var wfmAppViewModel = new AppViewModel(angRouteParams.companyId, true);
-                            ko.applyBindings(wfmAppViewModel, document.getElementById('workspace-project'));
-                            var jqrWindow = $(window);
-                            jqrWindow.resize(function () {
-                                wfmAppViewModel.windowHeight(jqrWindow.height());
-                                wfmAppViewModel.windowWidth(jqrWindow.width());
-                            });
-                        });
-                    });
-            });
-
         }]);
     });

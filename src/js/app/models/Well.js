@@ -119,6 +119,13 @@
         });
 
         self.selectItem = function () {
+            window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
+                region: self.getWellGroup().getWellField().getWellRegion().Id,
+                field: self.getWellGroup().getWellField().Id,
+                group: self.getWellGroup().Id,
+                well: self.Id
+            });
+
             // By default - no template - show widget page
             // Previous - by default - summary self.sectionList[0].id;
             var previousSelectedSectionId;

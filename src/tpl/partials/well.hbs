@@ -9,34 +9,34 @@ layout: false
         <ul class="nav nav-pills" data-bind="template: {foreach: sectionList, as: 'section'}">
             <!-- ko if: (section.id !== 'volume' && section.id !== 'sketch' && section.id !== 'pd') -->
             <li data-bind="css: {'active': section.id === $parent.selectedSectionId() }">
-                <a href="#" data-bind="click: function() { $parent.selectSection(section.id); }">
+                <div data-bind="click: function() { $parent.selectSection(section.id); }">
                     <span data-bind="text: section.name"></span><br /><i class="wfmicon" data-bind="css: 'wfmicon-' + section.id"></i>
-                </a>
+                </div>
             </li>
             <!-- /ko -->
             <!-- ko if: section.id === 'sketch' -->
             <li class="dropup" data-bind="css: {'active': section.id === $parent.selectedSectionId() }">
-                <a class="dropdown-toggle" title="Sketch and volume" href="#" data-toggle="dropdown" data-bind="drpdwn: {}">
+                <div class="dropdown-toggle" title="Sketch and volume" data-toggle="dropdown" data-bind="drpdwn: {}">
                     <span data-bind="text: section.name"></span><br /><i class="wfmicon" data-bind="css: 'wfmicon-'+section.id"></i>
                     <span class="caret"></span>
-                </a>
+                </div>
                 <ul class="dropdown-menu">
-                    <li><a href="#" data-bind="click: function() { $parent.selectSection('sketch'); }">Sketch</a></li>
-                    <li><a href="#" data-bind="click: function() { $parent.selectSection('volume'); }">Volume</a></li>
+                    <li><div data-bind="click: function() { $parent.selectSection('sketch'); }">Sketch</div></li>
+                    <li><div data-bind="click: function() { $parent.selectSection('volume'); }">Volume</div></li>
                 </ul>
             </li>
             <!-- /ko -->
             <!-- ko if: section.id === 'pd' -->
             <li class="dropup" data-bind="css: {'active': section.id === $parent.selectedSectionId() }">
-                <a class="dropdown-toggle" title="Decline curve analysis" data-toggle="dropdown" data-bind="drpdwn:{}" href="#">
+                <div class="dropdown-toggle" title="Decline curve analysis" data-toggle="dropdown" data-bind="drpdwn:{}">
                     <span data-bind="text: section.name"></span><br /><i class="wfmicon" data-bind="css: 'wfmicon-' + section.id"></i>
                     <span class="caret"></span>
-                </a>
+                </div>
                 <ul class="dropdown-menu" data-bind="foreach: $root.wfmParamSquadList">
                     <li>
-                        <a href="#" data-bind="click: function() { $parents[1].selectSection(section.id); $parents[1].mainPerfomanceView.selectAttrGroupId($data.id); }">
+                        <div data-bind="click: function() { $parents[1].selectSection(section.id); $parents[1].mainPerfomanceView.selectAttrGroupId($data.id); }">
 							<span data-bind="text: id"></span>
-						</a>
+						</div>
                     </li>
                 </ul>
             </li>

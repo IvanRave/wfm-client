@@ -17,9 +17,8 @@ define(['angular', 'angular-route', 'app/cabinet/controllers'], function (angula
                 .when('/{{syst.companyListUrl}}/create', { controller: 'CompanyCreateCtrl', templateUrl: tplFolder + 'cabinet/company-create.html' })
                 .when('/{{syst.companyListUrl}}/:companyId/manage-info', { controller: 'CompanyManageInfoCtrl', templateUrl: tplFolder + 'cabinet/manage-info.html' })
                 .when('/{{syst.companyListUrl}}/:companyId/manage-users', { controller: 'CompanyManageUserCtrl', templateUrl: tplFolder + 'cabinet/manage-user.html' })
-                .when('/{{syst.companyListUrl}}/:companyId', { controller: 'WorkspaceCtrl', templateUrl: tplFolder + 'workspace.html', reloadOnSearch: false })
-                .when('/{{syst.companyListUrl}}/:companyId/manage', { controller: 'WorkspaceManageCtrl', templateUrl: tplFolder + 'workspace.html', reloadOnSearch: false })
-                //.when('/{{syst.companyListUrl}}/:companyId/regions/:regionId', { controller: 'WorkspaceCtrl', templateUrl: tplFolder + 'workspace.html', reloadOnSearch: false })
+                .when('/{{syst.companyListUrl}}/:companyId/view', { controller: 'WorkspaceCtrl', templateUrl: tplFolder + 'workspace.html', reloadOnSearch: false })
+                .when('/{{syst.companyListUrl}}/:companyId/manage', { controller: 'WorkspaceCtrl', templateUrl: tplFolder + 'workspace.html', reloadOnSearch: false })
                 .otherwise({ redirectTo: '/{{syst.companyListUrl}}' });
 
             // Turn in CORS cookie support
