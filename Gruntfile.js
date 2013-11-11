@@ -15,7 +15,7 @@ module.exports = function (grunt) {
         isIpad = grunt.option('ipad') ? true : false,
 		isMetro = grunt.option('metro') ? true : false,
         // Request url
-        requrl = grunt.option('requrl') || 'http://wfm.azurewebsites.net',
+        requrl = grunt.option('requrl') || 'http://wfm-client.azurewebsites.net',
         // Build language: en, ru, es etc.
         lang = grunt.option('lang') || 'en';
 
@@ -71,7 +71,7 @@ module.exports = function (grunt) {
                     expand: true,
                     dot: true,
                     cwd: '<%= src %>/js/',
-                    src: ['app/**/*.js', 'rqr-*.js']
+                    src: ['app/**/*.js', 'main.js']
                 }]
             }
         },
@@ -86,7 +86,7 @@ module.exports = function (grunt) {
                     cwd: '<%= src %>/',
                     dest: '<%= trgt %>/',
                     // Copy all files besides templates and app scripts (which assembled separately)
-                    src: ['**/*', '!tpl/**/*', '!js/app/**/*', '!js/rqr-*.js']
+                    src: ['**/*', '!tpl/**/*', '!js/app/**/*', '!js/main.js']
                 }]
             }
         },
@@ -103,10 +103,9 @@ module.exports = function (grunt) {
                     // if empty - the same domain (simple requests)
                     // Example {{requrl}}/api/values
                     requrl: requrl,
-                    isProd: isProd,
-                    isIpad: isIpad,
-                    isMetro: isMetro,
-                    defPage: isMetro ? 'index.html' : 'index.html'
+                    isProd: isProd
+                    // isIpad: isIpad,
+                    // isMetro: isMetro
                 }
             },
             html: {
@@ -136,7 +135,7 @@ module.exports = function (grunt) {
                 files: [{
                     expand: true,
                     cwd: '<%= src %>/js/',
-                    src: ['app/**/*.js', 'rqr-*.js'],
+                    src: ['app/**/*.js', 'main.js'],
                     dest: '<%= trgt %>/js/'
                 }]
             }
@@ -169,7 +168,7 @@ module.exports = function (grunt) {
                 options: {
                     spawn: false
                 },
-                files: ['<%= src %>/js/app/**/*.js', '<%= src %>/js/rqr-*.js'],
+                files: ['<%= src %>/js/app/**/*.js', '<%= src %>/js/main.js'],
                 tasks: ['jshint:app']
             },
             copy_main: {
@@ -177,7 +176,7 @@ module.exports = function (grunt) {
                     cwd: '<%= src %>/',
                     spawn: false
                 },
-                files: ['**/*', '!tpl/**/*', '!js/app/**/*', '!js/rqr-*.js'],
+                files: ['**/*', '!tpl/**/*', '!js/app/**/*', '!js/main.js'],
                 tasks: ['copy:main']
             },
             // Update all template pages when change template data
@@ -197,7 +196,7 @@ module.exports = function (grunt) {
                 options: {
                     spawn: false
                 },
-                files: ['<%= src %>/js/app/**/*.js', '<%= src %>/js/rqr-*.js'],
+                files: ['<%= src %>/js/app/**/*.js', '<%= src %>/js/main.js'],
                 tasks: ['assemble:js']
             }
 

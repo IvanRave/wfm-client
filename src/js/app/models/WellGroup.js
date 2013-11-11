@@ -1,7 +1,9 @@
-﻿define(['jquery', 'knockout', 'app/datacontext', 'bootstrap-modal',
-    'app/workspace/viewmodel',
-    'app/models/Well', 'app/models/WellGroupWfmParameter'
-], function ($, ko, datacontext, bootstrapModal) {
+﻿define(['jquery',
+    'knockout',
+    'app/datacontext',
+    'bootstrap-modal',
+    'app/models/Well',
+    'app/models/WellGroupWfmParameter'], function ($, ko, datacontext, bootstrapModal) {
     'use strict';
 
     // 18. WellGroupWfmParameter

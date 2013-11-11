@@ -1,8 +1,8 @@
 ﻿{
-  "cookieIsAuth": "is_auth",
   "logonUrl": "account/logon",
   "logoffUrl": "account/logoff",
   "registerUrl": "account/register",
   "registerConfirmationUrl": "account/register/confirmation",
-  "companyListUrl": "companies"
+  "companyListUrl": "companies",
+  "tplUrl": "tpl"
 }

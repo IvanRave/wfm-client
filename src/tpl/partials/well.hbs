@@ -50,9 +50,9 @@ layout: false
 
 <div class="well-content-pad">
     <div data-bind="if: selectedSectionId">
-        <div data-bind="template: { name: selectedSectionId, templateUrl: './wfm-template/workspace/well/' }"></div>
+        <div data-bind="template: { name: selectedSectionId, templateUrl: './tpl/workspace/well/' }"></div>
     </div>
 	<div data-bind="ifnot: selectedSectionId">
-		<div data-bind="template: { name: 'widget-scope', templateUrl: './wfm-template/workspace/well/', afterRender: afterRenderWidgetScope }"></div>
+		<div data-bind="template: { name: 'widget-scope', templateUrl: './tpl/workspace/well/', afterRender: afterRenderWidgetScope }"></div>
 	</div>
 </div>

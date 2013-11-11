@@ -38,7 +38,7 @@
         return '{{conf.requrl}}/api/wellhistoryfile/' + (uqp ? ('?' + $.param(uqp)) : '');
     }
     function fileManagerUrl() {
-        return 'wfm-template/workspace/file-manager.html';
+        return 'tpl/workspace/file-manager.html';
     }
     function userProfileUrl(uqp) {
         return '{{conf.requrl}}/api/userprofile/' + (uqp ? ('?' + $.param(uqp)) : '');
@@ -147,7 +147,6 @@
                 console.log('WFM jqXHR: ' + JSON.stringify(jqXHR));
                 switch (jqXHR.status) {
                     case 401:
-                        ////window.location.href = '{{syst.logonUrl}}{{conf.defPage}}';
                         ////alert('Access is denied. Please login with right credentials.');
                         window.location.href = '#/{{syst.logonUrl}}';
                         break;

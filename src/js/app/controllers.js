@@ -1,24 +1,23 @@
 ﻿// Controllers (directives) for company page
-// requirejs: app/cabinet/controllers
+// requirejs: app/controllers
 // angular: ang-cabinet-controllers
 
 define(['jquery',
     'angular',
     'app/datacontext',
-    'app/cookie-helper',
     'angular-route',
     'app/app-resource',
-    'app/cabinet/services',
+    'app/services',
     'app/app-filters',
     'jquery.ui.widget', 'jquery.iframe-transport',
     // The XDomainRequest Transport is included for cross-domain file deletion for IE8+ 
     'ajaxupload/cors/jquery.xdr-transport',
     'ajaxupload/cors/jquery.postmessage-transport',
     'jquery.lightbox', 'bootstrap-datepicker'],
-    function ($, angular, appDatacontext, cookieHelper) {
+    function ($, angular, appDatacontext) {
         'use strict';
 
-        return angular.module('ang-cabinet-controllers', ['ngRoute', 'ang-app-resource', 'ang-cabinet-services', 'ang-app-filters'])
+        angular.module('ang-cabinet-controllers', ['ngRoute', 'ang-app-resource', 'ang-cabinet-services', 'ang-app-filters'])
         .controller('CompanyUserCtrl', ['$scope', 'SharedService', function (scp, sharedService) {
             scp.accessLevelDict = sharedService.getSharedObject().accessLevelDict;
 
@@ -187,8 +186,7 @@ define(['jquery',
             function afterLogon() {
                 ////angWindow.alert('success logon');
                 // Navigate to company list from /account/logon/index.html
-                //angWindow.location.href = '../../company/{{conf.defPage}}';
-                cookieHelper.createCookie('{{syst.cookieIsAuth}}', 'true');
+                
                 scp.$apply(function () {
                     angRootScope.isLogged = true;
                     angLocation.path('/{{syst.companyListUrl}}');
@@ -228,9 +226,8 @@ define(['jquery',
             };
         }])
         .controller('AccountLogoffCtrl', ['$window', function (angWindow) {
-            // Remove AUTH httponly cookie and is_auth cookie
+            // Remove AUTH httponly cookie
             appDatacontext.accountLogoff().done(function () {
-                cookieHelper.removeCookie('{{syst.cookieIsAuth}}');
                 // After logoff navigate to the main page
                 angWindow.location.href = '#/{{syst.logonUrl}}';
             });
@@ -312,9 +309,9 @@ define(['jquery',
 
                 require(['jquery',
                     'knockout',
-                    'app/workspace/viewmodel',
+                    'app/models/workspace',
                     'app/bindings',
-                    'ko-external-template-engine'], function ($, ko, AppViewModel) {
+                    'ko-external-template-engine'], function ($, ko, WorkspaceViewModel) {
 
                         // This function is called once the DOM is ready.
                         // It will be safe to query the DOM and manipulate DOM nodes in this function.
@@ -322,18 +319,18 @@ define(['jquery',
 
                             // Get company Id
                             ////'9cf09ba5-c049-4148-8e5f-869c1e26c330';
-                            var wfmAppViewModel = new AppViewModel(angRouteParams.companyId, angRouteParams['editable'] ? true : false, {
+                            var workspaceViewModel = new WorkspaceViewModel(angRouteParams.companyId, angRouteParams['editable'] ? true : false, {
                                 regionId: parseInt(angRouteParams['region']),
                                 fieldId: parseInt(angRouteParams['field']),
                                 groupId: parseInt(angRouteParams['group']),
                                 wellId: parseInt(angRouteParams['well']),
                                 sectionId: parseInt(angRouteParams['section'])
                             });
-                            ko.applyBindings(wfmAppViewModel, document.getElementById('workspace-project'));
+                            ko.applyBindings(workspaceViewModel, document.getElementById('workspace-project'));
                             var jqrWindow = $(window);
                             jqrWindow.resize(function () {
-                                wfmAppViewModel.windowHeight(jqrWindow.height());
-                                wfmAppViewModel.windowWidth(jqrWindow.width());
+                                workspaceViewModel.windowHeight(jqrWindow.height());
+                                workspaceViewModel.windowWidth(jqrWindow.width());
                             });
                         });
                     });
