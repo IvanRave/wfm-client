@@ -212,15 +212,6 @@
         }
     };
 
-    // boostrap slider
-    ko.bindingHandlers.sldr = {
-        init: function (element, valueAccessor) {
-            require(['bootstrap-slider'], function () {
-                $(element).slider(valueAccessor());
-            });
-        }
-    };
-
     // svg graph (like perfomance)
     ko.bindingHandlers.svgResponsive = {
         init: function (element, valueAccessor) {

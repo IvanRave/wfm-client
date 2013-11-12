@@ -111,12 +111,6 @@ module.exports = function (grunt) {
                     dest: '<%= trgt %>/css/',
                     src: ['bootstrap/dist/css/bootstrap.css', 'bootstrap/dist/css/bootstrap-theme.css']
                 }]
-                // files: {
-                    // '<%= trgt %>/js/jquery.js': '<%= bowerFolder %>/jquery/jquery.js',
-                    // '<%= trgt %>/js/moment.js': '<%= bowerFolder %>/moment/moment.js',
-                    // '<%= trgt %>/js/angular.js': '<%= bowerFolder %>/angular/angular.js',
-                    // '<%= trgt %>/js/angular-route.js': '<%= bowerFolder %>/angular-route/angular-route.js'
-                // }
             },
             bower_fonts: {
                 files: [{

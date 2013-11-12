@@ -52,9 +52,6 @@
     function testDataUrl(uqp) {
         return '{{conf.requrl}}/api/testdata/' + (uqp ? ('?' + $.param(uqp)) : '');
     }
-    function wfmParameterUrl(uqp) {
-        return '{{conf.requrl}}/api/wfmparameter/' + (uqp ? ('?' + $.param(uqp)) : '');
-    }
     function wellGroupWfmParameterUrl(uqp) {
         return '{{conf.requrl}}/api/wellgroupwfmparameter/' + (uqp ? ('?' + $.param(uqp)) : '');
     }
@@ -371,21 +368,6 @@
         }));
     }
 
-    // parameter list (all parameter only in Library)
-    // IsSystem: true
-    // for modal window select box, where user may choose some parameters for himself wellgroup
-    function getWfmParameterList(uqp) {
-        return ajaxRequest('GET', wfmParameterUrl(uqp));
-    }
-
-    function postWfmParameter(data) {
-        return ajaxRequest('POST', wfmParameterUrl(), data);
-    }
-
-    function putWfmParameter(uqp, data) {
-        return ajaxRequest('PUT', wfmParameterUrl(uqp), data);
-    }
-
     // get wellGroup wfmParameter list
     function getWellGroupWfmParameterList(uqp) {
         return ajaxRequest('GET', wellGroupWfmParameterUrl(uqp));
@@ -504,10 +486,6 @@
         saveNewTestData: saveNewTestData,
         saveChangedTestData: saveChangedTestData,
         deleteTestData: deleteTestData,
-        // wfm parameter
-        getWfmParameterList: getWfmParameterList,
-        postWfmParameter: postWfmParameter,
-        putWfmParameter: putWfmParameter,
         // well group wfm parameter
         getWellGroupWfmParameterList: getWellGroupWfmParameterList,
         postWellGroupWfmParameter: postWellGroupWfmParameter,

@@ -105,12 +105,12 @@
                         }
                         else {
                             console.log(resJson);
-                            alert(textStatus + ": " + jqXHR.responseText + " (" + errorThrown + ")");
+                            alert(textStatus + ": " + jqXHR.responseText + ' (' + errorThrown + ')');
                         }
 
                         break;
                     default:
-                        alert(textStatus + ": " + jqXHR.responseText + " (" + errorThrown + ")");
+                        alert(textStatus + ": " + jqXHR.responseText + ' (' + errorThrown + ')');
                         console.log(jqXHR);
                 }
             })

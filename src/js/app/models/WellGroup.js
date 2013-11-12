@@ -116,7 +116,7 @@
         ////            IsSystem: false
         ////        });
 
-        ////        datacontext.postWfmParameter(wfmParameterNew).done(function (wfmParameterResponse) {
+        ////        datacontext.postParameter(wfmParameterNew).done(function (wfmParameterResponse) {
         ////            var createdWfmParameter = datacontext.createWfmParameter(wfmParameterResponse);
 
         ////            // request to create wellGroupWfmParameter 
