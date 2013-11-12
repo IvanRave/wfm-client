@@ -97,7 +97,9 @@ module.exports = function (grunt) {
                     flatten: true,
                     cwd: '<%= bowerFolder %>/',
                     dest: '<%= trgt %>/js/',
-                    src: ['jquery/jquery.js', 'moment/moment.js', 'angular/angular.js', 'angular-route/angular-route.js', 'bootstrap/dist/js/bootstrap.js']
+                    src: ['jquery/jquery.js', 'moment/moment.js', 'angular/angular.js', 
+                        'angular-route/angular-route.js', 'bootstrap/dist/js/bootstrap.js',
+                        'requirejs/require.js', 'knockout/knockout.js']
                 }]
             },
             bower_css: {

@@ -16,14 +16,8 @@
     "moment": "~2.4.0",
     "bootstrap": "~3.0.2",
     "angular": "~1.2.0",
-    "angular-route": "~1.2.0"
-  },
-  "exportsOverride": {
-    "jquery": {
-      "js": "jquery.js"
-    },
-    "bootstrap": {
-      "js": "dist/js/bootstrap.js"
-    }
+    "angular-route": "~1.2.0",
+    "requirejs": "~2.1.9",
+    "knockout": "https://github.com/bowerjs/knockout.git#~3.0.0"
   }
 }
