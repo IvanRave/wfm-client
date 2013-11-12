@@ -37,8 +37,9 @@ module.exports = function (grunt) {
         // Metadata
         pkg: grunt.file.readJSON('package.json'),
         src: 'src',
-        // Use for <% template in JSON keys
+        // Use for < % template in JSON keys
         trgt: trgt,
+        bowerFolder: 'bower_components',
         lang: lang,
         // Banner for scripts comments: author, licence etc.
         banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
@@ -87,6 +88,42 @@ module.exports = function (grunt) {
                     dest: '<%= trgt %>/',
                     // Copy all files besides templates and app scripts (which assembled separately)
                     src: ['**/*', '!tpl/**/*', '!js/app/**/*', '!js/main.js']
+                }]
+            },
+            bower_js: {
+                files: [{
+                    expand: true,
+                    dot: true,
+                    flatten: true,
+                    cwd: '<%= bowerFolder %>/',
+                    dest: '<%= trgt %>/js/',
+                    src: ['jquery/jquery.js', 'moment/moment.js', 'angular/angular.js', 'angular-route/angular-route.js', 'bootstrap/dist/js/bootstrap.js']
+                }]
+            },
+            bower_css: {
+                files: [{
+                    expand: true,
+                    dot: true,
+                    flatten: true,
+                    cwd: '<%= bowerFolder %>/',
+                    dest: '<%= trgt %>/css/',
+                    src: ['bootstrap/dist/css/bootstrap.css', 'bootstrap/dist/css/bootstrap-theme.css']
+                }]
+                // files: {
+                    // '<%= trgt %>/js/jquery.js': '<%= bowerFolder %>/jquery/jquery.js',
+                    // '<%= trgt %>/js/moment.js': '<%= bowerFolder %>/moment/moment.js',
+                    // '<%= trgt %>/js/angular.js': '<%= bowerFolder %>/angular/angular.js',
+                    // '<%= trgt %>/js/angular-route.js': '<%= bowerFolder %>/angular-route/angular-route.js'
+                // }
+            },
+            bower_fonts: {
+                files: [{
+                    expand: true,
+                    dot: true,
+                    flatten: true,
+                    cwd: '<%= bowerFolder %>/',
+                    dest: '<%= trgt %>/fonts/',
+                    src: ['bootstrap/dist/fonts/*']
                 }]
             }
         },
@@ -220,6 +257,9 @@ module.exports = function (grunt) {
 
       // 3. Copy plain and assembled files
      'copy:main', // Copy main files
+     'copy:bower_js', // Copy unchanged files from bower folder: jquery, momentjs...
+     'copy:bower_css',
+     'copy:bower_fonts',
      'assemble:js', // After copy all files to destination - replace all {{value}} - rewrite the same files
      'assemble:html', // Copy other files: Assemble and copy templates files
      'assemble:readme' // Use main data to build readme for project description

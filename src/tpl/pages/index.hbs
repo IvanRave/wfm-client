@@ -20,11 +20,11 @@
     <div class="hide" id="wfm-project">
         <nav class="wfm-nav clearfix">
             <div class="pull-left">
-                <a href="#/{{syst.companyListUrl}}">{{lang.wfm}}</a>
+                <a href="#{{syst.companyListUrl}}">{{lang.wfm}}</a>
             </div>
             <div class="pull-right">
-                <a ng-hide="isLogged" href="#/{{syst.logonUrl}}">{{capitalizeFirst lang.signIn}}</a>
-                <a ng-show="isLogged" href="#/{{syst.logoffUrl}}">{{capitalizeFirst lang.logOut}}</a>
+                <a ng-hide="isLogged" href="#{{syst.logonUrl}}">{{capitalizeFirst lang.signIn}}</a>
+                <a ng-show="isLogged" href="#{{syst.logoffUrl}}">{{capitalizeFirst lang.logOut}}</a>
             </div>
         </nav>
         <div class="wfm-content-wrap">

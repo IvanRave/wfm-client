@@ -6,7 +6,6 @@ define(['jquery',
     'angular',
     'app/datacontext',
     'angular-route',
-    'app/app-resource',
     'app/services',
     'app/app-filters',
     'jquery.ui.widget', 'jquery.iframe-transport',
@@ -17,7 +16,7 @@ define(['jquery',
     function ($, angular, appDatacontext) {
         'use strict';
 
-        angular.module('ang-cabinet-controllers', ['ngRoute', 'ang-app-resource', 'ang-cabinet-services', 'ang-app-filters'])
+        angular.module('ang-company-controllers', ['ngRoute', 'ang-cabinet-services', 'ang-app-filters'])
         .controller('CompanyUserCtrl', ['$scope', 'SharedService', function (scp, sharedService) {
             scp.accessLevelDict = sharedService.getSharedObject().accessLevelDict;
 
@@ -59,7 +58,7 @@ define(['jquery',
                 scp.isPostSended = true;
                 scp.companyNew.LogoUrl = '';
                 appDatacontext.postCompany({}, scp.companyNew).done(function () {
-                    angLocation.path('/{{syst.companyListUrl}}');
+                    angLocation.path('{{syst.companyListUrl}}');
                 })
                 .fail(function (jqXhr) {
                     if (jqXhr.status === 422) {
@@ -160,142 +159,6 @@ define(['jquery',
             ////        }
             ////    });
             ////};
-        }])
-        .controller('AccountLogonCtrl', ['$scope', '$rootScope', '$location', '$routeParams', function (scp, angRootScope, angLocation, angRouteParams) {
-            angRootScope.isLogged = false;
-
-            scp.usver = {
-                Email: angRouteParams.email
-            };
-
-            // When user successfuly confirm email after registration - need to show notification
-            scp.isEmailConfirmed = angRouteParams.confirmed;
-
-            scp.isProcessBtnEnabled = true;
-
-            scp.processError = '';
-
-            // Password restriction bounds
-            scp.bound = {
-                password: {
-                    minLength: 6,
-                    maxLength: 18
-                }
-            };
-
-            function afterLogon() {
-                ////angWindow.alert('success logon');
-                // Navigate to company list from /account/logon/index.html
-                
-                scp.$apply(function () {
-                    angRootScope.isLogged = true;
-                    angLocation.path('/{{syst.companyListUrl}}');
-                });
-            }
-
-            scp.tryAuth = function () {
-                scp.isProcessBtnEnabled = false;
-                appDatacontext.accountLogon({}, scp.usver).done(afterLogon).fail(function (jqXHR) {
-                    if (jqXHR.status === 422) {
-                        var resJson = jqXHR.responseJSON;
-                        var tmpProcessError = '*';
-                        require(['app/lang-helper'], function (langHelper) {
-                            tmpProcessError += (langHelper.translate(resJson.errId) || '{{lang.unknownError}}');
-                            // Because using jQuery ajax is out of the world of angular, you need to wrap your $scope assignment inside of
-                            scp.$apply(function () {
-                                scp.processError = tmpProcessError;
-                            });
-                        });
-                    }
-                }).always(function () {
-                    // When error or smth activate login button
-                    scp.$apply(function () {
-                        scp.isProcessBtnEnabled = true;
-                    });
-                });
-            };
-
-            scp.isTestLoginBtnEnabled = true;
-
-            scp.testAuth = function () {
-                scp.isTestLoginBtnEnabled = false;
-                appDatacontext.accountLogon({}, {
-                    "Email": "wfm@example.com",
-                    "Password": "123321"
-                }).done(afterLogon);
-            };
-        }])
-        .controller('AccountLogoffCtrl', ['$window', function (angWindow) {
-            // Remove AUTH httponly cookie
-            appDatacontext.accountLogoff().done(function () {
-                // After logoff navigate to the main page
-                angWindow.location.href = '#/{{syst.logonUrl}}';
-            });
-        }])
-        .controller('AccountRegisterCtrl', ['$scope', '$location', function (scp, angLocation) {
-            scp.isProcessBtnEnabled = true;
-
-            scp.processError = '';
-
-            // Password restriction bounds
-            scp.bound = {
-                password: {
-                    minLength: 6,
-                    maxLength: 18
-                }
-            };
-
-            scp.tryRegister = function () {
-                scp.isProcessBtnEnabled = false;
-
-                appDatacontext.accountRegister({}, scp.usver).done(function () {
-                    angLocation.path('/{{syst.registerConfirmationUrl}}').search({
-                        email: scp.usver.Email
-                    });
-                    ////angWindow.alert('Success. Please check your email to confirm registration.');
-                    // TODO:
-                    // Send to email-confirm-sending
-                    // Redirect to email-confirmation with email in url
-                    // page with one text box (or with email) to put token into 
-                    // and confirm button
-                }).fail(function (jqXhr) {
-                    if (jqXhr.status === 422) {
-                        require(['app/lang-helper'], function (langHelper) {
-                            // Because using jQuery ajax is out of the world of angular, you need to wrap your $scope assignment inside of
-                            scp.$apply(function () {
-                                scp.processError = (langHelper.translate(jqXhr.responseJSON.errId) || '{{lang.unknownError}}');
-                                scp.isProcessBtnEnabled = true;
-                            });
-                        });
-                    }
-                });
-            };
-        }])
-        .controller('AccountRegisterConfirmationCtrl', ['$scope', '$routeParams', '$location', function (angScope, angRouteParams, angLocation) {
-
-            angScope.usver = {
-                email: angRouteParams.email,
-                token: angRouteParams.token
-            };
-
-            angScope.isProcessBtnEnabled = true;
-            angScope.processError = '';
-            angScope.confirmEmail = function () {
-                angScope.isProcessBtnEnabled = false;
-                appDatacontext.accountRegisterConfirmation({}, angScope.usver).done(function () {
-                    angScope.$apply(function () {
-                        angLocation.path('/{{syst.logonUrl}}').search({ email: angScope.usver.email, confirmed: true });
-                    });
-                }).fail(function () {
-                    angScope.$apply(function () {
-                        angScope.isProcessBtnEnabled = true;
-                        angScope.processError = '{{lang.emailConfirmationIsUnsuccessful}}';
-                    });
-                });
-            };
-
-            ////var confirmationEmail = angRouteParams.email,// decodeURIComponent(appHelper.queryString['email']),
-            ////    confirmationToken = angRouteParams.token; // appHelper.queryString['token'];            
         }])
         .controller('WorkspaceCtrl', ['$scope', '$routeParams', function (angScope, angRouteParams) {
             // View workspace: do not load libs for edit (for example Wisywig editor, or file-uploading features)

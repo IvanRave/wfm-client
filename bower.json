@@ -1,6 +1,6 @@
 {
   "name": "wfm",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "homepage": "https://github.com/IvanRave/wfm",
   "description": "Well file manager",
   "license": "MIT",
@@ -16,7 +16,14 @@
     "moment": "~2.4.0",
     "bootstrap": "~3.0.2",
     "angular": "~1.2.0",
-    "angular-resource": "~1.2.0",
     "angular-route": "~1.2.0"
+  },
+  "exportsOverride": {
+    "jquery": {
+      "js": "jquery.js"
+    },
+    "bootstrap": {
+      "js": "dist/js/bootstrap.js"
+    }
   }
 }

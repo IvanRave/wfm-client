@@ -1,22 +1,22 @@
 ﻿require(['require-config'], function () {
     'use strict';
 
-    require(['jquery', 'angular', 'app/controllers', 'angular-route', 'jquery.bootstrap'], function ($, angular) {
+    require(['jquery', 'angular', 'app/controllers/company', 'app/controllers/auth', 'app/controllers/register', 'angular-route', 'jquery.bootstrap'], function ($, angular) {
         var PRJ_MODULE_NAME = 'ang-cabinet-project';
 
-        angular.module(PRJ_MODULE_NAME, ['ngRoute', 'ang-cabinet-controllers'])
+        angular.module(PRJ_MODULE_NAME, ['ngRoute', 'ang-company-controllers', 'ang-auth-controllers', 'ang-register-controllers'])
         .config(['$routeProvider', '$httpProvider', '$interpolateProvider', function (rpr, angHttpProvider, angInterpolateProvider) {
-            rpr.when('/{{syst.logonUrl}}', { controller: 'AccountLogonCtrl', templateUrl: '{{syst.tplUrl}}/{{syst.logonUrl}}.html' })
-                .when('/{{syst.logoffUrl}}', { controller: 'AccountLogoffCtrl', templateUrl: '{{syst.tplUrl}}/{{syst.logoffUrl}}.html' })
-                .when('/{{syst.registerUrl}}', { controller: 'AccountRegisterCtrl', templateUrl: '{{syst.tplUrl}}/{{syst.registerUrl}}.html' })
-                .when('/{{syst.registerConfirmationUrl}}', { controller: 'AccountRegisterConfirmationCtrl', templateUrl: '{{syst.tplUrl}}/{{syst.registerConfirmationUrl}}.html' })
-                .when('/{{syst.companyListUrl}}', { controller: 'CompanyUserCtrl', templateUrl: '{{syst.tplUrl}}/cabinet/company-list.html' })
-                .when('/{{syst.companyListUrl}}/create', { controller: 'CompanyCreateCtrl', templateUrl: '{{syst.tplUrl}}/cabinet/company-create.html' })
-                .when('/{{syst.companyListUrl}}/:companyId/manage-info', { controller: 'CompanyManageInfoCtrl', templateUrl: '{{syst.tplUrl}}/cabinet/manage-info.html' })
-                .when('/{{syst.companyListUrl}}/:companyId/manage-users', { controller: 'CompanyManageUserCtrl', templateUrl: '{{syst.tplUrl}}/cabinet/manage-user.html' })
-                .when('/{{syst.companyListUrl}}/:companyId/view', { controller: 'WorkspaceCtrl', templateUrl: '{{syst.tplUrl}}/workspace.html', reloadOnSearch: false })
-                .when('/{{syst.companyListUrl}}/:companyId/manage', { controller: 'WorkspaceCtrl', templateUrl: '{{syst.tplUrl}}/workspace.html', reloadOnSearch: false })
-                .otherwise({ redirectTo: '/{{syst.companyListUrl}}' });
+            rpr.when('{{syst.logonUrl}}', { controller: 'AccountLogonCtrl', templateUrl: '.{{syst.tplUrl}}{{syst.logonUrl}}{{syst.tplExt}}' })
+                .when('{{syst.logoffUrl}}', { controller: 'AccountLogoffCtrl', templateUrl: '.{{syst.tplUrl}}{{syst.logoffUrl}}{{syst.tplExt}}' })
+                .when('{{syst.registerUrl}}', { controller: 'AccountRegisterCtrl', templateUrl: '.{{syst.tplUrl}}{{syst.registerUrl}}{{syst.tplExt}}' })
+                .when('{{syst.registerConfirmationUrl}}', { controller: 'AccountRegisterConfirmationCtrl', templateUrl: '.{{syst.tplUrl}}{{syst.registerConfirmationUrl}}{{syst.tplExt}}' })
+                .when('{{syst.companyListUrl}}', { controller: 'CompanyUserCtrl', templateUrl: '.{{syst.tplUrl}}/cabinet/company-list.html' })
+                .when('{{syst.companyListUrl}}/create', { controller: 'CompanyCreateCtrl', templateUrl: '.{{syst.tplUrl}}/cabinet/company-create.html' })
+                .when('{{syst.companyListUrl}}/:companyId/manage-info', { controller: 'CompanyManageInfoCtrl', templateUrl: '.{{syst.tplUrl}}/cabinet/manage-info.html' })
+                .when('{{syst.companyListUrl}}/:companyId/manage-users', { controller: 'CompanyManageUserCtrl', templateUrl: '.{{syst.tplUrl}}/cabinet/manage-user.html' })
+                .when('{{syst.companyListUrl}}/:companyId/view', { controller: 'WorkspaceCtrl', templateUrl: '.{{syst.tplUrl}}/workspace.html', reloadOnSearch: false })
+                .when('{{syst.companyListUrl}}/:companyId/manage', { controller: 'WorkspaceCtrl', templateUrl: '.{{syst.tplUrl}}/workspace.html', reloadOnSearch: false })
+                .otherwise({ redirectTo: '{{syst.companyListUrl}}' });
 
             // Turn in CORS cookie support
             angHttpProvider.defaults.withCredentials = true;

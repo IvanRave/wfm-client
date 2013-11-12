@@ -423,7 +423,6 @@
         ////        }
         ////    }
 
-        ////    appHelper.toggleLoadingState(true);
         ////    require(['app/pdf-helper'], function (pdfHelper) {
 
         ////        pdfHelper.getImageFromUrl(logoUrl, function (logoBase64) {
@@ -504,7 +503,6 @@
         ////                        }
 
         ////                        pdfHelper.savePdf(doc, 'Report ' + self.Name() + ' ' + nowDateString);
-        ////                        appHelper.toggleLoadingState(false);
         ////                    });
         ////                });
         ////            });
