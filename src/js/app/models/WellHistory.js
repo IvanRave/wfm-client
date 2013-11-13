@@ -113,7 +113,7 @@
                         }
                     });
 
-                    bootstrapModal.closeModalWideWindow();
+                    bootstrapModal.closeModalFileManager();
                 }
 
                 self.getWell().showFmg(callbackFunction);
@@ -133,7 +133,7 @@
                         return;
                     }
 
-                    bootstrapModal.closeModalWideWindow();
+                    bootstrapModal.closeModalFileManager();
 
                     var urlQueryParams = {
                         well_id: self.WellId,
@@ -187,7 +187,7 @@
                                     // push to wellhistory wfmimages
                                 });
 
-                                bootstrapModal.closeModalWideWindow();
+                                bootstrapModal.closeModalFileManager();
                             });
                             // end of require
                         });

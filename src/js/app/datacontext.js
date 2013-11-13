@@ -37,9 +37,6 @@
     function wellHistoryFileUrl(uqp) {
         return '{{conf.requrl}}/api/wellhistoryfile/' + (uqp ? ('?' + $.param(uqp)) : '');
     }
-    function fileManagerUrl() {
-        return '.{{syst.tplUrl}}/workspace/file-manager.html';
-    }
     function userProfileUrl(uqp) {
         return '{{conf.requrl}}/api/userprofile/' + (uqp ? ('?' + $.param(uqp)) : '');
     }
@@ -321,10 +318,6 @@
         }));
     }
 
-    function getFileManagerUrl() {
-        return fileManagerUrl();
-    }
-
     // user profile
     function createUserProfile(data) {
         return new datacontext.userProfile(data); // from cabinet.model.js
@@ -469,7 +462,6 @@
         // WellHistoryFile
         saveNewWellHistoryFile: saveNewWellHistoryFile,
         deleteWellHistoryFile: deleteWellHistoryFile,
-        getFileManagerUrl: getFileManagerUrl,
         // section list
         getSectionList: getSectionList,
         imageMimeTypes: imageMimeTypes,

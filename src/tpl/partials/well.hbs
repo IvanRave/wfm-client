@@ -77,4 +77,5 @@
     <div data-bind="template: { if: selectedSectionId, name: 'well-' + selectedSectionId() + '-tpl' }"></div>
     <div data-bind="template: { ifnot: selectedSectionId, name: 'well-widget-scope-tpl', afterRender: afterRenderWidgetScope }"></div>
   </div>
+  {{> modal-file-manager}}
 </div>
