@@ -160,42 +160,44 @@ define(['jquery',
             ////    });
             ////};
         }])
-        .controller('WorkspaceCtrl', ['$scope', '$routeParams', function (angScope, angRouteParams) {
+        .controller('WorkspaceCtrl', ['$routeParams', function (angRouteParams) {
             // View workspace: do not load libs for edit (for example Wisywig editor, or file-uploading features)
             // Views can be devided too: one - for view, second - for edit (do not put external elements, like input boxes, file-input boxes etc.)
-            require(['compability-fix'], function () {
-                // {{#if conf.isProd}}
-                ////require(['app/workspace/project-bundle-{{package.version}}.min']);
-                // {{else}}
-                ////require(['app/workspace/project']);
-                // {{/if}}
 
-                require(['jquery',
-                    'knockout',
-                    'app/models/workspace',
-                    'app/bindings'], function ($, ko, WorkspaceViewModel) {
+            // Script collection for rjs optimization (bundle or debug)
+            var workspaceWrapUrl = '';
+            // {{#if conf.isProd}}
+            workspaceWrapUrl = 'app/workspace-wrap-bundle-{{package.version}}';
+            // {{else}}
+            workspaceWrapUrl = 'app/workspace-wrap';
+            // {{/if}}
 
-                        // This function is called once the DOM is ready.
-                        // It will be safe to query the DOM and manipulate DOM nodes in this function.
+            require([workspaceWrapUrl], function () {
+
+                require(['app/view-models/workspace'], function (WorkspaceViewModel) {
+                    // Get company Id
+                    ////'9cf09ba5-c049-4148-8e5f-869c1e26c330';
+                    var workspaceViewModel = new WorkspaceViewModel(angRouteParams.companyId, angRouteParams['editable'] ? true : false, {
+                        regionId: parseInt(angRouteParams['region']),
+                        fieldId: parseInt(angRouteParams['field']),
+                        groupId: parseInt(angRouteParams['group']),
+                        wellId: parseInt(angRouteParams['well']),
+                        sectionId: parseInt(angRouteParams['section'])
+                    });
+
+                    require(['jquery', 'knockout', 'app/bindings'], function ($, ko) {
                         $(function () {
-
-                            // Get company Id
-                            ////'9cf09ba5-c049-4148-8e5f-869c1e26c330';
-                            var workspaceViewModel = new WorkspaceViewModel(angRouteParams.companyId, angRouteParams['editable'] ? true : false, {
-                                regionId: parseInt(angRouteParams['region']),
-                                fieldId: parseInt(angRouteParams['field']),
-                                groupId: parseInt(angRouteParams['group']),
-                                wellId: parseInt(angRouteParams['well']),
-                                sectionId: parseInt(angRouteParams['section'])
-                            });
-                            ko.applyBindings(workspaceViewModel, document.getElementById('workspace-project'));
                             var jqrWindow = $(window);
                             jqrWindow.resize(function () {
                                 workspaceViewModel.windowHeight(jqrWindow.height());
                                 workspaceViewModel.windowWidth(jqrWindow.width());
                             });
+
+
+                            ko.applyBindings(workspaceViewModel, document.getElementById('workspace-project'));
                         });
                     });
+                });
             });
         }]);
     });

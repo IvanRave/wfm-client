@@ -18,6 +18,8 @@
     "angular": "~1.2.0",
     "angular-route": "~1.2.0",
     "requirejs": "~2.1.9",
-    "knockout": "https://github.com/bowerjs/knockout.git#~3.0.0"
+    "knockout": "https://github.com/bowerjs/knockout.git#~3.0.0",
+    "es5-shim": "~2.1.0",
+    "console-shim": "*"
   }
 }

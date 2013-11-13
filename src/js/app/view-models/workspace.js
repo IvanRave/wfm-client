@@ -226,6 +226,6 @@
 
         loadStructure();
     }
-
+    
     return WorkspaceViewModel;
 });

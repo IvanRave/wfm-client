@@ -99,7 +99,8 @@ module.exports = function (grunt) {
                     dest: '<%= trgt %>/js/',
                     src: ['jquery/jquery.js', 'moment/moment.js', 'angular/angular.js', 
                         'angular-route/angular-route.js', 'bootstrap/dist/js/bootstrap.js',
-                        'requirejs/require.js', 'knockout/knockout.js']
+                        'requirejs/require.js', 'knockout/knockout.js', 
+                        'console-shim/console-shim.js', 'es5-shim/es5-shim.js']
                 }]
             },
             bower_css: {
@@ -174,20 +175,32 @@ module.exports = function (grunt) {
             }
         },
         requirejs: {
-            workspace: {
+            main: {
                 options: {
                     baseUrl: '<%= trgt %>/js/',
-                    name: 'app/workspace/project',
-                    out: '<%= trgt %>/js/app/workspace/project-bundle-<%= pkg.version %>.min.js',
+                    name: 'main',
+                    out: '<%= trgt %>/js/main-bundle-<%= pkg.version %>.js',
                     mainConfigFile: '<%= trgt %>/js/require-config.js',
                     optimize: 'uglify2',
                     // http://requirejs.org/docs/optimization.html#sourcemaps
-                    generateSourceMaps: true,
-                    preserveLicenseComments: false,
+                    ////generateSourceMaps: true,
+                    ////preserveLicenseComments: false,
                     ////useSourceUrl: true,
                     //  wrap: true, // wrap in closure
                     // jQuery automatically excluded if it's loaded from CDN
-                    exclude: ['jquery']
+                    include: ['es5-shim', 'console-shim', 'jquery', 'jquery.bootstrap', 'angular', 'angular-route',
+                    'app/controllers/company', 'app/controllers/auth', 'app/controllers/register']
+                }
+            },
+            workspace: {
+                options: {
+                    baseUrl: '<%= trgt %>/js/',
+                    name: 'app/workspace-wrap',
+                    out: '<%= trgt %>/js/app/workspace-wrap-bundle-<%= pkg.version %>.js',
+                    mainConfigFile: '<%= trgt %>/js/require-config.js',
+                    optimize: 'uglify2',
+                    include: ['app/bindings'],
+                    exclude: ['jquery', 'jquery.bootstrap']
                 }
             }
         },
@@ -263,7 +276,8 @@ module.exports = function (grunt) {
 
     // 4. Bundle and minify for production
     if (isProd) {
-        // Bundle with r.js app/workspace/project.js
+        // Bundle with r.js
+        tasks.push('requirejs:main');
         tasks.push('requirejs:workspace');
     }
 
