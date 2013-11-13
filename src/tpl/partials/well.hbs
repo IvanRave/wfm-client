@@ -1,58 +1,80 @@
-﻿---
-layout: false
----
-<div class="wfm-workspace-well-tab clearfix">
+﻿<div>
+  <div class="wfm-workspace-well-tab clearfix">
     <div class="pull-left" style="margin-top:1px">
-		<button type="button" class="btn btn-inverse btn-sm" data-bind="click: function(){ selectedSectionId(null); }">Well<br />dashboard</button>
+      <button type="button" class="btn btn-inverse btn-sm" data-bind="click: function(){ selectedSectionId(null); }">
+        Well<br />dashboard
+      </button>
     </div>
     <div class="pull-left">
-        <ul class="nav nav-pills" data-bind="template: {foreach: sectionList, as: 'section'}">
-            <!-- ko if: (section.id !== 'volume' && section.id !== 'sketch' && section.id !== 'pd') -->
-            <li data-bind="css: {'active': section.id === $parent.selectedSectionId() }">
-                <div data-bind="click: function() { $parent.selectSection(section.id); }">
-                    <span data-bind="text: section.name"></span><br /><i class="wfmicon" data-bind="css: 'wfmicon-' + section.id"></i>
-                </div>
+      <ul class="nav nav-pills" data-bind="template: {foreach: sectionList, as: 'section'}">
+        <!-- ko if: (section.id !== 'volume' && section.id !== 'sketch' && section.id !== 'pd') -->
+        <li data-bind="css: {'active': section.id === $parent.selectedSectionId() }">
+          <div data-bind="click: function() { $parent.selectSection(section.id); }">
+            <span data-bind="text: section.name"></span>
+            <br />
+            <i class="wfmicon" data-bind="css: 'wfmicon-' + section.id"></i>
+          </div>
+        </li>
+        <!-- /ko -->
+        <!-- ko if: section.id === 'sketch' -->
+        <li class="dropup" data-bind="css: {'active': section.id === $parent.selectedSectionId() }">
+          <div class="dropdown-toggle" title="Sketch and volume" data-toggle="dropdown" data-bind="drpdwn: {}">
+            <span data-bind="text: section.name"></span>
+            <br />
+            <i class="wfmicon" data-bind="css: 'wfmicon-'+section.id"></i>
+            <span class="caret"></span>
+          </div>
+          <ul class="dropdown-menu">
+            <li>
+              <div data-bind="click: function() { $parent.selectSection('sketch'); }">Sketch</div>
             </li>
-            <!-- /ko -->
-            <!-- ko if: section.id === 'sketch' -->
-            <li class="dropup" data-bind="css: {'active': section.id === $parent.selectedSectionId() }">
-                <div class="dropdown-toggle" title="Sketch and volume" data-toggle="dropdown" data-bind="drpdwn: {}">
-                    <span data-bind="text: section.name"></span><br /><i class="wfmicon" data-bind="css: 'wfmicon-'+section.id"></i>
-                    <span class="caret"></span>
-                </div>
-                <ul class="dropdown-menu">
-                    <li><div data-bind="click: function() { $parent.selectSection('sketch'); }">Sketch</div></li>
-                    <li><div data-bind="click: function() { $parent.selectSection('volume'); }">Volume</div></li>
-                </ul>
+            <li>
+              <div data-bind="click: function() { $parent.selectSection('volume'); }">Volume</div>
             </li>
-            <!-- /ko -->
-            <!-- ko if: section.id === 'pd' -->
-            <li class="dropup" data-bind="css: {'active': section.id === $parent.selectedSectionId() }">
-                <div class="dropdown-toggle" title="Decline curve analysis" data-toggle="dropdown" data-bind="drpdwn:{}">
-                    <span data-bind="text: section.name"></span><br /><i class="wfmicon" data-bind="css: 'wfmicon-' + section.id"></i>
-                    <span class="caret"></span>
-                </div>
-                <ul class="dropdown-menu" data-bind="foreach: $root.wfmParamSquadList">
-                    <li>
-                        <div data-bind="click: function() { $parents[1].selectSection(section.id); $parents[1].mainPerfomanceView.selectAttrGroupId($data.id); }">
-							<span data-bind="text: id"></span>
-						</div>
-                    </li>
-                </ul>
+          </ul>
+        </li>
+        <!-- /ko -->
+        <!-- ko if: section.id === 'pd' -->
+        <li class="dropup" data-bind="css: {'active': section.id === $parent.selectedSectionId() }">
+          <div class="dropdown-toggle" title="Decline curve analysis" data-toggle="dropdown" data-bind="drpdwn:{}">
+            <span data-bind="text: section.name"></span>
+            <br />
+            <i class="wfmicon" data-bind="css: 'wfmicon-' + section.id"></i>
+            <span class="caret"></span>
+          </div>
+          <ul class="dropdown-menu" data-bind="foreach: $root.wfmParamSquadList">
+            <li>
+              <div data-bind="click: function() { $parents[1].selectSection(section.id); $parents[1].mainPerfomanceView.selectAttrGroupId($data.id); }">
+                <span data-bind="text: id"></span>
+              </div>
             </li>
-            <!-- /ko -->
-        </ul>
+          </ul>
+        </li>
+        <!-- /ko -->
+      </ul>
     </div>
     <div class="pull-left" style="padding:1px;">
-        <button class="btn btn-inverse btn-sm" data-bind="click: showFmg">File<br />manager</button>
+      <button class="btn btn-inverse btn-sm" data-bind="click: showFmg">
+        File<br />manager
+      </button>
     </div>
-</div>
+  </div>
 
-<div class="well-content-pad">
-    <div data-bind="if: selectedSectionId">
-        <div data-bind="template: { name: selectedSectionId, templateUrl: './tpl/workspace/well/' }"></div>
-    </div>
-	<div data-bind="ifnot: selectedSectionId">
-		<div data-bind="template: { name: 'widget-scope', templateUrl: './tpl/workspace/well/', afterRender: afterRenderWidgetScope }"></div>
-	</div>
+  {{> well-history}}
+  {{> well-integrity}}
+  {{> well-log}}
+  {{> well-map}}
+  {{> well-nodalanalysis}}
+  {{> well-pd}}
+  {{> well-report}}
+  {{> well-sketch}}
+  {{> well-summary}}
+  {{> well-test}}
+  {{> well-volume}}
+  {{> well-widget-scope}}
+
+  <div class="well-content-pad">
+    <div data-bind="template: { if: selectedSectionId, name: 'well-' + selectedSectionId() + '-tpl' }"></div>
+    <div data-bind="template: { ifnot: selectedSectionId, name: 'well-widget-scope-tpl', afterRender: afterRenderWidgetScope }"></div>
+  </div>
 </div>

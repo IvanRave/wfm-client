@@ -1,8 +1,4 @@
-﻿---
-layout: false
----
-
-<script type="text/html" id="perfomance-widget-tpl">
+﻿<script type="text/html" id="perfomance-widget-tpl">
     <div data-bind="if: widget.isVisSettingPanel">
         <div class="widget-setting-panel">
             <div data-bind="with: widget.perfomanceView">
@@ -35,7 +31,7 @@ layout: false
                 <div data-bind="if: prfPartial.hstProductionDataSet().length === 0">No data. Import files from "File manager" to view production data.</div>
                 <div data-bind="if: prfPartial.hstProductionDataSet().length > 0">
                     <div data-bind="if: selectedAttrGroup">
-                        {{> well-pd-graph }}
+                        {{> pd-graph }}
                     </div>
                 </div>
             </div>
@@ -92,50 +88,53 @@ layout: false
     </div>
 </script>
 
-<div data-bind="if: isLoadedWellWidgoutList">
+
+<script type="text/html" id="well-widget-scope-tpl">
+  <div data-bind="if: isLoadedWellWidgoutList">
     <div class="text-right">
-        <select data-bind="options: wellWidgoutList, optionsText: 'name', value: selectedWellWidgout"></select>
+      <select data-bind="options: wellWidgoutList, optionsText: 'name', value: selectedWellWidgout"></select>
     </div>
     <div data-bind="with: selectedWellWidgout">
-        <div class="row" data-bind="foreach: widgockList">
-            <div data-bind="css: columnStyle">
-                <div data-bind="foreach: widgetList">
-                    <div class="widget-tile">
-                        <div class="clearfix widget-tile-header">
-                            <div class="pull-left">
-                                <div data-bind="ifnot: isVisSettingPanel">
-                                    <b data-bind="text: name"></b>
-                                </div>
-                                <div data-bind="if: isVisSettingPanel">
-                                    <input type="text" class="input-sm" data-bind="value: name" />
-                                </div>
-                            </div>
-                            <div class="pull-right">
-                                <div data-bind="ifnot: isVisSettingPanel">
-                                    <button type="button" class="btn btn-xs" data-bind="click: showVisSettingPanel">
-                                        <i class="glyphicon glyphicon-cog"></i>
-                                    </button>
-                                </div>
-                                <div data-bind="if: isVisSettingPanel">
-                                    <button type="button" class="btn btn-sm btn-success" data-bind="click: saveWidget">
-                                        Save
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="widget-tile-content">
-                            <div data-bind="template: { name: widgetTpl, data: $data, as: 'widget', afterRender: processWidget }"></div>
-                        </div>
-                    </div>
+      <div class="row" data-bind="foreach: widgockList">
+        <div data-bind="css: columnStyle">
+          <div data-bind="foreach: widgetList">
+            <div class="widget-tile">
+              <div class="clearfix widget-tile-header">
+                <div class="pull-left">
+                  <div data-bind="ifnot: isVisSettingPanel">
+                    <b data-bind="text: name"></b>
+                  </div>
+                  <div data-bind="if: isVisSettingPanel">
+                    <input type="text" class="input-sm" data-bind="value: name" />
+                  </div>
                 </div>
-                <div class="widget-tile">
-                    <div class="widget-empty">
-                        <button type="button" class="btn btn-default btn-xs">
-                            <i class="glyphicon glyphicon-plus"></i> Add widget
-                        </button>
-                    </div>
+                <div class="pull-right">
+                  <div data-bind="ifnot: isVisSettingPanel">
+                    <button type="button" class="btn btn-xs" data-bind="click: showVisSettingPanel">
+                      <i class="glyphicon glyphicon-cog"></i>
+                    </button>
+                  </div>
+                  <div data-bind="if: isVisSettingPanel">
+                    <button type="button" class="btn btn-sm btn-success" data-bind="click: saveWidget">
+                      Save
+                    </button>
+                  </div>
                 </div>
+              </div>
+              <div class="widget-tile-content">
+                <div data-bind="template: { name: widgetTpl, data: $data, as: 'widget', afterRender: processWidget }"></div>
+              </div>
             </div>
+          </div>
+          <div class="widget-tile">
+            <div class="widget-empty">
+              <button type="button" class="btn btn-default btn-xs">
+                <i class="glyphicon glyphicon-plus"></i> Add widget
+              </button>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
-</div>
+  </div>
+</script>

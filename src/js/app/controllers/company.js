@@ -173,8 +173,7 @@ define(['jquery',
                 require(['jquery',
                     'knockout',
                     'app/models/workspace',
-                    'app/bindings',
-                    'ko-external-template-engine'], function ($, ko, WorkspaceViewModel) {
+                    'app/bindings'], function ($, ko, WorkspaceViewModel) {
 
                         // This function is called once the DOM is ready.
                         // It will be safe to query the DOM and manipulate DOM nodes in this function.
