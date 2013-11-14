@@ -1,6 +1,6 @@
 {
   "name": "WFM",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Well file manager",
   "author": {
     "name": "IvanRave"
@@ -29,6 +29,7 @@
     "grunt-contrib-jshint": "~0.7.0",
     "assemble": "~0.4.18",
     "bower": "~1.2.7",
-    "grunt-bower-task": "~0.3.4"
+    "grunt-bower-task": "~0.3.4",
+    "grunt-bump": "0.0.11"
   }
 }

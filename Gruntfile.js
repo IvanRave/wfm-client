@@ -9,7 +9,8 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('assemble');
     grunt.loadNpmTasks('grunt-requirejs');
-
+    grunt.loadNpmTasks('grunt-bump');
+    
     // By default = devSite
     var isProd = grunt.option('prod') ? true : false,
         isIpad = grunt.option('ipad') ? true : false,
@@ -129,7 +130,7 @@ module.exports = function (grunt) {
                 engine: 'handlebars',
                 // Main properties
                 // TODO: Change "en" to <%= lang %> parameters - it doesn't work yet for second time of using
-                data: ['<%= src %>/tpl/data/syst.json', '<%= src %>/tpl/data/lang/en/lang.json', 'package.json'],
+                data: ['<%= src %>/tpl/data/syst.json', '<%= bowerFolder %>/wfm-dict/lang/en/lang.json', 'package.json'],
                 // Build configuration properties
                 conf: {
                     // Request url (begin of the path)
@@ -204,6 +205,20 @@ module.exports = function (grunt) {
                 }
             }
         },
+        bump: {
+          options: {
+            files: ['package.json', 'bower.json'],
+            updateConfigs: ['pkg'],
+            commit: true,
+            commitMessage: 'Release v%VERSION%',
+            commitFiles: ['-a'],
+            createTag: true,
+            tagName: 'v%VERSION%',
+            tagMessage: 'Version %VERSION%',
+            push: true,
+            pushTo: 'origin'
+          }
+        },
         // For development: run tasks when change files
         watch: {
             jshint_gruntfile: {
@@ -227,7 +242,7 @@ module.exports = function (grunt) {
             },
             // Update all template pages when change template data
             assemble_data: {
-                files: ['<%= src %>/tpl/data/syst.json', '<%= src %>/tpl/data/lang/en/lang.json', 'package.json'],
+                files: ['<%= src %>/tpl/data/syst.json', '<%= bowerFolder %>/wfm-dict/lang/en/lang.json', 'package.json'],
                 tasks: ['assemble:html', 'assemble:js']
             },
             assebmle_readme: {

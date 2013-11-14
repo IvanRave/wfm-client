@@ -74,8 +74,12 @@
   {{> well-widget-scope}}
 
   <div class="well-content-pad">
-    <div data-bind="template: { if: selectedSectionId, name: 'well-' + selectedSectionId() + '-tpl' }"></div>
-    <div data-bind="template: { ifnot: selectedSectionId, name: 'well-widget-scope-tpl', afterRender: afterRenderWidgetScope }"></div>
+    <div data-bind="if: selectedSectionId">
+      <div data-bind="template: { name: 'well-' + selectedSectionId() + '-tpl' }"></div>
+    </div>
+    <div data-bind="ifnot: selectedSectionId">
+      <div data-bind="template: { name: 'well-widget-scope-tpl', afterRender: afterRenderWidgetScope }"></div>
+    </div>
   </div>
   {{> modal-file-manager}}
 </div>

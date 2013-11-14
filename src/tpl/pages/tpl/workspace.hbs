@@ -18,11 +18,11 @@
               <div data-bind="ifnot: selectedWellGroup">
                 {{> wield }}
               </div>
-              <div data-bind="template: {if: selectedWellGroup, data: selectedWellGroup}">
+              <div data-bind="with: selectedWellGroup">
                 <div data-bind="ifnot: selectedWell">
                   {{> wroup }}
                 </div>
-                <div data-bind="template: {if: selectedWell, data: selectedWell }">
+                <div data-bind="with: selectedWell">
                   {{> well }}
                 </div>
               </div>
