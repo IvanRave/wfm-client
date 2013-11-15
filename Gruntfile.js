@@ -19,6 +19,31 @@ module.exports = function (grunt) {
         requrl = grunt.option('requrl') || 'http://wfm-client.azurewebsites.net',
         // Build language: en, ru, es etc.
         lang = grunt.option('lang') || 'en';
+        
+        // Commit message for bump feature
+        var cmtType = grunt.option('cmtType') || 'fix',
+            // Scope could be anything specifying place of the commit change
+            cmtScope = grunt.option('cmtScope') || 'project',
+            // use imperative, present tense: “change” not “changed” nor “changes”
+            // don't capitalize first letter
+            // no dot (.) at the end
+            cmtMsg = grunt.option('cmtMsg') || 'change';
+        
+        var allowedCmtTypes = ['feat', 'fix', 'docs', 'style', 'refactor', 'test', 'chore'];
+        
+        if (allowedCmtTypes.indexOf(cmtType) === -1){
+            cmtType = 'fix';
+        }
+        
+        // Allowed <type>
+        // feat (feature)
+        // fix (bug fix)
+        // docs (documentation)
+        // style (formatting, missing semi colons, …)
+        // refactor
+        // test (when adding missing tests)
+        // chore (maintain)
+
 
     // Target - destination folder plus config, for example: 
     // dev (development)
@@ -210,7 +235,8 @@ module.exports = function (grunt) {
             files: ['package.json', 'bower.json'],
             updateConfigs: ['pkg'],
             commit: true,
-            commitMessage: 'Release v%VERSION%',
+            // <type>(<scope>): <subject>
+            commitMessage: cmtType + '('+ cmtScope + '): ' + cmtMsg,
             commitFiles: ['-a'],
             createTag: true,
             tagName: 'v%VERSION%',
