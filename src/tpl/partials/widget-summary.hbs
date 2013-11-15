@@ -1,0 +1,26 @@
+﻿<script type="text/html" id="summary-widget-tpl">
+    <div data-bind="if: widget.isVisSettingPanel">
+        <div class="widget-setting-panel">
+            <label>
+                <input type="checkbox" data-bind="checked: widget.isVisName" /> {{capitalizeFirst lang.name}}
+            </label>
+            <label>
+                <input type="checkbox" data-bind="checked: widget.isVisDescription" /> {{capitalizeFirst lang.description}}
+            </label>
+            <label>
+                <input type="checkbox" data-bind="checked: widget.isVisProductionHistory" /> {{capitalizeFirst lang.productionHistory}}
+            </label>
+        </div>
+    </div>
+    <div class="widget-content" data-bind="with: $parents[3]">
+        <div data-bind="if: widget.isVisName">
+            <h4 data-bind="text: Name"></h4>
+        </div>
+        <div data-bind="if: widget.isVisDescription">
+            <span data-bind="text: Description"></span>
+        </div>
+        <div data-bind="if: widget.isVisProductionHistory">
+            <span data-bind="text: ProductionHistory"></span>
+        </div>
+    </div>
+</script>

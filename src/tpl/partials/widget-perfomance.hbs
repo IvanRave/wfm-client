@@ -1,0 +1,40 @@
+﻿<script type="text/html" id="perfomance-widget-tpl">
+    <div data-bind="if: widget.isVisSettingPanel">
+        <div class="widget-setting-panel">
+            <div data-bind="with: widget.perfomanceView">
+                <div class="text-center">
+                    <div data-bind="foreach: $root.wfmParamSquadList" class="btn-group">
+                        <!-- ko with: id -->
+                        <button type="button" class="btn btn-default btn-sm" data-bind="click: $parents[1].selectAttrGroupId, css: {'active': $parents[1].selectedAttrGroupId() === $data } ">
+                            <span data-bind="text: $data"></span>
+                        </button>
+                        <!-- /ko -->
+                    </div>
+                    <div style="margin-top:4px">
+                        <select data-bind="options: joinedYearList, value: WPDDateStartYear" class="input-sm"></select>
+                        <select data-bind="options: monthList, value: WPDDateStartMonth" class="input-sm"></select>
+                        <span>&nbsp;-&nbsp;</span>
+                        <select data-bind="options: joinedYearList, value: WPDDateEndYear" class="input-sm"></select>
+                        <select data-bind="options: monthList, value: WPDDateEndMonth" class="input-sm"></select>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" data-bind="checked: isVisibleForecastData, enable: prfPartial.isForecastPossible" />Show forecast
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="widget-content">
+        <div data-bind="with: widget.perfomanceView">
+            <div data-bind="ifnot: prfPartial.isLoadedHstProductionData">{{lang.loading}}...</div>
+            <div data-bind="if: prfPartial.isLoadedHstProductionData">
+                <div data-bind="if: prfPartial.hstProductionDataSet().length === 0">No data. Import files from "File manager" to view production data.</div>
+                <div data-bind="if: prfPartial.hstProductionDataSet().length > 0">
+                    <div data-bind="if: selectedAttrGroup">
+                        {{> pd-graph }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
