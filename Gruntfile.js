@@ -20,30 +20,28 @@ module.exports = function (grunt) {
         // Build language: en, ru, es etc.
         lang = grunt.option('lang') || 'en';
         
-        // Commit message for bump feature
-        var cmtType = grunt.option('cmtType') || 'fix',
-            // Scope could be anything specifying place of the commit change
-            cmtScope = grunt.option('cmtScope') || 'project',
-            // use imperative, present tense: “change” not “changed” nor “changes”
-            // don't capitalize first letter
-            // no dot (.) at the end
-            cmtMsg = grunt.option('cmtMsg') || 'change';
-        
-        var allowedCmtTypes = ['feat', 'fix', 'docs', 'style', 'refactor', 'test', 'chore'];
-        
-        if (allowedCmtTypes.indexOf(cmtType) === -1){
-            cmtType = 'fix';
-        }
-        
-        // Allowed <type>
-        // feat (feature)
-        // fix (bug fix)
-        // docs (documentation)
-        // style (formatting, missing semi colons, …)
-        // refactor
-        // test (when adding missing tests)
-        // chore (maintain)
-
+    // Commit message for bump feature
+    var cmtType = grunt.option('cmtType') || 'fix',
+        // Scope could be anything specifying place of the commit change
+        cmtScope = grunt.option('cmtScope') || 'project',
+        // use imperative, present tense: “change” not “changed” nor “changes”
+        // don't capitalize first letter
+        // no dot (.) at the end
+        cmtMsg = grunt.option('cmtMsg') || 'change';
+    
+    // Allowed <type>
+    // feat (feature)
+    // fix (bug fix)
+    // docs (documentation)
+    // style (formatting, missing semi colons, …)
+    // refactor
+    // test (when adding missing tests)
+    // chore (maintain)
+    var allowedCmtTypes = ['feat', 'fix', 'docs', 'style', 'refactor', 'test', 'chore'];
+    
+    if (allowedCmtTypes.indexOf(cmtType) === -1){
+        cmtType = 'fix';
+    }
 
     // Target - destination folder plus config, for example: 
     // dev (development)
