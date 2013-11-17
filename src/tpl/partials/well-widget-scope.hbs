@@ -4,11 +4,26 @@
 <script type="text/html" id="well-widget-scope-tpl">
     <div data-bind="if: isLoadedWellWidgoutList">
         <div class="clearfix">
-			<div class="pull-left">
-				<span class="bld" data-bind="text: Name"></span>
-			</div>
-            <div class="pull-right">
-				<select class="form-control input-sm" data-bind="options: wellWidgoutList, optionsText: 'name', value: selectedWellWidgout"></select>
+            <div class="pull-left">
+                <span class="bld" data-bind="text: Name"></span>
+                <span data-bind="with: selectedWellWidgout">
+                    <span data-bind="if: $root.isEditable">
+                        <input class="input-sm" type="text" data-bind="value: name" />
+                    </span>
+					<span data-bind="ifnot: $root.isEditable">
+                        <span data-bind="text: name" />
+                    </span>
+                </span>
+            </div>
+            <div class="pull-right" data-bind="if: $root.isEditable, visible: selectedWellWidgout">
+                <button class="btn btn-sm btn-default" data-bind="click: deleteWellWidgout">{{capitalizeFirst lang.toDeleteLayout}}</button>
+            </div>
+            <div class="pull-right" data-bind="visible: selectedWellWidgout" style="margin-left: 32px">
+                <select class="input-sm" data-bind="options: wellWidgoutList, optionsText: 'name', value: selectedWellWidgout"></select>
+            </div>
+            <div class="pull-right" data-bind="if: $root.isEditable">
+                <select class="input-sm" data-bind="options: possibleWidgoutList, optionsText: 'name', value: slcPossibleWidgout, optionsCaption: 'Choose scheme...'"></select>
+                <button class="btn btn-sm btn-default" data-bind="enable: slcPossibleWidgout, click: postWellWidgout">{{capitalizeFirst lang.toCreateLayout}}</button>
             </div>
         </div>
         <div data-bind="with: selectedWellWidgout">
@@ -46,13 +61,15 @@
                             </div>
                         </div>
                     </div>
-                    <div class="widget-tile">
-                        <div class="widget-empty">
-                            <div class="text-right">
-                                <select class="input-sm" data-bind="options: sectionIdList, value: selectedSectionId, optionsCaption: 'widget type...'"></select>
-                                <button class="btn btn-default btn-sm" type="button" data-bind="click: addWidget, enable: selectedSectionId">
-                                    {{capitalizeFirst lang.toAdd}}
-                                </button>
+                    <div data-bind="if: $root.isEditable">
+                        <div class="widget-tile">
+                            <div class="widget-empty">
+                                <div class="text-right">
+                                    <select class="input-sm" data-bind="options: sectionIdList, value: selectedSectionId, optionsCaption: 'widget type...'"></select>
+                                    <button class="btn btn-default btn-sm" type="button" data-bind="click: addWidget, enable: selectedSectionId">
+                                        {{capitalizeFirst lang.toAdd}}
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>

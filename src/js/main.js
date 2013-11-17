@@ -14,8 +14,8 @@
                 .when('{{syst.companyListUrl}}/create', { controller: 'CompanyCreateCtrl', templateUrl: '.{{syst.tplUrl}}/cabinet/company-create.html' })
                 .when('{{syst.companyListUrl}}/:companyId/manage-info', { controller: 'CompanyManageInfoCtrl', templateUrl: '.{{syst.tplUrl}}/cabinet/manage-info.html' })
                 .when('{{syst.companyListUrl}}/:companyId/manage-users', { controller: 'CompanyManageUserCtrl', templateUrl: '.{{syst.tplUrl}}/cabinet/manage-user.html' })
-                .when('{{syst.companyListUrl}}/:companyId/view', { controller: 'WorkspaceCtrl', templateUrl: '.{{syst.tplUrl}}/workspace.html', reloadOnSearch: false })
-                .when('{{syst.companyListUrl}}/:companyId/manage', { controller: 'WorkspaceCtrl', templateUrl: '.{{syst.tplUrl}}/workspace.html', reloadOnSearch: false })
+                .when('{{syst.companyListUrl}}/:companyId', { controller: 'WorkspaceCtrl', templateUrl: '.{{syst.tplUrl}}/workspace.html', reloadOnSearch: false })
+                .when('{{syst.companyListUrl}}/:companyId/manage', { controller: 'WorkspaceManageCtrl', templateUrl: '.{{syst.tplUrl}}/workspace.html', reloadOnSearch: false })
                 .otherwise({ redirectTo: '{{syst.companyListUrl}}' });
 
             // Turn in CORS cookie support

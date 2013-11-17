@@ -18,7 +18,7 @@ layout: false
                                 <span style="font-weight:normal" ng-bind="companyUser.CompanyDto.Description"></span>
                             </h5>
                         </div>
-                        <a ng-show="companyUser.AccessLevel | bitwiseand: accessLevelDict.CanViewAll.AccessCode" class="btn btn-default" ng-href="#{{syst.companyListUrl}}/{[{companyUser.CompanyDto.Id}]}/view">{{capitalizeFirst lang.toView}} {{lang.wfm}}</a>
+                        <a ng-show="companyUser.AccessLevel | bitwiseand: accessLevelDict.CanViewAll.AccessCode" class="btn btn-default" ng-href="#{{syst.companyListUrl}}/{[{companyUser.CompanyDto.Id}]}">{{capitalizeFirst lang.toView}} {{lang.wfm}}</a>
                         <a ng-show="companyUser.AccessLevel | bitwiseand: accessLevelDict.CanEditAll.AccessCode" class="btn btn-default" ng-href="#{{syst.companyListUrl}}/{[{companyUser.CompanyDto.Id}]}/manage">{{capitalizeFirst lang.toEdit}} {{lang.wfm}}</a>
                         <a ng-show="companyUser.AccessLevel | bitwiseand: accessLevelDict.CanManageAll.AccessCode" class="btn btn-default" ng-href="#{{syst.companyListUrl}}/{[{companyUser.CompanyDto.Id}]}/manage-info">{{capitalizeFirst lang.toEdit}} {{lang.companyInfo}}</a>
                         <a ng-show="companyUser.AccessLevel | bitwiseand: accessLevelDict.CanManageAll.AccessCode" class="btn btn-default" ng-href="#{{syst.companyListUrl}}/{[{companyUser.CompanyDto.Id}]}/manage-users">{{capitalizeFirst lang.toEdit}} {{lang.companyUsers}}</a>

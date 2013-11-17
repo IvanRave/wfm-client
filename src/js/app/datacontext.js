@@ -509,7 +509,7 @@
         return ajaxRequest('GET', companyUserUrl(uqp));
     };
 
-    // Widget layouts for well
+    // Widget layouts for well=================================================================
     datacontext.getWellWidgoutList = function (wellId) {
         return ajaxRequest('GET', wellWidgoutUrl(wellId));
     };
@@ -519,11 +519,19 @@
         return ajaxRequest('GET', wellWidgoutUrl(wellId, widgoutId));
     };
 
-    datacontext.postWellWidget = function (wellId, widgoutData) {
+    datacontext.postWellWidgout = function (wellId, widgoutData) {
         return ajaxRequest('POST', wellWidgoutUrl(wellId), widgoutData);
     };
 
-    // Widget (well widget or well group widget etc.)
+    datacontext.putWellWidgout = function (wellId, id, widgoutData) {
+        return ajaxRequest('PUT', wellWidgoutUrl(wellId, id), widgoutData);
+    };
+
+    datacontext.deleteWellWidgout = function (wellId, widgoutId) {
+        return ajaxRequest('DELETE', wellWidgoutUrl(wellId, widgoutId));
+    };
+
+    // Widget (well widget or well group widget etc.)==========================================
     datacontext.postWidget = function (widgockId, widgetData) {
         return ajaxRequest('POST', widgetUrl(widgockId), widgetData);
     };

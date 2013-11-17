@@ -39,7 +39,14 @@
             if (sectionId) {
                 var tmpWidgetList = ko.unwrap(self.widgetList);
                 // Get order number of last widget
-                var lastOrderNumber = ko.unwrap(tmpWidgetList[tmpWidgetList.length - 1].orderNumber);
+                var lastOrderNumber;
+
+                if (tmpWidgetList.length > 0) {
+                    lastOrderNumber = ko.unwrap(tmpWidgetList[tmpWidgetList.length - 1].orderNumber);
+                }
+                else {
+                    lastOrderNumber = 0;
+                }
 
                 appDatacontext.postWidget(self.id, {
                     Name: appHelper.capitalizeFirst(sectionId),
