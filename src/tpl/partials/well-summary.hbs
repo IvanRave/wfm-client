@@ -5,18 +5,17 @@
       <label data-bind="text: ttl"></label>
     </div>
     <div class="well well-sm" data-bind="visible: $parent[id]">
-      <!-- ko if: tpe === 'SingleLine' -->
-      <span data-bind="text: $parent[id]"></span>
-      <!-- /ko -->
-      <!-- ko if: tpe === 'MultiLine' -->
-      <span class="pre-wrap-text" data-bind="text: $parent[id]"></span>
-      <!-- /ko -->
-      <!-- ko if: tpe === 'DateLine' -->
-      <span data-bind="date: $parent[id]"></span>
-      <!-- /ko -->
+      <span data-bind="if: tpe === 'SingleLine'">
+        <span data-bind="text: $parent[id]"></span>
+      </span>
+      <span data-bind="if: tpe === 'MultiLine'">
+        <span class="pre-wrap-text" data-bind="text: $parent[id]"></span>
+      </span>
+      <span data-bind="if: tpe === 'DateLine'">
+        <span data-bind="date: $parent[id]"></span>
+      </span>
     </div>
   </div>
-
   <div class="text-right" data-bind="visible: $root.isEditable">
     <button type="button" class="btn btn-default" data-bind="click: $parent.deleteWell">Delete well</button>
   </div>

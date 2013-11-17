@@ -10,7 +10,7 @@
                     <span data-bind="if: $root.isEditable">
                         <input class="input-sm" type="text" data-bind="value: name" />
                     </span>
-					<span data-bind="ifnot: $root.isEditable">
+                    <span data-bind="ifnot: $root.isEditable">
                         <span data-bind="text: name" />
                     </span>
                 </span>
@@ -30,7 +30,7 @@
             <div class="row" data-bind="foreach: widgockList">
                 <div data-bind="css: columnStyle">
                     <div data-bind="foreach: widgetList">
-                        <div class="widget-tile">
+                        <div class="widget-tile" draggable="true">
                             <div class="clearfix widget-tile-header">
                                 <div class="pull-left">
                                     <div data-bind="ifnot: isVisSettingPanel">
@@ -40,7 +40,7 @@
                                         <input type="text" class="input-sm" data-bind="value: name" />
                                     </div>
                                 </div>
-                                <div class="pull-right">
+                                <div class="pull-right" data-bind="if: $root.isEditable">
                                     <div data-bind="ifnot: isVisSettingPanel">
                                         <button class="btn btn-xs" type="button" data-bind="click: showVisSettingPanel">
                                             <i class="glyphicon glyphicon-cog" title="{{capitalizeFirst lang.settings}}"></i>

@@ -1,26 +1,26 @@
 ﻿<script type="text/html" id="summary-widget-tpl">
-    <div data-bind="if: widget.isVisSettingPanel">
-        <div class="widget-setting-panel">
-            <label>
-                <input type="checkbox" data-bind="checked: widget.isVisName" /> {{capitalizeFirst lang.name}}
-            </label>
-            <label>
-                <input type="checkbox" data-bind="checked: widget.isVisDescription" /> {{capitalizeFirst lang.description}}
-            </label>
-            <label>
-                <input type="checkbox" data-bind="checked: widget.isVisProductionHistory" /> {{capitalizeFirst lang.productionHistory}}
-            </label>
-        </div>
+  <div data-bind="if: widget.isVisSettingPanel">
+    <div class="widget-setting-panel" data-bind="foreach: $parents[3].wellPropertyList">
+      <label style="font-weight: normal">
+        <input type="checkbox" data-bind="checked: widget['isVis' + id]" />
+        <span data-bind="text: ttl"></span>
+      </label>
     </div>
-    <div class="widget-content" data-bind="with: $parents[3]">
-        <div data-bind="if: widget.isVisName">
-            <h4 data-bind="text: Name"></h4>
-        </div>
-        <div data-bind="if: widget.isVisDescription">
-            <span data-bind="text: Description"></span>
-        </div>
-        <div data-bind="if: widget.isVisProductionHistory">
-            <span data-bind="text: ProductionHistory"></span>
-        </div>
+  </div>
+  <div data-bind="with: $parents[3]">
+    <div class="widget-content" data-bind="foreach: wellPropertyList">
+      <div data-bind="if: widget['isVis' + id]">
+        <small class="bld" data-bind="text: ttl"></small>:
+        <span data-bind="if: tpe === 'SingleLine'">
+          <span data-bind="text: $parent[id]"></span>
+        </span>
+        <span data-bind="if: tpe === 'MultiLine'">
+          <span class="pre-wrap-text" data-bind="text: $parent[id]"></span>
+        </span>
+        <span data-bind="if: tpe === 'DateLine'">
+          <span data-bind="date: $parent[id]"></span>
+        </span>
+      </div>
     </div>
+  </div>
 </script>

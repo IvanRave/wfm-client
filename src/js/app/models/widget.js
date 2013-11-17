@@ -53,7 +53,7 @@
             WidgetPerfomance.call(self, optsObj, self.getWidgock());
         }
         else if (self.sectionId === 'summary') {
-            WidgetSummary.call(self, optsObj);
+            WidgetSummary.call(self, optsObj, ko.unwrap(self.getWidgock().getWidgout().getParent().wellPropertyList));
         }
         else if (self.sectionId === 'sketch') {
             WidgetSketch.call(self, optsObj);
