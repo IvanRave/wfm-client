@@ -1,4 +1,4 @@
-﻿define(['jquery', 'knockout', 'moment', 'jquery.slimscroll', 'jquery.bootstrap', 'bootstrap-datepicker'], function ($, ko, appMoment) {
+﻿define(['jquery', 'knockout', 'moment', 'jquery.slimscroll', 'jquery.bootstrap', 'bootstrap-datepicker', 'picker.date'], function ($, ko, appMoment) {
     'use strict';
 
     // Hooks up a form to jQuery Validation
@@ -128,32 +128,81 @@
         }
     };
 
+    ////ko.bindingHandlers.datepicker = {
+    ////    init: function (element, valueAccessor, allBindingsAccessor) {
+    ////        //initialize datepicker with some optional options
+    ////        var options = allBindingsAccessor().datepickerOptions || {};
+    ////        $(element).datepicker(options);
+
+    ////        //when a user changes the date, update the view model
+    ////        ko.utils.registerEventHandler(element, "changeDate", function (event) {
+    ////            var value = valueAccessor();
+    ////            if (ko.isObservable(value)) {
+    ////                value(event.date);
+    ////            }
+    ////        });
+    ////    },
+    ////    update: function (element, valueAccessor) {
+    ////        var widget = $(element).data("datepicker");
+
+    ////        // When the view model is updated, update the widget
+    ////        if (widget) {
+
+    ////            widget.date = ko.utils.unwrapObservable(valueAccessor());
+    ////            if (widget.date) {
+    ////                widget.setValue();
+    ////            }
+    ////        }
+    ////    }
+    ////};
+
     ko.bindingHandlers.datepicker = {
         init: function (element, valueAccessor, allBindingsAccessor) {
             //initialize datepicker with some optional options
             var options = allBindingsAccessor().datepickerOptions || {};
-            $(element).datepicker(options);
 
-            //when a user changes the date, update the view model
-            ko.utils.registerEventHandler(element, "changeDate", function (event) {
-                var value = valueAccessor();
-                if (ko.isObservable(value)) {
-                    value(event.date);
+            options.onSet = function (event) {
+                console.log('serse', event.select);
+                var unixTimeMs = event.select;
+                if (unixTimeMs) {
+                    var value = valueAccessor();
+
+                    if (ko.isObservable(value)) {
+                        // offset in seconds
+                        var utcOffset = new Date(unixTimeMs).getTimezoneOffset() * 60;
+                        console.log(unixTimeMs / 1000 - utcOffset);
+                        // Save as UTC unix time (seconds)
+                        value(unixTimeMs / 1000 - utcOffset); // in UnixTime
+                    }
                 }
-            });
-        },
-        update: function (element, valueAccessor) {
-            var widget = $(element).data("datepicker");
+            };
 
-            // When the view model is updated, update the widget
-            if (widget) {
+            ////options.max = new Date();
 
-                widget.date = ko.utils.unwrapObservable(valueAccessor());
-                if (widget.date) {
-                    widget.setValue();
-                }
-            }
+            $(element).pickadate(options);
+
+            //////when a user changes the date, update the view model
+            ////ko.utils.registerEventHandler(element, 'onSet', function (event) {
+            ////    console.log(event);
+            ////    var value = valueAccessor();
+            ////    if (ko.isObservable(value)) {
+            ////        value(event.date);
+            ////    }
+            ////});
         }
+        ////update: function (element, valueAccessor) {
+        ////    console.log(element);
+        ////    //var widget = $(element).data("datepicker");
+
+        ////    //// When the view model is updated, update the widget
+        ////    //if (widget) {
+
+        ////    //    widget.date = ko.utils.unwrapObservable(valueAccessor());
+        ////    //    if (widget.date) {
+        ////    //        widget.setValue();
+        ////    //    }
+        ////    //}
+        ////}
     };
 
     // for bootstrap dropdown (wich not loaded correctly by data-toggle in external page)

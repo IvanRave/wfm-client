@@ -13,6 +13,11 @@
     <link href="css/jquery.fileupload-ui.css" rel="stylesheet" />
     <link href="css/bootstrap-datepicker.css" rel="stylesheet" />
     <link href="css/jquery.jcrop.css" rel="stylesheet" />
+    <!-- date picker -->
+    <link href="css/classic.css" rel="stylesheet" />
+    <link href="css/classic.date.css" rel="stylesheet" />
+    <link href="css/classic.time.css" rel="stylesheet" />
+    <!-- /date picker-->
 </head>
 <body>
     <!--[if lt IE 9]><p class="chromeframe">You are using an <strong>outdated</strong> browser. Please upgrade your browser.</p><![endif]-->
@@ -39,7 +44,7 @@
     </footer>
     <!-- Load main script file for page or default (with auth logic only) -->
     {{#if conf.isProd}}
-	<script data-main="js/main-bundle-{{package.version}}" src="js/require.js"></script>
+    <script data-main="js/main-bundle-{{package.version}}" src="js/require.js"></script>
     {{else}}
     <script data-main="js/main" src="js/require.js"></script>
     {{/if}}

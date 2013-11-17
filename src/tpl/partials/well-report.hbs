@@ -13,9 +13,9 @@
                     <!-- ko if: (id === 'history') -->
                     <!-- ko if: ($parent.isLoadedHistoryList() === true) -->
                     <span>Filter by date: </span>
-                    <input class="input-sm datepicker" size="16" type="text" data-bind="datepicker: $parent.historyListFilter.startDate, datepickerOptions: { format: 'yyyy-mm-dd', startView: 'year', autoclose: true }">
+                    <!--<input class="input-sm datepicker" size="16" type="text" data-bind="datepicker: $parent.historyListFilter.startDate, datepickerOptions: { format: 'yyyy-mm-dd', startView: 'year', autoclose: true }">-->
                     <span>- </span>
-                    <input class="input-sm datepicker" size="16" type="text" data-bind="datepicker: $parent.historyListFilter.endDate, datepickerOptions: { format: 'yyyy-mm-dd', startView: 'year', autoclose: true }">
+                    <!--<input class="input-sm datepicker" size="16" type="text" data-bind="datepicker: $parent.historyListFilter.endDate, datepickerOptions: { format: 'yyyy-mm-dd', startView: 'year', autoclose: true }">-->
                     <span>Record count: </span><span data-bind="text: $parent.sortedHistoryList().length"></span>
                     <!-- /ko -->
                     <!-- /ko -->

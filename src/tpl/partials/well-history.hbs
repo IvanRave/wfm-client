@@ -10,11 +10,11 @@
           </button>
         </div>
       </div>
-      <div class="col-sm-9">
+      <div class="col-sm-9" data-bind="with: historyListFilter">
         <span>Filter by date: </span>
-        <input type="text" class="datepicker" size="16" data-bind="datepicker: historyListFilter.startDate, datepickerOptions: { format: 'yyyy-mm-dd', startView: 'decade', autoclose: true }" />
+        <input type="text" class="datepicker" size="16" data-bind="datepicker: startDate, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }" />
         <span> - </span>
-        <input type="text" class="datepicker" size="16" data-bind="datepicker: historyListFilter.endDate, datepickerOptions: { format: 'yyyy-mm-dd', startView: 'decade', autoclose: true }" />
+        <input type="text" class="datepicker" size="16" data-bind="datepicker: endDate, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }" />
       </div>
     </div>
     <table class="table">

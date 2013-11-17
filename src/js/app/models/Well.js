@@ -182,6 +182,14 @@
 
         ///<param>attrGroup - when select PD section need to point attrGroup</param>
         self.selectSection = function (sectionId) {
+            window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
+                region: self.getWellGroup().getWellField().getWellRegion().Id,
+                field: self.getWellGroup().getWellField().Id,
+                group: self.getWellGroup().Id,
+                well: self.Id,
+                section: sectionId
+            });
+
             self.selectedSectionId(sectionId);
         };
 
@@ -239,13 +247,13 @@
         };
 
         self.addTestScope = function () {
-            var inputStartDate = document.createElement("input");
-            inputStartDate.type = "text";
+            var inputStartDate = document.createElement('input');
+            inputStartDate.type = 'text';
 
             $(inputStartDate).datepicker({
-                format: "yyyy-mm-dd",
+                format: 'yyyy-mm-dd',
                 autoclose: true
-            }).prop({ required: true, placeholder: "yyyy-mm-dd" }).addClass('datepicker');
+            }).prop({ required: true, placeholder: 'yyyy-mm-dd' }).addClass('datepicker');
 
             var inputStartHour = document.createElement("input");
             inputStartHour.type = "number";
@@ -315,6 +323,7 @@
             }
         };
 
+        // UTC unix time (in seconds)
         self.historyListFilter = {
             startDate: ko.observable(),
             endDate: ko.observable()
@@ -323,15 +332,22 @@
         self.sortedHistoryListOrder = ko.observable(-1);
 
         self.sortedHistoryList = ko.computed(function () {
-            var sortFilterArr = self.historyList();
+            var sortFilterArr = ko.unwrap(self.historyList);
 
-            if (self.historyListFilter.startDate() || self.historyListFilter.endDate()) {
+            // In unix time
+            var tmpStartDate = ko.unwrap(self.historyListFilter.startDate),
+                tmpEndDate = ko.unwrap(self.historyListFilter.endDate);
+
+            if (tmpStartDate || tmpEndDate) {
                 sortFilterArr = $.grep(sortFilterArr, function (elemValue) {
-                    if (self.historyListFilter.startDate() && new Date(self.historyListFilter.startDate()) > new Date(elemValue.StartDate())) {
+                    var tmpElemStartDate = ko.unwrap(elemValue.StartDate);
+                    if (tmpStartDate && (new Date(tmpStartDate * 1000) > new Date(tmpElemStartDate))) {
                         return false;
                     }
 
-                    if (self.historyListFilter.endDate() && new Date(self.historyListFilter.endDate()) < new Date(elemValue.EndDate())) {
+                    var tmpElemEndDate = ko.unwrap(elemValue.EndDate);
+
+                    if (tmpEndDate && (new Date(tmpEndDate * 1000) < new Date(tmpElemEndDate))) {
                         return false;
                     }
 

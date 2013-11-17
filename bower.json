@@ -1,6 +1,6 @@
 {
   "name": "wfm",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "homepage": "https://github.com/IvanRave/wfm",
   "description": "Well file manager",
   "license": "MIT",
@@ -21,6 +21,7 @@
     "knockout": "https://github.com/bowerjs/knockout.git#~3.0.0",
     "es5-shim": "~2.1.0",
     "console-shim": "*",
-    "wfm-dict": "https://github.com/IvanRave/wfm-dict.git"
+    "wfm-dict": "https://github.com/IvanRave/wfm-dict.git",
+    "pickadate": "~3.3.0"
   }
 }

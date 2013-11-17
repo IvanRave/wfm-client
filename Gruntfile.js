@@ -21,13 +21,14 @@ module.exports = function (grunt) {
         lang = grunt.option('lang') || 'en';
         
     // Commit message for bump feature
-    var cmtType = grunt.option('cmtType') || 'fix',
-        // Scope could be anything specifying place of the commit change
-        cmtScope = grunt.option('cmtScope') || 'project',
+    var cmtmsg = grunt.option('cmtmsg') || 'fix(project): change';
+    
+    // var cmtType = grunt.option('cmtType') || 'fix',
+        // // Scope could be anything specifying place of the commit change
+        // cmtScope = grunt.option('cmtScope') || 'project',
         // use imperative, present tense: “change” not “changed” nor “changes”
         // don't capitalize first letter
         // no dot (.) at the end
-        cmtMsg = grunt.option('cmtMsg') || 'change';
     
     // Allowed <type>
     // feat (feature)
@@ -37,11 +38,11 @@ module.exports = function (grunt) {
     // refactor
     // test (when adding missing tests)
     // chore (maintain)
-    var allowedCmtTypes = ['feat', 'fix', 'docs', 'style', 'refactor', 'test', 'chore'];
+    // var allowedCmtTypes = ['feat', 'fix', 'docs', 'style', 'refactor', 'test', 'chore'];
     
-    if (allowedCmtTypes.indexOf(cmtType) === -1){
-        cmtType = 'fix';
-    }
+    // if (allowedCmtTypes.indexOf(cmtType) === -1){
+        // cmtType = 'fix';
+    // }
 
     // Target - destination folder plus config, for example: 
     // dev (development)
@@ -124,7 +125,9 @@ module.exports = function (grunt) {
                     src: ['jquery/jquery.js', 'moment/moment.js', 'angular/angular.js', 
                         'angular-route/angular-route.js', 'bootstrap/dist/js/bootstrap.js',
                         'requirejs/require.js', 'knockout/knockout.js', 
-                        'console-shim/console-shim.js', 'es5-shim/es5-shim.js']
+                        'console-shim/console-shim.js', 'es5-shim/es5-shim.js',
+                        'pickadate/lib/picker.js', 'pickadate/lib/picker.date.js', 'pickadate/lib/picker.time.js'
+                        ]
                 }]
             },
             bower_css: {
@@ -134,7 +137,8 @@ module.exports = function (grunt) {
                     flatten: true,
                     cwd: '<%= bowerFolder %>/',
                     dest: '<%= trgt %>/css/',
-                    src: ['bootstrap/dist/css/bootstrap.css', 'bootstrap/dist/css/bootstrap-theme.css']
+                    src: ['bootstrap/dist/css/bootstrap.css', 'bootstrap/dist/css/bootstrap-theme.css',
+                    'pickadate/lib/themes/classic.css', 'pickadate/lib/themes/classic.date.css', 'pickadate/lib/themes/classic.time.css']
                 }]
             },
             bower_fonts: {
@@ -234,7 +238,7 @@ module.exports = function (grunt) {
             updateConfigs: ['pkg'],
             commit: true,
             // <type>(<scope>): <subject>
-            commitMessage: cmtType + '('+ cmtScope + '): ' + cmtMsg,
+            commitMessage: cmtmsg,
             commitFiles: ['-a'],
             createTag: true,
             tagName: 'v%VERSION%',

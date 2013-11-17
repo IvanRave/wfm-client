@@ -34,7 +34,7 @@ define(['jquery',
                         fieldId: parseInt(angRouteParams['field']),
                         groupId: parseInt(angRouteParams['group']),
                         wellId: parseInt(angRouteParams['well']),
-                        sectionId: parseInt(angRouteParams['section'])
+                        sectionId: angRouteParams['section']
                     });
 
                     require(['jquery', 'knockout', 'app/bindings'], function ($, ko) {
