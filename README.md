@@ -1,8 +1,6 @@
 # Well file manager (WFM)
-## Developer documentation
->team development - best decision
 
-### WFM services
+## WFM services
 * __WFM client__ http://wfm-client.azurewebsites.net/
 protected cabinet: manage companies, wells etc.
 * __WFM info__ http://wfm.azurewebsites.net/
@@ -15,24 +13,41 @@ mobile application created from WFM client using Phonegap
 methods to manage WFM data. Methods are secured and required authorization. 
 After getting auth token (after registration ang authentication) you can make requests to API
 
-### WFM helpers
+## WFM helpers
 * __WFM fonts__ https://github.com/IvanRave/wfm-fonts/
 contains section icons for all WFM services
 * __WFM dictionary__ https://github.com/IvanRave/wfm-dict/
 contains words (with translation) for all WFM services
 
-### Cabinet hierarchy
+### WFM developer documentation
+WFM client (mobile or web) - main WFM service.
+WFM client is a secured cabinet to manage well's documentation (files, data).
+
+#### Cabinet hierarchy
 ![CabinetHierarchy] (https://raw.github.com/IvanRave/wfm/master/src/img/structure/cabinet.png "Cabinet hierarchy")
-* Company may include many users
+* Each company may include many users
 * User may be in many companies
 * Company may contain many regions
-* Regions divides by fields
-* Field divides by groups
-* Group divides by wells
+* Well regions divides by fields
+* Well field divides by groups
+* Well group divides by wells
+* Each well contains sections and widgets (widgets for each section and more)
 
-### Widget hierarchy
+#### Well sections
+* Summary (main well parameters)
+* Sketch and volumes
+* History
+* Map
+* Log
+* Perfomance
+* Test
+* Integrity
+* Nodal analysis
+* Report
+
+#### Widget hierarchy
 ![WidgetStructure] (https://raw.github.com/IvanRave/wfm/master/src/img/structure/widget.png "Widget structure")
 * Well (well group, well field, well region) may contain widget layouts
 * Widget layout may contain widget blocks (columns) - 1, 2, 3 or 4 different size columns
 * Widget block may contain widgets
-* Widget may be few types
+* Widget has options (depending of widget type)
