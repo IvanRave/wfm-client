@@ -3,14 +3,22 @@
 >team development - best decision
 
 ### WFM services
-* WFM client - protected cabinet: http://wfm-client.azurewebsites.net/
-* WFM info - public site: http://wfm.azurewebsites.net/
-* WFM mobile - created from WFM client using Phonegap
+* __WFM client__ http://wfm-client.azurewebsites.net/
+protected cabinet: manage companies, wells etc.
+* __WFM info__ http://wfm.azurewebsites.net/
+public site with info about WFM: pricing, docs, contacts etc.
+* __WFM admin__ http://wfm-admin.azurewebsites.net/ protected service for database administration
+(will be moved to Intranet access to protect requests)
+* __WFM mobile client__ https://build.phonegap.com/apps/628274/ 
+mobile application created from WFM client using Phonegap
+* __WFM API__ http://wfm-client.azurewebsites.net/api/
+methods to manage WFM data. Methods are secured and required authorization. 
+After getting auth token (after registration ang authentication) you can make requests to API
 
-### WFM services dependencies
-* WFM fonts: https://github.com/IvanRave/wfm-fonts/
+### WFM helpers
+* __WFM fonts__ https://github.com/IvanRave/wfm-fonts/
 contains section icons for all WFM services
-* WFM dictionary: https://github.com/IvanRave/wfm-dict/
+* __WFM dictionary__ https://github.com/IvanRave/wfm-dict/
 contains words (with translation) for all WFM services
 
 ### Cabinet hierarchy
