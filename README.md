@@ -46,6 +46,9 @@ WFM client is a secured cabinet to manage well's documentation (files, data).
 * Report
 
 #### Widget hierarchy
+##### Simple scheme
+![WidgetStructure] (https://drive.google.com/uc?export=view&id=0B9c2LY35SH-cbWl3ak94c1pxYWM "Widget structure")
+##### Data scheme
 ![WidgetStructure] (docs/widget.png "Widget structure")
 * Well (well group, well field, well region) may contain widget layouts
 * Widget layout may contain widget blocks (columns) - 1, 2, 3 or 4 different size columns
