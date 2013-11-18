@@ -148,7 +148,7 @@ module.exports = function (grunt) {
                     flatten: true,
                     cwd: '<%= bowerFolder %>/',
                     dest: '<%= trgt %>/fonts/',
-                    src: ['bootstrap/dist/fonts/*']
+                    src: ['bootstrap/dist/fonts/*', 'wfm-fonts/fonts/*']
                 }]
             }
         },
