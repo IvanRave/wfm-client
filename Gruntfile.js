@@ -181,14 +181,6 @@ module.exports = function (grunt) {
                     dest: '<%= trgt %>'
                 }]
             },
-            readme: {
-                options: {
-                    ext: '.md'
-                },
-                files: {
-                    './README': 'README.md.hbs'
-                }
-            },
             // Assemble js files after copy in dest directory
             js: {
                 options: {
@@ -273,10 +265,6 @@ module.exports = function (grunt) {
                 files: ['<%= src %>/tpl/data/syst.json', '<%= bowerFolder %>/wfm-dict/lang/en/lang.json', 'package.json'],
                 tasks: ['assemble:html', 'assemble:js']
             },
-            assebmle_readme: {
-                files: ['README.md.hbs', 'package.json'],
-                tasks: ['assemble:readme']
-            },
             assemble_html: {
                 files: ['<%= src %>/tpl/**/*.hbs'],
                 tasks: ['assemble:html']
@@ -313,8 +301,7 @@ module.exports = function (grunt) {
      'copy:bower_css',
      'copy:bower_fonts',
      'assemble:js', // After copy all files to destination - replace all {{value}} - rewrite the same files
-     'assemble:html', // Copy other files: Assemble and copy templates files
-     'assemble:readme' // Use main data to build readme for project description
+     'assemble:html' // Copy other files: Assemble and copy templates files
     ];
 
     // 4. Bundle and minify for production

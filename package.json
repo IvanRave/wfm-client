@@ -1,9 +1,9 @@
 {
   "name": "WFM",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "Well file manager",
   "author": {
-    "name": "IvanRave"
+    "name": "Petrohelp"
   },
   "license": "MIT",
   "repository": {
