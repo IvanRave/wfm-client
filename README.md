@@ -24,7 +24,7 @@ WFM client (mobile or web) - main WFM service.
 WFM client is a secured cabinet to manage well's documentation (files, data).
 
 #### Cabinet hierarchy
-![CabinetHierarchy] (docs/cabinet.png "Cabinet hierarchy")
+![CabinetHierarchy] (https://drive.google.com/uc?export=view&id=0B9c2LY35SH-cZEh5aWtNWHpQUVE "Cabinet hierarchy")
 * Each company may include many users
 * User may be in many companies
 * Company may contain many regions
@@ -49,7 +49,7 @@ WFM client is a secured cabinet to manage well's documentation (files, data).
 ##### Simple scheme
 ![WidgetStructure] (https://drive.google.com/uc?export=view&id=0B9c2LY35SH-cbWl3ak94c1pxYWM "Widget structure")
 ##### Data scheme
-![WidgetStructure] (docs/widget.png "Widget structure")
+![WidgetStructure] (https://drive.google.com/uc?export=view&id=0B9c2LY35SH-cY0V3T3pEVWZjanc "Widget structure")
 * Well (well group, well field, well region) may contain widget layouts
 * Widget layout may contain widget blocks (columns) - 1, 2, 3 or 4 different size columns
 * Widget block may contain widgets
