@@ -13,6 +13,8 @@ mobile application created from WFM client using Phonegap
 methods to manage WFM data. Methods are secured and required authorization. 
 After getting auth token (after registration ang authentication) you can make requests to API
 
+![WFMServicesStructure] (https://drive.google.com/uc?export=view&id=0B9c2LY35SH-cYk9POHE3UTM2Vjg "WFM services structure")
+
 ## WFM helpers
 * __WFM fonts__ https://github.com/IvanRave/wfm-fonts/
 contains section icons for all WFM services
