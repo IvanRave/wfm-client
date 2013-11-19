@@ -15,6 +15,12 @@ After getting auth token (after registration ang authentication) you can make re
 
 ![WFMServicesStructure] (https://drive.google.com/uc?export=view&id=0B9c2LY35SH-cYk9POHE3UTM2Vjg "WFM services structure")
 
+## WFM data storage
+* Authentication data: relational database to store user profiles
+* Structured data: relational database to store structured WFM data, e.g. companies, well regions, groups, fields, wells
+* Unstructured data: non-relational storage to store dynamic data, e.g. well perfomance properties, units and data
+* File storage: secured blob storage to store WFM files
+
 ## WFM helpers
 * __WFM fonts__ https://github.com/IvanRave/wfm-fonts/
 contains section icons for all WFM services
@@ -56,3 +62,41 @@ WFM client is a secured cabinet to manage well's documentation (files, data).
 * Widget layout may contain widget blocks (columns) - 1, 2, 3 or 4 different size columns
 * Widget block may contain widgets
 * Widget has options (depending of widget type)
+
+###Build notes
+
+#### Build types
+
+##### Development (dev folder)
+* grunt
+
+##### Production (dst folder)
+* grunt --prod
+
+#### Other build types:
+
+##### IPad (IOS)
+* grunt --ipad
+
+##### Metro (Windows)
+* grunt --metro
+Metro application can not use links to directories. Please use full url path (with index.html)
+
+#### Assemble notes
+
+##### AngularJs:
+
+* for ngSrc and href - use {[{ my.value }]} - 
+standard double curly brackets {{value}} is used in Handlebars helpers in assemble.io library
+* for other elements use <span ng-bind="my.value"></span>
+
+##### Language:
+
+* Generate any language using assemble.io engine
+* Add json object with required language to wfm-dict helper
+* Change settings in Gruntfile.js
+
+##### CORS support:
+
+* Do not use in production (IE9 doesn't support requests wit json type and cookies)
+* Only for development (in modern browsers) and other project types (IOS, desktop etc.)
