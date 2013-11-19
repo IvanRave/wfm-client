@@ -99,15 +99,13 @@
             {{> pd-table }}
             <div class="text-center">
               <ul class="pagination pagination-sm" data-bind="foreach: {data: joinedYearList, as: 'joinedYear'}">
-                <li data-bind="visible: joinedYear >= $parent.WPDDateStartYear() && joinedYe"
-                  <= $parent.WPDDateEndYear(), css: {'active': joinedYear === $parent.selectedPrfTableYear() }">
+                <li data-bind="visible: joinedYear >= $parent.WPDDateStartYear() && joinedYear <= $parent.WPDDateEndYear(), css: {'active': joinedYear === $parent.selectedPrfTableYear() }">
                   <a href="#" data-bind="text: joinedYear, click: function(){ $parent.selectPrfTableYear(joinedYear);}"></a>
                 </li>
               </ul>
             </div>
           </div>
         </div>
-
       </div>
     </div>
   </div>

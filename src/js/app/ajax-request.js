@@ -71,7 +71,16 @@
                 switch (jqXHR.status) {
                     case 401:
                         ////alert('Access is denied. Please login with right credentials.');
-                        window.location.href = '#{{syst.logonUrl}}';
+                        
+                        var logonUrl = '#{{syst.logonUrl}}';
+
+                        var currentHash = window.location.hash;
+                        if (currentHash) {
+                            logonUrl += '?rurl=' + encodeURIComponent(currentHash.substring(1));
+                        }
+                        console.log('logurl', logonUrl);
+
+                        window.location.href = logonUrl;
                         break;
                         ////throw new Error('Access is denied');
                     case 404:
