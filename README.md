@@ -100,3 +100,9 @@ standard double curly brackets {{value}} is used in Handlebars helpers in assemb
 
 * Do not use in production (IE9 doesn't support requests wit json type and cookies)
 * Only for development (in modern browsers) and other project types (IOS, desktop etc.)
+
+#### Write notes
+
+[Angular commit guidelines] (https://github.com/angular/angular.js/blob/master/CONTRIBUTING.md#commit-message-format)
+
+[Javascript style guide] (http://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml)
