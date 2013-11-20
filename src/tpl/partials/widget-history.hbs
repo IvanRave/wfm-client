@@ -1,22 +1,52 @@
 ﻿<script type="text/html" id="history-widget-tpl">
   <div data-bind="if: widget.isVisSettingPanel">
     <div class="widget-setting-panel">
-      <!--<label>
-                <input type="checkbox" data-bind="checked: widget.isVisImg" /> Image
-            </label>
-            <label>
-                <input type="checkbox" data-bind="checked: widget.isVisDescription" /> Description
-            </label>-->
+      <div data-bind="with: widget.historyView">
+        <span>{{capitalizeFirst lang.filterByDate}}:</span>
+        <input class="input-sm" type="text" size="10" data-bind="datepicker: startDate, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }" />
+        <span data-bind="if: startDate">
+          <!--<span data-bind="text: new Date(startDate() * 1000).toISOString()"></span>-->
+        </span>
+        <span> - </span>
+        <input class="input-sm" type="text" size="10" data-bind="datepicker: endDate, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }" />
+        <button class="btn btn-default btn-sm" type="button" data-bind="click: changeSortByDateOrder">
+          {{capitalizeFirst lang.sortByDate}} <i class="glyphicon" data-bind="css: sortByDateCss"></i>
+        </button>
+      </div>
     </div>
   </div>
   <div class="widget-content">
     <div data-bind="with: $parents[3]">
-      <!--<div data-bind="if: widget.isVisImg">
-                <img src="#" class="img-responsive" data-bind="attr: { src: MainSketchUrl }" alt="Sketch image" />
+      <div data-bind="if: isLoadedHistoryList">
+        <div data-bind="if: historyList().length === 0">
+          <small>{{capitalizeFirst lang.noWellHistoryList}}</small>
+        </div>
+        <div data-bind="if: historyList().length > 0">
+          <div data-bind="with: widget.historyView">
+            <div data-bind="foreach: sortedHistoryList">
+              <div class="well-history-block">
+                <div class="text-center">
+                  <span class="bld" data-bind="date: StartDate"></span>
+                  <span data-bind="visible: StartDate() !== EndDate()">
+                    - <span class="bld" data-bind="date: EndDate"></span>
+                  </span>
+                </div>
+                <div data-bind="visible: History">
+                  <blockquote class="pre-wrap-text" data-bind="text: History"></blockquote>
+                </div>
+                <div data-bind="foreach: WfmImages">
+                  <img src="" data-bind="attr: { src: dataUrl }" alt="History image" class="img-thumbnail elem-shadow" />
+                </div>
+                <div data-bind="foreach: WellHistoryFiles" class="clearfix">
+                  <div class="img-thumbnail pull-left">
+                    <a href="#" data-bind="text: FileNameWODate, click: downloadWellHistoryFile"></a>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div data-bind="if: widget.isVisDescription">
-                <div data-bind="html: SketchDesc" style="-ms-word-wrap: break-word; word-wrap: break-word; padding: 8px 2px;"></div>
-            </div>-->
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </script>

@@ -541,9 +541,9 @@ footer {
     }
 
 .elem-shadow {
-    -moz-box-shadow: 1px 1px 2px 3px #ccc;
-    -webkit-box-shadow: 1px 1px 2px 3px #ccc;
-    box-shadow: 1px 1px 2px 3px #ccc;
+    -moz-box-shadow: 1px 1px 2px 2px #ccc;
+    -webkit-box-shadow: 1px 1px 2px 2px #ccc;
+    box-shadow: 1px 1px 2px 2px #ccc;
 }
 
 .pre-wrap-text {
@@ -630,4 +630,12 @@ footer {
 
 .bld {
     font-weight: bold;
+}
+
+.well-history-block {
+    margin-top: 4px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed #ccc;
+    border-top: 1px dashed #ccc;
 }

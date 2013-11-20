@@ -138,7 +138,7 @@ module.exports = function (grunt) {
                     cwd: '<%= bowerFolder %>/',
                     dest: '<%= trgt %>/css/',
                     src: ['bootstrap/dist/css/bootstrap.css', 'bootstrap/dist/css/bootstrap-theme.css',
-                    'pickadate/lib/themes/classic.css', 'pickadate/lib/themes/classic.date.css', 'pickadate/lib/themes/classic.time.css']
+                    'pickadate/lib/themes/default.css', 'pickadate/lib/themes/default.date.css', 'pickadate/lib/themes/default.time.css']
                 }]
             },
             bower_fonts: {
