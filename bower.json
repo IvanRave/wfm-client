@@ -1,6 +1,6 @@
 {
   "name": "wfm",
-  "version": "0.4.8",
+  "version": "0.4.9",
   "homepage": "https://github.com/IvanRave/wfm",
   "description": "Well file manager",
   "license": "MIT",
@@ -23,6 +23,7 @@
     "wfm-fonts": "https://github.com/IvanRave/wfm-fonts.git",
     "pickadate": "~3.3.0",
     "angular": "~1.2.1",
-    "angular-route": "~1.2.1"
+    "angular-route": "~1.2.1",
+    "jQuery-slimScroll": "https://github.com/rochal/jQuery-slimScroll.git#~1.3.1"
   }
 }

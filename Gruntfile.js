@@ -126,8 +126,8 @@ module.exports = function (grunt) {
                         'angular-route/angular-route.js', 'bootstrap/dist/js/bootstrap.js',
                         'requirejs/require.js', 'knockout/knockout.js', 
                         'console-shim/console-shim.js', 'es5-shim/es5-shim.js',
-                        'pickadate/lib/picker.js', 'pickadate/lib/picker.date.js', 'pickadate/lib/picker.time.js'
-                        ]
+                        'pickadate/lib/picker.js', 'pickadate/lib/picker.date.js', 'pickadate/lib/picker.time.js',
+                        'jQuery-slimScroll/jquery.slimscroll.js']
                 }]
             },
             bower_css: {

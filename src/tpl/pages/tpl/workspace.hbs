@@ -5,10 +5,10 @@
 
   <div style="display:none" data-bind="visible: isStructureLoaded">
     <div class="clearfix">
-      <div class="col-md-2" style="padding-left: 0">
+      <div style="padding-left: 0" data-bind="css: $root.menuCss">
         {{> workspace-menu }}
       </div>
-      <div class="col-md-10">
+      <div data-bind="css: $root.workAreaCss">
         <div class="workspace-container">
           <div data-bind="with: selectedWellRegion">
             <div data-bind="ifnot: selectedWellField">

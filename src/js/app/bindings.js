@@ -103,25 +103,39 @@
             });
         },
         update: function (element, valueAccessor) {
-            var needHeight = valueAccessor().height() - 32 - 40;
-            var needWidth;
-            // 992px - small size in bootstrap
-            if (valueAccessor().width() > 992) {
-                needWidth = valueAccessor().width() / 6 - 15;
+            var curValue = ko.unwrap(valueAccessor());
+            var curHeight = ko.unwrap(curValue.height),
+                curWidgth = ko.unwrap(curValue.width);
+
+            if ($.isNumeric(curHeight) && $.isNumeric(curWidgth)) {
+                // Convert to numbers (if not)
+                curHeight = +curHeight;
+                curWidgth = +curWidgth;
+
+                // 992px - small size in bootstrap - min width for div with scroll
+                var minWidth = 992,
+                    topMargin = 32,
+                    bottomMargin = 40;
+
+                var needHeight,
+                    needWidth;
+                if (curWidgth >= minWidth) {
+                    needHeight = curHeight - topMargin - bottomMargin;
+                    needWidth = curWidgth / 6 - 15; // Bootstrap - col-md-2
+                }
+                else {
+                    needHeight = 'auto'; // by content
+                    needWidth = curWidgth; // full width
+                }
+
+                $(element).parent().height(needHeight);
+                $(element).height(needHeight);
+
+                $(element).parent().width(needWidth);
+                $(element).width(needWidth);
             }
-            else {
-                needWidth = valueAccessor().width() - 15;
-            }
 
-            $(element).parent().height(needHeight);
-            $(element).height(needHeight);
-
-            $(element).parent().width(needWidth);
-            $(element).width(needWidth);
-
-            ////console.log(needHeight);
             ////$(element).slimScroll({
-            ////    height: needHeight,
             ////    railVisible: true,
             ////    alwaysVisible: true
             ////});
@@ -163,7 +177,7 @@
 
             if (ko.isObservable(curValue)) {
                 var options = allBindings.get('datepickerOptions') || {};
-                
+
                 var $input = $(element).pickadate(options);
                 var picker = $input.pickadate('picker');
 
@@ -200,7 +214,7 @@
                 });
 
                 ////options.onSet = function (event) {
-                    
+
 
                 ////};
 
@@ -210,7 +224,7 @@
             }
         }
         ////update: function (element, valueAccessor) {
-            
+
         ////    var picker = $(element).pickadate('picker');
 
         ////    var curVal = ko.unwrap(valueAccessor());
