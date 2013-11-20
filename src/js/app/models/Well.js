@@ -7,11 +7,12 @@
     'app/app-helper',
     'moment',
     'app/models/well-partials/perfomance-partial',
+    'app/models/well-partials/history-view',
     'app/models/WellFile',
     'app/models/ColumnAttribute',
     'app/models/WellHistory',
     'app/models/TestScope'
-], function ($, ko, datacontext, fileHelper, bootstrapModal, appHelper, appMoment, wellPerfomancePartial) {
+], function ($, ko, datacontext, fileHelper, bootstrapModal, appHelper, appMoment, wellPerfomancePartial, HistoryView) {
     'use strict';
 
     // WellFiles (convert data objects into array)
@@ -310,12 +311,14 @@
 
         self.WellInWellFieldMaps = ko.observableArray();
 
+        // ================================================= Well history section start =======================================
+
         self.historyList = ko.observableArray();
 
         self.isLoadedHistoryList = ko.observable(false);
 
-        self.getHistoryList = function () {
-            if (self.isLoadedHistoryList() === false) {
+        self.getWellHistoryList = function () {
+            if (ko.unwrap(self.isLoadedHistoryList) === false) {
                 datacontext.getWellHistoryList({ well_id: self.Id }).done(function (response) {
                     self.historyList(importWellHistoryDto(response, self));
                     self.isLoadedHistoryList(true);
@@ -323,46 +326,85 @@
             }
         };
 
-        // UTC unix time (in seconds)
-        self.historyListFilter = {
-            startDate: ko.observable(),
-            endDate: ko.observable()
-        };
+        self.addWellHistory = function () {
+            var historyDateFormat = 'yyyy-mm-dd';
 
-        self.sortedHistoryListOrder = ko.observable(-1);
+            var inputHistory = document.createElement('textarea');
+            $(inputHistory).prop({ 'rows': 5 }).addClass('form-control');
 
-        self.sortedHistoryList = ko.computed(function () {
-            var sortFilterArr = ko.unwrap(self.historyList);
+            // 1999-12-31 yyyy-mm-dd
+            var datePattern = '(?:19|20)[0-9]{2}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-9])|(?:(?!02)(?:0[1-9]|1[0-2])-(?:30))|(?:(?:0[13578]|1[02])-31))';
 
-            // In unix time
-            var tmpStartDate = ko.unwrap(self.historyListFilter.startDate),
-                tmpEndDate = ko.unwrap(self.historyListFilter.endDate);
+            var inputStartDate = document.createElement('input');
+            inputStartDate.type = 'text';
+            $(inputStartDate).prop({
+                'required': true,
+                'placeholder': historyDateFormat,
+                'pattern': datePattern,
+                'title': 'Date format: yyyy-mm-dd (year, month, day)'
+            }).addClass('datepicker').datepicker({
+                format: historyDateFormat,
+                startView: 'decade',
+                autoclose: true
+            });
 
-            if (tmpStartDate || tmpEndDate) {
-                sortFilterArr = $.grep(sortFilterArr, function (elemValue) {
-                    var tmpElemStartDate = ko.unwrap(elemValue.StartDate);
-                    if (tmpStartDate && (new Date(tmpStartDate * 1000) > new Date(tmpElemStartDate))) {
-                        return false;
-                    }
+            var inputEndDate = document.createElement('input');
+            inputEndDate.type = 'text';
+            $(inputEndDate).prop({
+                'placeholder': 'yyyy-mm-dd (not necessary)',
+                'pattern': datePattern,
+                'title': 'Date format: yyyy-mm-dd (year, month, day)'
+            }).addClass('datepicker').datepicker({
+                format: historyDateFormat,
+                startView: 'decade',
+                autoclose: true
+            });
 
-                    var tmpElemEndDate = ko.unwrap(elemValue.EndDate);
+            var innerDiv = document.createElement('div');
+            $(innerDiv).addClass('form-horizontal').append(
+                bootstrapModal.gnrtDom('Start date', inputStartDate),
+                bootstrapModal.gnrtDom('End date', inputEndDate),
+                bootstrapModal.gnrtDom('History', inputHistory)
+            );
 
-                    if (tmpEndDate && (new Date(tmpEndDate * 1000) < new Date(tmpElemEndDate))) {
-                        return false;
-                    }
+            function submitFunction() {
+                var userStartDate = $(inputStartDate).val();
+                var userEndDate = $(inputEndDate).val();
 
-                    return true;
+                if (userEndDate && appMoment(userEndDate, historyDateFormat).format() < appMoment(userStartDate, historyDateFormat).format()) {
+                    alert('End date must be greater than start date');
+                    return;
+                }
+
+                var wellHistoryItem = datacontext.createWellHistory({
+                    StartDate: userStartDate,
+                    EndDate: userEndDate || userStartDate,
+                    History: $(inputHistory).val(),
+                    WellId: self.Id
+                }, self);
+
+                datacontext.saveNewWellHistory(wellHistoryItem).done(function (result) {
+                    var whi = datacontext.createWellHistory(result, self);
+                    self.historyList.push(whi);
                 });
+                bootstrapModal.closeModalWindow();
             }
 
-            return sortFilterArr.sort(function (left, right) {
-                return left.StartDate() === right.StartDate() ? 0 : (left.StartDate() > right.StartDate() ? parseInt(self.sortedHistoryListOrder(), 10) : -parseInt(self.sortedHistoryListOrder(), 10));
-            });
-        });
-
-        self.changeSortedHistoryListOrder = function () {
-            self.sortedHistoryListOrder(-parseInt(self.sortedHistoryListOrder(), 10));
+            bootstrapModal.openModalWindow("Well history", innerDiv, submitFunction);
         };
+
+        self.deleteWellHistory = function () {
+            var itemForDelete = this;
+            if (confirm('Are you sure you want to delete "' + appMoment(itemForDelete.StartDate()).format('YYYY-MM-DD') + '" record?')) {
+                datacontext.deleteWellHistory(itemForDelete).done(function () {
+                    self.historyList.remove(itemForDelete);
+                });
+            }
+        };
+
+        self.historyView = new HistoryView({}, self.historyList);
+
+        // ============================================================= Well history end ===============================================
 
         self.sectionList = datacontext.getSectionList();
 
@@ -374,7 +416,7 @@
         self.checkReportSection = function (checkedReportSection) {
             switch (checkedReportSection.id) {
                 case 'map': self.getWellGroup().getWellField().getWellFieldMaps(); break;
-                case 'history': self.getHistoryList(); break;
+                case 'history': self.getWellHistoryList(); break;
                 case 'log': self.getWellFileList('log', 'work'); break;
                 case 'pd': self.perfomancePartial.getHstProductionDataSet(); break;
             }
@@ -836,86 +878,6 @@
             });
         });
 
-        // ================================================= Well history section start =======================================
-
-        self.addWellHistory = function () {
-            var historyDateFormat = 'yyyy-mm-dd';
-
-            var inputHistory = document.createElement('textarea');
-            $(inputHistory).prop({ 'rows': 5 }).addClass('form-control');
-
-            // 1999-12-31 yyyy-mm-dd
-            var datePattern = '(?:19|20)[0-9]{2}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-9])|(?:(?!02)(?:0[1-9]|1[0-2])-(?:30))|(?:(?:0[13578]|1[02])-31))';
-
-            var inputStartDate = document.createElement('input');
-            inputStartDate.type = 'text';
-            $(inputStartDate).prop({
-                'required': true,
-                'placeholder': historyDateFormat,
-                'pattern': datePattern,
-                'title': 'Date format: yyyy-mm-dd (year, month, day)'
-            }).addClass('datepicker').datepicker({
-                format: historyDateFormat,
-                startView: 'decade',
-                autoclose: true
-            });
-
-            var inputEndDate = document.createElement('input');
-            inputEndDate.type = 'text';
-            $(inputEndDate).prop({
-                'placeholder': 'yyyy-mm-dd (not necessary)',
-                'pattern': datePattern,
-                'title': 'Date format: yyyy-mm-dd (year, month, day)'
-            }).addClass('datepicker').datepicker({
-                format: historyDateFormat,
-                startView: 'decade',
-                autoclose: true
-            });
-
-            var innerDiv = document.createElement('div');
-            $(innerDiv).addClass('form-horizontal').append(
-                bootstrapModal.gnrtDom('Start date', inputStartDate),
-                bootstrapModal.gnrtDom('End date', inputEndDate),
-                bootstrapModal.gnrtDom('History', inputHistory)
-            );
-
-            function submitFunction() {
-                var userStartDate = $(inputStartDate).val();
-                var userEndDate = $(inputEndDate).val();
-
-                if (userEndDate && appMoment(userEndDate, historyDateFormat).format() < appMoment(userStartDate, historyDateFormat).format()) {
-                    alert('End date must be greater than start date');
-                    return;
-                }
-
-                var wellHistoryItem = datacontext.createWellHistory({
-                    StartDate: userStartDate,
-                    EndDate: userEndDate || userStartDate,
-                    History: $(inputHistory).val(),
-                    WellId: self.Id
-                }, self);
-
-                datacontext.saveNewWellHistory(wellHistoryItem).done(function (result) {
-                    var whi = datacontext.createWellHistory(result, self);
-                    self.historyList.push(whi);
-                });
-                bootstrapModal.closeModalWindow();
-            }
-
-            bootstrapModal.openModalWindow("Well history", innerDiv, submitFunction);
-        };
-
-        self.deleteWellHistory = function () {
-            var itemForDelete = this;
-            if (confirm('Are you sure you want to delete "' + appMoment(itemForDelete.StartDate()).format('YYYY-MM-DD') + '" record?')) {
-                datacontext.deleteWellHistory(itemForDelete).done(function () {
-                    self.historyList.remove(itemForDelete);
-                });
-            }
-        };
-
-        // ================================================= Well history section end =======================================
-
         // ================================================================= Well log section begin ==============================================
         self.wellLogSelectedFile = ko.observable();
 
@@ -1052,147 +1014,7 @@
         // Well widget layout -> widget block -> widget
         self.wellWidgoutList = ko.observableArray();
 
-        self.possibleWidgoutList = [{
-            name: '1 (one column)',
-            widgockDtoList: [{
-                orderNumber: 1,
-                columnCount: 12
-            }]
-        },
-        {
-            name: '1-1 (two columns)',
-            widgockDtoList: [{
-                orderNumber: 1,
-                columnCount: 6
-            },
-            {
-                orderNumber: 1,
-                columnCount: 6
-            }]
-        },
-        {
-            name: '1-1-1 (three columns)',
-            widgockDtoList: [{
-                orderNumber: 1,
-                columnCount: 4
-            },
-            {
-                orderNumber: 2,
-                columnCount: 4
-            },
-            {
-                orderNumber: 3,
-                columnCount: 4
-            }]
-        },
-        {
-            name: '1-2 (two columns)',
-            widgockDtoList: [{
-                orderNumber: 1,
-                columnCount: 4
-            },
-            {
-                orderNumber: 2,
-                columnCount: 8
-            }]
-        },
-        {
-            name: '2-1 (two columns)',
-            widgockDtoList: [{
-                orderNumber: 1,
-                columnCount: 8
-            },
-            {
-                orderNumber: 2,
-                columnCount: 4
-            }]
-        },
-        {
-            name: '1-1-1-1 (four columns)',
-            widgockDtoList: [{
-                orderNumber: 1,
-                columnCount: 3
-            },
-            {
-                orderNumber: 2,
-                columnCount: 3
-            },
-            {
-                orderNumber: 3,
-                columnCount: 3
-            },
-            {
-                orderNumber: 4,
-                columnCount: 3
-            }]
-        },
-        {
-            name: '1-1-2 (three columns)',
-            widgockDtoList: [{
-                orderNumber: 1,
-                columnCount: 3
-            },
-            {
-                orderNumber: 2,
-                columnCount: 3
-            },
-            {
-                orderNumber: 3,
-                columnCount: 6
-            }]
-        },
-        {
-            name: '1-2-1 (three columns)',
-            widgockDtoList: [{
-                orderNumber: 1,
-                columnCount: 3
-            },
-            {
-                orderNumber: 2,
-                columnCount: 6
-            },
-            {
-                orderNumber: 3,
-                columnCount: 3
-            }]
-        },
-        {
-            name: '2-1-1 (three columns)',
-            widgockDtoList: [{
-                orderNumber: 1,
-                columnCount: 6
-            },
-            {
-                orderNumber: 2,
-                columnCount: 3
-            },
-            {
-                orderNumber: 3,
-                columnCount: 3
-            }]
-        },
-        {
-            name: '3-1 (two columns)',
-            widgockDtoList: [{
-                orderNumber: 1,
-                columnCount: 9
-            },
-            {
-                orderNumber: 2,
-                columnCount: 3
-            }]
-        },
-        {
-            name: '1-3 (two columns)',
-            widgockDtoList: [{
-                orderNumber: 1,
-                columnCount: 3
-            },
-            {
-                orderNumber: 2,
-                columnCount: 9
-            }]
-        }];
+        self.possibleWidgoutList = datacontext.getPossibleWidgoutList();
 
         // Selected possible widget layout for adding to widget layout list
         self.slcPossibleWidgout = ko.observable();
@@ -1250,6 +1072,7 @@
             self.getWellGroup().getWellGroupWfmParameterList();
             self.perfomancePartial.forecastEvolution.getDict();
             self.perfomancePartial.getHstProductionDataSet();
+            self.getWellHistoryList();
         };
 
         // ============================================================ Change tab section =========================================================
@@ -1257,7 +1080,7 @@
             console.log(sectionId);
             switch (sectionId) {
                 case 'history': {
-                    self.getHistoryList();
+                    self.getWellHistoryList();
                     break;
                 }
                 case 'pd': {

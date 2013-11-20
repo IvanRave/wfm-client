@@ -157,51 +157,79 @@
     ////};
 
     ko.bindingHandlers.datepicker = {
-        init: function (element, valueAccessor, allBindingsAccessor) {
-            //initialize datepicker with some optional options
-            var options = allBindingsAccessor().datepickerOptions || {};
+        init: function (element, valueAccessor, allBindings) {
+            // Initialize datepicker with some optional options
+            var curValue = valueAccessor();
 
-            options.onSet = function (event) {
-                console.log('serse', event.select);
-                var unixTimeMs = event.select;
-                if (unixTimeMs) {
-                    var value = valueAccessor();
+            if (ko.isObservable(curValue)) {
+                var options = allBindings.get('datepickerOptions') || {};
+                
+                var $input = $(element).pickadate(options);
+                var picker = $input.pickadate('picker');
 
-                    if (ko.isObservable(value)) {
-                        // offset in seconds
-                        var utcOffset = new Date(unixTimeMs).getTimezoneOffset() * 60;
-                        console.log(unixTimeMs / 1000 - utcOffset);
-                        // Save as UTC unix time (seconds)
-                        value(unixTimeMs / 1000 - utcOffset); // in UnixTime
-                    }
+                var startValue = ko.unwrap(curValue);
+
+                if (startValue) {
+                    // convert to ms
+                    startValue = startValue * 1000;
+                    // convert to local time to show in input
+                    var startUtcOffset = new Date(startValue).getTimezoneOffset() * 60 * 1000;
+                    startValue -= startUtcOffset;
+                    ////console.log('set as a start value in input: with utc', new Date(startValue).toISOString());
+                    picker.set('select', startValue);
                 }
-            };
 
-            ////options.max = new Date();
+                picker.on({
+                    set: function (event) {
+                        ////console.log('on Set call with event: ', event);
 
-            $(element).pickadate(options);
+                        // select - UTC unix time
+                        var unixTimeMs = event.select;
+                        if (unixTimeMs) {
+                            // offset in seconds
+                            var utcOffset = new Date(unixTimeMs).getTimezoneOffset() * 60;
+                            ////console.log('withoututc', unixTimeMs / 1000 - utcOffset);
+                            // Save as UTC unix time (seconds)
+                            curValue(unixTimeMs / 1000 - utcOffset);
+                        }
+                        else {
+                            // Set to undefined
+                            curValue(null);
+                        }
+                    }
+                });
 
-            //////when a user changes the date, update the view model
-            ////ko.utils.registerEventHandler(element, 'onSet', function (event) {
-            ////    console.log(event);
-            ////    var value = valueAccessor();
-            ////    if (ko.isObservable(value)) {
-            ////        value(event.date);
-            ////    }
-            ////});
+                ////options.onSet = function (event) {
+                    
+
+                ////};
+
+                ////options.max = new Date();
+
+                ////$(element).pickadate(options);
+            }
         }
         ////update: function (element, valueAccessor) {
-        ////    console.log(element);
-        ////    //var widget = $(element).data("datepicker");
+            
+        ////    var picker = $(element).pickadate('picker');
 
-        ////    //// When the view model is updated, update the widget
-        ////    //if (widget) {
+        ////    var curVal = ko.unwrap(valueAccessor());
 
-        ////    //    widget.date = ko.utils.unwrapObservable(valueAccessor());
-        ////    //    if (widget.date) {
-        ////    //        widget.setValue();
-        ////    //    }
-        ////    //}
+        ////    console.log('picker', picker);
+        ////    console.log(curVal);
+
+        ////    ////if (curVal) {
+        ////    ////    // Convert to unit time miliseconds
+        ////    ////    curVal = curVal * 1000;
+        ////    ////    console.log('curval', new Date(curVal).toISOString());
+        ////    ////    // Get utc offset
+
+        ////    ////    //var utcOffset = new Date(curVal).getTimezoneOffset() * 60;
+        ////    ////    // Diff UTC
+        ////    ////    //curVal = curVal - utcOffset;
+
+        ////    ////    picker.set('select', curVal);
+        ////    ////}
         ////}
     };
 

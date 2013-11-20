@@ -30,7 +30,7 @@
 
         self.widgetList = ko.observableArray();
 
-        self.sectionIdList = ['perfomance', 'summary', 'sketch'];
+        self.sectionIdList = ['perfomance', 'summary', 'sketch', 'history'];
 
         self.selectedSectionId = ko.observable();
 
@@ -63,7 +63,7 @@
         };
 
         self.deleteWidget = function (widgetToDelete) {
-            if (confirm('Are you sure you want to delete "' + ko.unwrap(widgetToDelete.name) + '"?')) {
+            if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(widgetToDelete.name) + '"?')) {
                 appDatacontext.deleteWidget(widgetToDelete.widgockId, widgetToDelete.id).done(function () {
                     self.widgetList.remove(widgetToDelete);
                 });
