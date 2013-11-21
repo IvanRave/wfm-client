@@ -1,10 +1,18 @@
 ﻿<div>
-  <div class="wfm-workspace-well-tab clearfix">
+  <div class="wfm-workspace-well-top-tab clearfix">
     <div class="pull-left" style="margin-top:1px">
       <button type="button" class="btn btn-inverse btn-sm" data-bind="click: function(){ selectedSectionId(null); }">
-        Well<br />dashboard
+        <i class="glyphicon glyphicon-th"></i>&nbsp;&nbsp;<span>Well dashboard</span>
       </button>
     </div>
+    <div class="pull-left" style="margin-top:1px">
+      <button type="button" class="btn btn-inverse btn-sm" data-bind="click: showFmg">
+        <i class="glyphicon glyphicon-folder-open"></i>&nbsp;&nbsp;<span>File manager</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="wfm-workspace-well-tab clearfix">
     <div class="pull-left">
       <ul class="nav nav-pills" data-bind="template: {foreach: sectionList, as: 'section'}">
         <!-- ko if: (section.id !== 'volume' && section.id !== 'sketch' && section.id !== 'pd') -->
@@ -52,11 +60,6 @@
         </li>
         <!-- /ko -->
       </ul>
-    </div>
-    <div class="pull-left" style="padding:1px;">
-      <button class="btn btn-inverse btn-sm" data-bind="click: showFmg">
-        File<br />manager
-      </button>
     </div>
   </div>
 

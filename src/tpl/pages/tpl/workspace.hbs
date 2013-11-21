@@ -5,33 +5,39 @@
 
   <div style="display:none" data-bind="visible: isStructureLoaded">
     <div class="clearfix">
-      <div style="padding-left: 0" data-bind="css: $root.menuCss">
-        {{> workspace-menu }}
+      <div class="sidebar-toggle" data-bind="css: $root.sidebarToggleCss" >
+        <button type="button" data-bind="click: toggleIsVisibleMenu" title="Hide/show menu">
+          <i class="glyphicon glyphicon-chevron-left" data-bind="visible: $root.isVisibleMenu"></i>
+          <i class="glyphicon glyphicon-chevron-right" data-bind="hidden: $root.isVisibleMenu"></i>
+        </button>
       </div>
-      <div data-bind="css: $root.workAreaCss">
-        <div class="workspace-container">
-          <div data-bind="with: selectedWellRegion">
-            <div data-bind="ifnot: selectedWellField">
-              {{> wegion }}
+      <div class="sidebar-wrap" data-bind="css: $root.sidebarWrapCss">
+        <div data-bind="scroller: { height: windowHeight, width: windowWidth }">
+          {{> workspace-menu }}
+        </div>
+      </div>
+      <div class="workspace-container" data-bind="css: $root.workAreaCss">
+        <div data-bind="with: selectedWellRegion">
+          <div data-bind="ifnot: selectedWellField">
+            {{> wegion }}
+          </div>
+          <div data-bind="with: selectedWellField">
+            <div data-bind="ifnot: selectedWellGroup">
+              {{> wield }}
             </div>
-            <div data-bind="with: selectedWellField">
-              <div data-bind="ifnot: selectedWellGroup">
-                {{> wield }}
+            <div data-bind="with: selectedWellGroup">
+              <div data-bind="ifnot: selectedWell">
+                {{> wroup }}
               </div>
-              <div data-bind="with: selectedWellGroup">
-                <div data-bind="ifnot: selectedWell">
-                  {{> wroup }}
-                </div>
-                <div data-bind="with: selectedWell">
-                  {{> well }}
-                </div>
+              <div data-bind="with: selectedWell">
+                {{> well }}
               </div>
             </div>
           </div>
-          <p class="text-error" data-bind="if: viewModelError">
-            <span data-bind="text: viewModelError"></span>
-          </p>
         </div>
+        <p class="text-error" data-bind="if: viewModelError">
+          <span data-bind="text: viewModelError"></span>
+        </p>
       </div>
     </div>
   </div>

@@ -85,47 +85,52 @@
         }
     };
 
+    ko.bindingHandlers.hidden = {
+        update: function (element, valueAccessor) {
+            ko.bindingHandlers.visible.update(element, function () {
+                return !ko.utils.unwrapObservable(valueAccessor());
+            });
+        }
+    };
+
     ko.bindingHandlers.scroller = {
         init: function (element) {
-            // minus top block minus bottom block
-            var needHeight = $(window).height() - 32 - 40;
-            // 15 - col margin
-            var needWidth = $(window).width() / 6 - 15;
             $(element).slimScroll({
-                height: needHeight,
-                width: needWidth,
                 railVisible: true,
                 alwaysVisible: true,
                 color: '#fcfcfc',
-                distance: '0px',
+                //distance: '0',
+                position: 'left',
+                ////width: 210,
                 // move page scroll with this scroll
-                allowPageScroll: false
+                allowPageScroll: true
             });
         },
         update: function (element, valueAccessor) {
             var curValue = ko.unwrap(valueAccessor());
             var curHeight = ko.unwrap(curValue.height),
-                curWidgth = ko.unwrap(curValue.width);
+                curWidth = ko.unwrap(curValue.width);
 
-            if ($.isNumeric(curHeight) && $.isNumeric(curWidgth)) {
+            if ($.isNumeric(curHeight)) {
                 // Convert to numbers (if not)
                 curHeight = +curHeight;
-                curWidgth = +curWidgth;
+                curWidth = +curWidth;
 
                 // 992px - small size in bootstrap - min width for div with scroll
                 var minWidth = 992,
                     topMargin = 32,
-                    bottomMargin = 40;
+                    bottomMargin = 50,
+                    defaultMenuWidth = 210;
 
                 var needHeight,
                     needWidth;
-                if (curWidgth >= minWidth) {
+                if (curWidth >= minWidth) {
                     needHeight = curHeight - topMargin - bottomMargin;
-                    needWidth = curWidgth / 6 - 15; // Bootstrap - col-md-2
+                    needWidth = defaultMenuWidth;
                 }
                 else {
                     needHeight = 'auto'; // by content
-                    needWidth = curWidgth; // full width
+                    needWidth = curWidth; // full width
                 }
 
                 $(element).parent().height(needHeight);

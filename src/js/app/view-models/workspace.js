@@ -105,16 +105,23 @@
             self.isVisibleMenu(!ko.unwrap(self.isVisibleMenu));
         };
 
-        self.menuCss = ko.computed({
+        self.sidebarWrapCss = ko.computed({
             read: function () {
-                return ko.unwrap(self.isVisibleMenu) ? 'col-md-2' : 'hidden';
+                return ko.unwrap(self.isVisibleMenu) ? 'sidebar-wrap-visible' : 'hidden';
             },
             deferEvaluation: true
         });
 
         self.workAreaCss = ko.computed({
             read: function () {
-                return ko.unwrap(self.isVisibleMenu) ? 'col-md-10' : 'col-md-12';
+                return ko.unwrap(self.isVisibleMenu) ? 'work-area' : '';
+            },
+            deferEvaluation: true
+        });
+
+        self.sidebarToggleCss = ko.computed({
+            read: function () {
+                return ko.unwrap(self.isVisibleMenu) ? 'sidebar-toggle-visible' : 'sidebar-toggle-hidden';
             },
             deferEvaluation: true
         });
