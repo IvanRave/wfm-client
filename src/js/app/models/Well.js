@@ -326,7 +326,9 @@
             }
         };
 
-        self.addWellHistory = function () { };
+        self.addWellHistory = function () {
+            alert('Under construction');
+        };
 
         ////self.addWellHistory = function () {
         ////    var historyDateFormat = 'yyyy-mm-dd';

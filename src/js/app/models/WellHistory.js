@@ -15,11 +15,15 @@
                 return well;
             };
 
+            // Properties
             self.Id = data.Id;
             self.History = ko.observable(data.History);
-
             self.startUnixTime = ko.observable(data.StartUnixTime);
             self.endUnixTime = ko.observable(data.EndUnixTime);
+            self.jobTypeId = ko.observable(data.JobTypeId);
+            self.WellId = data.WellId;
+            self.WfmImages = ko.observableArray();
+            self.WellHistoryFiles = ko.observableArray(importWellHistoryFiles(data.WellHistoryFiles));
 
             self.isVisibleEndUnixTime = ko.computed({
                 read: function () {
@@ -28,16 +32,21 @@
                 deferEvaluation: true
             });
 
-            ////self.StartDate = ko.observable(data.StartDate);
-            ////self.EndDate = ko.observable(data.EndDate);
-            self.WellId = data.WellId;
-            self.WfmImages = ko.observableArray();
-
-            self.WellHistoryFiles = ko.observableArray(importWellHistoryFiles(data.WellHistoryFiles));
-
             self.putWellHistory = function () {
-                datacontext.saveChangedWellHistory(self);
+                var wellHistoryData = {
+                    id: ko.unwrap(self.Id),
+                    startUnixTime: ko.unwrap(self.startUnixTime),
+                    endUnixTime: ko.unwrap(self.endUnixTime),
+                    wellId: ko.unwrap(self.WellId),
+                    history: ko.unwrap(self.History),
+                    jobTypeId: ko.unwrap(self.jobTypeId)
+                };
+
+                datacontext.putWellHistory(wellHistoryData);
             };
+
+            self.startUnixTime.subscribe(self.putWellHistory);
+            self.endUnixTime.subscribe(self.putWellHistory);
 
             ////self.editWellHistory = function () {
             ////    var inputHistory = document.createElement('textarea');
@@ -73,7 +82,7 @@
             ////        self.History($(inputHistory).val());
             ////        self.StartDate($(inputStartDate).val());
             ////        self.EndDate($(inputEndDate).val() || $(inputStartDate).val());
-            ////        datacontext.saveChangedWellHistory(self).done(function (result) {
+            ////        datacontext.putWellHistory(self).done(function (result) {
             ////            self.History(result.History);
             ////            self.StartDate(result.StartDate);
             ////            self.EndDate(result.EndDate);
@@ -212,8 +221,6 @@
 
                 self.getWell().showFmg(callbackFunction);
             };
-
-            self.toPlainJson = function () { return ko.toJS(self); };
 
             self.WfmImages(importWfmImagesDto(data.WfmImagesDto));
         }
