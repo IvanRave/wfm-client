@@ -8,10 +8,10 @@
     'moment',
     'app/models/well-partials/perfomance-partial',
     'app/models/well-partials/history-view',
-    'app/models/WellFile',
-    'app/models/ColumnAttribute',
-    'app/models/WellHistory',
-    'app/models/TestScope'
+    'app/models/well-file',
+    'app/models/column-attribute',
+    'app/models/well-history',
+    'app/models/test-scope'
 ], function ($, ko, datacontext, fileHelper, bootstrapModal, appHelper, appMoment, wellPerfomancePartial, HistoryView) {
     'use strict';
 
@@ -988,7 +988,7 @@
 
             var cnvs = document.getElementById('log_cnvs');
 
-            require(['app/models/ByteImagePart'], function () {
+            require(['app/models/byte-image-part'], function () {
                 var createdByteImagePart = datacontext.createByteImagePart({
                     Base64String: cnvs.toDataURL('image/png').replace('data:image/png;base64,', ''),
                     StartY: Math.abs($('#log_img').position().top)
