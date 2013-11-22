@@ -1,5 +1,5 @@
-define(['jquery', 'knockout', 'app/datacontext', 'bootstrap-modal', 'moment', 'app/models/WellHistoryFile', 'app/models/wfm-image'],
-    function ($, ko, datacontext, bootstrapModal, appMoment) {
+define(['jquery', 'knockout', 'app/datacontext', 'bootstrap-modal', 'app/models/WellHistoryFile', 'app/models/wfm-image'],
+    function ($, ko, datacontext, bootstrapModal) {
         'use strict';
 
         // convert data objects into array
@@ -17,59 +17,72 @@ define(['jquery', 'knockout', 'app/datacontext', 'bootstrap-modal', 'moment', 'a
 
             self.Id = data.Id;
             self.History = ko.observable(data.History);
-            self.StartDate = ko.observable(data.StartDate);
-            self.EndDate = ko.observable(data.EndDate);
+
+            self.startUnixTime = ko.observable(data.StartUnixTime);
+            self.endUnixTime = ko.observable(data.EndUnixTime);
+
+            self.isVisibleEndUnixTime = ko.computed({
+                read: function () {
+                    return ko.unwrap(self.startUnixTime) !== ko.unwrap(self.endUnixTime);
+                },
+                deferEvaluation: true
+            });
+
+            ////self.StartDate = ko.observable(data.StartDate);
+            ////self.EndDate = ko.observable(data.EndDate);
             self.WellId = data.WellId;
             self.WfmImages = ko.observableArray();
 
             self.WellHistoryFiles = ko.observableArray(importWellHistoryFiles(data.WellHistoryFiles));
 
-            self.editWellHistory = function () {
-                var inputHistory = document.createElement('textarea');
-                $(inputHistory).prop({ 'rows': 5 }).val(self.History()).addClass('form-control');
-
-                var datePattern = '(?:19|20)[0-9]{2}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-9])|(?:(?!02)(?:0[1-9]|1[0-2])-(?:30))|(?:(?:0[13578]|1[02])-31))';
-
-                var inputStartDate = document.createElement('input');
-                inputStartDate.type = 'text';
-                $(inputStartDate).prop({
-                    'required': true,
-                    'placeholder': 'yyyy-mm-dd',
-                    'pattern': datePattern,
-                    'title': 'Date format: yyyy-mm-dd (year, month, day)'
-                }).val(appMoment(self.StartDate()).format('YYYY-MM-DD')).addClass('datepicker');
-
-                var inputEndDate = document.createElement('input');
-                inputEndDate.type = 'text';
-                $(inputEndDate).prop({
-                    'placeholder': 'yyyy-mm-dd (not necessary)',
-                    'pattern': datePattern,
-                    'title': 'Date format: yyyy-mm-dd (year, month, day)'
-                })
-                    .val(self.EndDate() ? appMoment(self.EndDate()).format('YYYY-MM-DD') : '')
-                    .addClass('datepicker');
-
-                var innerDiv = document.createElement('div');
-                $(innerDiv).addClass('form-horizontal').append(
-                    bootstrapModal.gnrtDom('Start date', inputStartDate),
-                    bootstrapModal.gnrtDom('End date', inputEndDate),
-                    bootstrapModal.gnrtDom('History', inputHistory)
-                );
-
-                function submitFunction() {
-                    self.History($(inputHistory).val());
-                    self.StartDate($(inputStartDate).val());
-                    self.EndDate($(inputEndDate).val() || $(inputStartDate).val());
-                    datacontext.saveChangedWellHistory(self).done(function (result) {
-                        self.History(result.History);
-                        self.StartDate(result.StartDate);
-                        self.EndDate(result.EndDate);
-                    });
-                    bootstrapModal.closeModalWindow();
-                }
-
-                bootstrapModal.openModalWindow("Well history", innerDiv, submitFunction);
+            self.putWellHistory = function () {
+                datacontext.saveChangedWellHistory(self);
             };
+
+            ////self.editWellHistory = function () {
+            ////    var inputHistory = document.createElement('textarea');
+            ////    $(inputHistory).prop({ 'rows': 5 }).val(self.History()).addClass('form-control');
+
+            ////    var datePattern = '(?:19|20)[0-9]{2}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-9])|(?:(?!02)(?:0[1-9]|1[0-2])-(?:30))|(?:(?:0[13578]|1[02])-31))';
+
+            ////    var inputStartDate = document.createElement('input');
+            ////    inputStartDate.type = 'text';
+            ////    $(inputStartDate).prop({
+            ////        'required': true,
+            ////        'placeholder': 'yyyy-mm-dd',
+            ////        'pattern': datePattern,
+            ////        'title': 'Date format: yyyy-mm-dd (year, month, day)'
+            ////    }).val(appMoment(self.StartDate()).format('YYYY-MM-DD')).addClass('datepicker');
+
+            ////    var inputEndDate = document.createElement('input');
+            ////    inputEndDate.type = 'text';
+            ////    $(inputEndDate).prop({
+            ////        'placeholder': 'yyyy-mm-dd (not necessary)',
+            ////        'pattern': datePattern,
+            ////        'title': 'Date format: yyyy-mm-dd (year, month, day)'
+            ////    }).val(self.EndDate() ? appMoment(self.EndDate()).format('YYYY-MM-DD') : '').addClass('datepicker');
+
+            ////    var innerDiv = document.createElement('div');
+            ////    $(innerDiv).addClass('form-horizontal').append(
+            ////        bootstrapModal.gnrtDom('Start date', inputStartDate),
+            ////        bootstrapModal.gnrtDom('End date', inputEndDate),
+            ////        bootstrapModal.gnrtDom('History', inputHistory)
+            ////    );
+
+            ////    function submitFunction() {
+            ////        self.History($(inputHistory).val());
+            ////        self.StartDate($(inputStartDate).val());
+            ////        self.EndDate($(inputEndDate).val() || $(inputStartDate).val());
+            ////        datacontext.saveChangedWellHistory(self).done(function (result) {
+            ////            self.History(result.History);
+            ////            self.StartDate(result.StartDate);
+            ////            self.EndDate(result.EndDate);
+            ////        });
+            ////        bootstrapModal.closeModalWindow();
+            ////    }
+
+            ////    bootstrapModal.openModalWindow("Well history", innerDiv, submitFunction);
+            ////};
 
             self.deleteWfmImage = function () {
                 var itemForDelete = this;

@@ -70,6 +70,9 @@ define(['jquery', 'app/ajax-request'], function ($, ajaxRequest) {
     function widgetUrl(widgockId, widgetId) {
         return 'http://wfm-client.azurewebsites.net/api/widgocks/' + widgockId + '/widgets' + (widgetId ? ('/' + widgetId) : '');
     }
+    function jobTypeUrl(companyId, jobTypeId) {
+        return 'http://wfm-client.azurewebsites.net/api/companies/' + companyId + '/job-types' + (jobTypeId ? ('/' + jobTypeId) : '');
+    }
 
     // DataContext operations
     // 1. WellRegion
@@ -543,6 +546,10 @@ define(['jquery', 'app/ajax-request'], function ($, ajaxRequest) {
 
     datacontext.deleteWidget = function (widgockId, widgetId) {
         return ajaxRequest('DELETE', widgetUrl(widgockId, widgetId));
+    };
+    
+    datacontext.getJobTypeList = function (companyId) {
+        return ajaxRequest('GET', jobTypeUrl(companyId));
     };
 
     datacontext.getPossibleWidgoutList = function () {
