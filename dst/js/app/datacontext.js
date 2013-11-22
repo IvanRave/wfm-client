@@ -241,8 +241,8 @@ define(['jquery', 'app/ajax-request'], function ($, ajaxRequest) {
         return ajaxRequest('POST', wellHistoryUrl(), item);
     }
 
-    function saveChangedWellHistory(item) {
-        return ajaxRequest('PUT', wellHistoryUrl({ id: item.Id }), item);
+    function putWellHistory(wellHistoryData) {
+        return ajaxRequest('PUT', wellHistoryUrl({ id: wellHistoryData.id }), wellHistoryData);
     }
 
     function deleteWellHistory(item) {
@@ -444,7 +444,7 @@ define(['jquery', 'app/ajax-request'], function ($, ajaxRequest) {
         // WellHistory
         getWellHistoryList: getWellHistoryList,
         saveNewWellHistory: saveNewWellHistory,
-        saveChangedWellHistory: saveChangedWellHistory,
+        putWellHistory: putWellHistory,
         deleteWellHistory: deleteWellHistory,
         // WfmImage
         saveNewWfmImage: saveNewWfmImage,
