@@ -245,8 +245,8 @@
         return ajaxRequest('PUT', wellHistoryUrl({ id: wellHistoryData.id }), wellHistoryData);
     }
 
-    function deleteWellHistory(item) {
-        return ajaxRequest('DELETE', wellHistoryUrl({ id: item.Id }));
+    function deleteWellHistory(wellHistoryId) {
+        return ajaxRequest('DELETE', wellHistoryUrl({ id: wellHistoryId }));
     }
 
     // 9. WfmImage

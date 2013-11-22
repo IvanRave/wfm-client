@@ -28,8 +28,8 @@
                     - <span class="bld" data-bind="unix: endUnixTime"></span>
                   </span>
                 </div>
-                <div data-bind="visible: History">
-                  <blockquote class="pre-wrap-text" data-bind="text: History"></blockquote>
+                <div data-bind="visible: historyText">
+                  <blockquote class="pre-wrap-text" data-bind="text: historyText"></blockquote>
                 </div>
                 <div data-bind="foreach: WfmImages">
                   <img src="" data-bind="attr: { src: dataUrl }" alt="History image" class="img-thumbnail elem-shadow" />

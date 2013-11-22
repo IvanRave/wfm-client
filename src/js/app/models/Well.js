@@ -400,7 +400,7 @@
         self.deleteWellHistory = function (itemForDelete) {
             var tmpStartUnixTime = ko.unwrap(itemForDelete.startUnixTime);
             if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + appMoment(tmpStartUnixTime * 1000).format('YYYY-MM-DD') + '" record?')) {
-                datacontext.deleteWellHistory(itemForDelete).done(function () {
+                datacontext.deleteWellHistory(itemForDelete.id).done(function () {
                     self.historyList.remove(itemForDelete);
                 });
             }
