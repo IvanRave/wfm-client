@@ -398,13 +398,13 @@
           </div>
           <div class="col-md-10">
             <div data-bind="ifnot: $root.isEditable">
-              <div data-bind="visible: History">
-                <blockquote class="pre-wrap-text" data-bind="text: History"></blockquote>
+              <div data-bind="visible: historyText">
+                <blockquote class="pre-wrap-text" data-bind="text: historyText"></blockquote>
               </div>
             </div>
             <div data-bind="if: $root.isEditable">
               <blockquote>
-                <textarea class="form-control" rows="3" style="resize: vertical" data-bind="value: History"></textarea>
+                <textarea class="form-control" rows="3" style="resize: vertical" data-bind="value: historyText"></textarea>
                 <button class="btn btn-default btn-sm" type="button" data-bind="click: putWellHistory">
                   <i class="glyphicon glyphicon-saved"></i> Save
                 </button>
@@ -1093,8 +1093,8 @@
                     - <span class="bld" data-bind="unix: endUnixTime"></span>
                   </span>
                 </div>
-                <div data-bind="visible: History">
-                  <blockquote class="pre-wrap-text" data-bind="text: History"></blockquote>
+                <div data-bind="visible: historyText">
+                  <blockquote class="pre-wrap-text" data-bind="text: historyText"></blockquote>
                 </div>
                 <div data-bind="foreach: WfmImages">
                   <img src="" data-bind="attr: { src: dataUrl }" alt="History image" class="img-thumbnail elem-shadow" />
