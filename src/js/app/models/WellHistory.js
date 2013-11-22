@@ -24,6 +24,10 @@
 
             self.WellHistoryFiles = ko.observableArray(importWellHistoryFiles(data.WellHistoryFiles));
 
+            self.putWellHistory = function () {
+                datacontext.saveChangedWellHistory(self);
+            };
+
             self.editWellHistory = function () {
                 var inputHistory = document.createElement('textarea');
                 $(inputHistory).prop({ 'rows': 5 }).val(self.History()).addClass('form-control');
@@ -45,9 +49,7 @@
                     'placeholder': 'yyyy-mm-dd (not necessary)',
                     'pattern': datePattern,
                     'title': 'Date format: yyyy-mm-dd (year, month, day)'
-                })
-                    .val(self.EndDate() ? appMoment(self.EndDate()).format('YYYY-MM-DD') : '')
-                    .addClass('datepicker');
+                }).val(self.EndDate() ? appMoment(self.EndDate()).format('YYYY-MM-DD') : '').addClass('datepicker');
 
                 var innerDiv = document.createElement('div');
                 $(innerDiv).addClass('form-horizontal').append(

@@ -70,6 +70,9 @@
     function widgetUrl(widgockId, widgetId) {
         return '{{conf.requrl}}/api/widgocks/' + widgockId + '/widgets' + (widgetId ? ('/' + widgetId) : '');
     }
+    function jobTypeUrl(companyId, jobTypeId) {
+        return '{{conf.requrl}}/api/companies/' + companyId + '/job-types' + (jobTypeId ? ('/' + jobTypeId) : '');
+    }
 
     // DataContext operations
     // 1. WellRegion
@@ -543,6 +546,10 @@
 
     datacontext.deleteWidget = function (widgockId, widgetId) {
         return ajaxRequest('DELETE', widgetUrl(widgockId, widgetId));
+    };
+    
+    datacontext.getJobTypeList = function (companyId) {
+        return ajaxRequest('GET', jobTypeUrl(companyId));
     };
 
     datacontext.getPossibleWidgoutList = function () {

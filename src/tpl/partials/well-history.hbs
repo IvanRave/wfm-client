@@ -19,6 +19,7 @@
             <button class="btn btn-default btn-sm" type="button" data-bind="click: changeSortByDateOrder">
               {{capitalizeFirst lang.sortByDate}} <i class="glyphicon" data-bind="css: sortByDateCss"></i>
             </button>
+            <!--<select data-bind="options: $root.jobTypeList"></select>-->
           </div>
         </div>
         <div data-bind="if: historyList().length === 0">
@@ -37,6 +38,12 @@
               <span data-bind="date: EndDate, visible: StartDate() !== EndDate()"></span>
             </div>
             <div data-bind="if: $root.isEditable">
+              <!--<div>
+                <input class="input-sm" size="10" data-bind="datepicker: StartDate, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }"></input>
+              </div>
+              <div>
+                <span data-bind="date: EndDate, visible: StartDate() !== EndDate()"></span>
+              </div>-->
               <div class="btn-group-vertical btn-group-sm">
                 <button class="btn btn-default" type="button" data-bind="click: editWellHistory">
                   <i class="glyphicon glyphicon-edit"></i> {{capitalizeFirst lang.toEdit}}
@@ -54,8 +61,18 @@
             </div>
           </div>
           <div class="col-md-10">
-            <div data-bind="visible: History">
-              <blockquote class="pre-wrap-text" data-bind="text: History"></blockquote>
+            <div data-bind="ifnot: $root.isEditable">
+              <div data-bind="visible: History">
+                <blockquote class="pre-wrap-text" data-bind="text: History"></blockquote>
+              </div>
+            </div>
+            <div data-bind="if: $root.isEditable">
+              <blockquote>
+                <textarea class="form-control" rows="3" style="resize: vertical" data-bind="value: History"></textarea>
+                <button class="btn btn-default btn-sm" type="button" data-bind="click: putWellHistory">
+                  <i class="glyphicon glyphicon-saved"></i> {{capitalizeFirst lang.toSave}}
+                </button>
+              </blockquote>
             </div>
             <div data-bind="foreach: WfmImages">
               <div>
