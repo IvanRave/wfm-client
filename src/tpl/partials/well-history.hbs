@@ -32,10 +32,10 @@
         <div class="row well-history-block">
           <div class="col-md-2">
             <div>
-              <span data-bind="date: StartDate"></span>
+              <span data-bind="unix: startUnixTime"></span>
             </div>
             <div>
-              <span data-bind="date: EndDate, visible: StartDate() !== EndDate()"></span>
+              <span data-bind="unix: endUnixTime, visible: isVisibleEndUnixTime"></span>
             </div>
             <div data-bind="if: $root.isEditable">
               <!--<div>
@@ -45,9 +45,6 @@
                 <span data-bind="date: EndDate, visible: StartDate() !== EndDate()"></span>
               </div>-->
               <div class="btn-group-vertical btn-group-sm">
-                <button class="btn btn-default" type="button" data-bind="click: editWellHistory">
-                  <i class="glyphicon glyphicon-edit"></i> {{capitalizeFirst lang.toEdit}}
-                </button>
                 <button class="btn btn-default" type="button" data-bind="click: chooseWellHistoryFile">
                   <i class="glyphicon glyphicon-paperclip"></i> {{capitalizeFirst lang.attachFile}}
                 </button>

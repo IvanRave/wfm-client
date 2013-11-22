@@ -55,6 +55,14 @@
             }
         }
     };
+    
+    ko.bindingHandlers.unix = {
+        update: function (element, valueAccessor) {
+            if (ko.unwrap(valueAccessor())) {
+                element.innerHTML = appMoment(ko.unwrap(valueAccessor()) * 1000).format('YYYY-MM-DD');
+            }
+        }
+    };
 
     ko.bindingHandlers.prec = {
         update: function (element, valueAccessor) {

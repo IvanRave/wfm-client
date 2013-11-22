@@ -4,9 +4,6 @@
       <div data-bind="with: widget.historyView">
         <span>{{capitalizeFirst lang.filterByDate}}:</span>
         <input class="input-sm" type="text" size="10" data-bind="datepicker: startDate, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }" />
-        <span data-bind="if: startDate">
-          <!--<span data-bind="text: new Date(startDate() * 1000).toISOString()"></span>-->
-        </span>
         <span> - </span>
         <input class="input-sm" type="text" size="10" data-bind="datepicker: endDate, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }" />
         <button class="btn btn-default btn-sm" type="button" data-bind="click: changeSortByDateOrder">
@@ -26,9 +23,9 @@
             <div data-bind="foreach: sortedHistoryList">
               <div class="well-history-block">
                 <div class="text-center">
-                  <span class="bld" data-bind="date: StartDate"></span>
-                  <span data-bind="visible: StartDate() !== EndDate()">
-                    - <span class="bld" data-bind="date: EndDate"></span>
+                  <span class="bld" data-bind="unix: startUnixTime"></span>
+                  <span data-bind="visible: isVisibleEndUnixTime">
+                    - <span class="bld" data-bind="unix: endUnixTime"></span>
                   </span>
                 </div>
                 <div data-bind="visible: History">
