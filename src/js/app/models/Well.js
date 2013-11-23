@@ -326,8 +326,42 @@
             }
         };
 
-        self.addWellHistory = function () {
-            alert('Under construction');
+        self.wellHistoryNew = {
+            startUnixTime: ko.observable(),
+            endUnixTime: ko.observable(),
+            wellId: self.Id,
+            historyText: ''
+        };
+
+        self.isEnabledPostWellHistory = ko.computed({
+            read: function () {
+                if (ko.unwrap(self.wellHistoryNew.startUnixTime)) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            },
+            deferEvaluation: true
+        });
+
+        self.postWellHistory = function () {
+            if (ko.unwrap(self.isEnabledPostWellHistory)) {
+                var wellHistoryNewData = ko.toJS(self.wellHistoryNew);
+
+                if (wellHistoryNewData.startUnixTime) {
+                    if (!wellHistoryNewData.endUnixTime) {
+                        wellHistoryNewData.endUnixTime = wellHistoryNewData.startUnixTime;
+                    }
+
+                    datacontext.postWellHistory(wellHistoryNewData).done(function (result) {
+                        self.historyList.push(datacontext.createWellHistory(result, self));
+                        // Set to null for psblty creating new well history
+                        self.wellHistoryNew.startUnixTime(null);
+                        self.wellHistoryNew.endUnixTime(null);
+                    });
+                }
+            }
         };
 
         ////self.addWellHistory = function () {
@@ -387,7 +421,7 @@
         ////            WellId: self.Id
         ////        }, self);
 
-        ////        datacontext.saveNewWellHistory(wellHistoryItem).done(function (result) {
+        ////        datacontext.postWellHistory(wellHistoryItem).done(function (result) {
         ////            var whi = datacontext.createWellHistory(result, self);
         ////            self.historyList.push(whi);
         ////        });

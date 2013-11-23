@@ -1,4 +1,4 @@
-define(['jquery', 'knockout', 'app/datacontext', 'moment', 'app/models/TestData'], function ($, ko, datacontext, appMoment) {
+define(['jquery', 'knockout', 'app/datacontext', 'moment', 'app/models/test-data'], function ($, ko, datacontext, appMoment) {
     'use strict';
 
     function importTestDataDtoList(data, testScopeItem) {

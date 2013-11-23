@@ -1,15 +1,8 @@
 ﻿<script type="text/html" id="well-history-tpl">
   <span data-bind="ifnot: isLoadedHistoryList">{{capitalizeFirst lang.loading}}...</span>
   <div data-bind="if: isLoadedHistoryList">
-    <div class="row">
-      <div class="col-sm-2">
-        <div data-bind="visible: $root.isEditable">
-          <button class="btn btn-sm btn-default" data-bind="click: addWellHistory">
-            <i class="glyphicon glyphicon-plus"></i> {{capitalizeFirst lang.toCreateRecord}}
-          </button>
-        </div>
-      </div>
-      <div class="col-sm-10">
+    <div class="clearfix">
+      <div class="pull-left">
         <div data-bind="if: historyList().length > 0">
           <div data-bind="with: historyView">
             <span>{{capitalizeFirst lang.filterByDate}}:</span>
@@ -26,6 +19,16 @@
           <small>{{capitalizeFirst lang.noWellHistoryList}}</small>
         </div>
       </div>
+      <div class="pull-right" data-bind="if: $root.isEditable">
+        <span data-bind="with: wellHistoryNew">
+          <input class="input-sm" type="text" size="10" data-bind="datepicker: startUnixTime, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }" />
+          <span> - </span>
+          <input class="input-sm" type="text" size="10" data-bind="datepicker: endUnixTime, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }" />
+        </span>
+        <button class="btn btn-sm btn-default" data-bind="click: postWellHistory, enable: isEnabledPostWellHistory">
+          <i class="glyphicon glyphicon-plus"></i> {{capitalizeFirst lang.toCreateRecord}}
+        </button>
+      </div>
     </div>
     <div data-bind="with: historyView">
       <div data-bind="foreach: sortedHistoryList">
@@ -38,13 +41,22 @@
               <div>
                 <span data-bind="unix: endUnixTime, visible: isVisibleEndUnixTime"></span>
               </div>
+              <div data-bind="with: jobType">
+                Job type: <span class="bld" data-bind="text: name"></span>
+              </div>
             </div>
             <div data-bind="if: $root.isEditable">
               <div>
-                <input class="input-sm" size="10" data-bind="datepicker: startUnixTime, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }"></input>
+                <input class="input-sm" type="text" size="10" data-bind="datepicker: startUnixTime, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }"></input>
               </div>
               <div>
-                <input class="input-sm" size="10" data-bind="datepicker: endUnixTime, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }"></input>
+                <input class="input-sm" type="text" size="10" data-bind="datepicker: endUnixTime, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }"></input>
+              </div>
+              <div>
+                <!--<div>Job type:</div>
+                <div>
+                  <select></select>
+                </div>-->
               </div>
               <div class="btn-group-vertical btn-group-sm">
                 <button class="btn btn-default" type="button" data-bind="click: chooseWellHistoryFile">

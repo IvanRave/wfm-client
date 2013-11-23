@@ -1,4 +1,4 @@
-define(['jquery', 'knockout', 'app/datacontext', 'bootstrap-modal', 'app/app-helper', 'app/models/WellFieldMapArea', 'app/models/WellInWellFieldMap'],
+define(['jquery', 'knockout', 'app/datacontext', 'bootstrap-modal', 'app/app-helper', 'app/models/well-field-map-area', 'app/models/well-in-well-field-map'],
     function ($, ko, datacontext, bootstrapModal, appHelper) {
         'use strict';
 

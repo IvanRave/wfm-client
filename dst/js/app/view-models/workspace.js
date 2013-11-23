@@ -6,7 +6,7 @@ define([
     'app/app-helper',
     'app/models/job-type',
     'knockout-lazy',
-    'app/models/WellRegion'
+    'app/models/well-region'
 ], function ($, ko, datacontext, bootstrapModal, appHelper, JobType) {
     'use strict';
 

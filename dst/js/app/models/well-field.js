@@ -3,8 +3,8 @@ define(['jquery',
     'app/datacontext',
     'app/file-helper',
     'bootstrap-modal',
-    'app/models/WellGroup',
-    'app/models/WellFieldMap'
+    'app/models/well-group',
+    'app/models/well-field-map'
 ], function ($, ko, datacontext, fileHelper, bootstrapModal) {
     'use strict';
 

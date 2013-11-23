@@ -21,7 +21,7 @@ module.exports = function (grunt) {
         lang = grunt.option('lang') || 'en';
         
     // Commit message for bump feature
-    var cmtmsg = grunt.option('cmtmsg') || 'fix(project): change';
+    // // var cmtmsg = grunt.option('cmtmsg') || 'fix(project): change';
     
     // var cmtType = grunt.option('cmtType') || 'fix',
         // // Scope could be anything specifying place of the commit change
@@ -228,15 +228,15 @@ module.exports = function (grunt) {
           options: {
             files: ['package.json', 'bower.json'],
             updateConfigs: ['pkg'],
-            commit: true,
+            commit: false,
             // <type>(<scope>): <subject>
-            commitMessage: cmtmsg,
-            commitFiles: ['-a'],
-            createTag: true,
-            tagName: 'v%VERSION%',
-            tagMessage: 'Version %VERSION%',
-            push: true,
-            pushTo: 'origin'
+            // commitMessage: cmtmsg,
+            // commitFiles: ['-a'],
+            // createTag: true,
+            // tagName: 'v%VERSION%',
+            // tagMessage: 'Version %VERSION%',
+            push: false
+            // pushTo: 'origin'
           }
         },
         // For development: run tasks when change files

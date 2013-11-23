@@ -2,7 +2,7 @@ define(['jquery',
     'knockout',
     'app/datacontext',
     'bootstrap-modal',
-    'app/models/WellField'], function ($, ko, datacontext, bootstrapModal) {
+    'app/models/well-field'], function ($, ko, datacontext, bootstrapModal) {
         'use strict';
 
         // 2. WellField (convert data objects into array)

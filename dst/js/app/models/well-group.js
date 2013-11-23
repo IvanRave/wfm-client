@@ -2,8 +2,8 @@ define(['jquery',
     'knockout',
     'app/datacontext',
     'bootstrap-modal',
-    'app/models/Well',
-    'app/models/WellGroupWfmParameter'], function ($, ko, datacontext, bootstrapModal) {
+    'app/models/well',
+    'app/models/well-group-wfm-parameter'], function ($, ko, datacontext, bootstrapModal) {
     'use strict';
 
     // 18. WellGroupWfmParameter

@@ -1,5 +1,5 @@
-﻿define(['jquery', 'knockout', 'app/datacontext', 'bootstrap-modal', 'app/models/well-history-file', 'app/models/wfm-image'],
-    function ($, ko, datacontext, bootstrapModal) {
+﻿define(['jquery', 'knockout', 'app/datacontext', 'bootstrap-modal', 'app/models/job-type', 'app/models/well-history-file', 'app/models/wfm-image'],
+    function ($, ko, datacontext, bootstrapModal, JobType) {
         'use strict';
 
         // convert data objects into array
@@ -25,6 +25,7 @@
 
             self.WfmImages = ko.observableArray();
             self.WellHistoryFiles = ko.observableArray(importWellHistoryFiles(data.WellHistoryFiles));
+            self.jobType = ko.observable();
 
             self.isVisibleEndUnixTime = ko.computed({
                 read: function () {
@@ -83,7 +84,7 @@
                                 CloudFileUrl: self.wellId + '/history/work/' + elemValue.Name()
                             });
 
-                            datacontext.saveNewWellHistoryFile(itemForAdd).done(function (response) {
+                            datacontext.postWellHistoryFile(itemForAdd).done(function (response) {
                                 self.WellHistoryFiles.push(datacontext.createWellHistoryFile(response));
                             });
                         }
@@ -176,7 +177,13 @@
                 self.getWell().showFmg(callbackFunction);
             };
 
-            self.WfmImages(importWfmImagesDto(data.WfmImagesDto));
+            if (data.WfmImagesDto){
+                self.WfmImages(importWfmImagesDto(data.WfmImagesDto));
+            }
+
+            if (data.JobTypeDto) {
+                self.jobType(new JobType(data.JobTypeDto));
+            }
         }
 
         datacontext.createWellHistory = function (item, wellParent) {

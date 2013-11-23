@@ -8,10 +8,10 @@ define([
     'moment',
     'app/models/well-partials/perfomance-partial',
     'app/models/well-partials/history-view',
-    'app/models/WellFile',
-    'app/models/ColumnAttribute',
-    'app/models/WellHistory',
-    'app/models/TestScope'
+    'app/models/well-file',
+    'app/models/column-attribute',
+    'app/models/well-history',
+    'app/models/test-scope'
 ], function ($, ko, datacontext, fileHelper, bootstrapModal, appHelper, appMoment, wellPerfomancePartial, HistoryView) {
     'use strict';
 
@@ -326,8 +326,42 @@ define([
             }
         };
 
-        self.addWellHistory = function () {
-            alert('Under construction');
+        self.wellHistoryNew = {
+            startUnixTime: ko.observable(),
+            endUnixTime: ko.observable(),
+            wellId: self.Id,
+            historyText: ''
+        };
+
+        self.isEnabledPostWellHistory = ko.computed({
+            read: function () {
+                if (ko.unwrap(self.wellHistoryNew.startUnixTime)) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            },
+            deferEvaluation: true
+        });
+
+        self.postWellHistory = function () {
+            if (ko.unwrap(self.isEnabledPostWellHistory)) {
+                var wellHistoryNewData = ko.toJS(self.wellHistoryNew);
+
+                if (wellHistoryNewData.startUnixTime) {
+                    if (!wellHistoryNewData.endUnixTime) {
+                        wellHistoryNewData.endUnixTime = wellHistoryNewData.startUnixTime;
+                    }
+
+                    datacontext.postWellHistory(wellHistoryNewData).done(function (result) {
+                        self.historyList.push(datacontext.createWellHistory(result, self));
+                        // Set to null for psblty creating new well history
+                        self.wellHistoryNew.startUnixTime(null);
+                        self.wellHistoryNew.endUnixTime(null);
+                    });
+                }
+            }
         };
 
         ////self.addWellHistory = function () {
@@ -387,7 +421,7 @@ define([
         ////            WellId: self.Id
         ////        }, self);
 
-        ////        datacontext.saveNewWellHistory(wellHistoryItem).done(function (result) {
+        ////        datacontext.postWellHistory(wellHistoryItem).done(function (result) {
         ////            var whi = datacontext.createWellHistory(result, self);
         ////            self.historyList.push(whi);
         ////        });
@@ -988,7 +1022,7 @@ define([
 
             var cnvs = document.getElementById('log_cnvs');
 
-            require(['app/models/ByteImagePart'], function () {
+            require(['app/models/byte-image-part'], function () {
                 var createdByteImagePart = datacontext.createByteImagePart({
                     Base64String: cnvs.toDataURL('image/png').replace('data:image/png;base64,', ''),
                     StartY: Math.abs($('#log_img').position().top)
