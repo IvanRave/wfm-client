@@ -109,7 +109,7 @@ define(['jquery',
             // Remove AUTH httponly cookie
             appDatacontext.accountLogoff().done(function () {
                 // After logoff navigate to the main page
-                angWindow.location.href = '#{{syst.logonUrl}}';
+                angWindow.location.href = '{{syst.hashPref}}{{syst.logonUrl}}';
             });
         }]);
     });

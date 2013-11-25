@@ -1,6 +1,6 @@
 {
   "name": "WFM",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "Well file manager",
   "author": {
     "name": "Petrohelp"
@@ -11,14 +11,14 @@
     "url": "https://github.com/IvanRave/wfm.git"
   },
   "devDependencies": {
-    "grunt": "~0.4.1",
+    "grunt": "~0.4.2",
     "grunt-contrib-clean": "~0.5.0",
-    "grunt-contrib-uglify": "~0.2.4",
+    "grunt-contrib-uglify": "~0.2.7",
     "grunt-contrib-concat": "~0.3.0",
     "grunt-contrib-copy": "~0.4.1",
     "grunt-contrib-htmlmin": "~0.1.3",
     "grunt-contrib-less": "~0.7.0",
-    "grunt-gh-pages": "~0.8.0",
+    "grunt-gh-pages": "~0.8.1",
     "grunt-env": "~0.4.0",
     "grunt-preprocess": "~3.0.1",
     "grunt-contrib-watch": "~0.5.3",
@@ -27,7 +27,7 @@
     "requirejs": "~2.1.9",
     "grunt-requirejs": "~0.4.0",
     "grunt-contrib-jshint": "~0.7.0",
-    "assemble": "~0.4.18",
+    "assemble": "~0.4.27",
     "bower": "~1.2.7",
     "grunt-bower-task": "~0.3.4",
     "grunt-bump": "0.0.11"

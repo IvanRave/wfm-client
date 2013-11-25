@@ -3,7 +3,7 @@ layout: false
 ---
 <div class="clearfix">
     <div class="col-md-6 col-md-offset-1">
-        <h3>{{capitalizeFirst lang.signIn}} {{lang.or}} <a href="#{{syst.registerUrl}}">{{lang.toRegisterACompany}}</a>:</h3>
+        <h3>{{capitalizeFirst lang.signIn}} {{lang.or}} <a href="{{syst.hashPref}}{{syst.registerUrl}}">{{lang.toRegisterACompany}}</a>:</h3>
         <form class="form-horizontal" name="accountForm">
             <div class="form-group" ng-class="{'has-error': accountForm.email.$invalid}">
                 <label class="control-label col-sm-2">{{capitalizeFirst lang.email}}</label>

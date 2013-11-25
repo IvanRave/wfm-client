@@ -1,4 +1,5 @@
 ﻿{
+  "hashPref": "#",
   "logonUrl": "/account/logon",
   "logoffUrl": "/account/logoff",
   "registerUrl": "/account/register",

@@ -72,7 +72,7 @@
                     case 401:
                         ////alert('Access is denied. Please login with right credentials.');
                         
-                        var logonUrl = '#{{syst.logonUrl}}';
+                        var logonUrl = '{{syst.hashPref}}{{syst.logonUrl}}';
 
                         var currentHash = window.location.hash;
                         if (currentHash) {
