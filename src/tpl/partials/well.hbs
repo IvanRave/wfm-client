@@ -1,13 +1,13 @@
 ﻿<div>
   <div class="wfm-workspace-well-top-tab clearfix">
     <div class="pull-left" style="margin-top:1px">
-      <button type="button" class="btn btn-inverse btn-sm" data-bind="click: function(){ selectedSectionId(null); }">
-        <i class="glyphicon glyphicon-th"></i>&nbsp;&nbsp;<span>Well dashboard</span>
+      <button type="button" class="btn btn-inverse btn-sm" data-bind="click: unselectSection">
+        <i class="glyphicon glyphicon-th"></i>&nbsp;&nbsp;<span>{{capitalizeFirst lang.well}} {{lang.dashboard}}</span>
       </button>
     </div>
     <div class="pull-left" style="margin-top:1px">
       <button type="button" class="btn btn-inverse btn-sm" data-bind="click: showFmg">
-        <i class="glyphicon glyphicon-folder-open"></i>&nbsp;&nbsp;<span>File manager</span>
+        <i class="glyphicon glyphicon-folder-open"></i>&nbsp;&nbsp;<span>{{capitalizeFirst lang.fileManager}}</span>
       </button>
     </div>
   </div>
@@ -34,10 +34,10 @@
           </div>
           <ul class="dropdown-menu">
             <li>
-              <div data-bind="click: function() { $parent.selectSection('sketch'); }">Sketch</div>
+              <div data-bind="click: function() { $parent.selectSection('sketch'); }">{{capitalizeFirst lang.sketch}}</div>
             </li>
             <li>
-              <div data-bind="click: function() { $parent.selectSection('volume'); }">Volume</div>
+              <div data-bind="click: function() { $parent.selectSection('volume'); }">{{capitalizeFirst lang.volume}}</div>
             </li>
           </ul>
         </li>

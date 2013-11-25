@@ -84,7 +84,16 @@
         }, self);
 
         self.goToPostingJobType = function () {
-            alert('{{capitalizeFirst lang.underConstruction}}');
+            var jobTypeNewName = window.prompt('{{capitalizeFirst lang.toAddJobTypeToList}}');
+            if (jobTypeNewName) {
+                datacontext.postCompanyJobType(companyId, {
+                    name: jobTypeNewName,
+                    description: '',
+                    companyId: companyId
+                }).done(function (jobTypeCreated) {
+                    self.jobTypeList.push(new JobType(jobTypeCreated));
+                });
+            }
         };
 
         // Get all parameters from all groups as one dimensional array

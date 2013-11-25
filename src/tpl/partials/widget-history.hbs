@@ -9,6 +9,7 @@
         <button class="btn btn-default btn-sm" type="button" data-bind="click: changeSortByDateOrder">
           {{capitalizeFirst lang.sortByDate}} <i class="glyphicon" data-bind="css: sortByDateCss"></i>
         </button>
+        <select class="input-sm" data-bind="options: $root.jobTypeList, optionsText: 'name', optionsValue: 'id', value: jobTypeId, optionsCaption: '{{capitalizeFirst lang.filterByJobType}}...'"></select>
       </div>
     </div>
   </div>

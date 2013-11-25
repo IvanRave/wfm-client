@@ -70,7 +70,7 @@
     function widgetUrl(widgockId, widgetId) {
         return '{{conf.requrl}}/api/widgocks/' + widgockId + '/widgets' + (widgetId ? ('/' + widgetId) : '');
     }
-    function jobTypeUrl(companyId, jobTypeId) {
+    function companyJobTypeUrl(companyId, jobTypeId) {
         return '{{conf.requrl}}/api/companies/' + companyId + '/job-types' + (jobTypeId ? ('/' + jobTypeId) : '');
     }
 
@@ -549,7 +549,11 @@
     };
     
     datacontext.getJobTypeList = function (companyId) {
-        return ajaxRequest('GET', jobTypeUrl(companyId));
+        return ajaxRequest('GET', companyJobTypeUrl(companyId));
+    };
+
+    datacontext.postCompanyJobType = function (companyId, jobTypeData) {
+        return ajaxRequest('POST', companyJobTypeUrl(companyId), jobTypeData);
     };
 
     datacontext.getPossibleWidgoutList = function () {

@@ -12,7 +12,7 @@
             <button class="btn btn-default btn-sm" type="button" data-bind="click: changeSortByDateOrder">
               {{capitalizeFirst lang.sortByDate}} <i class="glyphicon" data-bind="css: sortByDateCss"></i>
             </button>
-            <!--<select data-bind="options: $root.jobTypeList, optionsText: 'name', optionsCaption: 'filter by job type...'"></select>-->
+            <select class="input-sm" data-bind="options: $root.jobTypeList, optionsText: 'name', optionsValue: 'id', value: jobTypeId, optionsCaption: '{{capitalizeFirst lang.filterByJobType}}...'"></select>
           </div>
         </div>
         <div data-bind="if: historyList().length === 0">
@@ -60,7 +60,7 @@
                 <div data-bind="if: $root.jobTypeList().length > 0">
                   <span class="bld">{{capitalizeFirst lang.jobType}}:</span>
                   <select class="input-sm" data-bind="options: $root.jobTypeList, optionsText: 'name', optionsValue: 'id', optionsCaption: 'No job type', value: jobTypeId"></select>
-                  <button class="btn btn-xs btn-link" data-bind="click: $root.goToPostingJobType">{{lang.or}} {{lang.toAddJobType}}</button>
+                  <button class="btn btn-xs btn-link" data-bind="click: $root.goToPostingJobType">{{lang.toAddJobTypeToList}}</button>
                 </div>
               </div>
             </div>
