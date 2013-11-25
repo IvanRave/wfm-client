@@ -83,6 +83,10 @@
             });
         }, self);
 
+        self.goToPostingJobType = function () {
+            alert('{{capitalizeFirst lang.underConstruction}}');
+        };
+
         // Get all parameters from all groups as one dimensional array
         self.wfmParameterList = ko.computed({
             read: function () {

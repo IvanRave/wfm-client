@@ -51,8 +51,9 @@
             return wellGroup;
         };
 
-        // Do not include to self
-        var appViewModel = self.getWellGroup().getWellField().getWellRegion().getParentViewModel();
+        self.getAppViewModel = function () {
+            return self.getWellGroup().getWellField().getWellRegion().getParentViewModel();
+        };
 
         // Persisted properties
         self.Id = data.Id;
@@ -125,17 +126,22 @@
             // Previous - by default - summary self.sectionList[0].id;
             var previousSelectedSectionId;
 
+            var prevSlcWellRegion = ko.unwrap(self.getAppViewModel().selectedWellRegion);
+
             // get previous selected section (if exists)
-            if (appViewModel.selectedWellRegion()) {
-                if (appViewModel.selectedWellRegion().selectedWellField()) {
-                    if (appViewModel.selectedWellRegion().selectedWellField().selectedWellGroup()) {
+            if (prevSlcWellRegion) {
+                var prevSlcWellField = ko.unwrap(prevSlcWellRegion.selectedWellField);
+                if (prevSlcWellField) {
+                    var prevSlcWellGroup = ko.unwrap(prevSlcWellField.selectedWellGroup);
+                    if (prevSlcWellGroup) {
                         // previous selected well
-                        var previousWell = appViewModel.selectedWellRegion().selectedWellField().selectedWellGroup().selectedWell();
-                        if (previousWell) {
-                            if (previousWell.selectedSectionId()) {
-                                previousSelectedSectionId = previousWell.selectedSectionId();
+                        var prevSlcWell = ko.unwrap(prevSlcWellGroup.selectedWell);
+                        if (prevSlcWell) {
+                            var prevSlcSectionId = ko.unwrap(prevSlcWell.selectedSectionId);
+                            if (prevSlcSectionId) {
+                                previousSelectedSectionId = prevSlcSectionId;
                             }
-                            var tmpSelectedAttrGroupId = ko.unwrap(previousWell.mainPerfomanceView.selectedAttrGroupId);
+                            var tmpSelectedAttrGroupId = ko.unwrap(prevSlcWell.mainPerfomanceView.selectedAttrGroupId);
                             if (tmpSelectedAttrGroupId) {
                                 self.mainPerfomanceView.selectedAttrGroupId(tmpSelectedAttrGroupId);
                             }
@@ -490,7 +496,7 @@
 
         ////    if (self.isCompanyLogoInReport() === true) {
         ////        // get user profile
-        ////        if (!appViewModel.curUserProfile().companyLogo()) {
+        ////        if (!self.getAppViewModel().curUserProfile().companyLogo()) {
         ////            alert('No company logo. Please upload company logo in Cabinet');
         ////            return;
         ////        }
@@ -507,7 +513,7 @@
 
         ////    var logoUrl = null;
         ////    if (self.isCompanyLogoInReport() === true) {
-        ////        var companyLogoByte64String = appViewModel.curUserProfile().companyLogo();
+        ////        var companyLogoByte64String = self.getAppViewModel().curUserProfile().companyLogo();
         ////        if (companyLogoByte64String) {
         ////            logoUrl = companyLogoByte64String;
         ////        }

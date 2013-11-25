@@ -1,5 +1,5 @@
-define(['jquery', 'knockout', 'app/datacontext', 'bootstrap-modal', 'app/models/job-type', 'app/models/well-history-file', 'app/models/wfm-image'],
-    function ($, ko, datacontext, bootstrapModal, JobType) {
+define(['jquery', 'knockout', 'app/datacontext', 'bootstrap-modal', 'app/app-helper', 'app/models/well-history-file', 'app/models/wfm-image'],
+    function ($, ko, datacontext, bootstrapModal, appHelper) {
         'use strict';
 
         // convert data objects into array
@@ -20,12 +20,24 @@ define(['jquery', 'knockout', 'app/datacontext', 'bootstrap-modal', 'app/models/
             self.historyText = ko.observable(data.HistoryText);
             self.startUnixTime = ko.observable(data.StartUnixTime);
             self.endUnixTime = ko.observable(data.EndUnixTime);
-            self.jobTypeId = ko.observable(data.JobTypeId);
+            self.jobTypeId = data.JobTypeId ? ko.observable(data.JobTypeId) : ko.observable();
             self.wellId = data.WellId;
 
             self.WfmImages = ko.observableArray();
             self.WellHistoryFiles = ko.observableArray(importWellHistoryFiles(data.WellHistoryFiles));
-            self.jobType = ko.observable();
+            // Load job type id
+            // Extract from root.companyJobTypeList by id
+            // Computed
+            self.jobType = ko.computed({
+                read: function () {
+                    var tmpJobTypeId = ko.unwrap(self.jobTypeId);
+                    if (tmpJobTypeId) {
+                        var companyJobTypeList = ko.unwrap(self.getWell().getAppViewModel().jobTypeList);
+                        return appHelper.getElementByPropertyValue(companyJobTypeList, 'id', tmpJobTypeId);
+                    }
+                },
+                deferEvaluation: true
+            });
 
             self.isVisibleEndUnixTime = ko.computed({
                 read: function () {
@@ -49,6 +61,7 @@ define(['jquery', 'knockout', 'app/datacontext', 'bootstrap-modal', 'app/models/
 
             self.startUnixTime.subscribe(self.putWellHistory);
             self.endUnixTime.subscribe(self.putWellHistory);
+            self.jobTypeId.subscribe(self.putWellHistory);
 
             self.deleteWfmImage = function (itemForDelete) {
                 if (confirm('Are you sure you want to delete "' + itemForDelete.Name + '"?')) {
@@ -177,13 +190,14 @@ define(['jquery', 'knockout', 'app/datacontext', 'bootstrap-modal', 'app/models/
                 self.getWell().showFmg(callbackFunction);
             };
 
-            if (data.WfmImagesDto){
+            if (data.WfmImagesDto) {
                 self.WfmImages(importWfmImagesDto(data.WfmImagesDto));
             }
 
-            if (data.JobTypeDto) {
-                self.jobType(new JobType(data.JobTypeDto));
-            }
+            // No needs. Extracted from root.jobTypeList
+            ////if (data.JobTypeDto) {
+            ////    self.jobType(new JobType(data.JobTypeDto));
+            ////}
         }
 
         datacontext.createWellHistory = function (item, wellParent) {

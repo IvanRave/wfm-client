@@ -31,10 +31,16 @@
                 <div data-bind="visible: historyText">
                   <blockquote class="pre-wrap-text" data-bind="text: historyText"></blockquote>
                 </div>
-                <div data-bind="foreach: WfmImages">
-                  <img src="" data-bind="attr: { src: dataUrl }" alt="History image" class="img-thumbnail elem-shadow" />
+                <div data-bind="with: jobType">
+                  <blockquote>
+                    <span class="bld">{{capitalizeFirst lang.jobType}}:</span>
+                    <span data-bind="text: name"></span>
+                  </blockquote>
                 </div>
-                <div data-bind="foreach: WellHistoryFiles" class="clearfix">
+                <div data-bind="foreach: WfmImages">
+                  <img class="img-thumbnail elem-shadow" src="" data-bind="attr: { src: dataUrl }" alt="History image" />
+                </div>
+                <div class="clearfix" data-bind="foreach: WellHistoryFiles">
                   <div class="img-thumbnail pull-left">
                     <a href="#" data-bind="text: FileNameWODate, click: downloadWellHistoryFile"></a>
                   </div>
