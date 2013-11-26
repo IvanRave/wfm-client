@@ -130,7 +130,19 @@ module.exports = function (grunt) {
                         'jQuery-slimScroll/jquery.slimscroll.js', 'blueimp-file-upload/js/vendor/jquery.ui.widget.js',
                         'blueimp-file-upload/js/jquery.fileupload.js', 'blueimp-file-upload/js/jquery.iframe-transport.js',
                         'blueimp-canvas-to-blob/js/canvas-to-blob.js',
-                        'blueimp-load-image/js/load-image.js', 'blueimp-load-image/js/load-image-*.js']
+                        'blueimp-load-image/js/load-image.js', 'blueimp-load-image/js/load-image-*.js',
+                        'blueimp-gallery/js/blueimp-gallery.js', 'blueimp-gallery/js/blueimp-helper.js',
+                        'd3/d3.js']
+                }]
+            },
+            bower_img: {
+                files: [{
+                   expand: true,
+                    dot: true,
+                    flatten: true,
+                    cwd: '<%= bowerFolder %>/',
+                    dest: '<%= trgt %>/img/',
+                    src: ['blueimp-gallery/img/play-pause.*', 'blueimp-gallery/img/loading.gif']
                 }]
             },
             bower_css: {
@@ -142,7 +154,8 @@ module.exports = function (grunt) {
                     dest: '<%= trgt %>/css/',
                     src: ['bootstrap/dist/css/bootstrap.css', 'bootstrap/dist/css/bootstrap-theme.css',
                     'pickadate/lib/themes/default.css', 'pickadate/lib/themes/default.date.css', 'pickadate/lib/themes/default.time.css',
-                    'blueimp-file-upload/css/jquery.fileupload.css']
+                    'blueimp-file-upload/css/jquery.fileupload.css',
+                    'blueimp-gallery/css/blueimp-gallery.css']
                 }]
             },
             bower_fonts: {
@@ -304,6 +317,7 @@ module.exports = function (grunt) {
      'copy:bower_js', // Copy unchanged files from bower folder: jquery, momentjs...
      'copy:bower_css',
      'copy:bower_fonts',
+     'copy:bower_img',
      'assemble:js', // After copy all files to destination - replace all {{value}} - rewrite the same files
      'assemble:html' // Copy other files: Assemble and copy templates files
     ];

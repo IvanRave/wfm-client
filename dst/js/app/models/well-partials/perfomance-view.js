@@ -23,6 +23,29 @@ define(['jquery',
         prfv.WPDDateStartMonth = ko.observable(optns.startMonth);
         prfv.WPDDateEndMonth = ko.observable(optns.endMonth);
 
+        prfv.prfGraph = {
+            viewBox: {
+                width: 1200,
+                height: 400,
+                ratio: 1 / 3
+            },
+            axisSize: 10
+        };
+
+        // actual width of graph ang x-axis
+        prfv.prfGraph.width = ko.observable();
+
+        // actual height of graph ang y-axis
+        prfv.prfGraph.height = ko.computed({
+            read: function () {
+                var tmpWidth = ko.unwrap(prfv.prfGraph.width);
+                if (tmpWidth && $.isNumeric(tmpWidth)) {
+                    return tmpWidth * prfv.prfGraph.viewBox.ratio;
+                }
+            },
+            deferEvaluation: true
+        });
+
         function updateSelectedPrfTableYear() {
             var tmpWpdDateStartYear = ko.unwrap(prfv.WPDDateStartYear),
                 tmpWpdDateEndYear = ko.unwrap(prfv.WPDDateEndYear),
@@ -190,11 +213,12 @@ define(['jquery',
             deferEvaluation: true
         });
 
-        // actual height of graph ang y-axis
-        prfv.prfGraphHeight = ko.observable();
-
         function getSvgPath(dataSet, paramList, timeBorder, valueBorder) {
             var resultJson = {};
+
+            ////function zoomed() {
+            ////    console.log('zoomed event');
+            ////}
 
             // Check parameter and data existence
             if (dataSet.length > 0 &&
@@ -204,9 +228,8 @@ define(['jquery',
                 $.isNumeric(valueBorder[0]) &&
                 $.isNumeric(valueBorder[1])) {
 
-                ////require(['d3'], function (d3) {
-                var x = d3.time.scale().range([0, prfPartial.prfGraph.viewBox.width]),
-                    y = d3.scale.linear().range([prfPartial.prfGraph.viewBox.height, 0]);
+                var x = d3.time.scale().range([0, prfv.prfGraph.viewBox.width]),
+                    y = d3.scale.linear().range([prfv.prfGraph.viewBox.height, 0]);
 
                 var line = d3.svg.line()
                     .interpolate('linear')
@@ -215,6 +238,12 @@ define(['jquery',
 
                 x.domain([new Date(timeBorder[0] * 1000), new Date(timeBorder[1] * 1000)]);
                 y.domain(valueBorder);
+
+                ////var zoom = d3.behavior.zoom()
+                ////    .x(x)
+                ////    .y(y)
+                ////    .scaleExtent([1, 10])
+                ////    .on('zoom', zoomed);
 
                 $.each(paramList, function (paramIndex, paramElem) {
                     if (ko.unwrap(paramElem.isVisible) === true) {

@@ -27,16 +27,6 @@
 
         prtl.prdColumnAttributeList = ko.observableArray();
 
-        // namespace for graph
-        prtl.prfGraph = {
-            viewBox: {
-                width: 1200,
-                height: 400,
-                ratio: 1 / 3
-            },
-            axisSize: 10
-        };
-
         // ================================ FORECAST ===============================
 
         // forecast parameters to build graph
@@ -400,7 +390,7 @@
         });
 
         prtl.deleteWellProductionData = function () {
-            if (confirm('Are you sure you want to delete all production data from well?')) {
+            if (confirm('{{capitalizeFirst lang.confirmToDelete}} all production data from well?')) {
                 datacontext.deleteWellProductionData(wellObj.Id).done(function () {
                     prtl.hstProductionDataSet([]);
                     prtl.isLoadedHstProductionData(false);

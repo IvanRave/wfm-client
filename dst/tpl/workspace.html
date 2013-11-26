@@ -691,13 +691,13 @@
           <div>
             <div class="clearfix pd-graph-wrap">
   <div class="pull-right pd-graph-vscale">
-    <svg version="1.1" width="60px" data-bind="svgAxisValue: {valueBorder: filteredByDateProductionDataSetValueBorder}, attr:{ height: prfGraphHeight }">
+    <svg version="1.1" width="60px" data-bind="attr:{ height: prfGraph.height }, svgAxisValue: {valueBorder: filteredByDateProductionDataSetValueBorder, tmpPrfGraphHeight: prfGraph.height}">
       <g class="axis"></g>
     </svg>
   </div>
   <div class="pd-graph-grid">
     <div>
-      <svg version="1.1" width="100%" data-bind="attr: { height: prfGraphHeight }, svgResponsive: { ratio: prfPartial.prfGraph.viewBox.ratio, tmpPrfGraphHeight: prfGraphHeight }" viewbox="0 0 1200 400">
+      <svg version="1.1" width="100%" data-bind="attr: { height: prfGraph.height }, svgResponsive: { tmpPrfGraphWidth: prfGraph.width, tmpIsVisibleMenu: $root.isVisibleMenu }" viewbox="0 0 1200 400">
         <g class="svg-prf-graph-g" data-bind="foreach: {data: selectedWellGroupWfmParameterList, as: 'groupParam'}">
           <!-- ko with: $parent.productionDataSetSvgPath -->
           <!-- ko if: $data[groupParam.wfmParameterId] -->
@@ -709,7 +709,7 @@
     </div>
     <div>
       <!--svg-path-line-->
-      <svg version="1.1" width="100%" height="20px" data-bind="svgAxisTime: {timeBorder: filteredByDateProductionDataSetTimeBorder, windowSize: $root.windowWidth }">
+      <svg version="1.1" width="100%" height="20px" data-bind="svgAxisTime: {timeBorder: filteredByDateProductionDataSetTimeBorder, tmpPrfGraphWidth: prfGraph.width }">
         <g class="axis"></g>
       </svg>
     </div>
@@ -1004,13 +1004,13 @@
                     <div data-bind="if: selectedAttrGroup">
                         <div class="clearfix pd-graph-wrap">
   <div class="pull-right pd-graph-vscale">
-    <svg version="1.1" width="60px" data-bind="svgAxisValue: {valueBorder: filteredByDateProductionDataSetValueBorder}, attr:{ height: prfGraphHeight }">
+    <svg version="1.1" width="60px" data-bind="attr:{ height: prfGraph.height }, svgAxisValue: {valueBorder: filteredByDateProductionDataSetValueBorder, tmpPrfGraphHeight: prfGraph.height}">
       <g class="axis"></g>
     </svg>
   </div>
   <div class="pd-graph-grid">
     <div>
-      <svg version="1.1" width="100%" data-bind="attr: { height: prfGraphHeight }, svgResponsive: { ratio: prfPartial.prfGraph.viewBox.ratio, tmpPrfGraphHeight: prfGraphHeight }" viewbox="0 0 1200 400">
+      <svg version="1.1" width="100%" data-bind="attr: { height: prfGraph.height }, svgResponsive: { tmpPrfGraphWidth: prfGraph.width, tmpIsVisibleMenu: $root.isVisibleMenu }" viewbox="0 0 1200 400">
         <g class="svg-prf-graph-g" data-bind="foreach: {data: selectedWellGroupWfmParameterList, as: 'groupParam'}">
           <!-- ko with: $parent.productionDataSetSvgPath -->
           <!-- ko if: $data[groupParam.wfmParameterId] -->
@@ -1022,7 +1022,7 @@
     </div>
     <div>
       <!--svg-path-line-->
-      <svg version="1.1" width="100%" height="20px" data-bind="svgAxisTime: {timeBorder: filteredByDateProductionDataSetTimeBorder, windowSize: $root.windowWidth }">
+      <svg version="1.1" width="100%" height="20px" data-bind="svgAxisTime: {timeBorder: filteredByDateProductionDataSetTimeBorder, tmpPrfGraphWidth: prfGraph.width }">
         <g class="axis"></g>
       </svg>
     </div>

@@ -1,6 +1,6 @@
 {
   "name": "wfm",
-  "version": "0.5.7",
+  "version": "0.5.8",
   "homepage": "https://github.com/IvanRave/wfm",
   "description": "Well file manager",
   "license": "MIT",
@@ -26,6 +26,8 @@
     "angular": "~1.2.2",
     "angular-route": "~1.2.2",
     "angular-resource": "~1.2.2",
-    "blueimp-file-upload": "~9.4.1"
+    "blueimp-file-upload": "~9.4.1",
+    "blueimp-gallery": "~2.12.1",
+    "d3": "~3.3.10"
   }
 }
