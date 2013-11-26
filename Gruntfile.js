@@ -127,7 +127,10 @@ module.exports = function (grunt) {
                         'requirejs/require.js', 'knockout/knockout.js', 
                         'console-shim/console-shim.js', 'es5-shim/es5-shim.js',
                         'pickadate/lib/picker.js', 'pickadate/lib/picker.date.js', 'pickadate/lib/picker.time.js',
-                        'jQuery-slimScroll/jquery.slimscroll.js']
+                        'jQuery-slimScroll/jquery.slimscroll.js', 'blueimp-file-upload/js/vendor/jquery.ui.widget.js',
+                        'blueimp-file-upload/js/jquery.fileupload.js', 'blueimp-file-upload/js/jquery.iframe-transport.js',
+                        'blueimp-canvas-to-blob/js/canvas-to-blob.js',
+                        'blueimp-load-image/js/load-image.js', 'blueimp-load-image/js/load-image-*.js']
                 }]
             },
             bower_css: {
@@ -138,7 +141,8 @@ module.exports = function (grunt) {
                     cwd: '<%= bowerFolder %>/',
                     dest: '<%= trgt %>/css/',
                     src: ['bootstrap/dist/css/bootstrap.css', 'bootstrap/dist/css/bootstrap-theme.css',
-                    'pickadate/lib/themes/default.css', 'pickadate/lib/themes/default.date.css', 'pickadate/lib/themes/default.time.css']
+                    'pickadate/lib/themes/default.css', 'pickadate/lib/themes/default.date.css', 'pickadate/lib/themes/default.time.css',
+                    'blueimp-file-upload/css/jquery.fileupload.css']
                 }]
             },
             bower_fonts: {

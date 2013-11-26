@@ -10,8 +10,8 @@ define(['jquery',
     'app/app-filters',
     'jquery.ui.widget', 'jquery.iframe-transport',
     // The XDomainRequest Transport is included for cross-domain file deletion for IE8+ 
-    'ajaxupload/cors/jquery.xdr-transport',
-    'ajaxupload/cors/jquery.postmessage-transport',
+    'jquery.xdr-transport',
+    'jquery.postmessage-transport',
     'jquery.lightbox', 'bootstrap-datepicker'],
     function ($, angular, appDatacontext) {
         'use strict';
