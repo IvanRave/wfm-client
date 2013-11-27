@@ -236,48 +236,41 @@
                 $.isNumeric(valueBorder[0]) &&
                 $.isNumeric(valueBorder[1])) {
 
-                var x = d3.time.scale().range([0, prfv.prfGraph.viewBox.width]),
-                    y = d3.scale.linear().range([prfv.prfGraph.viewBox.height, 0]);
+                var x = d3.time.scale()
+                    .range([0, prfv.prfGraph.viewBox.width])
+                    .domain([new Date(timeBorder[0] * 1000), new Date(timeBorder[1] * 1000)]);
+
+                var y = d3.scale.linear()
+                    .range([prfv.prfGraph.viewBox.height, 0])
+                    .domain(valueBorder);
+
+                prfv.prfAltX(x);
+                prfv.prfAltY(y);
+
+                // tmp for axis ====================================
+                ////var altX = d3.time.scale()
+                ////        .domain([t1, t2])
+                ////        .range([t1, t2].map(d3.time.scale()
+                ////        .domain([t1, t2])
+                ////        .range([0, prfv.prfGraph.viewBox.width])));
+                // end tmp =================================
 
                 var line = d3.svg.line()
                     .interpolate('linear')
                     ////monotone
                     .x(function (d) { return x(new Date(d.unixTime * 1000)); });
 
-                var t1 = new Date(timeBorder[0] * 1000),
-                    t2 = new Date(timeBorder[1] * 1000);
-
-                x.domain([t1, t2]);
-                y.domain(valueBorder);
-
-                // tmp for axis ====================================
-                var altX = d3.time.scale()
-                        .domain([t1, t2])
-                        .range([t1, t2].map(d3.time.scale()
-                        .domain([t1, t2])
-                        .range([0, prfv.prfGraph.viewBox.width])));
-
-                prfv.prfAltX(altX);
-                // end tmp =================================
-
-                // tmp for axis Y ====================================
-                var altY = d3.scale.linear()
-                        .range([prfv.prfGraph.viewBox.height, 0])
-                        .domain(valueBorder);
-
-                prfv.prfAltY(altY);
-                // end tmp ===================================
-
                 $.each(paramList, function (paramIndex, paramElem) {
-                    if (ko.unwrap(paramElem.isVisible) === true) {
-                        line.y(function (d) {
-                            return y(
-                                $.isNumeric(ko.unwrap(d[paramElem.wfmParameterId])) ? (ko.unwrap(d[paramElem.wfmParameterId]) * ko.unwrap(ko.unwrap(paramElem.wfmParameter).uomCoef)) : null
-                            );
-                        });
+                    ////if (ko.unwrap(paramElem.isVisible) === true) {
+                    line.y(function (d) {
+                        return y(
+                            $.isNumeric(ko.unwrap(d[paramElem.wfmParameterId])) ? (ko.unwrap(d[paramElem.wfmParameterId]) * ko.unwrap(ko.unwrap(paramElem.wfmParameter).uomCoef)) : null
+                        );
+                    });
 
-                        resultJson[paramElem.wfmParameterId] = line(dataSet);
-                    }
+                    //resultJson[paramElem.wfmParameterId] = line;
+                    resultJson[paramElem.wfmParameterId] = line(dataSet);
+                    //}
                 });
             }
 
