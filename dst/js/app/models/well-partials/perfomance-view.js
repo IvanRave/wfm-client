@@ -24,23 +24,32 @@ define(['jquery',
         prfv.WPDDateEndMonth = ko.observable(optns.endMonth);
 
         prfv.prfGraph = {
+            ratio: 1 / 3,
+            // size, depended of svg viewbox
             viewBox: {
-                width: 1200,
-                height: 400,
-                ratio: 1 / 3
+                width: 1110,
+                height: 370,
+                // divide by 80 or 20 (where scale)
+                margin: {
+                    top: 10,
+                    right: 30,
+                    bottom: 20,
+                    left: 60
+                },
             },
             axisSize: 10
         };
 
-        // actual width of graph ang x-axis
+        // actual width of graph and x-axis
+        // real size of svg
         prfv.prfGraph.width = ko.observable();
 
-        // actual height of graph ang y-axis
+        // actual height of graph and y-axis
         prfv.prfGraph.height = ko.computed({
             read: function () {
                 var tmpWidth = ko.unwrap(prfv.prfGraph.width);
                 if (tmpWidth && $.isNumeric(tmpWidth)) {
-                    return tmpWidth * prfv.prfGraph.viewBox.ratio;
+                    return tmpWidth * prfv.prfGraph.ratio;
                 }
             },
             deferEvaluation: true
@@ -213,12 +222,11 @@ define(['jquery',
             deferEvaluation: true
         });
 
+        prfv.prfAltX = ko.observable();
+        prfv.prfAltY = ko.observable();
+
         function getSvgPath(dataSet, paramList, timeBorder, valueBorder) {
             var resultJson = {};
-
-            ////function zoomed() {
-            ////    console.log('zoomed event');
-            ////}
 
             // Check parameter and data existence
             if (dataSet.length > 0 &&
@@ -236,14 +244,29 @@ define(['jquery',
                     ////monotone
                     .x(function (d) { return x(new Date(d.unixTime * 1000)); });
 
-                x.domain([new Date(timeBorder[0] * 1000), new Date(timeBorder[1] * 1000)]);
+                var t1 = new Date(timeBorder[0] * 1000),
+                    t2 = new Date(timeBorder[1] * 1000);
+
+                x.domain([t1, t2]);
                 y.domain(valueBorder);
 
-                ////var zoom = d3.behavior.zoom()
-                ////    .x(x)
-                ////    .y(y)
-                ////    .scaleExtent([1, 10])
-                ////    .on('zoom', zoomed);
+                // tmp for axis ====================================
+                var altX = d3.time.scale()
+                        .domain([t1, t2])
+                        .range([t1, t2].map(d3.time.scale()
+                        .domain([t1, t2])
+                        .range([0, prfv.prfGraph.viewBox.width])));
+
+                prfv.prfAltX(altX);
+                // end tmp =================================
+
+                // tmp for axis Y ====================================
+                var altY = d3.scale.linear()
+                        .range([prfv.prfGraph.viewBox.height, 0])
+                        .domain(valueBorder);
+
+                prfv.prfAltY(altY);
+                // end tmp ===================================
 
                 $.each(paramList, function (paramIndex, paramElem) {
                     if (ko.unwrap(paramElem.isVisible) === true) {

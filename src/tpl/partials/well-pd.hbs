@@ -72,14 +72,14 @@
         </div>
         <!-- / with prfPartial  -->
         <div data-bind="ifnot: selectedAttrGroup">
-          Please choose perfomance group:
-          <ul data-bind="foreach: $root.wfmParamSquadList">
+          Please choose perfomance group
+          <!--<ul data-bind="foreach: $root.wfmParamSquadList">
             <li data-bind="with: id">
-              <a href="#" data-bind="click: $parent.selectAttrGroupId">
+              <a href="#" data-bind="click: function(){ $parents[1].selectAttrGroupId($data);}">
                 <span data-bind="text: $data"></span>
               </a>
             </li>
-          </ul>
+          </ul>-->
         </div>
         <div data-bind="if: selectedAttrGroup">
           <div>

@@ -357,52 +357,91 @@
 
     ko.bindingHandlers.svgAxisTime = {
         update: function (element, valueAccessor) {
-            var tmpPrfGraphWidth = ko.unwrap(valueAccessor().tmpPrfGraphWidth);
-            if (!$.isNumeric(tmpPrfGraphWidth)) { return; }
+            ////var timeBorder = ko.unwrap(valueAccessor().timeBorder);
+            ////if (!$.isNumeric(timeBorder[0]) || !$.isNumeric(timeBorder[1])) { return; }
 
-            var timeBorder = ko.unwrap(valueAccessor().timeBorder);
-            if (!$.isNumeric(timeBorder[0]) || !$.isNumeric(timeBorder[1])) { return; }
+            var prfAltX = ko.unwrap(valueAccessor().prfAltX);
+            if (prfAltX) {
+                require(['d3'], function (d3) {
+                    ////var t1 = new Date(timeBorder[0] * 1000),
+                    ////    t2 = new Date(timeBorder[1] * 1000);
 
-            require(['d3'], function (d3) {
-                var t1 = new Date(timeBorder[0] * 1000),
-                    t2 = new Date(timeBorder[1] * 1000);
+                    ////var x = d3.time.scale()
+                    ////        .domain([t1, t2])
+                    ////        .range([t1, t2].map(d3.time.scale()
+                    ////        .domain([t1, t2])
+                    ////        .range([0, tmpPrfGraphViewBoxWidth])));
+                    ////var axisX = d3.svg.axis().scale(x);
 
-                var x = d3.time.scale()
-                        .domain([t1, t2])
-                        .range([t1, t2].map(d3.time.scale()
-                        .domain([t1, t2])
-                        .range([0, tmpPrfGraphWidth])));
-
-                var axisX = d3.svg.axis().scale(x);
-
-                d3.select(element).select("g")
-                        .call(axisX)
-                        .selectAll("text")
-                        .attr("y", 8)
-                        .attr("x", -6)
-                        .style("text-anchor", "start");
-            });
+                    var altAxisX = d3.svg.axis().scale(prfAltX);
+                    d3.select(element).call(altAxisX);
+                    ////.selectAll("text")
+                    ////.attr("y", 8)
+                    ////.attr("x", -6)
+                    ////.style("text-anchor", "start");
+                });
+            }
         }
     };
 
     ko.bindingHandlers.svgAxisValue = {
         update: function (element, valueAccessor) {
-            var tmpPrfGraphHeight = ko.unwrap(valueAccessor().tmpPrfGraphHeight);
-            if (!$.isNumeric(tmpPrfGraphHeight)) { return; }
+            var prfAltY = ko.unwrap(valueAccessor().prfAltY);
+            ////var tmpPrfGraphViewBoxHeight = ko.unwrap(valueAccessor().tmpPrfGraphViewBoxHeight);
+            ////if (!$.isNumeric(tmpPrfGraphViewBoxHeight)) { return; }
 
-            var valueBorder = ko.unwrap(valueAccessor().valueBorder);
-            if (!$.isNumeric(valueBorder[0]) || !$.isNumeric(valueBorder[1])) { return; }
+            ////var valueBorder = ko.unwrap(valueAccessor().valueBorder);
+            ////if (!$.isNumeric(valueBorder[0]) || !$.isNumeric(valueBorder[1])) { return; }
+            if (prfAltY) {
+                require(['d3'], function (d3) {
+                    ////var y = d3.scale.linear().range([tmpPrfGraphViewBoxHeight, 0]);
+                    ////// [123,123]
+                    ////y.domain(valueBorder);
+                    ////var axisY = d3.svg.axis().scale(y).orient('left');
+                    var altAxisY = d3.svg.axis().scale(prfAltY).orient('left');
+                    d3.select(element).call(altAxisY);
+                    ////.selectAll('text')
+                    ////.attr('y', 0);
+                });
+            }
+        }
+    };
+
+    ko.bindingHandlers.svgZoomGraph = {
+        update: function (element, valueAccessor) {
+            var prfAltX = ko.unwrap(valueAccessor().prfAltX),
+                prfAltY = ko.unwrap(valueAccessor().prfAltY);
+
+            if (!prfAltX || !prfAltY) { return; }
 
             require(['d3'], function (d3) {
-                var y = d3.scale.linear().range([tmpPrfGraphHeight, 0]);
-                // [123,123]
-                y.domain(valueBorder);
+                ////var y = d3.scale.linear().range([tmpPrfGraphViewBoxHeight, 0]);
+                ////// [123,123]
+                ////y.domain(valueBorder);
 
-                var axisY = d3.svg.axis().scale(y).orient('right');
-                d3.select(element).select('g')
-                    .call(axisY)
-                    .selectAll('text')
-                    .attr('y', 0);
+                var altAxisX = d3.svg.axis().scale(prfAltX);
+                var altAxisY = d3.svg.axis().scale(prfAltY).orient('left');
+                
+                function zoomed() {
+                    console.log('zoomed event');
+                    d3.select(element).select('.axis.x').call(altAxisX);
+                    d3.select(element).select('.axis.y').call(altAxisY);
+                }
+
+                // tmp for zoom ========================================
+                var altZoom = d3.behavior.zoom()
+                    .x(prfAltX)
+                    .y(prfAltY)
+                    .scaleExtent([0.5, 10])
+                    .on('zoom', zoomed);
+                // end tmp
+
+                ////var axisY = d3.svg.axis().scale(y).orient('left');
+                d3.select(element).call(altZoom);
+
+                zoomed();
+                ////.selectAll('text')
+                ////.attr('y', 0);
             });
         }
     };
