@@ -225,12 +225,12 @@
         prfv.prfAltX = ko.observable();
         prfv.prfAltY = ko.observable();
 
-        function getSvgPath(dataSet, paramList, timeBorder, valueBorder) {
+        function getSvgPath(paramList, timeBorder, valueBorder) {
             var resultJson = {};
 
             // Check parameter and data existence
-            if (dataSet.length > 0 &&
-                paramList.length > 0 &&
+            // dataSet.length > 0 &&
+            if (paramList.length > 0 &&
                 $.isNumeric(timeBorder[0]) &&
                 $.isNumeric(timeBorder[1]) &&
                 $.isNumeric(valueBorder[0]) &&
@@ -255,21 +255,21 @@
                 ////        .range([0, prfv.prfGraph.viewBox.width])));
                 // end tmp =================================
 
-                var line = d3.svg.line()
-                    .interpolate('linear')
-                    ////monotone
-                    .x(function (d) { return x(new Date(d.unixTime * 1000)); });
+
 
                 $.each(paramList, function (paramIndex, paramElem) {
-                    ////if (ko.unwrap(paramElem.isVisible) === true) {
-                    line.y(function (d) {
-                        return y(
-                            $.isNumeric(ko.unwrap(d[paramElem.wfmParameterId])) ? (ko.unwrap(d[paramElem.wfmParameterId]) * ko.unwrap(ko.unwrap(paramElem.wfmParameter).uomCoef)) : null
-                        );
-                    });
+                    var line = d3.svg.line()
+                            .interpolate('linear') ////monotone
+                            .x(function (d) { return x(new Date(d.unixTime * 1000)); })
+                            .y(function (d) {
+                                return y(
+                                    $.isNumeric(ko.unwrap(d[paramElem.wfmParameterId])) ? (ko.unwrap(d[paramElem.wfmParameterId]) * ko.unwrap(ko.unwrap(paramElem.wfmParameter).uomCoef)) : null
+                                );
+                            });
 
-                    //resultJson[paramElem.wfmParameterId] = line;
-                    resultJson[paramElem.wfmParameterId] = line(dataSet);
+                    resultJson[paramElem.wfmParameterId] = line;
+                    ////resultJson[paramElem.wfmParameterId] = line(dataSet);
+                    ////if (ko.unwrap(paramElem.isVisible) === true) {
                     //}
                 });
             }
@@ -280,7 +280,7 @@
         // Update perfomance graph data: graph path for selected regions
         prfv.productionDataSetSvgPath = ko.computed(function () {
             return getSvgPath(
-                    ko.unwrap(prfv.filteredByDateProductionDataSet),
+                    ////ko.unwrap(prfv.filteredByDateProductionDataSet),
                     ko.unwrap(prfv.selectedWellGroupWfmParameterList),
                     ko.unwrap(prfv.filteredByDateProductionDataSetTimeBorder),
                     ko.unwrap(prfv.filteredByDateProductionDataSetValueBorder));

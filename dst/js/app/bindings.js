@@ -414,6 +414,9 @@ define(['jquery', 'knockout', 'moment', 'jquery.slimscroll', 'jquery.bootstrap',
 
             if (!prfAltX || !prfAltY) { return; }
 
+            var dataSet = ko.unwrap(valueAccessor().filteredByDateProductionDataSet);
+            if (dataSet.length === 0) { return; }
+
             var productionDataSetSvgPath = ko.unwrap(valueAccessor().productionDataSetSvgPath);
 
             require(['d3'], function (d3) {
@@ -427,8 +430,7 @@ define(['jquery', 'knockout', 'moment', 'jquery.slimscroll', 'jquery.bootstrap',
                 function redrawGraph() {
                     //d3.select(element).select('.svg-prf-graph-g').select('path').remove();
                     $.each(productionDataSetSvgPath, function (elemKey, elemVal) {
-                        console.log(elemVal);
-                        d3.select(element).select('.svg-prf-graph-g').select('#grp-' + elemKey).attr('d', elemVal);
+                        d3.select(element).select('.svg-prf-graph-g').select('#grp-' + elemKey).attr('d', elemVal(dataSet));
                     });
 
                     d3.select(element).select('.axis.x').call(altAxisX);
@@ -438,11 +440,11 @@ define(['jquery', 'knockout', 'moment', 'jquery.slimscroll', 'jquery.bootstrap',
                 var altZoom = d3.behavior.zoom()
                     .x(prfAltX)
                     .y(prfAltY)
-                    .scaleExtent([0.5, 10])
+                    .scaleExtent([1, 10000])
                     .on('zoom', redrawGraph);
 
                 ////var axisY = d3.svg.axis().scale(y).orient('left');
-                d3.select(element).call(altZoom);
+                d3.select(element).select('.graph-zoom-rect').call(altZoom);
 
                 redrawGraph();
                 ////.selectAll('text')
