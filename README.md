@@ -1,10 +1,10 @@
 # Well file manager client (WFM client)
 
 * [Environment] (#environment)
-* [Cabinet structure] (#cabinet_structure)
-* [Write notes] (#write_notes)
-* [Build notes] (#build_notes)
-* [Publish notes] (#publish_notes)
+* [Cabinet structure] (#cabinet-structure)
+* [Write notes] (#write-notes)
+* [Build notes] (#build-notes)
+* [Publish notes] (#publish-notes)
 
 ## Environment
 
