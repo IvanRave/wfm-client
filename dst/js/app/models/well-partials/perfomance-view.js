@@ -216,6 +216,13 @@ define(['jquery',
                         }
                     });
                 });
+
+                // Plus (top and bottom) margin 5% - monotone function can be overdrawen out of graph wrap border
+                if (typeof (minValue) !== 'undefined') {
+                    minValue -= minValue / 20;
+                    maxValue += maxValue / 20;
+                }
+
                 // Still can be undefined
                 return [minValue, maxValue];
             },
@@ -255,11 +262,9 @@ define(['jquery',
                 ////        .range([0, prfv.prfGraph.viewBox.width])));
                 // end tmp =================================
 
-
-
                 $.each(paramList, function (paramIndex, paramElem) {
                     var line = d3.svg.line()
-                            .interpolate('linear') ////monotone
+                            .interpolate('monotone') ////monotone //linear
                             .x(function (d) { return x(new Date(d.unixTime * 1000)); })
                             .y(function (d) {
                                 return y(
@@ -277,10 +282,10 @@ define(['jquery',
             return resultJson;
         }
 
-        // Update perfomance graph data: graph path for selected regions
+        // Update perfomance graph data: graph path for selected regions (d3 line objects in one json object)
+        ///<return>{'WaterRate': d3Line, ...}</return>
         prfv.productionDataSetSvgPath = ko.computed(function () {
             return getSvgPath(
-                    ////ko.unwrap(prfv.filteredByDateProductionDataSet),
                     ko.unwrap(prfv.selectedWellGroupWfmParameterList),
                     ko.unwrap(prfv.filteredByDateProductionDataSetTimeBorder),
                     ko.unwrap(prfv.filteredByDateProductionDataSetValueBorder));
@@ -289,7 +294,6 @@ define(['jquery',
         prfv.joinedYearList = ko.computed({
             read: function () {
                 if (ko.unwrap(prfv.isVisibleForecastData)) {
-                    console.log('fyear', ko.unwrap(prfPartial.forecastYearList));
                     return ko.unwrap(prfPartial.forecastYearList).concat(ko.unwrap(prfPartial.histYearList));
                 }
                 else {

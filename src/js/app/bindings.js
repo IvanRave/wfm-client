@@ -108,7 +108,7 @@
                 alwaysVisible: true,
                 color: '#fcfcfc',
                 //distance: '0',
-                position: 'left',
+                position: 'right',
                 ////width: 210,
                 // move page scroll with this scroll
                 allowPageScroll: true
@@ -419,22 +419,22 @@
 
             var productionDataSetSvgPath = ko.unwrap(valueAccessor().productionDataSetSvgPath);
 
-            require(['d3'], function (d3) {
-                ////var y = d3.scale.linear().range([tmpPrfGraphViewBoxHeight, 0]);
-                ////// [123,123]
-                ////y.domain(valueBorder);
+            var prfGraphViewBox = ko.unwrap(valueAccessor().prfGraphViewBox);
 
-                var altAxisX = d3.svg.axis().scale(prfAltX);
-                var altAxisY = d3.svg.axis().scale(prfAltY).orient('left');
+            require(['d3'], function (d3) {
+                var altAxisX = d3.svg.axis().scale(prfAltX).tickSize(-prfGraphViewBox.height);
+                var altAxisY = d3.svg.axis().scale(prfAltY).orient('left').tickSize(-prfGraphViewBox.width);
+
+                var graphWrap = d3.select(element);
 
                 function redrawGraph() {
                     //d3.select(element).select('.svg-prf-graph-g').select('path').remove();
                     $.each(productionDataSetSvgPath, function (elemKey, elemVal) {
-                        d3.select(element).select('.svg-prf-graph-g').select('#grp-' + elemKey).attr('d', elemVal(dataSet));
+                        graphWrap.select('.svg-prf-graph-g').select('#grp-' + elemKey).attr('d', elemVal(dataSet));
                     });
 
-                    d3.select(element).select('.axis.x').call(altAxisX);
-                    d3.select(element).select('.axis.y').call(altAxisY);
+                    graphWrap.select('.axis.x').call(altAxisX);
+                    graphWrap.select('.axis.y').call(altAxisY);
                 }
 
                 var altZoom = d3.behavior.zoom()
@@ -444,7 +444,7 @@
                     .on('zoom', redrawGraph);
 
                 ////var axisY = d3.svg.axis().scale(y).orient('left');
-                d3.select(element).select('.graph-zoom-rect').call(altZoom);
+                graphWrap.select('.graph-zoom-rect').call(altZoom);
 
                 redrawGraph();
                 ////.selectAll('text')
