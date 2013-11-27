@@ -82,6 +82,20 @@ WFM client is a secured cabinet to manage well's documentation (files, data).
 * grunt --metro
 Metro application can not use links to directories. Please use full url path (with index.html)
 
+#### Publish notes
+
+##### Source files (master branch)
+
+* Check state: git status
+* If there are new files add: git add -a (for all files)
+* Use grunt task to publish: grunt bump --cmtmsg="some commit message (see commit guidelines)"
+* Source will be published to master branch
+
+##### Distributive (gh-pages branch)
+* Create distributive: grunt --prod
+* Use grunt task: grunt gh-pages --cmtmsg="some commit message (see commit guidelines)"
+* Distributive will be published to gh-pages branch
+
 #### Assemble notes
 
 ##### AngularJs:

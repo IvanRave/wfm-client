@@ -264,7 +264,6 @@ module.exports = function (grunt) {
             files: ['package.json', 'bower.json'],
             updateConfigs: ['pkg'],
             commit: true,
-            // <type>(<scope>): <subject>
             commitMessage: cmtmsg,
             commitFiles: ['-a'],
             createTag: true,
