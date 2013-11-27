@@ -10,6 +10,8 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('assemble');
     grunt.loadNpmTasks('grunt-requirejs');
     grunt.loadNpmTasks('grunt-bump');
+    grunt.loadNpmTasks('grunt-conventional-changelog');
+    grunt.loadNpmTasks('grunt-gh-pages');
     
     // By default = devSite
     var isProd = grunt.option('prod') ? true : false,
@@ -21,7 +23,7 @@ module.exports = function (grunt) {
         lang = grunt.option('lang') || 'en';
         
     // Commit message for bump feature
-    // // var cmtmsg = grunt.option('cmtmsg') || 'fix(project): change';
+    var cmtmsg = grunt.option('cmtmsg') || 'fix(project): change';
     
     // var cmtType = grunt.option('cmtType') || 'fix',
         // // Scope could be anything specifying place of the commit change
@@ -81,6 +83,15 @@ module.exports = function (grunt) {
                     base: '<%= trgt %>'
                 }
             }
+        },
+        'gh-pages': {
+          options: {
+            base: 'dst'
+          },
+          src: '**/*',
+          tag: 'v<%= pkg.version %>',
+          message: cmtmsg,
+          push: true
         },
         jshint: {
             gruntfile: {
@@ -241,19 +252,26 @@ module.exports = function (grunt) {
                 }
             }
         },
+        changelog: {
+            options: {
+                prepend: false,
+                version: '0.5.2'
+            // Task-specific options go here.
+            }
+        },
         bump: {
           options: {
             files: ['package.json', 'bower.json'],
             updateConfigs: ['pkg'],
-            commit: false,
+            commit: true,
             // <type>(<scope>): <subject>
-            // commitMessage: cmtmsg,
-            // commitFiles: ['-a'],
-            // createTag: true,
-            // tagName: 'v%VERSION%',
-            // tagMessage: 'Version %VERSION%',
-            push: false
-            // pushTo: 'origin'
+            commitMessage: cmtmsg,
+            commitFiles: ['-a'],
+            createTag: true,
+            tagName: 'v%VERSION%',
+            tagMessage: 'Version %VERSION%',
+            push: false,
+            pushTo: 'origin'
           }
         },
         // For development: run tasks when change files
