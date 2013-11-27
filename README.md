@@ -1,6 +1,16 @@
-# Well file manager (WFM)
+# Well file manager client (WFM client)
 
-## WFM services
+* [Environment] (#environment)
+* [Cabinet structure] (#cabinet_structure)
+* [Write notes] (#write_notes)
+* [Build notes] (#build_notes)
+* [Publish notes] (#publish_notes)
+
+## Environment
+
+![WFMServicesStructure] (https://drive.google.com/uc?export=view&id=0B9c2LY35SH-cYk9POHE3UTM2Vjg "WFM services structure")
+
+### WFM services
 * __WFM client__ http://wfm-client.azurewebsites.net/
 protected cabinet: manage companies, wells etc.
 * __WFM info__ http://wfm.azurewebsites.net/
@@ -13,25 +23,20 @@ mobile application created from WFM client using Phonegap
 methods to manage WFM data. Methods are secured and required authorization. 
 After getting auth token (after registration ang authentication) you can make requests to API
 
-![WFMServicesStructure] (https://drive.google.com/uc?export=view&id=0B9c2LY35SH-cYk9POHE3UTM2Vjg "WFM services structure")
-
-## WFM data storage
+### WFM data storage
 * Authentication data: relational database to store user profiles
 * Structured data: relational database to store structured WFM data, e.g. companies, well regions, groups, fields, wells
 * Unstructured data: non-relational storage to store dynamic data, e.g. well perfomance properties, units and data
 * File storage: secured blob storage to store WFM files
 
-## WFM helpers
+### WFM helpers
 * __WFM fonts__ https://github.com/IvanRave/wfm-fonts/
 contains section icons for all WFM services
 * __WFM dictionary__ https://github.com/IvanRave/wfm-dict/
 contains words (with translation) for all WFM services
 
-### WFM developer documentation
-WFM client (mobile or web) - main WFM service.
-WFM client is a secured cabinet to manage well's documentation (files, data).
-
-#### Cabinet hierarchy
+## Cabinet structure
+### Hierarchy
 ![CabinetHierarchy] (https://drive.google.com/uc?export=view&id=0B9c2LY35SH-cZEh5aWtNWHpQUVE "Cabinet hierarchy")
 * Each company may include many users
 * User may be in many companies
@@ -41,7 +46,7 @@ WFM client is a secured cabinet to manage well's documentation (files, data).
 * Well group divides by wells
 * Each well contains sections and widgets (widgets for each section and more)
 
-#### Well sections
+### Well sections
 * Summary (main well parameters)
 * Sketch and volumes
 * History
@@ -53,70 +58,68 @@ WFM client is a secured cabinet to manage well's documentation (files, data).
 * Nodal analysis
 * Report
 
-#### Widget hierarchy
-##### Simple scheme
+### Widget hierarchy
+#### Simple scheme
 ![WidgetStructure] (https://drive.google.com/uc?export=view&id=0B9c2LY35SH-cbWl3ak94c1pxYWM "Widget structure")
-##### Data scheme
+### Data scheme
 ![WidgetStructure] (https://drive.google.com/uc?export=view&id=0B9c2LY35SH-cY0V3T3pEVWZjanc "Widget structure")
 * Well (well group, well field, well region) may contain widget layouts
 * Widget layout may contain widget blocks (columns) - 1, 2, 3 or 4 different size columns
 * Widget block may contain widgets
 * Widget has options (depending of widget type)
 
-###Build notes
+## Write notes
 
-#### Build types
+### Guidelines
+* [Angular commit guidelines] (https://github.com/angular/angular.js/blob/master/CONTRIBUTING.md#commit-message-format)
+* [Javascript style guide] (http://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml)
 
-##### Development (dev folder)
-* grunt
+### AngularJs
 
-##### Production (dst folder)
-* grunt --prod
+* for ngSrc and href - use ```{[{ my.value }]}``` - 
+standard double curly brackets ```{{value}}``` is used in Handlebars helpers in assemble.io library
+* for other elements use ```<span ng-bind="my.value"></span>```
 
-#### Other build types:
-
-##### IPad (IOS)
-* grunt --ipad
-
-##### Metro (Windows)
-* grunt --metro
-Metro application can not use links to directories. Please use full url path (with index.html)
-
-#### Publish notes
-
-##### Source files (master branch)
-
-* Check state: git status
-* If there are new files add: git add -a (for all files)
-* Use grunt task to publish: grunt bump --cmtmsg="some commit message (see commit guidelines)"
-* Source will be published to master branch
-
-##### Distributive (gh-pages branch)
-* Create distributive: grunt --prod
-* Use grunt task: grunt gh-pages --cmtmsg="some commit message (see commit guidelines)"
-* Distributive will be published to gh-pages branch
-
-#### Assemble notes
-
-##### AngularJs:
-
-* for ngSrc and href - use {[{ my.value }]} - 
-standard double curly brackets {{value}} is used in Handlebars helpers in assemble.io library
-* for other elements use <span ng-bind="my.value"></span>
-
-##### Language:
+### Localization
 
 * Generate any language using assemble.io engine
 * Add json object with required language to wfm-dict helper
 * Change settings in Gruntfile.js
 
-##### CORS support:
+### CORS support
 
-* Do not use in production (IE9 doesn't support requests wit json type and cookies)
+* Do not use in production (IE9 doesn't support requests with json type and cookies)
 * Only for development (in modern browsers) and other project types (IOS, desktop etc.)
 
-#### Write notes
+## Build notes
 
-[Angular commit guidelines] (https://github.com/angular/angular.js/blob/master/CONTRIBUTING.md#commit-message-format)
+### Website build types
 
-[Javascript style guide] (http://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml)
+#### Development (dev folder)
+* ```grunt```
+
+#### Production (dst folder)
+* ```grunt --prod```
+
+### Other build types:
+
+#### IPad (IOS)
+* ```grunt --ipad```
+
+#### Metro (Windows)
+* ```grunt --metro```
+Metro application can not use links to directories. Please use full url path (with index.html)
+
+## Publish notes
+
+### Source files (master branch)
+
+* Check state: ```git status```
+* If there are new files add: ```git add -a``` (for all files)
+* Use grunt task to publish: ```grunt bump --cmtmsg="some commit message (see commit guidelines)"```
+* Source will be published to master branch
+
+### Distributive (gh-pages branch)
+* Create distributive: ```grunt --prod```
+* Use grunt task: ```grunt gh-pages --cmtmsg="some commit message (see commit guidelines)"```
+* Distributive will be published to gh-pages branch
