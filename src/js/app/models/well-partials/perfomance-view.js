@@ -197,6 +197,7 @@
             deferEvaluation: true
         });
 
+        // =============================== Perfomance graph ================================
         vw.prfGraph = {
             // Width -> Height
             ratio: 1 / 3,
@@ -237,18 +238,6 @@
 
         vw.prfGraph.zoom = d3.behavior.zoom().scaleExtent([1, 10000]);
 
-        // Function for lines and time scale
-        vw.prfAltX = ko.observable();
-        vw.prfAltY = ko.observable();
-
-        vw.zoomIn = function () {
-            var tmpZoom = vw.prfGraph.zoom.scale();
-            console.log(tmpZoom);
-            if ($.isNumeric(tmpZoom)) {
-                vw.prfGraph.zoom.scale(tmpZoom * 2);
-            }
-        };
-
         function getSvgPath(paramList, timeBorder, valueBorder) {
             var resultJson = {};
 
@@ -268,12 +257,8 @@
                     .range([vw.prfGraph.viewBox.height, 0])
                     .domain(valueBorder);
 
-                vw.prfAltX(x);
-                vw.prfAltY(y);
-
                 vw.prfGraph.axis.x.scale(x);
                 vw.prfGraph.axis.y.scale(y);
-                /////prfGraphAxis.y.scale(prfAltY);
 
                 vw.prfGraph.zoom.x(x).y(y);
 

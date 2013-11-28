@@ -355,92 +355,124 @@
         }
     };
 
-    ////ko.bindingHandlers.svgAxisTime = {
-    ////    update: function (element, valueAccessor) {
-    ////        ////var timeBorder = ko.unwrap(valueAccessor().timeBorder);
-    ////        ////if (!$.isNumeric(timeBorder[0]) || !$.isNumeric(timeBorder[1])) { return; }
-
-    ////        var prfAltX = ko.unwrap(valueAccessor().prfAltX);
-    ////        if (prfAltX) {
-    ////            require(['d3'], function (d3) {
-    ////                ////var t1 = new Date(timeBorder[0] * 1000),
-    ////                ////    t2 = new Date(timeBorder[1] * 1000);
-
-    ////                ////var x = d3.time.scale()
-    ////                ////        .domain([t1, t2])
-    ////                ////        .range([t1, t2].map(d3.time.scale()
-    ////                ////        .domain([t1, t2])
-    ////                ////        .range([0, tmpPrfGraphViewBoxWidth])));
-    ////                ////var axisX = d3.svg.axis().scale(x);
-
-    ////                var altAxisX = d3.svg.axis().scale(prfAltX);
-    ////                d3.select(element).call(altAxisX);
-    ////                ////.selectAll("text")
-    ////                ////.attr("y", 8)
-    ////                ////.attr("x", -6)
-    ////                ////.style("text-anchor", "start");
-    ////            });
-    ////        }
-    ////    }
-    ////};
-
-    ////ko.bindingHandlers.svgAxisValue = {
-    ////    update: function (element, valueAccessor) {
-    ////        var prfAltY = ko.unwrap(valueAccessor().prfAltY);
-    ////        ////var tmpPrfGraphViewBoxHeight = ko.unwrap(valueAccessor().tmpPrfGraphViewBoxHeight);
-    ////        ////if (!$.isNumeric(tmpPrfGraphViewBoxHeight)) { return; }
-
-    ////        ////var valueBorder = ko.unwrap(valueAccessor().valueBorder);
-    ////        ////if (!$.isNumeric(valueBorder[0]) || !$.isNumeric(valueBorder[1])) { return; }
-    ////        if (prfAltY) {
-    ////            require(['d3'], function (d3) {
-    ////                ////var y = d3.scale.linear().range([tmpPrfGraphViewBoxHeight, 0]);
-    ////                ////// [123,123]
-    ////                ////y.domain(valueBorder);
-    ////                ////var axisY = d3.svg.axis().scale(y).orient('left');
-    ////                var altAxisY = d3.svg.axis().scale(prfAltY).orient('left');
-    ////                d3.select(element).call(altAxisY);
-    ////                ////.selectAll('text')
-    ////                ////.attr('y', 0);
-    ////            });
-    ////        }
-    ////    }
-    ////};
-
     ko.bindingHandlers.svgZoomGraph = {
         update: function (element, valueAccessor) {
             var dataSet = ko.unwrap(valueAccessor().filteredByDateProductionDataSet);
             if (dataSet.length === 0) { return; }
 
-            var prfGraphAxis = ko.unwrap(valueAccessor().prfGraphAxis);
+            var graph = {
+                axis: ko.unwrap(valueAccessor().prfGraphAxis),
+                zoom: ko.unwrap(valueAccessor().prfGraphZoom),
+                viewBox: ko.unwrap(valueAccessor().prfGraphViewBox),
+                svgPath: ko.unwrap(valueAccessor().productionDataSetSvgPath)
+            };
 
-            var productionDataSetSvgPath = ko.unwrap(valueAccessor().productionDataSetSvgPath);
-
-            var prfGraphZoom = ko.unwrap(valueAccessor().prfGraphZoom);
+            // Zoom coefficient for plus/minus buttons
+            var scaleCoef = 1.1;
+            var diffX = (graph.viewBox.width / 2) * (scaleCoef - 1),
+                diffY = (graph.viewBox.height / 2) * (scaleCoef - 1);
 
             require(['d3'], function (d3) {
 
                 var graphWrap = d3.select(element);
 
                 function redrawGraph() {
-                    //d3.select(element).select('.svg-prf-graph-g').select('path').remove();
-                    $.each(productionDataSetSvgPath, function (elemKey, elemVal) {
+                    // Redraw each curve (JSON obj)
+                    $.each(graph.svgPath, function (elemKey, elemVal) {
                         graphWrap.select('.svg-prf-graph-g').select('#grp-' + elemKey).attr('d', elemVal(dataSet));
                     });
 
-                    graphWrap.select('.axis.x').call(prfGraphAxis.x);
-                    graphWrap.select('.axis.y').call(prfGraphAxis.y);
+                    // Redraw x axis
+                    graphWrap.select('.axis.x').call(graph.axis.x);
+
+                    // Redraw y axis
+                    graphWrap.select('.axis.y').call(graph.axis.y);
                 }
 
-                prfGraphZoom.on('zoom', redrawGraph);
+                // When zooming redraw graph
+                graph.zoom.on('zoom', redrawGraph);
 
-                // graphWrap.select('.graph-zoom-rect')
-                ////var axisY = d3.svg.axis().scale(y).orient('left');
-                graphWrap.select('.graph-zoom-rect').call(prfGraphZoom);
+                // Apply zoom to whole graph (axis + lines)
+                graphWrap.select('.graph-zoom-rect').call(graph.zoom);
 
+                graphWrap.select('.zoom-in').on('click', function () {
+                    graph.zoom.scale(graph.zoom.scale() * scaleCoef);
+
+                    var tmpTr = graph.zoom.translate();
+                    tmpTr[0] -= diffX;
+                    tmpTr[1] -= diffY;
+                    graph.zoom.translate(tmpTr);
+
+                    redrawGraph();
+
+                    // Previous graph state - before click
+                    ////var prevGraph = {
+                    ////    // by default = 1
+                    ////    scale: graph.zoom.scale(),
+                    ////    // by default = [0,0]
+                    ////    translate: graph.zoom.translate()
+                    ////};
+
+                    ////// Previous width of graph = Initial width * previous zoom
+                    ////prevGraph.width = graph.viewBox.width / prevGraph.scale;
+                    ////prevGraph.height = graph.viewBox.height / prevGraph.scale;
+
+                    ////// 1 -> 2 -> 4 -> 8 -> 16
+                    ////// Current graph state - after click
+                    ////var curGraph = {
+                    ////    scale: prevGraph.scale + scaleCoef,
+                    ////    translate: []
+                    ////};
+
+                    ////graph.zoom.scale(curGraph.scale);
+
+                    ////curGraph.width = prevGraph.width / curGraph.scale;
+                    ////curGraph.height = prevGraph.height / curGraph.scale;
+
+                    ////curGraph.translate[0] = prevGraph.translate[0] - ((prevGraph.width - curGraph.width) / 2);
+                    ////curGraph.translate[1] = prevGraph.translate[1] - ((prevGraph.height - curGraph.height) / 2);
+
+                    ////graph.zoom.translate(curGraph.translate);
+                    //////    // dx = (x * cf - x)/2
+
+                    //////    tmpTranslate[0] -= (prfGraphViewBox.width * tmpZoom - prfGraphViewBox.width) / 2;
+                    //////    tmpTranslate[1] -= (prfGraphViewBox.height * tmpZoom - prfGraphViewBox.height) / 2;
+                    //////    prfGraphZoom.translate(tmpTranslate);
+                    
+                });
+
+                graphWrap.select('.zoom-out').on('click', function () {
+                    var tmpSc = graph.zoom.scale() / scaleCoef;
+
+                    if (tmpSc > 1) {
+                        graph.zoom.scale(graph.zoom.scale() / scaleCoef);
+
+                        var tmpTr = graph.zoom.translate();
+                        tmpTr[0] += diffX;
+                        tmpTr[1] += diffY;
+                        graph.zoom.translate(tmpTr);
+
+                        redrawGraph();
+                    }
+                    ////var tmpZoom = prfGraphZoom.scale();
+                    ////// 1 -> 1/2 -> 1/4 -> 1/8 -> 1/16
+                    ////if ($.isNumeric(tmpZoom)) {
+                    ////    tmpZoom = tmpZoom / zoomCoef;
+                    ////    prfGraphZoom.scale(tmpZoom);
+
+                    ////    var tmpTranslate = prfGraphZoom.translate();
+                    ////    tmpTranslate[0] += (1110 * (zoomCoef - 1)) / 2;
+                    ////    tmpTranslate[1] += (370 * (zoomCoef - 1)) / 2;
+
+                    ////    prfGraphZoom.translate(tmpTranslate);
+
+                    ////    redrawGraph();
+                    ////    console.log(tmpZoom);
+                    ////}
+                });
+
+                // Redraw graph once like initial zoom event
                 redrawGraph();
-                ////.selectAll('text')
-                ////.attr('y', 0);
             });
         }
     };

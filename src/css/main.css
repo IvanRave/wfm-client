@@ -693,3 +693,24 @@ footer {
     pointer-events: all;
     cursor: move;
 }
+
+.graph-zoom-controls {
+    stroke: #555;
+    cursor: pointer;
+    fill: none;
+}
+
+    .graph-zoom-controls rect {
+        pointer-events: all;
+        stroke-width: 2px;
+    }
+
+        .graph-zoom-controls rect:hover {
+            stroke: #000;
+        }
+
+    .graph-zoom-controls text {
+        font-size: 60px;
+        stroke: #000;
+        pointer-events: none;
+    }
