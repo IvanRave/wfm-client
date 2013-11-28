@@ -23,7 +23,7 @@ module.exports = function (grunt) {
         lang = grunt.option('lang') || 'en';
         
     // Commit message for bump feature
-    var cmtheader = grunt.option('cmtmsg') || 'fix(project): change',
+    var cmtheader = grunt.option('cmtheader') || 'fix(project): change',
         cmtbody = grunt.option('cmtbody') || 'some changes',
         cmtfooter = grunt.option('cmtfooter') || 'some footer';
     
