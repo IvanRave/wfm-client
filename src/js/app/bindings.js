@@ -409,21 +409,16 @@
 
     ko.bindingHandlers.svgZoomGraph = {
         update: function (element, valueAccessor) {
-            var prfAltX = ko.unwrap(valueAccessor().prfAltX),
-                prfAltY = ko.unwrap(valueAccessor().prfAltY);
-
-            if (!prfAltX || !prfAltY) { return; }
-
             var dataSet = ko.unwrap(valueAccessor().filteredByDateProductionDataSet);
             if (dataSet.length === 0) { return; }
 
+            var prfGraphAxis = ko.unwrap(valueAccessor().prfGraphAxis);
+
             var productionDataSetSvgPath = ko.unwrap(valueAccessor().productionDataSetSvgPath);
 
-            var prfGraphViewBox = ko.unwrap(valueAccessor().prfGraphViewBox);
+            var prfGraphZoom = ko.unwrap(valueAccessor().prfGraphZoom);
 
             require(['d3'], function (d3) {
-                var altAxisX = d3.svg.axis().scale(prfAltX).tickSize(-prfGraphViewBox.height);
-                var altAxisY = d3.svg.axis().scale(prfAltY).orient('left').tickSize(-prfGraphViewBox.width);
 
                 var graphWrap = d3.select(element);
 
@@ -433,18 +428,15 @@
                         graphWrap.select('.svg-prf-graph-g').select('#grp-' + elemKey).attr('d', elemVal(dataSet));
                     });
 
-                    graphWrap.select('.axis.x').call(altAxisX);
-                    graphWrap.select('.axis.y').call(altAxisY);
+                    graphWrap.select('.axis.x').call(prfGraphAxis.x);
+                    graphWrap.select('.axis.y').call(prfGraphAxis.y);
                 }
 
-                var altZoom = d3.behavior.zoom()
-                    .x(prfAltX)
-                    .y(prfAltY)
-                    .scaleExtent([1, 10000])
-                    .on('zoom', redrawGraph);
+                prfGraphZoom.on('zoom', redrawGraph);
 
+                // graphWrap.select('.graph-zoom-rect')
                 ////var axisY = d3.svg.axis().scale(y).orient('left');
-                graphWrap.select('.graph-zoom-rect').call(altZoom);
+                graphWrap.select('.graph-zoom-rect').call(prfGraphZoom);
 
                 redrawGraph();
                 ////.selectAll('text')
