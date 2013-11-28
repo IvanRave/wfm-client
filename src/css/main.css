@@ -695,22 +695,21 @@ footer {
 }
 
 .graph-zoom-controls {
-    stroke: #555;
+    stroke: #bbb;
     cursor: pointer;
-    fill: none;
+    stroke-width: 1px;
 }
 
-    .graph-zoom-controls rect {
+    .graph-zoom-controls circle {
+        fill: none;
         pointer-events: all;
-        stroke-width: 2px;
     }
 
-        .graph-zoom-controls rect:hover {
+        .graph-zoom-controls circle:hover {
             stroke: #000;
+            stroke-width: 2px;
         }
 
-    .graph-zoom-controls text {
-        font-size: 60px;
-        stroke: #000;
-        pointer-events: none;
+    .graph-zoom-controls path {
+        fill: #bbb;
     }

@@ -236,7 +236,10 @@
             y: d3.svg.axis().orient('left').tickSize(-vw.prfGraph.viewBox.width)
         };
 
-        vw.prfGraph.zoom = d3.behavior.zoom().scaleExtent([1, 10000]);
+        // Min and max zoom coeficient - 1 by default - without zoom
+        ////vw.prfGraph.scaleBorder = [0.0001, 10000];
+
+        vw.prfGraph.zoom = d3.behavior.zoom().scaleExtent([0.0001, 10000]);
 
         function getSvgPath(paramList, timeBorder, valueBorder) {
             var resultJson = {};

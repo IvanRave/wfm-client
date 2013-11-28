@@ -257,19 +257,20 @@ module.exports = function (grunt) {
         },
         changelog: {
             options: {
+                version: '0.6.9'
             }
         },
         bump: {
           options: {
             files: ['package.json', 'bower.json'],
             updateConfigs: ['pkg'],
-            commit: true,
+            commit: false,
             commitMessage: cmtmsg,
             commitFiles: ['-a'],
-            createTag: true,
+            createTag: false,
             tagName: 'v%VERSION%',
             tagMessage: 'Version %VERSION%',
-            push: true,
+            push: false,
             pushTo: 'origin'
           }
         },

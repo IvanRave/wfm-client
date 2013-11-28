@@ -438,22 +438,20 @@
                     //////    tmpTranslate[0] -= (prfGraphViewBox.width * tmpZoom - prfGraphViewBox.width) / 2;
                     //////    tmpTranslate[1] -= (prfGraphViewBox.height * tmpZoom - prfGraphViewBox.height) / 2;
                     //////    prfGraphZoom.translate(tmpTranslate);
-                    
+
                 });
 
                 graphWrap.select('.zoom-out').on('click', function () {
-                    var tmpSc = graph.zoom.scale() / scaleCoef;
+                    ////if (tmpSc > 1) {
+                    graph.zoom.scale(graph.zoom.scale() / scaleCoef);
 
-                    if (tmpSc > 1) {
-                        graph.zoom.scale(graph.zoom.scale() / scaleCoef);
+                    var tmpTr = graph.zoom.translate();
+                    tmpTr[0] += diffX;
+                    tmpTr[1] += diffY;
+                    graph.zoom.translate(tmpTr);
 
-                        var tmpTr = graph.zoom.translate();
-                        tmpTr[0] += diffX;
-                        tmpTr[1] += diffY;
-                        graph.zoom.translate(tmpTr);
-
-                        redrawGraph();
-                    }
+                    redrawGraph();
+                    ////}
                     ////var tmpZoom = prfGraphZoom.scale();
                     ////// 1 -> 1/2 -> 1/4 -> 1/8 -> 1/16
                     ////if ($.isNumeric(tmpZoom)) {
