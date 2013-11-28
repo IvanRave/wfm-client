@@ -23,8 +23,11 @@ module.exports = function (grunt) {
         lang = grunt.option('lang') || 'en';
         
     // Commit message for bump feature
-    var cmtmsg = grunt.option('cmtmsg') || 'fix(project): change';
+    var cmtheader = grunt.option('cmtmsg') || 'fix(project): change',
+        cmtbody = grunt.option('cmtbody') || 'some changes',
+        cmtfooter = grunt.option('cmtfooter') || 'some footer';
     
+    var cmtmsg = cmtheader + '\n' + cmtbody + '\n' + cmtfooter;
     // var cmtType = grunt.option('cmtType') || 'fix',
         // // Scope could be anything specifying place of the commit change
         // cmtScope = grunt.option('cmtScope') || 'project',
@@ -254,9 +257,6 @@ module.exports = function (grunt) {
         },
         changelog: {
             options: {
-                prepend: false,
-                version: '0.5.2'
-            // Task-specific options go here.
             }
         },
         bump: {
