@@ -255,11 +255,6 @@ module.exports = function (grunt) {
                 }
             }
         },
-        changelog: {
-            options: {
-                version: '0.6.9'
-            }
-        },
         bump: {
           options: {
             files: ['package.json', 'bower.json'],
