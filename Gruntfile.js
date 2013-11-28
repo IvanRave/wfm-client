@@ -27,7 +27,7 @@ module.exports = function (grunt) {
         cmtbody = grunt.option('cmtbody') || 'some changes',
         cmtfooter = grunt.option('cmtfooter') || 'some footer';
     
-    var cmtmsg = cmtheader + '\n' + cmtbody + '\n' + cmtfooter;
+    var cmtmsg = cmtheader + '\n\n' + cmtbody + '\n\n' + cmtfooter;
     // var cmtType = grunt.option('cmtType') || 'fix',
         // // Scope could be anything specifying place of the commit change
         // cmtScope = grunt.option('cmtScope') || 'project',
