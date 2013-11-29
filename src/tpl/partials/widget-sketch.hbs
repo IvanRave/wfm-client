@@ -13,7 +13,9 @@
     <div data-bind="with: $parents[3]">
       <div data-bind="if: widget.isVisImg">
         <!--attr: { src: MainSketchUrl }-->
-        <img src="#" class="img-responsive" data-bind="attr: { src: MainSketchUrl }, panzoomImg: { src: MainSketchUrl}" alt="Sketch image" style="cursor: pointer" />
+        <span class="pointer" data-bind="panzoomImg: { src: MainSketchUrl}">
+          <img class="img-responsive" src="#" data-bind="attr: { src: MainSketchUrl }" alt="Sketch image" />
+        </span>
       </div>
       <div data-bind="if: widget.isVisDescription">
         <div data-bind="html: SketchDesc" style="-ms-word-wrap: break-word; word-wrap: break-word; padding: 8px 2px;"></div>

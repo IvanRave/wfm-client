@@ -39,7 +39,9 @@
                   </blockquote>
                 </div>
                 <div data-bind="foreach: WfmImages">
-                  <img class="img-thumbnail elem-shadow" src="" data-bind="attr: { src: dataUrl }" alt="History image" />
+                  <span class="pointer" data-bind="panzoomImg: {src: dataUrl}">
+                    <img class="img-thumbnail elem-shadow" src="" data-bind="attr: { src: dataUrl }" alt="History image" />
+                  </span>
                 </div>
                 <div class="clearfix" data-bind="foreach: WellHistoryFiles">
                   <div class="img-thumbnail pull-left">

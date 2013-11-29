@@ -12,7 +12,7 @@ define(['jquery',
     // The XDomainRequest Transport is included for cross-domain file deletion for IE8+ 
     'jquery.xdr-transport',
     'jquery.postmessage-transport',
-    'jquery.lightbox', 'bootstrap-datepicker'],
+    'bootstrap-datepicker'],
     function ($, angular, appDatacontext) {
         'use strict';
 

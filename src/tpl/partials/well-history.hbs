@@ -94,7 +94,9 @@
             </div>
             <div data-bind="foreach: WfmImages">
               <div>
-                <img class="img-thumbnail elem-shadow" src="" data-bind="attr: { src: dataUrl }" alt="History image" />
+                <span class="pointer" data-bind="panzoomImg: {src: dataUrl}">
+                  <img class="img-thumbnail elem-shadow" src="" data-bind="attr: { src: dataUrl }" alt="History image" />
+                </span>
                 <span data-bind="visible: $root.isEditable">
                   <i class="glyphicon glyphicon-remove link-icon" data-bind="click: $parent.deleteWfmImage"></i>
                 </span>

@@ -358,7 +358,10 @@
     ko.bindingHandlers.panzoomImg = {
         init: function (element, valueAccessor) {
             var imgSrc = ko.unwrap(valueAccessor().src);
-            $(element).on('click', function () { bootstrapModal.openModalPanzoomWindow(imgSrc); });
+            $(element).on('click', function (e) {
+                e.preventDefault();
+                bootstrapModal.openModalPanzoomWindow(imgSrc);
+            });
         }
     };
 
