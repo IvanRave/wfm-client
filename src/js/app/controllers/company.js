@@ -39,13 +39,6 @@ define(['jquery',
 
                     require(['jquery', 'knockout', 'app/bindings'], function ($, ko) {
                         $(function () {
-                            var jqrWindow = $(window);
-                            jqrWindow.resize(function () {
-                                workspaceViewModel.windowHeight(jqrWindow.height());
-                                workspaceViewModel.windowWidth(jqrWindow.width());
-                            });
-
-
                             ko.applyBindings(workspaceViewModel, document.getElementById('workspace-project'));
                         });
                     });

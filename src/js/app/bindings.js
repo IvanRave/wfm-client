@@ -113,45 +113,51 @@
                 // move page scroll with this scroll
                 allowPageScroll: true
             });
-        },
-        update: function (element, valueAccessor) {
-            var curValue = ko.unwrap(valueAccessor());
-            var curHeight = ko.unwrap(curValue.height),
-                curWidth = ko.unwrap(curValue.width);
 
-            if ($.isNumeric(curHeight)) {
-                // Convert to numbers (if not)
-                curHeight = +curHeight;
-                curWidth = +curWidth;
+            var jqrWindow = $(window);
 
-                // 992px - small size in bootstrap - min width for div with scroll
-                var minWidth = 992,
-                    topMargin = 32,
-                    bottomMargin = 50,
-                    defaultMenuWidth = 210;
+            function redrawBlock() {
+                var curHeight = jqrWindow.height(),
+                    curWidth = jqrWindow.width();
 
-                var needHeight,
-                    needWidth;
-                if (curWidth >= minWidth) {
-                    needHeight = curHeight - topMargin - bottomMargin;
-                    needWidth = defaultMenuWidth;
+                if ($.isNumeric(curHeight)) {
+                    // Convert to numbers (if not)
+                    curHeight = +curHeight;
+                    curWidth = +curWidth;
+
+                    // 992px - small size in bootstrap - min width for div with scroll
+                    var minWidth = 992,
+                        topMargin = 32,
+                        bottomMargin = 50,
+                        defaultMenuWidth = 210;
+
+                    var needHeight,
+                        needWidth;
+                    if (curWidth >= minWidth) {
+                        needHeight = curHeight - topMargin - bottomMargin;
+                        needWidth = defaultMenuWidth;
+                    }
+                    else {
+                        needHeight = 'auto'; // by content
+                        needWidth = curWidth; // full width
+                    }
+
+                    $(element).parent().height(needHeight);
+                    $(element).height(needHeight);
+
+                    $(element).parent().width(needWidth);
+                    $(element).width(needWidth);
                 }
-                else {
-                    needHeight = 'auto'; // by content
-                    needWidth = curWidth; // full width
-                }
 
-                $(element).parent().height(needHeight);
-                $(element).height(needHeight);
-
-                $(element).parent().width(needWidth);
-                $(element).width(needWidth);
+                ////$(element).slimScroll({
+                ////    railVisible: true,
+                ////    alwaysVisible: true
+                ////});
             }
 
-            ////$(element).slimScroll({
-            ////    railVisible: true,
-            ////    alwaysVisible: true
-            ////});
+            jqrWindow.resize(redrawBlock);
+
+            redrawBlock();
         }
     };
 

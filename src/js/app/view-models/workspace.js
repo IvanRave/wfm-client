@@ -25,8 +25,6 @@
         self.wellRegionList = ko.observableArray();
         self.selectedWellRegion = ko.observable();
         self.isStructureLoaded = ko.observable(false);
-        self.windowHeight = ko.observable($(window).height());
-        self.windowWidth = ko.observable($(window).width());
 
         // Left tree menu with well regions, groups, fields, wells
         self.toggleIsVisibleMenu = function () {
