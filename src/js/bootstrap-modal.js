@@ -63,6 +63,9 @@
         $modalBlock.find('.btn-modal-close').off('click').on('click', function () {
             $modalBlock.modal('hide');
         });
+
+        $modalBlock.find('.panzoom-reset').click();
+
         $modalBlock.modal('show');
     };
 

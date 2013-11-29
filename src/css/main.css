@@ -722,3 +722,23 @@ footer {
     top: 10px;
     right: 10px;
 }
+
+.panzoom-controls {
+    position: absolute;
+    font-size: 1.5em;
+    font-weight: normal;
+    right: 10px;
+    line-height: 1;
+}
+
+.panzoom-in {
+    top: 70px;
+}
+
+.panzoom-out {
+    top: 100px;
+}
+
+.panzoom-reset {
+    top: 130px;
+}

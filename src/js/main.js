@@ -45,7 +45,15 @@
                 $(wfmProject).removeClass('hide');
 
                 // ======================================= pan zoom =======================
-                var $panzoom = $('.panzoom').panzoom();
+                var $panzoom = $('.panzoom').panzoom({
+                    $zoomIn: $('.panzoom-in'),
+                    $zoomOut: $('.panzoom-out'),
+                    $reset: $('.panzoom-reset'),
+                    increment: 0.3,
+                    minScale: 0.0001,
+                    maxScale: 10000,
+                });
+
                 $panzoom.parent().on('mousewheel.focal', function (e) {
                     e.preventDefault();
                     var delta = e.delta || e.originalEvent.wheelDelta;
