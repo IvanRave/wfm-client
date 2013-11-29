@@ -1,22 +1,23 @@
 ﻿<script type="text/html" id="sketch-widget-tpl">
-    <div data-bind="if: widget.isVisSettingPanel">
-        <div class="widget-setting-panel">
-            <label>
-                <input type="checkbox" data-bind="checked: widget.isVisImg" /> Image
-            </label>
-            <label>
-                <input type="checkbox" data-bind="checked: widget.isVisDescription" /> Description
-            </label>
-        </div>
+  <div data-bind="if: widget.isVisSettingPanel">
+    <div class="widget-setting-panel">
+      <label>
+        <input type="checkbox" data-bind="checked: widget.isVisImg" /> Image
+      </label>
+      <label>
+        <input type="checkbox" data-bind="checked: widget.isVisDescription" /> Description
+      </label>
     </div>
-    <div class="widget-content">
-        <div data-bind="with: $parents[3]">
-            <div data-bind="if: widget.isVisImg">
-                <img src="#" class="img-responsive" data-bind="attr: { src: MainSketchUrl }" alt="Sketch image" />
-            </div>
-            <div data-bind="if: widget.isVisDescription">
-                <div data-bind="html: SketchDesc" style="-ms-word-wrap: break-word; word-wrap: break-word; padding: 8px 2px;"></div>
-            </div>
-        </div>
+  </div>
+  <div class="widget-content">
+    <div data-bind="with: $parents[3]">
+      <div data-bind="if: widget.isVisImg">
+        <!--attr: { src: MainSketchUrl }-->
+        <img src="#" class="img-responsive" data-bind="attr: { src: MainSketchUrl }, panzoomImg: { src: MainSketchUrl}" alt="Sketch image" style="cursor: pointer" />
+      </div>
+      <div data-bind="if: widget.isVisDescription">
+        <div data-bind="html: SketchDesc" style="-ms-word-wrap: break-word; word-wrap: break-word; padding: 8px 2px;"></div>
+      </div>
     </div>
+  </div>
 </script>

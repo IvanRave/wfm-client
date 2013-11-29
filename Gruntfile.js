@@ -93,7 +93,7 @@ module.exports = function (grunt) {
           },
           src: '**/*',
           tag: 'v<%= pkg.version %>',
-          message: cmtmsg,
+          message: 'feat(project): version <%= pkg.version %>',
           push: true
         },
         jshint: {
@@ -146,7 +146,7 @@ module.exports = function (grunt) {
                         'blueimp-canvas-to-blob/js/canvas-to-blob.js',
                         'blueimp-load-image/js/load-image.js', 'blueimp-load-image/js/load-image-*.js',
                         'blueimp-gallery/js/blueimp-gallery.js', 'blueimp-gallery/js/blueimp-helper.js',
-                        'd3/d3.js']
+                        'd3/d3.js', 'jquery.panzoom/dist/jquery.panzoom.js']
                 }]
             },
             bower_img: {

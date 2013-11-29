@@ -28,6 +28,7 @@
     "angular-resource": "~1.2.2",
     "blueimp-file-upload": "~9.4.1",
     "blueimp-gallery": "~2.12.1",
-    "d3": "~3.3.10"
+    "d3": "~3.3.10",
+    "jquery.panzoom": "~1.8.5"
   }
 }
