@@ -116,9 +116,9 @@ Metro application can not use links to directories. Please use full url path (wi
 
 After all commits:
 
-* Generate changelog for changes since previous version: ```grunt changelog```
 * Define version level: PATCH, MINOR, MAJOR using [semantic versioning](http://semver.org/)
 * Bump a version: ```grunt bump[:minor, :major]```
+* Generate change log for changes since previous version: ```grunt changelog```
 * Commit all changed files
 * Create tag for new version: ```git tag -a vX.Y.Z -m "Version vZ.Y.Z"```
 * Push tag: ```git push origin vZ.Y.Z```
