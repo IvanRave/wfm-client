@@ -1,8 +1,9 @@
 ﻿/*z-index:
     9999: spinner
-    1030: top and bottom fixed panel 
+    1030: top and bottom fixed panel, fixed wfm-nav menu
     1040: modal window has
-    99: workspace sidebar trailer       
+    99: workspace sidebar trailer
+    -1: body
 */
 
 html, body {
@@ -282,13 +283,14 @@ footer {
 
 .modal-fullscreen {
     width: 99% !important;
-    height: 100% !important;
+    height: 99% !important;
     padding: 0 !important;
+    margin: auto !important;
 }
 
     .modal-fullscreen .modal-content {
         height: 100% !important;
-        border-radius: 0 !important;
+        /*border-radius: 0 !important;*/
     }
 
 .workspace-container {
@@ -298,27 +300,6 @@ footer {
 .sidebar-wrap {
     background-color: #333;
 }
-
-/*svg.wfm-icon {
-    width: 28px;
-    height: 28px;
-    cursor: pointer;
-    stroke: #86ee10;
-    fill: #333;
-}*/
-
-/*svg.wfm-home-icon {
-    width: 28px;
-    height: 28px;
-    cursor: pointer;
-    stroke: #86ee10;
-    fill: #fff;
-}
-
-    svg.wfm-home-icon:hover {
-        fill: #86ee10;
-        stroke: #333;
-    }*/
 
 .wfm-workspace-well-tab {
     background-color: #222;

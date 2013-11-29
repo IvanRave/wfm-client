@@ -23,11 +23,11 @@ module.exports = function (grunt) {
         lang = grunt.option('lang') || 'en';
         
     // Commit message for bump feature
-    var cmtheader = grunt.option('cmtheader') || 'fix(project): change',
-        cmtbody = grunt.option('cmtbody') || 'some changes',
-        cmtfooter = grunt.option('cmtfooter') || 'some footer';
+    // var cmtheader = grunt.option('cmtheader') || 'fix(project): change',
+        // cmtbody = grunt.option('cmtbody') || 'some changes',
+        // cmtfooter = grunt.option('cmtfooter') || 'some footer';
     
-    var cmtmsg = cmtheader + '\n\n' + cmtbody + '\n\n' + cmtfooter;
+    // var cmtmsg = cmtheader + '\n\n' + cmtbody + '\n\n' + cmtfooter;
     // var cmtType = grunt.option('cmtType') || 'fix',
         // // Scope could be anything specifying place of the commit change
         // cmtScope = grunt.option('cmtScope') || 'project',
@@ -89,12 +89,12 @@ module.exports = function (grunt) {
         },
         'gh-pages': {
           options: {
-            base: 'dst'
+            base: 'dst',
+            tag: 'v<%= pkg.version %>',
+            message: 'chore(release): version <%= pkg.version %>',
+            push: true
           },
-          src: '**/*',
-          tag: 'v<%= pkg.version %>',
-          message: 'feat(project): version <%= pkg.version %>',
-          push: true
+          src: '**/*'
         },
         jshint: {
             gruntfile: {
@@ -145,7 +145,6 @@ module.exports = function (grunt) {
                         'blueimp-file-upload/js/jquery.fileupload.js', 'blueimp-file-upload/js/jquery.iframe-transport.js',
                         'blueimp-canvas-to-blob/js/canvas-to-blob.js',
                         'blueimp-load-image/js/load-image.js', 'blueimp-load-image/js/load-image-*.js',
-                        'blueimp-gallery/js/blueimp-gallery.js', 'blueimp-gallery/js/blueimp-helper.js',
                         'd3/d3.js', 'jquery.panzoom/dist/jquery.panzoom.js']
                 }]
             },
@@ -156,7 +155,7 @@ module.exports = function (grunt) {
                     flatten: true,
                     cwd: '<%= bowerFolder %>/',
                     dest: '<%= trgt %>/img/',
-                    src: ['blueimp-gallery/img/play-pause.*', 'blueimp-gallery/img/loading.gif']
+                    src: []
                 }]
             },
             bower_css: {
@@ -168,8 +167,7 @@ module.exports = function (grunt) {
                     dest: '<%= trgt %>/css/',
                     src: ['bootstrap/dist/css/bootstrap.css', 'bootstrap/dist/css/bootstrap-theme.css',
                     'pickadate/lib/themes/default.css', 'pickadate/lib/themes/default.date.css', 'pickadate/lib/themes/default.time.css',
-                    'blueimp-file-upload/css/jquery.fileupload.css',
-                    'blueimp-gallery/css/blueimp-gallery.css']
+                    'blueimp-file-upload/css/jquery.fileupload.css']
                 }]
             },
             bower_fonts: {
@@ -260,13 +258,13 @@ module.exports = function (grunt) {
             files: ['package.json', 'bower.json'],
             updateConfigs: ['pkg'],
             commit: false,
-            commitMessage: cmtmsg,
-            commitFiles: ['-a'],
+            // commitMessage: cmtmsg,
+            // commitFiles: ['-a'],
             createTag: false,
-            tagName: 'v%VERSION%',
-            tagMessage: 'Version %VERSION%',
-            push: false,
-            pushTo: 'origin'
+            // tagName: 'v%VERSION%',
+            // tagMessage: 'Version %VERSION%',
+            push: false
+            // pushTo: 'origin'
           }
         },
         // For development: run tasks when change files

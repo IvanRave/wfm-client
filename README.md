@@ -114,12 +114,15 @@ Metro application can not use links to directories. Please use full url path (wi
 
 ### Source files (master branch)
 
-* Check state: ```git status```
-* If there are new files add: ```git add -a``` (for all files)
-* Use grunt task to publish: ```grunt bump --cmtmsg="some commit message (see commit guidelines)"```
-* Source will be published to master branch
+After all commits:
+
+* Generate changelog for changes since previous version: ```grunt changelog```
+* Define version level: PATCH, MINOR, MAJOR using [semantic versioning](http://semver.org/)
+* Bump a version: ```grunt bump[:minor, :major]```
+* Commit all changed files
+* Create tag for new version: ```git tag -a vX.Y.Z -m "Version vZ.Y.Z"```
+* Push tag: ```git push origin vZ.Y.Z```
 
 ### Distributive (gh-pages branch)
 * Create distributive: ```grunt --prod```
-* Use grunt task: ```grunt gh-pages --cmtmsg="some commit message (see commit guidelines)"```
-* Distributive will be published to gh-pages branch
+* Push to gh-pages branch: ```grunt gh-pages```

@@ -18,8 +18,6 @@
     <link href="css/default.date.css" rel="stylesheet" />
     <link href="css/default.time.css" rel="stylesheet" />
     <!-- /date picker-->
-    <!-- blueimp gallery -->
-    <link href="css/blueimp-gallery.css" rel="stylesheet" />
 </head>
 <body>
     <!--[if lt IE 9]><p class="chromeframe">You are using an <strong>outdated</strong> browser. Please upgrade your browser.</p><![endif]-->
@@ -35,32 +33,10 @@
             </div>
         </nav>
         <div class="wfm-content-wrap">
-            <div id="blueimp-gallery" class="blueimp-gallery">
-                <div class="slides"></div>
-                <h3 class="title"></h3>
-                <a class="prev">‹</a>
-                <a class="next">›</a>
-                <a class="close">×</a>
-                <a class="play-pause"></a>
-                <ol class="indicator"></ol>
-            </div>
-            <!--<div id="links">
-                <a href="img/carousel-wfm-1.jpg" title="Banana">
-                    <img src="img/question.jpg" alt="Banana">
-                </a>
-                <a href="img/carousel-wfm-2.jpg" title="Banana">
-                    <img src="img/question.jpg" alt="Banana">
-                </a>
-            </div>
-            <div style="overflow: hidden; position: relative">
-                <div class="panzoom">
-                    <img src="img/620x300.jpg" />
-                </div>
-            </div>-->
-            {{> modal-standard }}
-			{{> modal-panzoom }}
             <div ng-view></div>
         </div>
+		{{> modal-standard }}
+		{{> modal-panzoom }}
     </div>
     <footer class="navbar-fixed-bottom navbar-inverse">
         <div class="footer-logo-wrap">
