@@ -1,4 +1,4 @@
-﻿<script type="text/html" id="well-pd-tpl">
+﻿<div data-bind="if: selectedSectionId() === 'pd'">
   <div data-bind="with: mainPerfomanceView">
     <div data-bind="ifnot: prfPartial.isLoadedHstProductionData">{{lang.loading}}...</div>
     <div data-bind="if: prfPartial.isLoadedHstProductionData">
@@ -99,7 +99,7 @@
             {{> pd-table }}
             <div class="text-center">
               <ul class="pagination pagination-sm" data-bind="foreach: {data: joinedYearList, as: 'joinedYear'}">
-                <li data-bind="visible: joinedYear >= $parent.WPDDateStartYear() && joinedYear <= $parent.WPDDateEndYear(), css: {'active': joinedYear === $parent.selectedPrfTableYear() }">
+                <li data-bind="css: {'active': joinedYear === $parent.selectedPrfTableYear() }, visible: joinedYear >= $parent.WPDDateStartYear() && joinedYear <= $parent.WPDDateEndYear()">
                   <a href="#" data-bind="text: joinedYear, click: function(){ $parent.selectPrfTableYear(joinedYear);}"></a>
                 </li>
               </ul>
@@ -109,4 +109,4 @@
       </div>
     </div>
   </div>
-</script>
+</div>

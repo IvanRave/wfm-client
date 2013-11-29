@@ -1,6 +1,6 @@
-﻿<script type="text/html" id="well-integrity-tpl">
+﻿<div data-bind="if: selectedSectionId() === 'integrity'">
   <div data-bind="ifnot: isLoadedIntegrity">
-    Loading...
+    {{capitalizeFirst lang.loading}}...
   </div>
   <div data-bind="if: isLoadedIntegrity">
     <div data-bind="ifnot: isExistsSectionWellFiles">
@@ -24,4 +24,4 @@
       </div>
     </div>
   </div>
-</script>
+</div>

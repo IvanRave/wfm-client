@@ -1,4 +1,4 @@
-﻿<script type="text/html" id="well-history-tpl">
+﻿<div data-bind="if: selectedSectionId() === 'history'">
   <span data-bind="ifnot: isLoadedHistoryList">{{capitalizeFirst lang.loading}}...</span>
   <div data-bind="if: isLoadedHistoryList">
     <div class="clearfix">
@@ -19,7 +19,7 @@
           <small>{{capitalizeFirst lang.noWellHistoryList}}</small>
         </div>
       </div>
-      <div class="pull-right" data-bind="if: $root.isEditable">
+      <div class="pull-right" data-ng-if="isEdt">
         <span data-bind="with: wellHistoryNew">
           <input class="input-sm" type="text" size="10" data-bind="datepicker: startUnixTime, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }" />
           <span> - </span>
@@ -36,7 +36,7 @@
           <div class="col-md-2">
             <div>
               <div class="bld">{{capitalizeFirst lang.timePeriod}}:</div>
-              <div data-bind="ifnot: $root.isEditable">
+              <div data-ng-if="!isEdt">
                 <div>
                   <span data-bind="unix: startUnixTime"></span>
                 </div>
@@ -44,19 +44,19 @@
                   <span data-bind="unix: endUnixTime, visible: isVisibleEndUnixTime"></span>
                 </div>
               </div>
-              <div data-bind="if: $root.isEditable">
+              <div data-ng-if="isEdt">
                 <input class="input-sm" type="text" size="10" data-bind="datepicker: startUnixTime, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }"></input>
                 <input class="input-sm" type="text" size="10" data-bind="datepicker: endUnixTime, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }"></input>
               </div>
             </div>
             <div>
-              <div data-bind="ifnot: $root.isEditable">
+              <div data-ng-if="!isEdt">
                 <div data-bind="with: jobType">
                   <span class="bld">{{capitalizeFirst lang.jobType}}:</span>
                   <span data-bind="text: name"></span>
                 </div>
               </div>
-              <div data-bind="if: $root.isEditable">
+              <div data-ng-if="isEdt">
                 <div data-bind="if: $root.jobTypeList().length > 0">
                   <span class="bld">{{capitalizeFirst lang.jobType}}:</span>
                   <select class="input-sm" data-bind="options: $root.jobTypeList, optionsText: 'name', optionsValue: 'id', optionsCaption: 'No job type', value: jobTypeId"></select>
@@ -64,7 +64,7 @@
                 </div>
               </div>
             </div>
-            <div data-bind="if: $root.isEditable" style="margin-top:8px">
+            <div data-ng-if="isEdt" style="margin-top:8px">
               <div class="btn-group-vertical btn-group-sm">
                 <button class="btn btn-default" type="button" data-bind="click: chooseWellHistoryFile">
                   <i class="glyphicon glyphicon-paperclip"></i> {{capitalizeFirst lang.attachFile}}
@@ -79,12 +79,12 @@
             </div>
           </div>
           <div class="col-md-10">
-            <div data-bind="ifnot: $root.isEditable">
+            <div data-ng-if="!isEdt">
               <div data-bind="visible: historyText">
                 <blockquote class="pre-wrap-text" data-bind="text: historyText"></blockquote>
               </div>
             </div>
-            <div data-bind="if: $root.isEditable">
+            <div data-ng-if="isEdt">
               <blockquote>
                 <textarea class="form-control" rows="3" style="resize: vertical" data-bind="value: historyText"></textarea>
                 <button class="btn btn-default btn-sm" type="button" data-bind="click: putWellHistory">
@@ -97,7 +97,7 @@
                 <span class="pointer" data-bind="panzoomImg: {src: dataUrl}">
                   <img class="img-thumbnail elem-shadow" src="" data-bind="attr: { src: dataUrl }" alt="History image" />
                 </span>
-                <span data-bind="visible: $root.isEditable">
+                <span data-ng-if="isEdt">
                   <i class="glyphicon glyphicon-remove link-icon" data-bind="click: $parent.deleteWfmImage"></i>
                 </span>
               </div>
@@ -105,7 +105,9 @@
             <div data-bind="foreach: WellHistoryFiles" class="clearfix">
               <div class="img-thumbnail pull-left">
                 <a href="#" data-bind="text: FileNameWODate, click: downloadWellHistoryFile"></a>
-                <i class="glyphicon glyphicon-remove link-icon" data-bind="click: $parent.deleteWellHistoryFile, visible: $root.isEditable"></i>
+                <span data-ng-if="isEdt">
+                  <i class="glyphicon glyphicon-remove link-icon" data-bind="click: $parent.deleteWellHistoryFile"></i>
+                </span>
               </div>
             </div>
           </div>
@@ -113,4 +115,4 @@
       </div>
     </div>
   </div>
-</script>
+</div>

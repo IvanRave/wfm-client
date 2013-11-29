@@ -1,6 +1,6 @@
-﻿<script type="text/html" id="well-nodalanalysis-tpl">
+﻿<div data-bind="if: selectedSectionId() === 'nodalanalysis'">
   <div data-bind="ifnot: isLoadedNodal">
-    Loading...
+    {{lang.loading}}...
   </div>
   <div data-bind="if: isLoadedNodal">
     <div data-bind="ifnot: isExistsSectionWellFiles">
@@ -24,4 +24,4 @@
       </div>
     </div>
   </div>
-</script>
+</div>

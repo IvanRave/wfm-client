@@ -37,10 +37,6 @@
             });
         };
 
-        self.processWidget = function () {
-            console.log('process widget');
-        };
-
         var optsObj = JSON.parse(data.Opts);
         
         switch (self.sectionId) {

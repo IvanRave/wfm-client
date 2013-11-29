@@ -1,12 +1,12 @@
 ﻿<div>
   <div class="wfm-workspace-well-top-tab clearfix">
     <div class="pull-left" style="margin-top:1px">
-      <button type="button" class="btn btn-inverse btn-sm" data-bind="click: unselectSection">
+      <button class="btn btn-inverse btn-sm" type="button" data-bind="click: unselectSection">
         <i class="glyphicon glyphicon-th"></i>&nbsp;&nbsp;<span>{{capitalizeFirst lang.well}} {{lang.dashboard}}</span>
       </button>
     </div>
     <div class="pull-left" style="margin-top:1px">
-      <button type="button" class="btn btn-inverse btn-sm" data-bind="click: showFmg">
+      <button class="btn btn-inverse btn-sm" type="button" data-bind="click: showFmg">
         <i class="glyphicon glyphicon-folder-open"></i>&nbsp;&nbsp;<span>{{capitalizeFirst lang.fileManager}}</span>
       </button>
     </div>
@@ -63,26 +63,25 @@
     </div>
   </div>
 
-  {{> well-history}}
-  {{> well-integrity}}
-  {{> well-log}}
-  {{> well-map}}
-  {{> well-nodalanalysis}}
-  {{> well-pd}}
-  {{> well-report}}
-  {{> well-sketch}}
-  {{> well-summary}}
-  {{> well-test}}
-  {{> well-volume}}
-  {{> well-widget-scope}}
-
   <div class="well-content-pad">
-    <div data-bind="if: selectedSectionId">
-      <div data-bind="template: { name: 'well-' + selectedSectionId() + '-tpl' }"></div>
-    </div>
-    <div data-bind="ifnot: selectedSectionId">
-      <div data-bind="template: { name: 'well-widget-scope-tpl', afterRender: afterRenderWidgetScope }"></div>
-    </div>
+    {{> well-history}}
+    {{> well-integrity}}
+    {{> well-log}}
+    {{> well-map}}
+    {{> well-nodalanalysis}}
+    {{> well-pd}}
+    {{> well-report}}
+    {{> well-sketch}}
+    {{> well-summary}}
+    {{> well-test}}
+    {{> well-volume}}
+
+    {{> widget-perfomance}}
+    {{> widget-sketch}}
+    {{> widget-summary}}
+    {{> widget-history}}
+
+    {{> well-widget-scope}}
   </div>
   {{> modal-file-manager}}
 </div>

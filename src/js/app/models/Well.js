@@ -137,10 +137,9 @@
                         // previous selected well
                         var prevSlcWell = ko.unwrap(prevSlcWellGroup.selectedWell);
                         if (prevSlcWell) {
-                            var prevSlcSectionId = ko.unwrap(prevSlcWell.selectedSectionId);
-                            if (prevSlcSectionId) {
-                                previousSelectedSectionId = prevSlcSectionId;
-                            }
+                            previousSelectedSectionId = ko.unwrap(prevSlcWell.selectedSectionId);
+
+                            // If selected perfomance section
                             var tmpSelectedAttrGroupId = ko.unwrap(prevSlcWell.mainPerfomanceView.selectedAttrGroupId);
                             if (tmpSelectedAttrGroupId) {
                                 self.mainPerfomanceView.selectedAttrGroupId(tmpSelectedAttrGroupId);
@@ -168,11 +167,9 @@
             // set selected well field
             slcWellRegion.selectedWellField(slcWellField);
 
-            if (previousSelectedSectionId) {
-                self.selectedSectionId(previousSelectedSectionId);
-            }
-
-            console.log('well selected');
+            console.log(previousSelectedSectionId);
+            // if null - then select Dashboard
+            self.selectedSectionId(previousSelectedSectionId || null);
         };
 
         // ======================= file manager section ======================
@@ -185,7 +182,7 @@
 
         // ========================= view section ===========================
         // section, which user select on the well view
-        self.selectedSectionId = ko.observable(null);
+        self.selectedSectionId = ko.observable();
 
         ///<param>attrGroup - when select PD section need to point attrGroup</param>
         self.selectSection = function (sectionId) {
@@ -1106,7 +1103,6 @@
         self.getWellWidgoutList = function () {
             if (!ko.unwrap(self.isLoadedWellWidgoutList)) {
                 datacontext.getWellWidgoutList(self.Id).done(function (response) {
-                    console.log('well widgout response', response);
                     require(['app/models/widgout'], function (Widgout) {
                         // Well widget layout list
                         function importWidgoutList(data, parentItem) {
@@ -1115,25 +1111,25 @@
 
                         self.wellWidgoutList(importWidgoutList(response, self));
                         self.isLoadedWellWidgoutList(true);
-                        console.log('wList', ko.unwrap(self.wellWidgoutList));
                     });
                 });
             }
         };
 
-        self.afterRenderWidgetScope = function () {
-            self.getWellWidgoutList();
-            // TODO: load data only if there is one or more perfomance widgets (only once) for entire well
-            self.getWellGroup().getWellGroupWfmParameterList();
-            self.perfomancePartial.forecastEvolution.getDict();
-            self.perfomancePartial.getHstProductionDataSet();
-            self.getWellHistoryList();
-        };
-
         // ============================================================ Change tab section =========================================================
         self.selectedSectionId.subscribe(function (sectionId) {
-            console.log(sectionId);
             switch (sectionId) {
+                // Dashboard: from undefined to null
+                case null: {
+                    // Get all widgouts for well
+                    self.getWellWidgoutList();
+                    // TODO: load data only if there is one or more perfomance widgets (only once) for entire well
+                    self.getWellGroup().getWellGroupWfmParameterList();
+                    self.perfomancePartial.forecastEvolution.getDict();
+                    self.perfomancePartial.getHstProductionDataSet();
+                    self.getWellHistoryList();
+                    break;
+                }
                 case 'history': {
                     self.getWellHistoryList();
                     break;

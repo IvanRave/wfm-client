@@ -1,28 +1,24 @@
-﻿{{> widget-perfomance}}
-{{> widget-sketch}}
-{{> widget-summary}}
-{{> widget-history}}
-<script type="text/html" id="well-widget-scope-tpl">
+﻿<div data-bind="if: selectedSectionId() === null">
     <div data-bind="if: isLoadedWellWidgoutList">
         <div class="clearfix">
             <div class="pull-left">
                 <span class="bld" data-bind="text: Name"></span>
                 <span data-bind="with: selectedWellWidgout">
-                    <span data-bind="if: $root.isEditable">
+                    <span data-ng-if="isEdt">
                         <input class="input-sm" type="text" data-bind="value: name" />
                     </span>
-                    <span data-bind="ifnot: $root.isEditable">
+                    <span data-ng-if="!isEdt">
                         <span data-bind="text: name" />
                     </span>
                 </span>
             </div>
-            <div class="pull-right" data-bind="if: $root.isEditable, visible: selectedWellWidgout">
+            <div class="pull-right" data-ng-if="isEdt" data-bind="visible: selectedWellWidgout">
                 <button class="btn btn-sm btn-default" data-bind="click: deleteWellWidgout">{{capitalizeFirst lang.toDeleteLayout}}</button>
             </div>
             <div class="pull-right" data-bind="visible: selectedWellWidgout" style="margin-left: 32px">
                 <select class="input-sm" data-bind="options: wellWidgoutList, optionsText: 'name', value: selectedWellWidgout"></select>
             </div>
-            <div class="pull-right" data-bind="if: $root.isEditable">
+            <div class="pull-right" data-ng-if="isEdt">
                 <select class="input-sm" data-bind="options: possibleWidgoutList, optionsText: 'name', value: slcPossibleWidgout, optionsCaption: 'Choose scheme...'"></select>
                 <button class="btn btn-sm btn-default" data-bind="enable: slcPossibleWidgout, click: postWellWidgout">{{capitalizeFirst lang.toCreateLayout}}</button>
             </div>
@@ -41,7 +37,7 @@
                                         <input type="text" class="input-sm" data-bind="value: name" />
                                     </div>
                                 </div>
-                                <div class="pull-right" data-bind="if: $root.isEditable">
+                                <div class="pull-right" data-ng-if="isEdt">
                                     <div data-bind="ifnot: isVisSettingPanel">
                                         <button class="btn btn-xs" type="button" data-bind="click: showVisSettingPanel">
                                             <i class="glyphicon glyphicon-cog" title="{{capitalizeFirst lang.settings}}"></i>
@@ -58,11 +54,11 @@
                                 </div>
                             </div>
                             <div class="widget-tile-content">
-                                <div data-bind="template: { name: widgetTpl, data: $data, as: 'widget', afterRender: processWidget }"></div>
+                                <div data-bind="template: { name: widgetTpl, data: $data, as: 'widget' }"></div>
                             </div>
                         </div>
                     </div>
-                    <div data-bind="if: $root.isEditable">
+                    <div data-ng-if="isEdt">
                         <div class="widget-tile">
                             <div class="widget-empty">
                                 <div class="text-right">
@@ -78,4 +74,4 @@
             </div>
         </div>
     </div>
-</script>
+</div>

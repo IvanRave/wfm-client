@@ -10,7 +10,7 @@
 ], function ($, ko, datacontext, bootstrapModal, appHelper, JobType) {
     'use strict';
 
-    function WorkspaceViewModel(companyId, isEditable, choosedObj) {
+    function WorkspaceViewModel(companyId, choosedObj) {
         // Test company Id with Guid format (this checks retry server check in WorkSpace view of Home controller
         if (!appHelper.isGuidValid(companyId)) {
             var errValidMsg = 'Company id is not valid GUID';
@@ -20,16 +20,11 @@
 
         var self = this;
 
-        // Manage or view: hide all editable blocks
-        self.isEditable = isEditable;
         // Left tree menu with well regions, groups, fields, wells
         self.isVisibleMenu = ko.observable(true);
         self.wellRegionList = ko.observableArray();
-        self.viewModelError = ko.observable();
         self.selectedWellRegion = ko.observable();
-        self.curUserProfile = ko.observable();
         self.isStructureLoaded = ko.observable(false);
-        self.currentCompanyId = companyId;
         self.windowHeight = ko.observable($(window).height());
         self.windowWidth = ko.observable($(window).width());
 
@@ -141,7 +136,7 @@
                 return;
             }
 
-            if (confirm('Are you sure you want to delete "' + wellRegionForDelete.Name() + '"?')) {
+            if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(wellRegionForDelete.Name) + '"?')) {
                 datacontext.deleteWellRegion(wellRegionForDelete).done(function () {
                     self.wellRegionList.remove(wellRegionForDelete);
                 });
@@ -184,6 +179,10 @@
                                 if (choosedObj.sectionId) {
                                     tmpWell.selectedSectionId(choosedObj.sectionId);
                                 }
+                                else {
+                                    // Null - show dashboard: load all widget layouts and data
+                                    tmpWell.selectedSectionId(null);
+                                }
                                 // Apchive: previously - set summary as a default page
                                 ////else {
                                 ////    tmpWell.selectedSectionId(tmpWell.sectionList[0].id);
@@ -202,9 +201,7 @@
             datacontext.getWellRegionList({
                 company_id: companyId,
                 is_inclusive: true
-            }).done(getSucceeded).fail(function () {
-                self.viewModelError('Error retrieving lists.');
-            });
+            }).done(getSucceeded);
         }
 
         loadStructure();

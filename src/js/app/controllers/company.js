@@ -16,7 +16,7 @@ define(['jquery',
     function ($, angular, appDatacontext) {
         'use strict';
 
-        function initWorkspace(angRouteParams, isEditable) {
+        function initWorkspace(angRouteParams) {
             // Script collection for rjs optimization (bundle or debug)
             var workspaceWrapUrl = '';
             // {{#if conf.isProd}}
@@ -29,7 +29,7 @@ define(['jquery',
                 require(['app/view-models/workspace'], function (WorkspaceViewModel) {
                     // Get company Id
                     ////'9cf09ba5-c049-4148-8e5f-869c1e26c330';
-                    var workspaceViewModel = new WorkspaceViewModel(angRouteParams.companyId, isEditable, {
+                    var workspaceViewModel = new WorkspaceViewModel(angRouteParams.companyId, {
                         regionId: parseInt(angRouteParams['region']),
                         fieldId: parseInt(angRouteParams['field']),
                         groupId: parseInt(angRouteParams['group']),
@@ -197,12 +197,15 @@ define(['jquery',
             ////    });
             ////};
         }])
-        .controller('WorkspaceManageCtrl', ['$routeParams', function (angRouteParams) {
+        .controller('WorkspaceManageCtrl', ['$scope', '$routeParams', function (angScope, angRouteParams) {
+            angScope.isEdt = true;
             // View workspace: do not load libs for edit (for example Wisywig editor, or file-uploading features)
             // Views can be devided too: one - for view, second - for edit (do not put external elements, like input boxes, file-input boxes etc.)
             initWorkspace(angRouteParams, true);
         }])
-        .controller('WorkspaceCtrl', ['$routeParams', function (angRouteParams) {
+        .controller('WorkspaceCtrl', ['$scope', '$routeParams', function (angScope, angRouteParams) {
+            angScope.isEdt = false;
+
             initWorkspace(angRouteParams, false);
         }]);
     });

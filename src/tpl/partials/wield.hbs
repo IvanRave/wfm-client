@@ -15,7 +15,7 @@ layout: false
         <div class="clearfix">
             <h4 class="pull-left">
                 <span data-bind="text: Name"></span>
-                <small data-bind="if: $root.isEditable">
+                <small data-ng-if="isEdt">
                     <button class="btn btn-xs btn-default" data-bind="click: editWellField">
                         <i class="glyphicon glyphicon-edit"></i>
                     </button>
