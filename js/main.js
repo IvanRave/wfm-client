@@ -45,7 +45,15 @@ require(['require-config'], function () {
                 $(wfmProject).removeClass('hide');
 
                 // ======================================= pan zoom =======================
-                var $panzoom = $('.panzoom').panzoom();
+                var $panzoom = $('.panzoom').panzoom({
+                    $zoomIn: $('.panzoom-in'),
+                    $zoomOut: $('.panzoom-out'),
+                    $reset: $('.panzoom-reset'),
+                    increment: 0.3,
+                    minScale: 0.0001,
+                    maxScale: 10000,
+                });
+
                 $panzoom.parent().on('mousewheel.focal', function (e) {
                     e.preventDefault();
                     var delta = e.delta || e.originalEvent.wheelDelta;
@@ -56,30 +64,6 @@ require(['require-config'], function () {
                     });
                 });
                 // ======================================= pan zoom end =======================
-
-
-                ////console.log('blueimp', blueimpGallery);
-                ////document.getElementById('links').onclick = function (event) {
-                ////    event = event || window.event;
-                ////    // event.target / event.srcElement contains a reference to the element the event was raised on.
-                ////    var target = event.target || event.srcElement,
-                ////        // get parent link or link if no image inside
-                ////        link = target.src ? target.parentNode : target,
-                ////        // all links for building gallery
-                ////        links = this.getElementsByTagName('a');
-                ////    //event.preventDefault();
-                ////    blueimpGallery(links, {
-                ////        index: link,
-                ////        event: event,
-                ////        stretchImages: false
-                ////    });
-
-                ////    //console.log(link);
-                ////    //console.log(links);
-                ////    //console.log(options);
-
-                ////    return false;
-                ////};
             });
         });
 });
