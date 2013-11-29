@@ -90,7 +90,6 @@ module.exports = function (grunt) {
         'gh-pages': {
           options: {
             base: 'dst',
-            tag: 'v<%= pkg.version %>',
             message: 'chore(release): version <%= pkg.version %>',
             push: true
           },
