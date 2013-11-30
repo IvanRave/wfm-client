@@ -1,13 +1,6 @@
 ﻿define(['jquery', 'knockout', 'moment', 'bootstrap-modal', 'jquery.slimscroll', 'jquery.bootstrap', 'bootstrap-datepicker', 'picker.date'], function ($, ko, appMoment, bootstrapModal) {
     'use strict';
 
-    // Hooks up a form to jQuery Validation
-    ko.bindingHandlers.validate = {
-        init: function (elem) {
-            $(elem).validate();
-        }
-    };
-
     // Controls whether or not the text in a textbox is selected based on a model property
     ko.bindingHandlers.selected = {
         init: function (elem, valueAccessor) {
@@ -23,19 +16,6 @@
             if (shouldBeSelected) {
                 $(elem).select();
             }
-        }
-    };
-
-    // Makes a textbox lose focus if you press "enter"
-    ko.bindingHandlers.blurOnEnter = {
-        init: function (elem) {
-            $(elem).keypress(function (evt) {
-                if (evt.keyCode === 13 /* enter */) {
-                    evt.preventDefault();
-                    $(elem).triggerHandler("change");
-                    $(elem).blur();
-                }
-            });
         }
     };
 
