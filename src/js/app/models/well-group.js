@@ -1,4 +1,8 @@
-﻿define(['jquery',
+﻿/**
+* A module representing a well group.
+* @module
+*/
+define(['jquery',
     'knockout',
     'app/datacontext',
     'bootstrap-modal',

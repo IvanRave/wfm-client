@@ -1,4 +1,7 @@
-﻿define(['jquery', 'jquery.fileupload'], function ($) {
+﻿/** 
+ * @return {!Object} Scope of methods to help working with files.
+*/
+define(['jquery', 'jquery.fileupload'], function ($) {
     'use strict';
 
     return {

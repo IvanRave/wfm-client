@@ -12,6 +12,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-bump');
     grunt.loadNpmTasks('grunt-conventional-changelog');
     grunt.loadNpmTasks('grunt-gh-pages');
+    grunt.loadNpmTasks('grunt-jsdoc');
     
     // By default = devSite
     var isProd = grunt.option('prod') ? true : false,
@@ -144,7 +145,7 @@ module.exports = function (grunt) {
                         'blueimp-file-upload/js/jquery.fileupload.js', 'blueimp-file-upload/js/jquery.iframe-transport.js',
                         'blueimp-canvas-to-blob/js/canvas-to-blob.js',
                         'blueimp-load-image/js/load-image.js', 'blueimp-load-image/js/load-image-*.js',
-                        'd3/d3.js', 'jquery.panzoom/dist/jquery.panzoom.js']
+                        'd3/d3.js', 'jquery.panzoom/dist/jquery.panzoom.js', 'jcrop/js/jquery.Jcrop.js']
                 }]
             },
             bower_img: {
@@ -166,7 +167,8 @@ module.exports = function (grunt) {
                     dest: '<%= trgt %>/css/',
                     src: ['bootstrap/dist/css/bootstrap.css', 'bootstrap/dist/css/bootstrap-theme.css',
                     'pickadate/lib/themes/default.css', 'pickadate/lib/themes/default.date.css', 'pickadate/lib/themes/default.time.css',
-                    'blueimp-file-upload/css/jquery.fileupload.css']
+                    'blueimp-file-upload/css/jquery.fileupload.css',
+                    'jcrop/css/jquery.Jcrop.css', 'jcrop/css/Jcrop.gif']
                 }]
             },
             bower_fonts: {
@@ -178,6 +180,14 @@ module.exports = function (grunt) {
                     dest: '<%= trgt %>/fonts/',
                     src: ['bootstrap/dist/fonts/*', 'wfm-fonts/fonts/*']
                 }]
+            }
+        },
+        jsdoc : {
+            main : {
+                src: ['src/js/**/*.js'], 
+                options: {
+                    destination: 'doc'
+                }
             }
         },
         assemble: {

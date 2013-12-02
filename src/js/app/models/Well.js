@@ -1,4 +1,9 @@
-﻿define([
+﻿/**
+* A module representing a well.
+* @module
+* @param {Object} $ - Jquery lib.
+*/
+define([
     'jquery',
     'knockout',
     'app/datacontext',
@@ -11,22 +16,24 @@
     'app/models/well-file',
     'app/models/column-attribute',
     'app/models/well-history',
-    'app/models/test-scope'
+    'app/models/test-scope',
+    'bootstrap-datepicker'
 ], function ($, ko, datacontext, fileHelper, bootstrapModal, appHelper, appMoment, wellPerfomancePartial, HistoryView) {
     'use strict';
 
-    // WellFiles (convert data objects into array)
+    /** WellFiles (convert data objects into array) */
     function importWellFilesDto(data, parent) { return $.map(data || [], function (item) { return datacontext.createWellFile(item, parent); }); }
 
-    // ColumnAttributes (convert data objects into array)
+    /** ColumnAttributes (convert data objects into array) */
     function importColumnAttributesDto(data) { return $.map(data || [], function (item) { return datacontext.createColumnAttribute(item); }); }
 
-    // 8. WellHistory (convert data objects into array)
+    /** WellHistory (convert data objects into array) */
     function importWellHistoryDto(data, parent) { return $.map(data || [], function (item) { return datacontext.createWellHistory(item, parent); }); }
 
-    // Test scope
+    /** Test scope */
     function importTestScopeDtoList(data, wellItem) { return $.map(data || [], function (item) { return datacontext.createTestScope(item, wellItem); }); }
 
+    /** Well property list */
     var wellPropertyList = [
         { id: 'Name', ttl: 'Name', tpe: 'SingleLine' },
         { id: 'Description', ttl: 'Description', tpe: 'MultiLine' },
@@ -43,6 +50,12 @@
         { id: 'ReservoirData', ttl: 'Reservoir data', tpe: 'MultiLine' },
     ];
 
+    /**
+     * Well model.
+     * @param {Object} data - Well data.
+     * @param {Object} wellGroup - Well group.
+     * @constructor
+     */
     function Well(data, wellGroup) {
         var self = this;
         data = data || {};
@@ -55,7 +68,10 @@
             return self.getWellGroup().getWellField().getWellRegion().getParentViewModel();
         };
 
-        // Persisted properties
+        /**
+         * Well id
+         * @type {number}
+         */
         self.Id = data.Id;
 
         self.WellType = ko.observable(data.WellType);
@@ -771,20 +787,26 @@
 
             var tmpFieldValue = ko.unwrap(self[fieldName]);
 
-            if (inputType === "SingleLine") {
+            if (inputType === 'SingleLine') {
                 inputField = document.createElement('input');
                 inputField.type = 'text';
                 $(inputField).prop({
                     'placeholder': fieldTitle
                 }).val(tmpFieldValue).addClass('form-control');
             }
-            else if (inputType === "MultiLine") {
+            else if (inputType === 'MultiLine') {
                 inputField = document.createElement('textarea');
                 $(inputField).prop({ "rows": 5, 'placeholder': fieldTitle }).val(tmpFieldValue).addClass('form-control');
             }
-            else if (inputType === "DateLine") {
+            else if (inputType === 'DateLine') {
                 inputField = document.createElement('input');
                 inputField.type = 'text';
+
+                ////$(inputField).pickadate({
+                ////    format: 'yyyy-mm-dd',
+                ////    selectYears: true,
+                ////    selectMonths: true
+                ////}).prop({ placeholder: 'yyyy-mm-dd' }); //.addClass('form-control');
 
                 $(inputField).datepicker({
                     format: 'yyyy-mm-dd',
@@ -792,7 +814,10 @@
                 }).prop({ placeholder: 'yyyy-mm-dd' }).addClass('form-control');
 
                 if (tmpFieldValue) {
+                    //    console.log('Date: ', new Date(tmpFieldValue));
                     $(inputField).val(appMoment(tmpFieldValue).format('YYYY-MM-DD'));
+                    ////var picker = $(inputField).pickadate('picker');
+                    ////picker.set('select', initialValue);
                 }
             }
 

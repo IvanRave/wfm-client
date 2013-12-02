@@ -1,4 +1,4 @@
-﻿define(['jquery', 'knockout', 'moment', 'bootstrap-modal', 'jquery.slimscroll', 'jquery.bootstrap', 'bootstrap-datepicker', 'picker.date'], function ($, ko, appMoment, bootstrapModal) {
+﻿define(['jquery', 'knockout', 'moment', 'bootstrap-modal', 'jquery.slimscroll', 'jquery.bootstrap', 'picker.date'], function ($, ko, appMoment, bootstrapModal) {
     'use strict';
 
     // Controls whether or not the text in a textbox is selected based on a model property

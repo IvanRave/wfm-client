@@ -11,8 +11,7 @@ define(['jquery',
     'jquery.ui.widget', 'jquery.iframe-transport',
     // The XDomainRequest Transport is included for cross-domain file deletion for IE8+ 
     'jquery.xdr-transport',
-    'jquery.postmessage-transport',
-    'bootstrap-datepicker'],
+    'jquery.postmessage-transport'],
     function ($, angular, appDatacontext) {
         'use strict';
 

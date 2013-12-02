@@ -140,7 +140,7 @@
                     // load image before open window and set JCrop
                     historyImgElem.onload = function () {
                         // load need libraries for cropping
-                        require(['jquery.jcrop'], function () {
+                        require(['jquery.Jcrop'], function () {
 
                             var coords = [0, 0, 0, 0];
 
