@@ -74,7 +74,16 @@ define([
          */
         self.Id = data.Id;
 
+        /**
+        * Well type
+        * @type {string}
+        */
         self.WellType = ko.observable(data.WellType);
+
+        /**
+        * Flow type
+        * @type {string}
+        */
         self.FlowType = ko.observable(data.FlowType);
 
         self.wellPropertyList = wellPropertyList;
@@ -740,6 +749,10 @@ define([
 
         self.volumeHashString = ko.observable(new Date().getTime());
 
+        self.putWell = function () {
+            datacontext.saveChangedWell(self);
+        };
+
         self.chooseMainFile = function (purpose) {
             self.selectedFmgSectionId(purpose);
             var callbackFunction = function (checkedWellFileList) {
@@ -798,28 +811,6 @@ define([
                 inputField = document.createElement('textarea');
                 $(inputField).prop({ "rows": 5, 'placeholder': fieldTitle }).val(tmpFieldValue).addClass('form-control');
             }
-            else if (inputType === 'DateLine') {
-                inputField = document.createElement('input');
-                inputField.type = 'text';
-
-                ////$(inputField).pickadate({
-                ////    format: 'yyyy-mm-dd',
-                ////    selectYears: true,
-                ////    selectMonths: true
-                ////}).prop({ placeholder: 'yyyy-mm-dd' }); //.addClass('form-control');
-
-                $(inputField).datepicker({
-                    format: 'yyyy-mm-dd',
-                    autoclose: true
-                }).prop({ placeholder: 'yyyy-mm-dd' }).addClass('form-control');
-
-                if (tmpFieldValue) {
-                    //    console.log('Date: ', new Date(tmpFieldValue));
-                    $(inputField).val(appMoment(tmpFieldValue).format('YYYY-MM-DD'));
-                    ////var picker = $(inputField).pickadate('picker');
-                    ////picker.set('select', initialValue);
-                }
-            }
 
             var innerDiv = document.createElement('div');
             $(innerDiv).addClass('form-horizontal').append(
@@ -828,11 +819,11 @@ define([
 
             function submitFunction() {
                 self[fieldName]($(inputField).val());
-                datacontext.saveChangedWell(self);
+                self.putWell();
                 bootstrapModal.closeModalWindow();
             }
 
-            bootstrapModal.openModalWindow("Edit", innerDiv, submitFunction);
+            bootstrapModal.openModalWindow('{{capitalizeFirst lang.toEdit}}', innerDiv, submitFunction);
         };
 
         self.MainSketchUrl = ko.computed({
