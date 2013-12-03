@@ -3,13 +3,17 @@
     'services/datacontext',
     'helpers/file-helper',
     'helpers/modal-helper',
-    'models/well-group',
-    'models/well-field-map'
-], function ($, ko, datacontext, fileHelper, bootstrapModal) {
+    'models/well-field-map',
+    'models/well-group'
+], function ($, ko, datacontext, fileHelper, bootstrapModal, WellFieldMap) {
     'use strict';
 
     // 10. WellFieldMaps (convert data objects into array)
-    function importWellFieldMapsDto(data, parent) { return $.map(data || [], function (item) { return datacontext.createWellFieldMap(item, parent); }); }
+    function importWellFieldMapsDto(data, parent) {
+        return $.map(data || [], function (item) {
+            return new WellFieldMap(item, parent);
+        });
+    }
 
     // 3. WellGroup (convert data objects into array)
     function importWellGroupsDto(data, parent) { return $.map(data || [], function (item) { return datacontext.createWellGroup(item, parent); }); }
@@ -37,7 +41,7 @@
         self.deleteWellFieldMap = function () {
             var itemToDelete = this;
             if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + itemToDelete.Name() + '"?')) {
-                datacontext.deleteWellFieldMap(itemToDelete).done(function () {
+                datacontext.deleteWellFieldMap(self.Id, itemToDelete.Id).done(function () {
                     self.WellFieldMaps.remove(itemToDelete);
                 });
             }
@@ -45,7 +49,7 @@
 
         self.getWellFieldMaps = function (callbackFunction) {
             if (self.WellFieldMaps().length === 0) {
-                datacontext.getWellFieldMaps({ 'wellfield_id': self.Id }).done(function (result) {
+                datacontext.getWellFieldMaps(self.Id).done(function (result) {
                     self.WellFieldMaps(importWellFieldMapsDto(result, self));
 
                     if ($.isFunction(callbackFunction) === true) {
@@ -62,10 +66,8 @@
 
         self.initMapFileUpload = function () {
             var mapFileInput = document.getElementById('map_file_upload');
-            fileHelper.initFileUpload(mapFileInput, datacontext.getWellFieldMapUrl({
-                wellfield_id: self.Id
-            }), ["image/jpeg", "image/png"], function (result) {
-                self.WellFieldMaps.push(datacontext.createWellFieldMap(result[0], self));
+            fileHelper.initFileUpload(mapFileInput, datacontext.getWieldMapsUrl(self.Id), ['image/jpeg', 'image/png'], function (result) {
+                self.WellFieldMaps.push(new WellFieldMap(result[0], self));
             });
         };
 

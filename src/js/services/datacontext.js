@@ -28,6 +28,16 @@
     function wellFieldMapUrl(uqp) {
         return '{{conf.requrl}}/api/wellfieldmap/' + (uqp ? ('?' + $.param(uqp)) : '');
     }
+
+    /** 
+    * Well-field maps url
+    * @param {number} wieldId - Well-field id
+    * @param {number} [mapId] - Well-field map id
+    */
+    function wieldMapsUrl(wieldId, mapId) {
+        return '{{conf.requrl}}/api/well-fields/' + wieldId + '/maps' + (mapId ? ('/' + mapId) : '');
+    }
+
     function wellFieldMapAreaUrl(uqp) {
         return '{{conf.requrl}}/api/wellfieldmaparea/' + (uqp ? ('?' + $.param(uqp)) : '');
     }
@@ -263,22 +273,6 @@
         return wellFieldMapUrl(urlQueryParams);
     }
 
-    function getWellFieldMaps(urlQueryParams) {
-        return ajaxRequest('GET', wellFieldMapUrl(urlQueryParams));
-    }
-
-    ////function saveNewWellFieldMap(item) {
-    ////    return ajaxRequest('POST', wellFieldMapUrl(), item);
-    ////}
-
-    function saveChangedWellFieldMap(item) {
-        return ajaxRequest('PUT', wellFieldMapUrl({ 'id': item.Id }), item);
-    }
-
-    function deleteWellFieldMap(item) {
-        return ajaxRequest('DELETE', wellFieldMapUrl({ 'id': item.Id }));
-    }
-
     // 11. WellFieldMapArea
     function getWellFieldMapAreas(urlQueryParams) {
         return ajaxRequest('GET', wellFieldMapAreaUrl(urlQueryParams));
@@ -451,10 +445,6 @@
         deleteWfmImage: deleteWfmImage,
         // WellFieldMap
         getWellFieldMapUrl: getWellFieldMapUrl,
-        getWellFieldMaps: getWellFieldMaps,
-        //// saveNewWellFieldMap: saveNewWellFieldMap,
-        saveChangedWellFieldMap: saveChangedWellFieldMap,
-        deleteWellFieldMap: deleteWellFieldMap,
         // WellFieldMapArea
         getWellFieldMapAreas: getWellFieldMapAreas,
         saveNewWellFieldMapArea: saveNewWellFieldMapArea,
@@ -547,13 +537,42 @@
     datacontext.deleteWidget = function (widgockId, widgetId) {
         return ajaxRequest('DELETE', widgetUrl(widgockId, widgetId));
     };
-    
+
     datacontext.getJobTypeList = function (companyId) {
         return ajaxRequest('GET', companyJobTypeUrl(companyId));
     };
 
     datacontext.postCompanyJobType = function (companyId, jobTypeData) {
         return ajaxRequest('POST', companyJobTypeUrl(companyId), jobTypeData);
+    };
+
+    /** Get well-field maps url */
+    datacontext.getWieldMapsUrl = function (wieldId, mapId) {
+        return wieldMapsUrl(wieldId, mapId);
+    };
+
+    /** Get well-field maps */
+    datacontext.getWellFieldMaps = function (wieldId) {
+        return ajaxRequest('GET', wieldMapsUrl(wieldId));
+    };
+
+    /** 
+    * Save changed well-field map 
+    * @param {number} wieldId - Well-field (parent) id
+    * @param {number} mapId - Well-field map id (primary key)
+    * @param {Object.<WellFieldMap>} item - Map object to change
+    */
+    datacontext.putWieldMap = function (wieldId, mapId, mapData) {
+        return ajaxRequest('PUT', wieldMapsUrl(wieldId, mapId), mapData);
+    };
+
+    /** 
+    * Delete well-field map
+    * @param {number} wieldId - Well-field id (parent of the map)
+    * @param {number} id - Map id
+    */
+    datacontext.deleteWellFieldMap = function (wieldId, mapId) {
+        return ajaxRequest('DELETE', wieldMapsUrl(wieldId, mapId));
     };
 
     datacontext.getPossibleWidgoutList = function () {

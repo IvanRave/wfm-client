@@ -133,8 +133,8 @@ define([
         this.WellFiles = ko.observableArray();
 
         /** 
-        * Well maps
-        * @type {Array.<WellMap>}
+        * Field maps for this well
+        * @type {Array.<WellFieldMap>}
         */
         this.wellMapList = ko.computed({
             read: function () {

@@ -1,4 +1,6 @@
-﻿define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper', 'helpers/app-helper', 'models/well-field-map-area', 'models/well-in-well-field-map'],
+﻿/** @module */
+define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
+    'helpers/app-helper', 'models/well-field-map-area', 'models/well-in-well-field-map'],
     function ($, ko, datacontext, bootstrapModal, appHelper) {
         'use strict';
 
@@ -16,33 +18,93 @@
                 });
         }
 
-        function WellFieldMap(data, wellField) {
-            var self = this;
+        /**
+        * Well field map model
+        * @param {object} data - Map data
+        * @param {WellField} wellField - Well field
+        * @constructor
+        */
+        var exports = function (data, wellField) {
             data = data || {};
 
-            self.getWellField = function () {
+            /** Get well field (parent) */
+            this.getWellField = function () {
                 return wellField;
             };
 
-            self.Id = data.Id;
-            self.Name = ko.observable(data.Name);
-            self.Description = ko.observable(data.Description);
-            //// '{{conf.requrl}}/api/wellfieldmap?img_url=' + data.ImgUrl;
-            self.ImgUrl = data.ImgUrl;
+            /** 
+            * Map id
+            * @type {number}
+            */
+            this.Id = data.Id;
 
-            self.fullImgUrl = datacontext.getWellFieldMapUrl({ img_url: self.ImgUrl });
+            /** 
+            * Map id
+            * @type {string}
+            */
+            this.Name = ko.observable(data.Name);
 
-            self.ScaleCoefficient = ko.observable(data.ScaleCoefficient);
-            self.WellFieldId = data.WellFieldId;
-            self.Width = data.Width;
-            self.Height = data.Height;
+            /** 
+            * Map description
+            * @type {string}
+            */
+            this.Description = ko.observable(data.Description);
 
-            // coef width to height
-            self.coefWH = data.Width / data.Height;
+            /** 
+            * Map image (right part of url)
+            * @type {string}
+            */
+            this.ImgUrl = data.ImgUrl;
 
-            self.WellFieldMapAreas = ko.observableArray();
+            /** 
+            * Map image (full url)
+            * @type {string}
+            */
+            this.fullImgUrl = datacontext.getWellFieldMapUrl({ img_url: this.ImgUrl });
 
-            self.WellInWellFieldMaps = ko.observableArray();
+            /** 
+            * Map scale coefficient
+            * @type {number}
+            */
+            this.ScaleCoefficient = ko.observable(data.ScaleCoefficient);
+
+            /** 
+            * Well field (parent) id
+            * @type {number}
+            */
+            this.WellFieldId = data.WellFieldId;
+
+            /** 
+            * Map width
+            * @type {number}
+            */
+            this.Width = data.Width;
+
+            /** 
+            * Map height
+            * @type {number}
+            */
+            this.Height = data.Height;
+
+            /** 
+            * Map ratio (width / height)
+            * @type {number}
+            */
+            this.coefWH = this.Width / this.Height;
+
+            /** 
+            * Map areas
+            * @type {Array.<WellFieldMapArea>}
+            */
+            this.WellFieldMapAreas = ko.observableArray();
+
+            /** 
+            * Wells on this map
+            * @type {Array.<Well>}
+            */
+            this.WellInWellFieldMaps = ko.observableArray();
+
+            var self = this;
 
             function initYandexMap(wellFieldMapItem, wellFieldItem) {
                 ////if (myMap) { myMap.destroy(); }
@@ -623,7 +685,7 @@
             };
 
             self.setScaleCoefficient = function () {
-                datacontext.saveChangedWellFieldMap(self);
+                datacontext.putWieldMap(self.WellFieldId, self.Id, self.toPlainJson());
             };
 
             self.editWellFieldMap = function () {
@@ -652,7 +714,7 @@
                     self.Name($(inputName).val());
                     self.Description($(inputDescription).val());
                     self.ScaleCoefficient($(inputScaleCoefficient).val());
-                    datacontext.saveChangedWellFieldMap(self).done(function (result) {
+                    datacontext.putWieldMap(self.WellFieldId, self.Id, self.toPlainJson()).done(function (result) {
                         self.Name(result.Name);
                         self.Description(result.Description);
                         self.ScaleCoefficient(result.ScaleCoefficient);
@@ -668,9 +730,7 @@
             // get areas
             self.WellFieldMapAreas(importWellFieldMapAreasDto(data.WellFieldMapAreasDto, self));
             self.WellInWellFieldMaps(importWellInWellFieldMapsDto(data.WellInWellFieldMapsDto, self));
-        }
-
-        datacontext.createWellFieldMap = function (item, wellField) {
-            return new WellFieldMap(item, wellField);
         };
+
+        return exports;
     });
