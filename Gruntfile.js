@@ -111,7 +111,7 @@ module.exports = function (grunt) {
                     expand: true,
                     dot: true,
                     cwd: '<%= src %>/js/',
-                    src: ['app/**/*.js', 'main.js']
+                    src: ['**/*.js']
                 }]
             }
         },
@@ -125,8 +125,8 @@ module.exports = function (grunt) {
                     dot: true,
                     cwd: '<%= src %>/',
                     dest: '<%= trgt %>/',
-                    // Copy all files besides templates and app scripts (which assembled separately)
-                    src: ['**/*', '!tpl/**/*', '!js/app/**/*', '!js/main.js']
+                    // Copy all files besides templates and scripts (which assembled separately)
+                    src: ['**/*', '!tpl/**/*', '!js/**/*']
                 }]
             },
             bower_js: {
@@ -227,7 +227,7 @@ module.exports = function (grunt) {
                 files: [{
                     expand: true,
                     cwd: '<%= src %>/js/',
-                    src: ['app/**/*.js', 'main.js'],
+                    src: ['**/*.js'],
                     dest: '<%= trgt %>/js/'
                 }]
             }
@@ -247,17 +247,17 @@ module.exports = function (grunt) {
                     //  wrap: true, // wrap in closure
                     // jQuery automatically excluded if it's loaded from CDN
                     include: ['es5-shim', 'console-shim', 'jquery', 'jquery.bootstrap', 'angular', 'angular-route',
-                    'app/controllers/company', 'app/controllers/auth', 'app/controllers/register']
+                    'controllers/company', 'controllers/auth', 'controllers/register']
                 }
             },
             workspace: {
                 options: {
                     baseUrl: '<%= trgt %>/js/',
-                    name: 'app/workspace-wrap',
-                    out: '<%= trgt %>/js/app/workspace-wrap-bundle-<%= pkg.version %>.js',
+                    name: 'viewmodels/workspace-wrap',
+                    out: '<%= trgt %>/js/viewmodels/workspace-wrap-bundle-<%= pkg.version %>.js',
                     mainConfigFile: '<%= trgt %>/js/require-config.js',
                     optimize: 'uglify2',
-                    include: ['app/bindings'],
+                    include: ['filters/bindings'],
                     exclude: ['jquery', 'jquery.bootstrap']
                 }
             }
@@ -286,7 +286,7 @@ module.exports = function (grunt) {
                 options: {
                     spawn: false
                 },
-                files: ['<%= src %>/js/app/**/*.js', '<%= src %>/js/main.js'],
+                files: ['<%= src %>/js/**/*.js'],
                 tasks: ['jshint:app']
             },
             copy_main: {
@@ -294,7 +294,7 @@ module.exports = function (grunt) {
                     cwd: '<%= src %>/',
                     spawn: false
                 },
-                files: ['**/*', '!tpl/**/*', '!js/app/**/*', '!js/main.js'],
+                files: ['**/*', '!tpl/**/*', '!js/**/*'],
                 tasks: ['copy:main']
             },
             // Update all template pages when change template data
@@ -310,7 +310,7 @@ module.exports = function (grunt) {
                 options: {
                     spawn: false
                 },
-                files: ['<%= src %>/js/app/**/*.js', '<%= src %>/js/main.js'],
+                files: ['<%= src %>/js/**/*.js'],
                 tasks: ['assemble:js']
             }
 
