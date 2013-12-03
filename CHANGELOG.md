@@ -1,3 +1,12 @@
+<a name="v0.7.4"></a>
+### v0.7.4 (2013-12-03)
+
+
+#### Bug Fixes
+
+* **wellSummary:** fix datepicker for mobile ([f48b7af7](https://github.com/IvanRave/wfm/commit/f48b7af703f012e59e66205d0455dda29ed3b41e))
+* **wellTest:** add test scope without modal ([72cb0baf](https://github.com/IvanRave/wfm/commit/72cb0bafd70195de55d298496d27bfe340f4351b))
+
 <a name="v0.7.3"></a>
 ### v0.7.3 (2013-11-29)
 
