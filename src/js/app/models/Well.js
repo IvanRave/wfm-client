@@ -16,8 +16,7 @@ define([
     'app/models/well-file',
     'app/models/column-attribute',
     'app/models/well-history',
-    'app/models/test-scope',
-    'bootstrap-datepicker'
+    'app/models/test-scope'
 ], function ($, ko, datacontext, fileHelper, bootstrapModal, appHelper, appMoment, wellPerfomancePartial, HistoryView) {
     'use strict';
 
@@ -402,73 +401,6 @@ define([
                 }
             }
         };
-
-        ////self.addWellHistory = function () {
-        ////    var historyDateFormat = 'yyyy-mm-dd';
-
-        ////    var inputHistory = document.createElement('textarea');
-        ////    $(inputHistory).prop({ 'rows': 5 }).addClass('form-control');
-
-        ////    // 1999-12-31 yyyy-mm-dd
-        ////    var datePattern = '(?:19|20)[0-9]{2}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-9])|(?:(?!02)(?:0[1-9]|1[0-2])-(?:30))|(?:(?:0[13578]|1[02])-31))';
-
-        ////    var inputStartDate = document.createElement('input');
-        ////    inputStartDate.type = 'text';
-        ////    $(inputStartDate).prop({
-        ////        'required': true,
-        ////        'placeholder': historyDateFormat,
-        ////        'pattern': datePattern,
-        ////        'title': 'Date format: yyyy-mm-dd (year, month, day)'
-        ////    }).addClass('datepicker').datepicker({
-        ////        format: historyDateFormat,
-        ////        startView: 'decade',
-        ////        autoclose: true
-        ////    });
-
-        ////    var inputEndDate = document.createElement('input');
-        ////    inputEndDate.type = 'text';
-        ////    $(inputEndDate).prop({
-        ////        'placeholder': 'yyyy-mm-dd (not necessary)',
-        ////        'pattern': datePattern,
-        ////        'title': 'Date format: yyyy-mm-dd (year, month, day)'
-        ////    }).addClass('datepicker').datepicker({
-        ////        format: historyDateFormat,
-        ////        startView: 'decade',
-        ////        autoclose: true
-        ////    });
-
-        ////    var innerDiv = document.createElement('div');
-        ////    $(innerDiv).addClass('form-horizontal').append(
-        ////        bootstrapModal.gnrtDom('Start date', inputStartDate),
-        ////        bootstrapModal.gnrtDom('End date', inputEndDate),
-        ////        bootstrapModal.gnrtDom('History', inputHistory)
-        ////    );
-
-        ////    function submitFunction() {
-        ////        var userStartDate = $(inputStartDate).val();
-        ////        var userEndDate = $(inputEndDate).val();
-
-        ////        if (userEndDate && appMoment(userEndDate, historyDateFormat).format() < appMoment(userStartDate, historyDateFormat).format()) {
-        ////            alert('End date must be greater than start date');
-        ////            return;
-        ////        }
-
-        ////        var wellHistoryItem = datacontext.createWellHistory({
-        ////            StartDate: userStartDate,
-        ////            EndDate: userEndDate || userStartDate,
-        ////            History: $(inputHistory).val(),
-        ////            WellId: self.Id
-        ////        }, self);
-
-        ////        datacontext.postWellHistory(wellHistoryItem).done(function (result) {
-        ////            var whi = datacontext.createWellHistory(result, self);
-        ////            self.historyList.push(whi);
-        ////        });
-        ////        bootstrapModal.closeModalWindow();
-        ////    }
-
-        ////    bootstrapModal.openModalWindow("Well history", innerDiv, submitFunction);
-        ////};
 
         self.deleteWellHistory = function (itemForDelete) {
             var tmpStartUnixTime = ko.unwrap(itemForDelete.startUnixTime);
