@@ -286,53 +286,53 @@ define([
             });
         };
 
-        self.addTestScope = function () {
-            var inputStartDate = document.createElement('input');
-            inputStartDate.type = 'text';
+        /** Unix time data for creating new test scope */
+        self.testScopeNewStartUnixTime = {
+            unixDate: ko.observable(),
+            hour: ko.observable(0),
+            minute: ko.observable(0)
+        };
 
-            $(inputStartDate).datepicker({
-                format: 'yyyy-mm-dd',
-                autoclose: true
-            }).prop({ required: true, placeholder: 'yyyy-mm-dd' }).addClass('datepicker');
+        self.isEnabledPostTestScope = ko.computed({
+            read: function () {
+                if (ko.unwrap(self.testScopeNewStartUnixTime.unixDate)) {
+                    if (ko.unwrap(self.testScopeNewStartUnixTime.hour) >= 0) {
+                        if (ko.unwrap(self.testScopeNewStartUnixTime.minute) >= 0) {
+                            return true;
+                        }
+                    }
+                }
 
-            var inputStartHour = document.createElement("input");
-            inputStartHour.type = "number";
-            $(inputStartHour).prop({ required: true, min: 0, max: 23, placeholder: "hour" }).val("0");
+                return false;
+            },
+            deferEvaluation: true
+        });
 
-            var inputStartMinute = document.createElement("input");
-            inputStartMinute.type = "number";
-            $(inputStartMinute).prop({ required: true, min: 0, max: 59, placeholder: "minute" }).val("0");
+        /** Post test scope to server */
+        self.postTestScope = function () {
+            if (self.isEnabledPostTestScope) {
+                // Date in UTC second
+                var unixTime = ko.unwrap(self.testScopeNewStartUnixTime.unixDate);
 
-            var divTime = document.createElement("div");
-            $(divTime).append(inputStartHour, inputStartMinute);
+                // Remove UTC offset
+                // in seconds
+                unixTime += new Date(unixTime * 1000).getTimezoneOffset() * 60;
 
-            var innerDiv = document.createElement("div");
-            $(innerDiv).addClass("form-horizontal").append(
-                bootstrapModal.gnrtDom("Date", inputStartDate),
-                bootstrapModal.gnrtDom("Start time", divTime)
-            );
+                // Add hours
+                unixTime += ko.unwrap(self.testScopeNewStartUnixTime.hour) * 3600;
+                // Add minutes
+                unixTime += ko.unwrap(self.testScopeNewStartUnixTime.minute) * 60;
 
-            function submitFunction() {
-                var momentUnixTime = appMoment($(inputStartDate).val(), "YYYY-MM-DD");
-                momentUnixTime.add("hours", parseInt($(inputStartHour).val(), 10));
-                momentUnixTime.add("minutes", parseInt($(inputStartMinute).val(), 10));
-
-                var testScopeItem = datacontext.createTestScope({
+                datacontext.saveNewTestScope({
                     WellId: self.Id,
-                    StartUnixTime: momentUnixTime.format("X"),
+                    StartUnixTime: unixTime,
                     IsApproved: null,
-                    ConductedBy: "",
-                    CertifiedBy: ""
-                }, self);
-
-                datacontext.saveNewTestScope(testScopeItem).done(function (response) {
+                    ConductedBy: '',
+                    CertifiedBy: ''
+                }).done(function (response) {
                     self.testScopeList.unshift(datacontext.createTestScope(response, self));
                 });
-
-                bootstrapModal.closeModalWindow();
             }
-
-            bootstrapModal.openModalWindow("Add test", innerDiv, submitFunction);
         };
 
         self.selectedTestScope = ko.observable();
