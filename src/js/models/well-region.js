@@ -66,13 +66,9 @@
                 window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({ region: self.Id });
             };
 
-            self.getHashPath = function () {
-                return window.location.hash.split('?')[0] + '?' + $.param({ region: self.Id });
-            };
-
             self.deleteWellField = function () {
                 var wellFieldForDelete = this;
-                if (confirm('Are you sure you want to delete "' + wellFieldForDelete.Name() + '"?')) {
+                if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + wellFieldForDelete.Name() + '"?')) {
                     datacontext.deleteWellField(wellFieldForDelete.Id).done(function () {
                         self.WellFields.remove(wellFieldForDelete);
                     });

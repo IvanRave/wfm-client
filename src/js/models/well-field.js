@@ -36,7 +36,7 @@
 
         self.deleteWellFieldMap = function () {
             var itemToDelete = this;
-            if (confirm('Are you sure you want to delete "' + itemToDelete.Name() + '"?')) {
+            if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + itemToDelete.Name() + '"?')) {
                 datacontext.deleteWellFieldMap(itemToDelete).done(function () {
                     self.WellFieldMaps.remove(itemToDelete);
                 });
@@ -102,10 +102,6 @@
             });
         };
 
-        self.getHashPath = function () {
-            return '#region/' + self.getWellRegion().Id + '/field/' + self.Id;
-        };
-
         self.addWellGroup = function () {
             var inputName = document.createElement('input');
             inputName.type = 'text';
@@ -135,7 +131,7 @@
 
         self.deleteWellGroup = function () {
             var wellGroupForDelete = this;
-            if (confirm('Are you sure you want to delete "' + wellGroupForDelete.Name() + '"?')) {
+            if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + wellGroupForDelete.Name() + '"?')) {
                 datacontext.deleteWellGroup(wellGroupForDelete).done(function () {
                     self.WellGroups.remove(wellGroupForDelete);
                 });

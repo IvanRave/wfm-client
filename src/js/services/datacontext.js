@@ -118,7 +118,7 @@
         return ajaxRequest('PUT', wellGroupUrl({ id: item.Id }), item);
     }
 
-    function saveNewWell(item) {
+    function postWell(item) {
         return ajaxRequest('POST', wellUrl(), item);
     }
 
@@ -418,7 +418,7 @@
         saveNewWellRegion: saveNewWellRegion,
         saveNewWellField: saveNewWellField,
         saveNewWellGroup: saveNewWellGroup,
-        saveNewWell: saveNewWell,
+        postWell: postWell,
         // delete objects from db
         deleteWellRegion: deleteWellRegion,
         deleteWellField: deleteWellField,

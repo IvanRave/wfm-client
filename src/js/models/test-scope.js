@@ -52,7 +52,7 @@
         };
 
         self.deleteTestData = function (testDataItem) {
-            if (confirm("Are you sure to delete?") === true) {
+            if (confirm('{{capitalizeFirst lang.confirmToDelete}}?') === true) {
                 datacontext.deleteTestData(testDataItem).done(function () {
                     self.testDataList.remove(testDataItem);
                 });

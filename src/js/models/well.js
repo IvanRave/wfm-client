@@ -1,8 +1,4 @@
-﻿/**
-* A module representing a well.
-* @module
-* @param {Object} $ - Jquery lib.
-*/
+﻿/** @module */
 define([
     'jquery',
     'knockout',
@@ -32,74 +28,123 @@ define([
     /** Test scope */
     function importTestScopeDtoList(data, wellItem) { return $.map(data || [], function (item) { return datacontext.createTestScope(item, wellItem); }); }
 
-    /** Well property list */
-    var wellPropertyList = [
-        { id: 'Name', ttl: 'Name', tpe: 'SingleLine' },
-        { id: 'Description', ttl: 'Description', tpe: 'MultiLine' },
-        { id: 'DrillingDate', ttl: 'Drilling date', tpe: 'DateLine' },
-        { id: 'ProductionHistory', ttl: 'Production history', tpe: 'MultiLine' },
-        { id: 'CompletionType', ttl: 'Completion type', tpe: 'MultiLine' },
-        { id: 'FormationCompleteState', ttl: 'Formation complete state', tpe: 'MultiLine' },
-        { id: 'IntegrityStatus', ttl: 'Integrity status', tpe: 'MultiLine' },
-        { id: 'LastInterventionType', ttl: 'Last intervention type', tpe: 'MultiLine' },
-        { id: 'LastInterventionDate', ttl: 'Last intervention date', tpe: 'DateLine' },
-        { id: 'PerforationDepth', ttl: 'Perforation depth', tpe: 'MultiLine' },
-        { id: 'PressureData', ttl: 'Pressure data', tpe: 'MultiLine' },
-        { id: 'Pvt', ttl: 'PVT', tpe: 'MultiLine' },
-        { id: 'ReservoirData', ttl: 'Reservoir data', tpe: 'MultiLine' },
-    ];
+    /** Get well map list from well field maps with need well id */
+    function getWellMapList(wellFieldMapList, wellId) {
+        return $.grep(wellFieldMapList, function (elemValue) {
+            var wellInWellFieldMaps = ko.unwrap(elemValue.WellInWellFieldMaps);
+
+            var wellIdList = wellInWellFieldMaps.map(function (wfmElem) {
+                return ko.unwrap(wfmElem.WellId);
+            });
+
+            return $.inArray(wellId, wellIdList) >= 0;
+        });
+    }
 
     /**
-     * Well model.
-     * @param {Object} data - Well data.
-     * @param {Object} wellGroup - Well group.
+     * Well model
+     * @param {object} data - Well data
+     * @param {WellGroup} wellGroup - Well group
      * @constructor
      */
-    function Well(data, wellGroup) {
-        var self = this;
+    var exports = function (data, wellGroup) {
         data = data || {};
 
-        self.getWellGroup = function () {
+        /** Get well group */
+        this.getWellGroup = function () {
             return wellGroup;
         };
 
-        self.getAppViewModel = function () {
-            return self.getWellGroup().getWellField().getWellRegion().getParentViewModel();
+        /** Get workspace view model */
+        this.getAppViewModel = function () {
+            return this.getWellGroup().getWellField().getWellRegion().getParentViewModel();
         };
 
         /**
          * Well id
          * @type {number}
          */
-        self.Id = data.Id;
+        this.Id = data.Id;
 
         /**
         * Well type
         * @type {string}
         */
-        self.WellType = ko.observable(data.WellType);
+        this.WellType = ko.observable(data.WellType);
 
         /**
         * Flow type
         * @type {string}
         */
-        self.FlowType = ko.observable(data.FlowType);
+        this.FlowType = ko.observable(data.FlowType);
 
-        self.wellPropertyList = wellPropertyList;
+        // TODO: convert each well property to the wellProperty class
+        /**
+        * Well property list
+        * @type {Object.<string, string, string>}
+        */
+        this.wellPropertyList = [
+            { id: 'Name', ttl: 'Name', tpe: 'SingleLine' },
+            { id: 'Description', ttl: 'Description', tpe: 'MultiLine' },
+            { id: 'DrillingDate', ttl: 'Drilling date', tpe: 'DateLine' },
+            { id: 'ProductionHistory', ttl: 'Production history', tpe: 'MultiLine' },
+            { id: 'CompletionType', ttl: 'Completion type', tpe: 'MultiLine' },
+            { id: 'FormationCompleteState', ttl: 'Formation complete state', tpe: 'MultiLine' },
+            { id: 'IntegrityStatus', ttl: 'Integrity status', tpe: 'MultiLine' },
+            { id: 'LastInterventionType', ttl: 'Last intervention type', tpe: 'MultiLine' },
+            { id: 'LastInterventionDate', ttl: 'Last intervention date', tpe: 'DateLine' },
+            { id: 'PerforationDepth', ttl: 'Perforation depth', tpe: 'MultiLine' },
+            { id: 'PressureData', ttl: 'Pressure data', tpe: 'MultiLine' },
+            { id: 'Pvt', ttl: 'PVT', tpe: 'MultiLine' },
+            { id: 'ReservoirData', ttl: 'Reservoir data', tpe: 'MultiLine' }
+        ];
 
-        $.each(self.wellPropertyList, function (arrIndex, arrElem) {
-            self[arrElem.id] = ko.observable(data[arrElem.id]);
-            self['ttl' + arrElem.id] = arrElem.ttl;
+        /** Load other properties */
+        this.wellPropertyList.forEach(function (arrElem) {
+            /** some member */
+            this[arrElem.id] = ko.observable(data[arrElem.id]);
+
+            /** some member title */
+            this['ttl' + arrElem.id] = arrElem.ttl;
+        }, this);
+
+        /** 
+        * Sketch description
+        * @type {string}
+        */
+        this.SketchDesc = ko.observable(data.SketchDesc);
+
+        /** 
+        * Well comment
+        * @type {string}
+        */
+        this.Comment = ko.observable(data.Comment);
+
+        /** 
+        * Well group id (foreign key - parent)
+        * @type {number}
+        */
+        this.WellGroupId = data.WellGroupId;
+
+        /**
+        * Well files
+        * @type {Array.<WellFile>}
+        */
+        this.WellFiles = ko.observableArray();
+
+        /** 
+        * Well maps
+        * @type {Array.<WellMap>}
+        */
+        this.wellMapList = ko.computed({
+            read: function () {
+                return getWellMapList(ko.unwrap(this.getWellGroup().getWellField().WellFieldMaps), this.Id);
+            },
+            deferEvaluation: true,
+            owner: this
         });
 
-        // additional (non-standard) parameters for every well
-        self.SketchDesc = ko.observable(data.SketchDesc);
-        self.Comment = ko.observable(data.Comment);
-
-        // Foreign key
-        self.WellGroupId = data.WellGroupId;
-
-        self.WellFiles = ko.observableArray(); // empty array: []
+        var self = this;
 
         self.sectionWellFiles = ko.computed({
             read: function () {
@@ -120,13 +165,6 @@ define([
             },
             deferEvaluation: true
         });
-
-        self.getHashPath = function () {
-            var prntGroup = self.getWellGroup();
-            var prntField = prntGroup.getWellField();
-            var prntRegion = prntField.getWellRegion();
-            return '#region/' + prntRegion.Id + '/field/' + prntField.Id + '/group/' + prntGroup.Id + '/well/' + self.Id;
-        };
 
         self.isOpenItem = ko.observable(false);
 
@@ -832,7 +870,7 @@ define([
 
         self.deleteWellFile = function () {
             var wellFileForDelete = this;
-            if (confirm('Are you sure you want to delete "' + wellFileForDelete.Name() + '"?')) {
+            if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + wellFileForDelete.Name() + '"?')) {
                 datacontext.deleteWellFile(wellFileForDelete).done(function () {
                     self.WellFiles.remove(wellFileForDelete);
                 });
@@ -864,19 +902,6 @@ define([
         ////        }
         ////    });
         ////};
-
-        self.wellMapList = ko.computed(function () {
-            var wellFieldItem = self.getWellGroup().getWellField();
-            return $.map(wellFieldItem.WellFieldMaps(), function (elemValue) {
-                var wellIdList = $.map(elemValue.WellInWellFieldMaps(), function (wfmElem) {
-                    return wfmElem.WellId;
-                });
-
-                if ($.inArray(self.Id, wellIdList) >= 0) {
-                    return elemValue;
-                }
-            });
-        });
 
         // ================================================================= Well log section begin ==============================================
         self.wellLogSelectedFile = ko.observable();
@@ -1137,7 +1162,7 @@ define([
                     var wellFieldItem = self.getWellGroup().getWellField();
 
                     wellFieldItem.getWellFieldMaps(function () {
-                        var arr = wellFieldItem.WellFieldMaps();
+                        var arr = ko.unwrap(wellFieldItem.WellFieldMaps);
                         // TODO:???
                         ////arr = $.grep(arr, function (arrElem, arrIndex) {
                         ////    var cnt = 0;
@@ -1180,7 +1205,7 @@ define([
             ////public string Comment { get; set; }
             // Join two property arrays
             var tmpPropList = ['Id', 'WellGroupId', 'SketchDesc', 'WellType', 'FlowType', 'Comment'];
-            $.each(wellPropertyList, function (propIndex, propValue) {
+            $.each(self.wellPropertyList, function (propIndex, propValue) {
                 tmpPropList.push(propValue.id);
             });
 
@@ -1194,9 +1219,7 @@ define([
 
             return objReady;
         };
-    }
-
-    datacontext.createWell = function (data, parent) {
-        return new Well(data, parent);
     };
+
+    return exports;
 });
