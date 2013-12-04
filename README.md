@@ -68,6 +68,56 @@ contains words (with translation) for all WFM services
 * Widget block may contain widgets
 * Widget has options (depending of widget type)
 
+### Well test - Измерение показателей скважины
+* Сперва пользователь определяет необходимые параметры для замера.
+Все возможные параметры можно получить с помощью GET запроса соотвествующего API
+Данные параметры может редактировать только админ (модератор) сайта.
+Если пользователь хочет добавить свой какой-либо параметр, ему необходимо связаться с админом (модератором) сайта
+(пока не утвердились со всей структурой, лучше это делать просто по имэйлу)
+* Выбранные параметры необходимо закрепить за скважиной (Well), точнее за группой (WellGroup):
+для каждой WellGroup свой набор параметров, по которым проводятся тесты всех скважин данной группы.
+Для связи WellGroup и WfmParameter можно возпользоваться API "WellGroupWfmParameter" (GET - получить, POST - добавить)
+* Начало теста. Фактически замер начинается в любое время, принимаемое за начало отсчёта (нулевой час).
+Со скважины снимаются показатели (соответствующие выбранным параметрам). Каждый новый час - получение новых показателей.
+Тест длится обычно двенадцать часов или сутки. Для разделения понятий введены два обозначения:
+<ul>
+    <li>TestScope - полный тест, набор ежечасных показателей</li>
+    <li>TestData - единица теста - данные за определённый час</li>
+</ul>
+* Cперва добавляется TestScope, получается созданный TestScope.Id и с этим идентификатором добавляются по очереди TestData
+(по возрастанию номера часа: 0, 1, 2.. - лимит технически не задан, но подразумевается либо до 12, либо до 24).
+В TestData в параметре Dict содержится набор значений: {WfmParameter.Id: соответствующее значение замера}.
+
+### Constants
+#### File purposes (array)
+```[
+        { id: 'summary', name: 'Summary', formatList: ['*'] }, // any file type (main well files)
+        { id: 'sketch', name: 'Sketch', formatList: ['image/jpeg', 'image/png'] },
+        { id: 'volume', name: 'Volume', formatList: ['image/jpeg', 'image/png'] },
+        { id: 'history', name: 'History', formatList: ['*'] }, // any file type
+        { id: 'map', name: 'Map', formatList: [] }, // file loading forbidden
+        { id: 'log', name: 'Log', formatList: [''] }, // las files has empty mime type
+        { id: 'pd', name: 'Perfomance', formatList: ['text/plain', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel'] },
+        { id: 'test', name: 'Test', formatList: [] }, // file loading forbidden
+        { id: 'integrity', name: 'Integrity', formatList: ['image/jpeg', 'image/png', 'application/pdf'] },
+        { id: 'nodalanalysis', name: 'Nodal analysis', formatList: ['image/jpeg', 'image/png'] },
+        { id: 'report', name: 'Report', formatList: ['application/pdf'] }
+]```
+
+#### File statuses (array)
+```['work', 'archive']```
+
+#### Access levels for company user (JSON object)
+```{
+    "CanManageAll":{"AccessCode":1,"Description":"Can manage"},
+    "CanEditAll":{"AccessCode":2,"Description":"Can edit"},
+    "CanViewAll":{"AccessCode":4,"Description":"Can view"}
+}```
+every user has a property "AccessLevel" (which equals SUM of AccessCode from the Enumerator above).
+For example: if user "Can view" and "Can edit" then AccessLevel = (4 + 2 = 6).
+To check "Whether the user has access to edit (or manage, or view..)?", you may use "bitwise AND":
+```return (user.AccessLevel & needAccessLevel) > 0```
+
 ## Write notes
 
 ### Guidelines
