@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: models/job-type.js</title>
+    <title>JSDoc: Source: models/company-file.js</title>
     
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Source: models/job-type.js</h1>
+    <h1 class="page-title">Source: models/company-file.js</h1>
     
     
 
@@ -25,38 +25,44 @@
     
     <section>
         <article>
-            <pre class="prettyprint source"><code>﻿/** 
-* Job type module
-* @module
-*/
+            <pre class="prettyprint source"><code>﻿/** @module */
 define(['knockout'], function (ko) {
     'use strict';
 
-    /** 
-    * Job type module
+    /**
+    * Company file model
+    * @param {object} data - File data
     * @constructor
-    * @param {object} data - Job type data
     */
-    var JobType = function (data) {
+    var exports = function (data) {
         data = data || {};
 
         /**
-        * Job type id
-        * @type {number}
+        * File guid
+        * @type {string}
         */
-        this.id = data.Id;
+        this.Id = data.Id;
 
-        /** Job type name */
-        this.name = ko.observable(data.Name);
+        /**
+        * File name (255)
+        * @type {string}
+        */
+        this.Name = ko.observable(data.Name);
 
-        /** Job type description */
-        this.description = ko.observable(data.Description);
+        /**
+        * Company guid
+        * @type {string}
+        */
+        this.CompanyId = data.CompanyId;
 
-        /** Job type company id */
-        this.companyId = data.CompanyId;
+        /**
+        * Is active or not (in Recycle Bin)
+        * @type {boolean}
+        */
+        this.IsActive = ko.observable(data.IsActive);
     };
 
-    return JobType;
+    return exports;
 });</code></pre>
         </article>
     </section>

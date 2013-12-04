@@ -20,7 +20,9 @@
           <div class="pull-left">
             <i class="glyphicon glyphicon-circle-arrow-down" data-bind="visible: $data === $parent.getWellGroup().getWellField().selectedWellFieldMap()"></i>
             <i class="glyphicon glyphicon-circle-arrow-right" data-bind="visible: $data != $parent.getWellGroup().getWellField().selectedWellFieldMap()"></i>
-            <a href="#" data-bind="click: showWellFieldMap, text: Name, attr: { title: Description }"></a>
+            <a href="#" data-bind="click: showWellFieldMap, attr: { title: Description }">
+              <span data-bind="text: CompanyFile.Name"></span>
+            </a>
           </div>
           <div class="pull-right">
             <i class="glyphicon glyphicon-edit link-icon" data-bind="click: editWellFieldMap"></i>

@@ -1,7 +1,8 @@
 ﻿/** @module */
 define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
-    'helpers/app-helper', 'models/well-field-map-area', 'models/well-in-well-field-map'],
-    function ($, ko, datacontext, bootstrapModal, appHelper) {
+    'helpers/app-helper', 'models/company-file',
+    'models/well-field-map-area', 'models/well-in-well-field-map'],
+    function ($, ko, datacontext, bootstrapModal, appHelper, CompanyFile) {
         'use strict';
 
         function importWellFieldMapAreasDto(items, parent) {
@@ -38,11 +39,17 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
             */
             this.Id = data.Id;
 
-            /** 
-            * Map id
+            /**
+            * Map file guid
             * @type {string}
             */
-            this.Name = ko.observable(data.Name);
+            this.CompanyFileId = data.CompanyFileId;
+
+            /**
+            * Map file
+            * @type {module:models/company-file}
+            */
+            this.CompanyFile = new CompanyFile(data.CompanyFileDto);
 
             /** 
             * Map description
@@ -51,16 +58,10 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
             this.Description = ko.observable(data.Description);
 
             /** 
-            * Map image (right part of url)
-            * @type {string}
-            */
-            this.ImgUrl = data.ImgUrl;
-
-            /** 
             * Map image (full url)
             * @type {string}
             */
-            this.fullImgUrl = datacontext.getWellFieldMapUrl({ img_url: this.ImgUrl });
+            this.fullImgUrl = datacontext.getWellFieldMapUrl({ img_url: this.CompanyFile.Id });
 
             /** 
             * Map scale coefficient
@@ -139,7 +140,6 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
 
                             ////var cropCoords = [x1, y1, x2, y2];
                             ////return '{{conf.requrl}}/api/wellfile/?well_id=80&purpose=history&status=work&file_name=fid20130213003420656_Map2560x1600.jpg&crop=(' + cropCoords.join(',') + ')&map_size=250'
-                            ////return 'imgUrl + '&crop=(' + cropCoords.join(',') + ')';
                             return wellFieldMapItem.fullImgUrl + '&x1=' + x1 + '&y1=' + y1 + '&x2=' + x2 + '&y2=' + y2;
                         });
 
