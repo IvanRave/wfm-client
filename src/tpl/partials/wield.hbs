@@ -43,11 +43,10 @@ layout: false
 						<span data-bind="text: CompanyFile.Name"></span>
 					</a>
                 </div>
-                <!-- TODO: return after creating delete/edit logic -->
-                <!--<div class="pull-right">
+                <div class="pull-right">
                     <i class="glyphicon glyphicon-edit link-icon" data-bind="click: editWellFieldMap"></i>
                     <i class="glyphicon glyphicon-remove link-icon" data-bind="click: $parent.deleteWellFieldMap"></i>
-                </div>-->
+                </div>
             </div>
             <div data-bind="visible: $data === $parent.selectedWellFieldMap()">
                 <div data-bind="foreach: WellInWellFieldMaps">

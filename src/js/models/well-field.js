@@ -38,9 +38,8 @@
         self.WellFieldMaps = ko.observableArray();
         self.selectedWellFieldMap = ko.observable();
 
-        self.deleteWellFieldMap = function () {
-            var itemToDelete = this;
-            if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + itemToDelete.Name() + '"?')) {
+        self.deleteWellFieldMap = function (itemToDelete) {
+            if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(itemToDelete.CompanyFile.Name) + '"?')) {
                 datacontext.deleteWellFieldMap(self.Id, itemToDelete.Id).done(function () {
                     self.WellFieldMaps.remove(itemToDelete);
                 });
