@@ -66,6 +66,20 @@
             });
         }, self);
 
+        /** Get list of section patterns: lazy loading by first request */
+        self.ListOfSectionPatternDto = ko.lazyObservableArray(function () {
+            datacontext.getListOfSectionPattern().done(function (r) {
+                require(['models/section-pattern'], function (SectionPattern) {
+                    
+                    function importListOfSectionPattern(data) {
+                        return $.map(data || [], function (item) { return new SectionPattern(item); });
+                    }
+
+                    self.ListOfSectionPatternDto(importListOfSectionPattern(r));
+                });
+            });
+        }, self);
+
         self.jobTypeList = ko.lazyObservableArray(function () {
             datacontext.getJobTypeList(companyId).done(function (r) {
                 function importJobTypeList(data) {

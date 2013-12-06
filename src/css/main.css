@@ -305,11 +305,12 @@ footer {
     background-color: #333;
 }
 
-.wfm-workspace-well-tab {
+/* Well, field, group, region tab links to sections */
+.wfm-tab-panel {
     background-color: #222;
 }
 
-    .wfm-workspace-well-tab .nav-pills > li > div {
+    .wfm-tab-panel .nav-pills > li > div {
         border-radius: 0;
         padding: 0;
         color: #a1a1a1;
@@ -319,17 +320,17 @@ footer {
         cursor: pointer;
     }
 
-        .wfm-workspace-well-tab .nav-pills > li > div:focus {
+        .wfm-tab-panel .nav-pills > li > div:focus {
             background-color: #000;
             color: #c0c0c0;
         }
 
-        .wfm-workspace-well-tab .nav-pills > li > div:hover {
+        .wfm-tab-panel .nav-pills > li > div:hover {
             background-color: #111;
             color: #c8c8c8;
         }
 
-        .wfm-workspace-well-tab .nav-pills > li > div .caret {
+        .wfm-tab-panel .nav-pills > li > div .caret {
             position: absolute;
             bottom: 4px;
             right: 4px;
@@ -337,15 +338,15 @@ footer {
             border-bottom-color: #ccc;
         }
 
-        .wfm-workspace-well-tab .nav-pills > li > div > span {
+        .wfm-tab-panel .nav-pills > li > div > span {
             font-size: 70%;
         }
 
-        .wfm-workspace-well-tab .nav-pills > li > div > i {
+        .wfm-tab-panel .nav-pills > li > div > i {
             font-size: 150%;
         }
 
-    .wfm-workspace-well-tab .nav-pills > li.active > div {
+    .wfm-tab-panel .nav-pills > li.active > div {
         background-color: #000;
         color: #c0c0c0;
     }
@@ -396,7 +397,7 @@ footer {
         /*z-index for scroll - 99*/
     }
 
-    .wfm-workspace-well-tab {
+    .wfm-tab-panel {
         position: fixed;
         bottom: 0;
         z-index: 1031;

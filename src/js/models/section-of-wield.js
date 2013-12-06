@@ -1,5 +1,5 @@
 ﻿/** @module */
-define(['knockout'], function (ko) {
+define(['jquery', 'knockout'], function ($, ko) {
     'use strict';
 
     /**
@@ -33,6 +33,24 @@ define(['knockout'], function (ko) {
         * @type {string}
         */
         this.SectionPatternId = data.SectionPatternId;
+
+
+        this.SectionPattern = ko.computed({
+            read: function () {
+                var tmpListOfSectionPattern = ko.unwrap(this.getWield().getWellRegion().getParentViewModel().ListOfSectionPatternDto);
+                var tmpSectionPatternId = this.SectionPatternId;
+                var byId = $.grep(tmpListOfSectionPattern, function (arrElem) {
+                    return arrElem.Id === tmpSectionPatternId;
+                });
+
+                if (byId.length === 1) {
+                    return byId[0];
+                }
+            },
+            deferEvaluation: true,
+            owner: this
+        });
+
 
         /**
         * Id of well field

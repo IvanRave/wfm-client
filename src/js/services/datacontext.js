@@ -29,6 +29,10 @@
         return '{{conf.requrl}}/api/wellfieldmap/' + (uqp ? ('?' + $.param(uqp)) : '');
     }
 
+    function sectionPatternsUrl() {
+        return '{{conf.requrl}}/api/section-patterns';
+    }
+
     /** 
     * Well-field maps url
     * @param {number} wieldId - Well-field id
@@ -573,6 +577,10 @@
     */
     datacontext.deleteWellFieldMap = function (wieldId, mapId) {
         return ajaxRequest('DELETE', wieldMapsUrl(wieldId, mapId));
+    };
+
+    datacontext.getListOfSectionPattern = function () {
+        return ajaxRequest('GET', sectionPatternsUrl());
     };
 
     datacontext.getPossibleWidgoutList = function () {
