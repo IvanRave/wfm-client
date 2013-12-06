@@ -1,7 +1,4 @@
-﻿/**
-* A module representing a well group.
-* @module
-*/
+﻿/** @module */
 define(['jquery',
     'knockout',
     'services/datacontext',
