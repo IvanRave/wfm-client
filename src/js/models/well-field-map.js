@@ -1,8 +1,8 @@
 ﻿/** @module */
 define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
-    'helpers/app-helper', 'models/company-file',
+    'helpers/app-helper', 'models/file-spec',
     'models/well-field-map-area', 'models/well-in-well-field-map'],
-    function ($, ko, datacontext, bootstrapModal, appHelper, CompanyFile) {
+    function ($, ko, datacontext, bootstrapModal, appHelper, FileSpec) {
         'use strict';
 
         function importWellFieldMapAreasDto(items, parent) {
@@ -40,16 +40,16 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
             this.Id = data.Id;
 
             /**
-            * Map file guid
+            * Id of file specification (guid)
             * @type {string}
             */
-            this.CompanyFileId = data.CompanyFileId;
+            this.IdOfFileSpec = data.IdOfFileSpec;
 
             /**
-            * Map file
-            * @type {module:models/company-file}
+            * Map file specification
+            * @type {module:models/file-spec}
             */
-            this.CompanyFile = new CompanyFile(data.CompanyFileDto);
+            this.FileSpec = new FileSpec(data.FileSpecDto);
 
             /** 
             * Map description
@@ -61,7 +61,7 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
             * Map image (full url)
             * @type {string}
             */
-            this.fullImgUrl = datacontext.getWellFieldMapUrl({ img_url: this.CompanyFile.Id });
+            this.fullImgUrl = datacontext.getWellFieldMapUrl({ img_url: this.IdOfFileSpec });
 
             /** 
             * Map scale coefficient

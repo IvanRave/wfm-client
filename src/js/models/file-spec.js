@@ -3,8 +3,8 @@ define(['knockout'], function (ko) {
     'use strict';
 
     /**
-    * Company file model
-    * @param {object} data - File data
+    * File specification
+    * @param {object} data - File specification data
     * @constructor
     */
     var exports = function (data) {
@@ -23,16 +23,18 @@ define(['knockout'], function (ko) {
         this.Name = ko.observable(data.Name);
 
         /**
-        * Company guid
+        * File extension
         * @type {string}
         */
-        this.CompanyId = data.CompanyId;
+        this.Extension = data.Extension;
 
         /**
-        * Is active or not (in Recycle Bin)
-        * @type {boolean}
+        * Content type
+        * @type {string}
         */
-        this.IsActive = ko.observable(data.IsActive);
+        this.ContentType = data.ContentType;
+
+        // TODO: add other properties
     };
 
     return exports;
