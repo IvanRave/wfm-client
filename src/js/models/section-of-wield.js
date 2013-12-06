@@ -57,6 +57,24 @@ define(['jquery', 'knockout'], function ($, ko) {
         * @type {number}
         */
         this.WieldId = data.WieldId;
+
+        /**
+        * Whether section is selected
+        * @type {boolean}
+        */
+        this.isSectionSelected = ko.computed({
+            read: function () {
+                return (ko.unwrap(this.getWield().selectedSection) === this);
+            },
+            deferEvaluation: true,
+            owner: this
+        });
+
+        /** Set this section as selected */
+        this.selectSection = function () {
+            console.log(this);
+            this.getWield().selectedSection(this);
+        };
     };
 
     return exports;

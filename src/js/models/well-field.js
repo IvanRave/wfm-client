@@ -67,6 +67,12 @@ define(['jquery',
         this.ListOfSectionOfWieldDto = ko.observableArray();
 
         /**
+        * Selected section
+        * @type {module:models/section-of-wield}
+        */
+        this.selectedSection = ko.observable();
+
+        /**
         * List of groups
         * @type {Array.<module:models/well-group>}
         */
