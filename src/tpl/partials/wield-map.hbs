@@ -1,4 +1,4 @@
-﻿<div data-bind="if: selectedSection().SectionPatternId === 'wield-map'">
+﻿<div>
     <div class="row">
         <div class="col-md-8">
             <div style="width: 620px; height: 512px; border: 1px dotted #ccc">
@@ -26,7 +26,7 @@
                     <span class="btn btn-xs btn-default fileinput-button">
                         <i class="glyphicon glyphicon-plus"></i>
                         <span>Add map...</span>
-                        <input id="map_file_upload" type="file" name="map_files[]">
+                        <input data-bind="filoader: mapFiloader" type="file" name="map_files[]"></input>
                     </span>
                 </h4>
             </div>
@@ -60,12 +60,6 @@
                 </div>
             </div>
             <!-- /ko -->
-        </div>
-
-    </div>
-
-    <div style="margin-left: 16px">
-        <div id="map_obj_list">
         </div>
     </div>
 

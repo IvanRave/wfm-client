@@ -69,12 +69,6 @@ define(['jquery', 'knockout'], function ($, ko) {
             deferEvaluation: true,
             owner: this
         });
-
-        /** Set this section as selected */
-        this.selectSection = function () {
-            console.log(this);
-            this.getWield().selectedSection(this);
-        };
     };
 
     return exports;

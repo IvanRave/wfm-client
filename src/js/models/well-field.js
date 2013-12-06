@@ -67,12 +67,6 @@ define(['jquery',
         this.ListOfSectionOfWieldDto = ko.observableArray();
 
         /**
-        * Selected section
-        * @type {module:models/section-of-wield}
-        */
-        this.selectedSection = ko.observable();
-
-        /**
         * List of groups
         * @type {Array.<module:models/well-group>}
         */
@@ -90,7 +84,34 @@ define(['jquery',
         /** Selected map */
         this.selectedWellFieldMap = ko.observable();
 
+        /**
+        * Selected section
+        * @type {module:models/section-of-wield}
+        */
+        this.selectedSection = ko.observable();
+
         var self = this;
+
+        /** Set this section as selected */
+        self.selectSection = function (sectionToSelect) {
+            if (sectionToSelect){
+                switch (sectionToSelect.SectionPatternId) {
+                    case 'wield-map':
+                        // Get all maps from this field
+                        self.getWellFieldMaps(function () {
+                            var arr = ko.unwrap(self.WellFieldMaps);
+                            if (arr.length > 0) {
+                                arr[0].showWellFieldMap();
+                            }
+                        });
+
+                        //self.initMapFileUpload();
+                        break;
+                }
+
+                self.selectedSection(sectionToSelect);
+            }
+        };
 
         self.deleteWellFieldMap = function (itemToDelete) {
             if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(itemToDelete.FileSpec.Name) + '"?')) {
@@ -117,12 +138,20 @@ define(['jquery',
             }
         };
 
-        self.initMapFileUpload = function () {
-            var mapFileInput = document.getElementById('map_file_upload');
-            fileHelper.initFileUpload(mapFileInput, datacontext.getWieldMapsUrl(self.Id), ['image/jpeg', 'image/png'], function (result) {
+        self.mapFiloader = {
+            callback: function (result) {
                 self.WellFieldMaps.push(new WellFieldMap(result[0], self));
-            });
+            },
+            url: datacontext.getWieldMapsUrl(self.Id),
+            fileFormats: ['image/jpeg', 'image/png']
         };
+
+        ////self.initMapFileUpload = function () {
+        ////    var mapFileInput = document.getElementById('map_file_upload');
+        ////    fileHelper.initFileUpload(mapFileInput, datacontext.getWieldMapsUrl(self.Id), ['image/jpeg', 'image/png'], function (result) {
+        ////        self.WellFieldMaps.push(new WellFieldMap(result[0], self));
+        ////    });
+        ////};
 
         self.isOpenItem = ko.observable(false);
 
@@ -136,20 +165,10 @@ define(['jquery',
 
         self.selectItem = function () {
             self.isOpenItem(true);
-            self.selectedWellFieldMap(null);
+            ////self.selectedWellFieldMap(null);
 
             self.getWellRegion().clearSetSelectedWellRegion();
             self.getWellRegion().selectedWellField(self);
-
-            // get all maps from this field
-            self.getWellFieldMaps(function () {
-                var arr = self.WellFieldMaps();
-                if (arr.length > 0) {
-                    arr[0].showWellFieldMap();
-                }
-            });
-
-            self.initMapFileUpload();
 
             window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
                 region: self.getWellRegion().Id,
