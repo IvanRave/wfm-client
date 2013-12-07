@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: models/file-spec.js</title>
+    <title>JSDoc: Source: models/section-of-well.js</title>
     
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Source: models/file-spec.js</h1>
+    <h1 class="page-title">Source: models/section-of-well.js</h1>
     
     
 
@@ -26,42 +26,79 @@
     <section>
         <article>
             <pre class="prettyprint source"><code>﻿/** @module */
-define(['knockout'], function (ko) {
+define(['jquery', 'knockout'], function ($, ko) {
     'use strict';
 
     /**
-    * File specification
-    * @param {object} data - File specification data
+    * Section of well
+    * @param {object} data - section data
+    * @param {module:models/well} well - well (parent)
     * @constructor
     */
-    var exports = function (data) {
+    var exports = function (data, well) {
         data = data || {};
 
+        /** Get parent (well) */
+        this.getWell = function () {
+            return well;
+        };
+
         /**
-        * File guid
+        * Section guid
         * @type {string}
         */
         this.Id = data.Id;
 
         /**
-        * File name (255)
-        * @type {string}
+        * Whether the section is visible
+        * @type {boolean}
         */
-        this.Name = ko.observable(data.Name);
+        this.IsVisible = ko.observable(data.IsVisible);
 
         /**
-        * File extension
+        * Id of section pattern: contains info like section Name and other
         * @type {string}
         */
-        this.Extension = data.Extension;
+        this.SectionPatternId = data.SectionPatternId;
 
         /**
-        * Content type
-        * @type {string}
+        * Section pattern (default name, file formats and other params for section)
+        * @type {module:models/section-pattern}
         */
-        this.ContentType = data.ContentType;
+        this.SectionPattern = ko.computed({
+            read: function () {
+                var tmpListOfSectionPattern = ko.unwrap(this.getWell().getWellGroup().getWellField().getWellRegion().getParentViewModel().ListOfSectionPatternDto);
+                var tmpSectionPatternId = this.SectionPatternId;
+                var byId = $.grep(tmpListOfSectionPattern, function (arrElem) {
+                    return arrElem.Id === tmpSectionPatternId;
+                });
 
-        // TODO: add other properties
+                if (byId.length === 1) {
+                    return byId[0];
+                }
+            },
+            deferEvaluation: true,
+            owner: this
+        });
+
+
+        /**
+        * Id of well
+        * @type {number}
+        */
+        this.WellId = data.WellId;
+
+        /**
+        * Whether section is selected
+        * @type {boolean}
+        */
+        this.isSectionSelected = ko.computed({
+            read: function () {
+                return (ko.unwrap(this.getWell().selectedSection) === this);
+            },
+            deferEvaluation: true,
+            owner: this
+        });
     };
 
     return exports;

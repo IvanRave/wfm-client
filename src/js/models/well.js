@@ -14,11 +14,12 @@ define([
     'models/column-attribute',
     'models/well-history',
     'models/test-scope'
-], function ($, ko, datacontext, fileHelper, bootstrapModal, appHelper, appMoment, wellPerfomancePartial, HistoryView, SectionOfWell) {
+], function ($, ko, datacontext, fileHelper, bootstrapModal,
+    appHelper, appMoment, wellPerfomancePartial, HistoryView, SectionOfWell, WellFile) {
     'use strict';
 
     /** WellFiles (convert data objects into array) */
-    function importWellFilesDto(data, parent) { return $.map(data || [], function (item) { return datacontext.createWellFile(item, parent); }); }
+    function importWellFilesDto(data, parent) { return $.map(data || [], function (item) { return new WellFile(item, parent); }); }
 
     /** ColumnAttributes (convert data objects into array) */
     function importColumnAttributesDto(data) { return $.map(data || [], function (item) { return datacontext.createColumnAttribute(item); }); }

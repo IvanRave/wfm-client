@@ -1,4 +1,31 @@
-﻿/** @module */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: models/well-file.js</title>
+    
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+    
+    <h1 class="page-title">Source: models/well-file.js</h1>
+    
+    
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source"><code>﻿/** @module */
 define(['jquery', 'knockout', 'services/datacontext',
     'helpers/modal-helper', 'helpers/app-helper',
     'moment', 'models/column-attribute'], function ($, ko, datacontext, bootstrapModal, appHelper, appMoment) {
@@ -142,7 +169,7 @@ define(['jquery', 'knockout', 'services/datacontext',
                     var selectRS = document.createElement('select');
                     $(selectRS).addClass('pd-parameter');
 
-                    for (var caIndex = 0, caMaxIndex = columnAttributes.length; caIndex < caMaxIndex; caIndex++) {
+                    for (var caIndex = 0, caMaxIndex = columnAttributes.length; caIndex &lt; caMaxIndex; caIndex++) {
                         var optionColumnAttribute = document.createElement('option');
                         $(optionColumnAttribute)
                             .val(columnAttributes[caIndex].Id)
@@ -169,7 +196,7 @@ define(['jquery', 'knockout', 'services/datacontext',
                             return $(this).val();
                         }).get();
 
-                        if (selectedArray.length < 4) {
+                        if (selectedArray.length &lt; 4) {
                             alert('All fields required');
                             return;
                         }
@@ -230,14 +257,14 @@ define(['jquery', 'knockout', 'services/datacontext',
 
                     var isFileExtensionTxt = /txt$/.test(self.Name());
 
-                    for (var i = 0, ilimit = response.length; i < ilimit; i++) {
+                    for (var i = 0, ilimit = response.length; i &lt; ilimit; i++) {
                         var fragmentTR = document.createElement('tr');
                         var jlimit = response[i].length;
 
                         maxColumnIndex = Math.max(maxColumnIndex, jlimit);
 
                         // add first column as a data begin index selector
-                        for (var j = 0; j < jlimit; j++) {
+                        for (var j = 0; j &lt; jlimit; j++) {
                             var fragmentTD = document.createElement('td');
                             var cellText = response[i][j];
                             // if not empty then add (0 value - stay in table)
@@ -284,10 +311,10 @@ define(['jquery', 'knockout', 'services/datacontext',
                     columnAttrList.push(dateObj);
 
                     // string with column names
-                    var sourceSelect = '<option></option>';
+                    var sourceSelect = '&lt;option>&lt;/option>';
 
-                    for (var clm = 0; clm < columnAttrList.length; clm++) {
-                        sourceSelect += '<option val="' + columnAttrList[clm].Name + '">' + columnAttrList[clm].Name + '</option>';
+                    for (var clm = 0; clm &lt; columnAttrList.length; clm++) {
+                        sourceSelect += '&lt;option val="' + columnAttrList[clm].Name + '">' + columnAttrList[clm].Name + '&lt;/option>';
                     }
 
                     // 1. set names
@@ -306,7 +333,7 @@ define(['jquery', 'knockout', 'services/datacontext',
                     // collection of select inputs
                     var matchSelectList = [];
                     // create all inputs and put in collection
-                    for (var z = 0; z < maxColumnIndex; z++) {
+                    for (var z = 0; z &lt; maxColumnIndex; z++) {
                         var matchNameTD = document.createElement('td');
                         ////$(matchNameTD).addClass('wo-border');
                         // select input for column match names
@@ -354,7 +381,7 @@ define(['jquery', 'knockout', 'services/datacontext',
                         var numeratorOptionList = '';
                         // make select box from format list                        
                         $.each(columnAttrElement.NumeratorList, function (frmIndex, frmElem) {
-                            numeratorOptionList += '<option value="' + frmElem + '">' + frmElem + '</option>';
+                            numeratorOptionList += '&lt;option value="' + frmElem + '">' + frmElem + '&lt;/option>';
                         });
 
                         $(matchSelectList[event.data.elemColumnIndex].matchFormatElem).html(numeratorOptionList).show();
@@ -363,7 +390,7 @@ define(['jquery', 'knockout', 'services/datacontext',
                             var denominatorOptionList = '';
                             // make select box from format list                        
                             $.each(columnAttrElement.DenominatorList, function (frmIndex, frmElem) {
-                                denominatorOptionList += '<option value="' + frmElem + '">' + frmElem + '</option>';
+                                denominatorOptionList += '&lt;option value="' + frmElem + '">' + frmElem + '&lt;/option>';
                             });
 
                             $(matchSelectList[event.data.elemColumnIndex].matchFormatElemDenominator).html(denominatorOptionList).show();
@@ -374,7 +401,7 @@ define(['jquery', 'knockout', 'services/datacontext',
                     }
 
                     // Generate select-boxes with unit format from select-box with unit name
-                    for (var k = 0; k < matchSelectList.length; k += 1) {
+                    for (var k = 0; k &lt; matchSelectList.length; k += 1) {
                         $(matchSelectList[k].matchNameElem).on('change', { elemColumnIndex: k }, fillSelectBoxes);
                     }
 
@@ -487,14 +514,14 @@ define(['jquery', 'knockout', 'services/datacontext',
             ////    for (var dateFormatKey in dateFormat) {
             ////        if (dateFormat.hasOwnProperty(dateFormatKey)) {
             ////            $(selectOfDateFormat).append(
-            ////                $('<option></option>').val(dateFormatKey).html(dateFormatKey + ' (' + dateFormat[dateFormatKey] + ')')
+            ////                $('&lt;option>&lt;/option>').val(dateFormatKey).html(dateFormatKey + ' (' + dateFormat[dateFormatKey] + ')')
             ////            );
             ////        }
             ////    }
 
             ////    if (self.Name().substr(self.Name().length - 4) === '.txt') {
             ////        $(innerDefineColumnDiv).append(
-            ////                $('<div></div>').css({
+            ////                $('&lt;div>&lt;/div>').css({
             ////                    "height": "8px",
             ////                    "border-top": "1px dashed #555"
             ////                }),
@@ -534,9 +561,9 @@ define(['jquery', 'knockout', 'services/datacontext',
 
             ////            // create select with options
             ////            var selectOfColumnAttributes = document.createElement('select');
-            ////            $(selectOfColumnAttributes).addClass('pd-parameter').append($('<option></option>').html('choose column...').val(''));
+            ////            $(selectOfColumnAttributes).addClass('pd-parameter').append($('&lt;option>&lt;/option>').html('choose column...').val(''));
 
-            ////            for (var caIndex = 0, caMaxIndex = columnAttributes.length; caIndex < caMaxIndex; caIndex++) {
+            ////            for (var caIndex = 0, caMaxIndex = columnAttributes.length; caIndex &lt; caMaxIndex; caIndex++) {
             ////                var optionColumnAttribute = document.createElement('option');
             ////                $(optionColumnAttribute).val(columnAttributes[caIndex].Id).html(columnAttributes[caIndex].Name + (columnAttributes[caIndex].Format ? (', ' + columnAttributes[caIndex].Format) : ''));
             ////                $(selectOfColumnAttributes).append(optionColumnAttribute);
@@ -545,7 +572,7 @@ define(['jquery', 'knockout', 'services/datacontext',
 
             ////            var innerDiv = document.createElement('div');
             ////            $(innerDiv).addClass('form-horizontal');
-            ////            for (var columnIndex = 0; columnIndex < needColumns.length; columnIndex++) {
+            ////            for (var columnIndex = 0; columnIndex &lt; needColumns.length; columnIndex++) {
             ////                needColumns[columnIndex].SelectInput = $(selectOfColumnAttributes).clone();
             ////                if (needColumns[columnIndex].IsRequired === true) {
             ////                    $(needColumns[columnIndex].SelectInput).prop({ 'required': true });
@@ -561,7 +588,7 @@ define(['jquery', 'knockout', 'services/datacontext',
 
             ////                var needColumnListSelected = [];
 
-            ////                for (var columnIndex = 0; columnIndex < needColumns.length; columnIndex++) {
+            ////                for (var columnIndex = 0; columnIndex &lt; needColumns.length; columnIndex++) {
             ////                    if ($(needColumns[columnIndex].SelectInput).val() !== '') {
             ////                        var needColumnItemSelected = {
             ////                            Id: $(needColumns[columnIndex].SelectInput).val(),
@@ -603,4 +630,26 @@ define(['jquery', 'knockout', 'services/datacontext',
         };
 
         return exports;
-    });
+    });</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="file-spec.html">models/file-spec</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="section-of-well.html">models/section-of-well</a></li><li><a href="section-of-wield.html">models/section-of-wield</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="well.html">models/well</a></li><li><a href="well-field.html">models/well-field</a></li><li><a href="well-field-map.html">models/well-field-map</a></li><li><a href="well-file.html">models/well-file</a></li><li><a href="well-group.html">models/well-group</a></li><li><a href="well-group-wfm-parameter.html">models/well-group-wfm-parameter</a></li><li><a href="well-region.html">models/well-region</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0</a> on Sat Dec 07 2013 14:14:14 GMT+0200 (EET)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

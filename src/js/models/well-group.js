@@ -4,36 +4,75 @@ define(['jquery',
     'services/datacontext',
     'helpers/modal-helper',
     'models/well',
-    'models/well-group-wfm-parameter'], function ($, ko, datacontext, bootstrapModal, Well) {
+    'models/well-group-wfm-parameter'], function ($, ko, datacontext, bootstrapModal, Well, WellGroupWfmParameter) {
         'use strict';
 
         // 18. WellGroupWfmParameter
-        function importWellGroupWfmParameterDtoList(data, wellGroupItem) { return $.map(data || [], function (item) { return datacontext.createWellGroupWfmParameter(item, wellGroupItem); }); }
+        function importWellGroupWfmParameterDtoList(data, wellGroupItem) { return $.map(data || [], function (item) { return new WellGroupWfmParameter(item, wellGroupItem); }); }
 
         // 4. Wells (convert data objects into array)
         function importWellsDto(data, parent) { return $.map(data || [], function (item) { return new Well(item, parent); }); }
 
-        function WellGroup(data, wellField) {
-            var self = this;
+        /**
+        * Well group
+        * @constructor
+        * @param {object} data - Group data
+        * @param {module:models/well-field} wellField - Well field (parent)
+        */
+        var exports = function (data, wellField) {
             data = data || {};
 
-            self.getWellField = function () {
+            /**
+            * Get well field (parent)
+            * @returns {module:models/well-field}
+            */
+            this.getWellField = function () {
                 return wellField;
             };
 
-            // Persisted properties
-            self.Id = data.Id;
-            self.Name = ko.observable(data.Name);
+            /**
+            * Group id
+            * @type {number}
+            */
+            this.Id = data.Id;
 
-            // Foreign key
-            self.WellFieldId = data.WellFieldId;
-            self.Wells = ko.observableArray();
-            self.selectedWell = ko.observable();
+            /**
+            * Group name
+            * @type {string}
+            */
+            this.Name = ko.observable(data.Name);
 
-            // Well file manager parameter for this group
-            self.wellGroupWfmParameterList = ko.observableArray();
+            /**
+            * Field (parent) id
+            * @type {number}
+            */
+            this.WellFieldId = data.WellFieldId;
 
-            self.isLoadWellGroupWfmParameterList = ko.observable(false);
+            /**
+            * List of well for this group
+            * @type {Array.<module:models/well>}
+            */
+            this.Wells = ko.observableArray();
+
+            /**
+            * Selected well
+            * @type {module:models/well}
+            */
+            this.selectedWell = ko.observable();
+
+            /**
+            * List of wfm parameters for this group
+            * @type {Array.<module:models/well-group-wfm-parameter>}
+            */
+            this.wellGroupWfmParameterList = ko.observableArray();
+
+            /**
+            * Whether parameters are loaded
+            * @type {boolean}
+            */
+            this.isLoadWellGroupWfmParameterList = ko.observable(false);
+
+            var self = this;
 
             self.getWellGroupWfmParameterList = function () {
                 if (ko.unwrap(self.isLoadWellGroupWfmParameterList) === false) {
@@ -71,20 +110,17 @@ define(['jquery',
             self.selectedWfmParameterId = ko.observable();
 
             self.addWellGroupWfmParameter = function () {
-                if (!self.selectedWfmParameterId()) { return; }
-
-                // request to create wellGroupWfmParameter 
-                var wellGroupWfmParameterNew = datacontext.createWellGroupWfmParameter({
-                    Color: "",
-                    SerialNumber: 1,
-                    WellGroupId: self.Id,
-                    WfmParameterId: self.selectedWfmParameterId()
-                });
-
-                datacontext.postWellGroupWfmParameter(wellGroupWfmParameterNew).done(function (response) {
-                    var createdWellGroupWfmParameter = datacontext.createWellGroupWfmParameter(response);
-                    self.wellGroupWfmParameterList.push(createdWellGroupWfmParameter);
-                });
+                var tmpWfmParamId = ko.unwrap(self.selectedWfmParameterId);
+                if (tmpWfmParamId) {
+                    datacontext.postWellGroupWfmParameter({
+                        Color: '',
+                        SerialNumber: 1,
+                        WellGroupId: self.Id,
+                        WfmParameterId: tmpWfmParamId
+                    }).done(function (response) {
+                        self.wellGroupWfmParameterList.push(new WellGroupWfmParameter(response, self));
+                    });
+                }
             };
 
             ////self.addWellGroupWfmParameter = function () {
@@ -284,9 +320,7 @@ define(['jquery',
 
             // load wells
             self.Wells(importWellsDto(data.WellsDto, self));
-        }
-
-        datacontext.createWellGroup = function (data, parent) {
-            return new WellGroup(data, parent);
         };
+
+        return exports;
     });

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Module: models/well-field</title>
+    <title>JSDoc: Module: models/well-group-wfm-parameter</title>
     
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Module: models/well-field</h1>
+    <h1 class="page-title">Module: models/well-group-wfm-parameter</h1>
     
     
 
@@ -27,7 +27,7 @@
     
 <header>
     <h2>
-    models/well-field
+    models/well-group-wfm-parameter
     </h2>
     
 </header>  
@@ -37,7 +37,7 @@
     
         
 <dt>
-    <h4 class="name" id="module:models/well-field"><span class="type-signature"></span>new require("models/well-field")<span class="signature">(data, wellRegion)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="module:models/well-group-wfm-parameter"><span class="type-signature"></span>new require("models/well-group-wfm-parameter")<span class="signature">(data, wellGroupItem)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -45,7 +45,7 @@
     
     
     <div class="description">
-        Well field
+        Parameter (union) for test or perfomance data. Every well group has own array of wfm parameters.
     </div>
     
 
@@ -95,20 +95,20 @@
             
             
             
-            <td class="description last">Field data</td>
+            <td class="description last">Parameter data</td>
         </tr>
 	
 	
 	
         <tr>
             
-                <td class="name"><code>wellRegion</code></td>
+                <td class="name"><code>wellGroupItem</code></td>
             
             
             <td class="type">
             
                 
-<span class="param-type"><a href="well-region.html">module:models/well-region</a></span>
+<span class="param-type"><a href="well-group.html">module:models/well-group</a></span>
 
 
             
@@ -118,7 +118,7 @@
             
             
             
-            <td class="description last">Region (parent)</td>
+            <td class="description last">Well group (parent of parameter)</td>
         </tr>
 	
 	
@@ -149,7 +149,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="well-field.js.html">models/well-field.js</a>, <a href="well-field.js.html#line37">line 37</a>
+        <a href="well-group-wfm-parameter.js.html">models/well-group-wfm-parameter.js</a>, <a href="well-group-wfm-parameter.js.html#line11">line 11</a>
     </li></ul></dd>
     
     
@@ -202,7 +202,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="well-field.js.html">models/well-field.js</a>, <a href="well-field.js.html#line1">line 1</a>
+        <a href="well-group-wfm-parameter.js.html">models/well-group-wfm-parameter.js</a>, <a href="well-group-wfm-parameter.js.html#line1">line 1</a>
     </li></ul></dd>
     
     
@@ -228,7 +228,7 @@
         <h3 class="subsection-title">Classes</h3>
         
         <dl>
-            <dt><a href="well-field.html">require("models/well-field")</a></dt>
+            <dt><a href="well-group-wfm-parameter.html">require("models/well-group-wfm-parameter")</a></dt>
             <dd></dd>
         </dl>
     
@@ -241,142 +241,14 @@
         <dl>
             
 <dt>
-    <h4 class="name" id="Id"><span class="type-signature"></span>Id<span class="type-signature"> :number</span></h4>
+    <h4 class="name" id="color"><span class="type-signature"></span>color<span class="type-signature"> :string</span></h4>
     
     
 </dt>
 <dd>
     
     <div class="description">
-        Field id
-    </div>
-    
-    
-    
-        <h5>Type:</h5>
-        <ul>
-            <li>
-                
-<span class="param-type">number</span>
-
-
-            </li>
-        </ul>
-    
-
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="well-field.js.html">models/well-field.js</a>, <a href="well-field.js.html#line49">line 49</a>
-    </li></ul></dd>
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <h4 class="name" id="ListOfSectionOfWieldDto"><span class="type-signature"></span>ListOfSectionOfWieldDto<span class="type-signature"> :Array.&lt;<a href="section-of-wield.html">module:models/section-of-wield</a>></span></h4>
-    
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        List of sections
-    </div>
-    
-    
-    
-        <h5>Type:</h5>
-        <ul>
-            <li>
-                
-<span class="param-type">Array.&lt;<a href="section-of-wield.html">module:models/section-of-wield</a>></span>
-
-
-            </li>
-        </ul>
-    
-
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="well-field.js.html">models/well-field.js</a>, <a href="well-field.js.html#line67">line 67</a>
-    </li></ul></dd>
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <h4 class="name" id="Name"><span class="type-signature"></span>Name<span class="type-signature"> :string</span></h4>
-    
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        Field name
+        Parameter color, specified for this well group. Ovveride default color of parameter.
     </div>
     
     
@@ -415,7 +287,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="well-field.js.html">models/well-field.js</a>, <a href="well-field.js.html#line55">line 55</a>
+        <a href="well-group-wfm-parameter.js.html">models/well-group-wfm-parameter.js</a>, <a href="well-group-wfm-parameter.js.html#line43">line 43</a>
     </li></ul></dd>
     
     
@@ -433,14 +305,14 @@
         
             
 <dt>
-    <h4 class="name" id="selectedSection"><span class="type-signature"></span>selectedSection<span class="type-signature"> :<a href="section-of-wield.html">module:models/section-of-wield</a></span></h4>
+    <h4 class="name" id="isCalc"><span class="type-signature"></span>isCalc<span class="type-signature"> :boolean</span></h4>
     
     
 </dt>
 <dd>
     
     <div class="description">
-        Selected section
+        Whether parameter can be calculated from other parameters
     </div>
     
     
@@ -449,7 +321,7 @@
         <ul>
             <li>
                 
-<span class="param-type"><a href="section-of-wield.html">module:models/section-of-wield</a></span>
+<span class="param-type">boolean</span>
 
 
             </li>
@@ -479,7 +351,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="well-field.js.html">models/well-field.js</a>, <a href="well-field.js.html#line91">line 91</a>
+        <a href="well-group-wfm-parameter.js.html">models/well-group-wfm-parameter.js</a>, <a href="well-group-wfm-parameter.js.html#line55">line 55</a>
     </li></ul></dd>
     
     
@@ -497,122 +369,14 @@
         
             
 <dt>
-    <h4 class="name" id="selectedWellFieldMap"><span class="type-signature"></span>selectedWellFieldMap<span class="type-signature"></span></h4>
+    <h4 class="name" id="isVisible"><span class="type-signature"></span>isVisible<span class="type-signature"> :boolean</span></h4>
     
     
 </dt>
 <dd>
     
     <div class="description">
-        Selected map
-    </div>
-    
-    
-    
-
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="well-field.js.html">models/well-field.js</a>, <a href="well-field.js.html#line85">line 85</a>
-    </li></ul></dd>
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <h4 class="name" id="selectedWellGroup"><span class="type-signature"></span>selectedWellGroup<span class="type-signature"></span></h4>
-    
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        Selected group
-    </div>
-    
-    
-    
-
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="well-field.js.html">models/well-field.js</a>, <a href="well-field.js.html#line76">line 76</a>
-    </li></ul></dd>
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <h4 class="name" id="WellFieldMaps"><span class="type-signature"></span>WellFieldMaps<span class="type-signature"> :Array.&lt;<a href="well-field-map.html">module:models/well-field-map</a>></span></h4>
-    
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        List of maps
+        Whether parameter is visible on test or perfomance page
     </div>
     
     
@@ -621,7 +385,7 @@
         <ul>
             <li>
                 
-<span class="param-type">Array.&lt;<a href="well-field-map.html">module:models/well-field-map</a>></span>
+<span class="param-type">boolean</span>
 
 
             </li>
@@ -651,7 +415,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="well-field.js.html">models/well-field.js</a>, <a href="well-field.js.html#line82">line 82</a>
+        <a href="well-group-wfm-parameter.js.html">models/well-group-wfm-parameter.js</a>, <a href="well-group-wfm-parameter.js.html#line49">line 49</a>
     </li></ul></dd>
     
     
@@ -669,78 +433,14 @@
         
             
 <dt>
-    <h4 class="name" id="WellGroups"><span class="type-signature"></span>WellGroups<span class="type-signature"> :Array.&lt;<a href="well-group.html">module:models/well-group</a>></span></h4>
+    <h4 class="name" id="serialNumber"><span class="type-signature"></span>serialNumber<span class="type-signature"> :number</span></h4>
     
     
 </dt>
 <dd>
     
     <div class="description">
-        List of groups
-    </div>
-    
-    
-    
-        <h5>Type:</h5>
-        <ul>
-            <li>
-                
-<span class="param-type">Array.&lt;<a href="well-group.html">module:models/well-group</a>></span>
-
-
-            </li>
-        </ul>
-    
-
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="well-field.js.html">models/well-field.js</a>, <a href="well-field.js.html#line73">line 73</a>
-    </li></ul></dd>
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <h4 class="name" id="WellRegionId"><span class="type-signature"></span>WellRegionId<span class="type-signature"> :number</span></h4>
-    
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        Id of region (parent): foreign key
+        Serial number (order number)
     </div>
     
     
@@ -779,7 +479,189 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="well-field.js.html">models/well-field.js</a>, <a href="well-field.js.html#line61">line 61</a>
+        <a href="well-group-wfm-parameter.js.html">models/well-group-wfm-parameter.js</a>, <a href="well-group-wfm-parameter.js.html#line37">line 37</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="wellGroupId"><span class="type-signature"></span>wellGroupId<span class="type-signature"> :number</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        Well group (parent) id
+    </div>
+    
+    
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">number</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="well-group-wfm-parameter.js.html">models/well-group-wfm-parameter.js</a>, <a href="well-group-wfm-parameter.js.html#line26">line 26</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="wfmParameter"><span class="type-signature"></span>wfmParameter<span class="type-signature"> :<a href="wfm-parameter.html">module:models/wfm-parameter</a></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        Wfm parameter (global parameter definition - not only for this group)
+    </div>
+    
+    
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type"><a href="wfm-parameter.html">module:models/wfm-parameter</a></span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="well-group-wfm-parameter.js.html">models/well-group-wfm-parameter.js</a>, <a href="well-group-wfm-parameter.js.html#line61">line 61</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="wfmParameterId"><span class="type-signature"></span>wfmParameterId<span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        Wfm parameter id
+    </div>
+    
+    
+    
+
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="well-group-wfm-parameter.js.html">models/well-group-wfm-parameter.js</a>, <a href="well-group-wfm-parameter.js.html#line31">line 31</a>
     </li></ul></dd>
     
     
@@ -803,7 +685,7 @@
         <dl>
             
 <dt>
-    <h4 class="name" id="getWellRegion"><span class="type-signature"></span>getWellRegion<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="getWellGroup"><span class="type-signature"></span>getWellGroup<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="well-group.html">module:models/well-group</a>}</span></h4>
     
     
 </dt>
@@ -811,7 +693,7 @@
     
     
     <div class="description">
-        Get region (parent)
+        Get well group (parent)
     </div>
     
 
@@ -844,7 +726,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="well-field.js.html">models/well-field.js</a>, <a href="well-field.js.html#line41">line 41</a>
+        <a href="well-group-wfm-parameter.js.html">models/well-group-wfm-parameter.js</a>, <a href="well-group-wfm-parameter.js.html#line18">line 18</a>
     </li></ul></dd>
     
     
@@ -865,6 +747,28 @@
     
     
     
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    Well group (parent)
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="well-group.html">module:models/well-group</a></span>
+
+
+	</dd>
+</dl>
+
+        
     
     
 </dd>

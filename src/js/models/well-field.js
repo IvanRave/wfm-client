@@ -6,273 +6,270 @@ define(['jquery',
     'helpers/modal-helper',
     'models/well-field-map',
     'models/section-of-wield',
-    'models/well-group'
-], function ($, ko, datacontext, fileHelper, bootstrapModal, WellFieldMap, SectionOfWield) {
-    'use strict';
+    'models/well-group'], function ($, ko, datacontext,
+        fileHelper, bootstrapModal, WellFieldMap, SectionOfWield, WellGroup) {
+        'use strict';
 
-    // 10. WellFieldMaps (convert data objects into array)
-    function importWellFieldMapsDto(data, parent) {
-        return $.map(data || [], function (item) {
-            return new WellFieldMap(item, parent);
-        });
-    }
+        // 10. WellFieldMaps (convert data objects into array)
+        function importWellFieldMapsDto(data, parent) {
+            return $.map(data || [], function (item) {
+                return new WellFieldMap(item, parent);
+            });
+        }
 
-    // 3. WellGroup (convert data objects into array)
-    function importWellGroupsDto(data, parent) {
-        return $.map(data || [], function (item) { return datacontext.createWellGroup(item, parent); });
-    }
+        // 3. WellGroup (convert data objects into array)
+        function importWellGroupsDto(data, parent) {
+            return $.map(data || [], function (item) { return new WellGroup(item, parent); });
+        }
 
-    function importListOfSectionOfWieldDto(data, parent) {
-        return $.map(data || [], function (item) {
-            return new SectionOfWield(item, parent);
-        });
-    }
-
-    /**
-    * Well field
-    * @constructor
-    * @param {object} data - Field data
-    * @param {module:models/well-region} wellRegion - Region (parent)
-    */
-    var exports = function (data, wellRegion) {
-        data = data || {};
-
-        /** Get region (parent) */
-        this.getWellRegion = function () {
-            return wellRegion;
-        };
+        function importListOfSectionOfWieldDto(data, parent) {
+            return $.map(data || [], function (item) {
+                return new SectionOfWield(item, parent);
+            });
+        }
 
         /**
-        * Field id
-        * @type {number}
+        * Well field
+        * @constructor
+        * @param {object} data - Field data
+        * @param {module:models/well-region} wellRegion - Region (parent)
         */
-        this.Id = data.Id;
+        var exports = function (data, wellRegion) {
+            data = data || {};
 
-        /**
-        * Field name
-        * @type {string}
-        */
-        this.Name = ko.observable(data.Name);
+            /** Get region (parent) */
+            this.getWellRegion = function () {
+                return wellRegion;
+            };
 
-        /**
-        * Id of region (parent): foreign key
-        * @type {number}
-        */
-        this.WellRegionId = data.WellRegionId;        
+            /**
+            * Field id
+            * @type {number}
+            */
+            this.Id = data.Id;
 
-        /** 
-        * List of sections
-        * @type {Array.<module:models/section-of-wield>}
-        */
-        this.ListOfSectionOfWieldDto = ko.observableArray();
+            /**
+            * Field name
+            * @type {string}
+            */
+            this.Name = ko.observable(data.Name);
 
-        /**
-        * List of groups
-        * @type {Array.<module:models/well-group>}
-        */
-        this.WellGroups = ko.observableArray();
+            /**
+            * Id of region (parent): foreign key
+            * @type {number}
+            */
+            this.WellRegionId = data.WellRegionId;
 
-        /** Selected group */
-        this.selectedWellGroup = ko.observable();
+            /** 
+            * List of sections
+            * @type {Array.<module:models/section-of-wield>}
+            */
+            this.ListOfSectionOfWieldDto = ko.observableArray();
 
-        /**
-        * List of maps
-        * @type {Array.<module:models/well-field-map>}
-        */
-        this.WellFieldMaps = ko.observableArray();
+            /**
+            * List of groups
+            * @type {Array.<module:models/well-group>}
+            */
+            this.WellGroups = ko.observableArray();
 
-        /** Selected map */
-        this.selectedWellFieldMap = ko.observable();
+            /** Selected group */
+            this.selectedWellGroup = ko.observable();
 
-        /**
-        * Selected section
-        * @type {module:models/section-of-wield}
-        */
-        this.selectedSection = ko.observable();
+            /**
+            * List of maps
+            * @type {Array.<module:models/well-field-map>}
+            */
+            this.WellFieldMaps = ko.observableArray();
 
-        var self = this;
+            /** Selected map */
+            this.selectedWellFieldMap = ko.observable();
 
-        /** Set this section as selected */
-        self.selectSection = function (sectionToSelect) {
-            if (sectionToSelect){
-                switch (sectionToSelect.SectionPatternId) {
-                    case 'wield-map':
-                        // Get all maps from this field
-                        self.getWellFieldMaps(function () {
-                            var arr = ko.unwrap(self.WellFieldMaps);
-                            if (arr.length > 0) {
-                                arr[0].showWellFieldMap();
-                            }
-                        });
+            /**
+            * Selected section
+            * @type {module:models/section-of-wield}
+            */
+            this.selectedSection = ko.observable();
 
-                        //self.initMapFileUpload();
-                        break;
+            var self = this;
+
+            /** Set this section as selected */
+            self.selectSection = function (sectionToSelect) {
+                if (sectionToSelect) {
+                    switch (sectionToSelect.SectionPatternId) {
+                        case 'wield-map':
+                            // Get all maps from this field
+                            self.getWellFieldMaps(function () {
+                                var arr = ko.unwrap(self.WellFieldMaps);
+                                if (arr.length > 0) {
+                                    arr[0].showWellFieldMap();
+                                }
+                            });
+
+                            //self.initMapFileUpload();
+                            break;
+                    }
+
+                    self.selectedSection(sectionToSelect);
                 }
+            };
 
-                self.selectedSection(sectionToSelect);
-            }
-        };
+            self.deleteWellFieldMap = function (itemToDelete) {
+                if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(itemToDelete.FileSpec.Name) + '"?')) {
+                    datacontext.deleteWellFieldMap(self.Id, itemToDelete.Id).done(function () {
+                        self.WellFieldMaps.remove(itemToDelete);
+                    });
+                }
+            };
 
-        self.deleteWellFieldMap = function (itemToDelete) {
-            if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(itemToDelete.FileSpec.Name) + '"?')) {
-                datacontext.deleteWellFieldMap(self.Id, itemToDelete.Id).done(function () {
-                    self.WellFieldMaps.remove(itemToDelete);
-                });
-            }
-        };
+            self.getWellFieldMaps = function (callbackFunction) {
+                if (self.WellFieldMaps().length === 0) {
+                    datacontext.getWellFieldMaps(self.Id).done(function (result) {
+                        self.WellFieldMaps(importWellFieldMapsDto(result, self));
 
-        self.getWellFieldMaps = function (callbackFunction) {
-            if (self.WellFieldMaps().length === 0) {
-                datacontext.getWellFieldMaps(self.Id).done(function (result) {
-                    self.WellFieldMaps(importWellFieldMapsDto(result, self));
-
+                        if ($.isFunction(callbackFunction) === true) {
+                            callbackFunction();
+                        }
+                    });
+                }
+                else {
                     if ($.isFunction(callbackFunction) === true) {
                         callbackFunction();
                     }
-                });
-            }
-            else {
-                if ($.isFunction(callbackFunction) === true) {
-                    callbackFunction();
                 }
-            }
-        };
+            };
 
-        /** 
-        * Options for file loader (files loaded to the map-section)
-        */
-        self.mapFiloader = {
-            callback: function (result) {
-                self.WellFieldMaps.push(new WellFieldMap(result[0], self));
-            },
-            url: datacontext.getWieldMapsUrl(self.Id),
-            fileFormats: ['image/jpeg', 'image/png']
-        };
+            /** 
+            * Options for file loader (files loaded to the map-section)
+            */
+            self.mapFiloader = {
+                callback: function (result) {
+                    self.WellFieldMaps.push(new WellFieldMap(result[0], self));
+                },
+                url: datacontext.getWieldMapsUrl(self.Id),
+                fileFormats: ['image/jpeg', 'image/png']
+            };
 
-        self.isOpenItem = ko.observable(false);
+            self.isOpenItem = ko.observable(false);
 
-        self.toggleItem = function () {
-            self.isOpenItem(!self.isOpenItem());
-        };
+            self.toggleItem = function () {
+                self.isOpenItem(!self.isOpenItem());
+            };
 
-        /** Whether item and parent are selected */
-        self.isSelectedItem = ko.computed({
-            read: function () {
-                var tmpRegion = self.getWellRegion();
-                if (ko.unwrap(tmpRegion.isSelectedItem)) {
-                    if (self === ko.unwrap(tmpRegion.selectedWellField)) {
-                        return true;
+            /** Whether item and parent are selected */
+            self.isSelectedItem = ko.computed({
+                read: function () {
+                    var tmpRegion = self.getWellRegion();
+                    if (ko.unwrap(tmpRegion.isSelectedItem)) {
+                        if (self === ko.unwrap(tmpRegion.selectedWellField)) {
+                            return true;
+                        }
                     }
-                }
-            },
-            deferEvaluation: true
-        });
-
-        /** Is item selected and showed on the page */
-        self.isShowedItem = ko.computed({
-            read: function () {
-                if (ko.unwrap(self.isSelectedItem)) {
-                    if (!ko.unwrap(self.selectedWellGroup)) {
-                        return true;
-                    }
-                }
-            },
-            deferEvaluation: true
-        });
-
-        self.selectItem = function () {
-            self.isOpenItem(true);
-
-            self.getWellRegion().clearSetSelectedWellRegion();
-            self.getWellRegion().selectedWellField(self);
-
-            window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
-                region: self.getWellRegion().Id,
-                field: self.Id
+                },
+                deferEvaluation: true
             });
 
-            // Select section by default (or selected section from prevous selected field)
-            var mapSection = $.grep(ko.unwrap(self.ListOfSectionOfWieldDto), function (arrElem) {
-                return (arrElem.SectionPatternId === 'wield-map');
-            })[0];
+            /** Is item selected and showed on the page */
+            self.isShowedItem = ko.computed({
+                read: function () {
+                    if (ko.unwrap(self.isSelectedItem)) {
+                        if (!ko.unwrap(self.selectedWellGroup)) {
+                            return true;
+                        }
+                    }
+                },
+                deferEvaluation: true
+            });
 
-            if (mapSection) {
-                self.selectSection(mapSection);
-            }
-        };
+            self.selectItem = function () {
+                self.isOpenItem(true);
 
-        self.addWellGroup = function () {
-            var inputName = document.createElement('input');
-            inputName.type = 'text';
-            $(inputName).prop({ 'required': true }).addClass('form-control');
+                self.getWellRegion().clearSetSelectedWellRegion();
+                self.getWellRegion().selectedWellField(self);
 
-            var innerDiv = document.createElement('div');
-            $(innerDiv).addClass('form-horizontal').append(
-                bootstrapModal.gnrtDom('Name', inputName)
-            );
+                window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
+                    region: self.getWellRegion().Id,
+                    field: self.Id
+                });
 
-            function submitFunction() {
-                var wellGroupItem = datacontext.createWellGroup(
-                    {
+                // Select section by default (or selected section from prevous selected field)
+                var mapSection = $.grep(ko.unwrap(self.ListOfSectionOfWieldDto), function (arrElem) {
+                    return (arrElem.SectionPatternId === 'wield-map');
+                })[0];
+
+                if (mapSection) {
+                    self.selectSection(mapSection);
+                }
+            };
+
+            self.addWellGroup = function () {
+                var inputName = document.createElement('input');
+                inputName.type = 'text';
+                $(inputName).prop({ 'required': true }).addClass('form-control');
+
+                var innerDiv = document.createElement('div');
+                $(innerDiv).addClass('form-horizontal').append(
+                    bootstrapModal.gnrtDom('Name', inputName)
+                );
+
+                function submitFunction() {
+                    datacontext.saveNewWellGroup({
                         Name: $(inputName).val(),
                         WellFieldId: self.Id
-                    }, self);
+                    }).done(function (result) {
+                        self.WellGroups.push(new WellGroup(result, self));
+                    });
 
-                datacontext.saveNewWellGroup(wellGroupItem).done(function (result) {
-                    self.WellGroups.push(datacontext.createWellGroup(result, self));
-                });
-
-                bootstrapModal.closeModalWindow();
-            }
-
-            bootstrapModal.openModalWindow("Well group", innerDiv, submitFunction);
-        };
-
-        self.deleteWellGroup = function (wellGroupForDelete) {
-            if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(wellGroupForDelete.Name) + '"?')) {
-                datacontext.deleteWellGroup(wellGroupForDelete).done(function () {
-                    self.WellGroups.remove(wellGroupForDelete);
-                    self.selectItem();
-                });
-            }
-        };
-
-        self.editWellField = function () {
-            var inputName = document.createElement('input');
-            inputName.type = 'text';
-            $(inputName).val(self.Name()).prop({ 'required': true }).addClass('form-control');
-
-            var innerDiv = document.createElement('div');
-            $(innerDiv).addClass('form-horizontal').append(
-                bootstrapModal.gnrtDom('Name', inputName)
-            );
-
-            bootstrapModal.openModalWindow("Well field", innerDiv, function () {
-                self.Name($(inputName).val());
-                datacontext.saveChangedWellField(self).done(function (result) { self.Name(result.Name); });
-                bootstrapModal.closeModalWindow();
-            });
-        };
-
-        self.toPlainJson = function () {
-            var tmpPropList = ['Id', 'Name', 'WellRegionId'];
-            var objReady = {};
-            $.each(tmpPropList, function (propIndex, propValue) {
-                // null can be sended to ovveride current value to null
-                if (typeof ko.unwrap(self[propValue]) !== 'undefined') {
-                    objReady[propValue] = ko.unwrap(self[propValue]);
+                    bootstrapModal.closeModalWindow();
                 }
-            });
 
-            return objReady;
+                bootstrapModal.openModalWindow("Well group", innerDiv, submitFunction);
+            };
+
+            self.deleteWellGroup = function (wellGroupForDelete) {
+                if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(wellGroupForDelete.Name) + '"?')) {
+                    datacontext.deleteWellGroup(wellGroupForDelete).done(function () {
+                        self.WellGroups.remove(wellGroupForDelete);
+                        self.selectItem();
+                    });
+                }
+            };
+
+            self.editWellField = function () {
+                var inputName = document.createElement('input');
+                inputName.type = 'text';
+                $(inputName).val(self.Name()).prop({ 'required': true }).addClass('form-control');
+
+                var innerDiv = document.createElement('div');
+                $(innerDiv).addClass('form-horizontal').append(
+                    bootstrapModal.gnrtDom('Name', inputName)
+                );
+
+                bootstrapModal.openModalWindow("Well field", innerDiv, function () {
+                    self.Name($(inputName).val());
+                    datacontext.saveChangedWellField(self).done(function (result) { self.Name(result.Name); });
+                    bootstrapModal.closeModalWindow();
+                });
+            };
+
+            self.toPlainJson = function () {
+                var tmpPropList = ['Id', 'Name', 'WellRegionId'];
+                var objReady = {};
+                $.each(tmpPropList, function (propIndex, propValue) {
+                    // null can be sended to ovveride current value to null
+                    if (typeof ko.unwrap(self[propValue]) !== 'undefined') {
+                        objReady[propValue] = ko.unwrap(self[propValue]);
+                    }
+                });
+
+                return objReady;
+            };
+
+            /** Load groups */
+            self.WellGroups(importWellGroupsDto(data.WellGroupsDto, self));
+
+            /** Load sections */
+            self.ListOfSectionOfWieldDto(importListOfSectionOfWieldDto(data.ListOfSectionOfWieldDto, self));
         };
 
-        /** Load groups */
-        self.WellGroups(importWellGroupsDto(data.WellGroupsDto, self));
-        
-        /** Load sections */
-        self.ListOfSectionOfWieldDto(importListOfSectionOfWieldDto(data.ListOfSectionOfWieldDto, self));
-    };
-
-    return exports;
-});
+        return exports;
+    });

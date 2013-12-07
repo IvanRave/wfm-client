@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Module: models/file-spec</title>
+    <title>JSDoc: Module: models/wfm-parameter</title>
     
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Module: models/file-spec</h1>
+    <h1 class="page-title">Module: models/wfm-parameter</h1>
     
     
 
@@ -27,7 +27,7 @@
     
 <header>
     <h2>
-    models/file-spec
+    models/wfm-parameter
     </h2>
     
 </header>  
@@ -37,7 +37,7 @@
     
         
 <dt>
-    <h4 class="name" id="module:models/file-spec"><span class="type-signature"></span>new require("models/file-spec")<span class="signature">(data)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="module:models/wfm-parameter"><span class="type-signature"></span>new require("models/wfm-parameter")<span class="signature">(data)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -45,7 +45,7 @@
     
     
     <div class="description">
-        File specification
+        Parameter, like OilRate, WaterRate etc.
     </div>
     
 
@@ -95,7 +95,7 @@
             
             
             
-            <td class="description last">File specification data</td>
+            <td class="description last">Parameter data</td>
         </tr>
 	
 	
@@ -126,7 +126,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="file-spec.js.html">models/file-spec.js</a>, <a href="file-spec.js.html#line10">line 10</a>
+        <a href="wfm-parameter.js.html">models/wfm-parameter.js</a>, <a href="wfm-parameter.js.html#line75">line 75</a>
     </li></ul></dd>
     
     
@@ -179,7 +179,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="file-spec.js.html">models/file-spec.js</a>, <a href="file-spec.js.html#line1">line 1</a>
+        <a href="wfm-parameter.js.html">models/wfm-parameter.js</a>, <a href="wfm-parameter.js.html#line1">line 1</a>
     </li></ul></dd>
     
     
@@ -205,7 +205,7 @@
         <h3 class="subsection-title">Classes</h3>
         
         <dl>
-            <dt><a href="file-spec.html">require("models/file-spec")</a></dt>
+            <dt><a href="wfm-parameter.html">require("models/wfm-parameter")</a></dt>
             <dd></dd>
         </dl>
     
@@ -218,14 +218,14 @@
         <dl>
             
 <dt>
-    <h4 class="name" id="ContentType"><span class="type-signature"></span>ContentType<span class="type-signature"> :string</span></h4>
+    <h4 class="name" id="id"><span class="type-signature"></span>id<span class="type-signature"> :string</span></h4>
     
     
 </dt>
 <dd>
     
     <div class="description">
-        Content type
+        Parameter id (OilRate, WaterRate, etc.)
     </div>
     
     
@@ -264,7 +264,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="file-spec.js.html">models/file-spec.js</a>, <a href="file-spec.js.html#line35">line 35</a>
+        <a href="wfm-parameter.js.html">models/wfm-parameter.js</a>, <a href="wfm-parameter.js.html#line82">line 82</a>
     </li></ul></dd>
     
     
@@ -282,14 +282,14 @@
         
             
 <dt>
-    <h4 class="name" id="Extension"><span class="type-signature"></span>Extension<span class="type-signature"> :string</span></h4>
+    <h4 class="name" id="name"><span class="type-signature"></span>name<span class="type-signature"> :string</span></h4>
     
     
 </dt>
 <dd>
     
     <div class="description">
-        File extension
+        Parameter name (Oil rate, water rate, etc.)
     </div>
     
     
@@ -328,7 +328,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="file-spec.js.html">models/file-spec.js</a>, <a href="file-spec.js.html#line29">line 29</a>
+        <a href="wfm-parameter.js.html">models/wfm-parameter.js</a>, <a href="wfm-parameter.js.html#line88">line 88</a>
     </li></ul></dd>
     
     
@@ -346,14 +346,14 @@
         
             
 <dt>
-    <h4 class="name" id="Id"><span class="type-signature"></span>Id<span class="type-signature"> :string</span></h4>
+    <h4 class="name" id="uom"><span class="type-signature"></span>uom<span class="type-signature"> :string</span></h4>
     
     
 </dt>
 <dd>
     
     <div class="description">
-        File guid
+        Unit of measurement (scf, barrels, etc.)
     </div>
     
     
@@ -392,71 +392,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="file-spec.js.html">models/file-spec.js</a>, <a href="file-spec.js.html#line17">line 17</a>
-    </li></ul></dd>
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <h4 class="name" id="Name"><span class="type-signature"></span>Name<span class="type-signature"> :string</span></h4>
-    
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        File name (255)
-    </div>
-    
-    
-    
-        <h5>Type:</h5>
-        <ul>
-            <li>
-                
-<span class="param-type">string</span>
-
-
-            </li>
-        </ul>
-    
-
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="file-spec.js.html">models/file-spec.js</a>, <a href="file-spec.js.html#line23">line 23</a>
+        <a href="wfm-parameter.js.html">models/wfm-parameter.js</a>, <a href="wfm-parameter.js.html#line94">line 94</a>
     </li></ul></dd>
     
     
@@ -495,7 +431,7 @@
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0</a> on Sat Dec 07 2013 14:14:14 GMT+0200 (EET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0</a> on Sat Dec 07 2013 14:14:15 GMT+0200 (EET)
 </footer>
 
 <script> prettyPrint(); </script>
