@@ -172,8 +172,17 @@ define([
             self.isOpenItem(!self.isOpenItem());
         };
 
-        self.isSelectedItem = ko.computed(function () {
-            return self === self.getWellGroup().selectedWell();
+        /** Whether item and parent are selected */
+        self.isSelectedItem = ko.computed({
+            read: function () {
+                var tmpGroup = self.getWellGroup();
+                if (ko.unwrap(tmpGroup.isSelectedItem)) {
+                    if (self === ko.unwrap(tmpGroup.selectedWell)) {
+                        return true;
+                    }
+                }
+            },
+            deferEvaluation: true
         });
 
         self.selectItem = function () {

@@ -202,8 +202,29 @@ define(['jquery',
                 self.isOpenItem(!self.isOpenItem());
             };
 
-            self.isSelectedItem = ko.computed(function () {
-                return self === self.getWellField().selectedWellGroup();
+            /** Whether item and parent are selected */
+            self.isSelectedItem = ko.computed({
+                read: function () {
+                    var tmpField = self.getWellField();
+                    if (ko.unwrap(tmpField.isSelectedItem)) {
+                        if (self === ko.unwrap(tmpField.selectedWellGroup)) {
+                            return true;
+                        }
+                    }
+                },
+                deferEvaluation: true
+            });
+
+            /** Is item selected and showed on the page */
+            self.isShowedItem = ko.computed({
+                read: function () {
+                    if (ko.unwrap(self.isSelectedItem)) {
+                        if (!ko.unwrap(self.selectedWell)) {
+                            return true;
+                        }
+                    }
+                },
+                deferEvaluation: true
             });
 
             self.selectItem = function () {

@@ -4,7 +4,7 @@
     <li>
       <div class="clearfix">
         <i class="glyphicon" data-bind="css:{ 'glyphicon-circle-arrow-down' : isOpenItem, 'glyphicon-circle-arrow-right' : !isOpenItem() }, click: toggleItem"></i>
-        <div class="wfm-menu-item" data-bind="click: selectItem">
+        <div class="wfm-menu-item" data-bind="click: selectItem, css: { 'wfm-slc-menu-item': isShowedItem }">
           <div class="pull-right">
             <small>
               <i class="glyphicon glyphicon-globe"></i>
@@ -20,7 +20,7 @@
         <li>
           <div class="clearfix">
             <i class="glyphicon" data-bind="css:{ 'glyphicon-circle-arrow-down' : isOpenItem, 'glyphicon-circle-arrow-right' : !isOpenItem() }, click: toggleItem"></i>
-            <div class="wfm-menu-item" data-bind="click: selectItem">
+            <div class="wfm-menu-item" data-bind="click: selectItem, css: { 'wfm-slc-menu-item': isShowedItem }">
               <div class="pull-right">
                 <small>
                   <i class="glyphicon glyphicon-home"></i>
@@ -36,7 +36,7 @@
             <li>
               <div class="clearfix">
                 <i class="glyphicon" data-bind="css:{ 'glyphicon-circle-arrow-down' : isOpenItem, 'glyphicon-circle-arrow-right' : !isOpenItem() }, click: toggleItem"></i>
-                <div class="wfm-menu-item" data-bind="click: selectItem">
+                <div class="wfm-menu-item" data-bind="click: selectItem, css: { 'wfm-slc-menu-item': isShowedItem }">
                   <div class="pull-right">
                     <small>
                       <i class="glyphicon glyphicon-list"></i>
@@ -51,7 +51,7 @@
                 <!-- ko foreach: Wells -->
                 <li>
                   <div class="clearfix">
-                    <div class="wfm-menu-item" data-bind="click: selectItem">
+                    <div class="wfm-menu-item" data-bind="click: selectItem, css: { 'wfm-slc-menu-item': isSelectedItem }">
                       <div class="pull-right">
                         <small>
                           <i class="glyphicon glyphicon-leaf"></i>

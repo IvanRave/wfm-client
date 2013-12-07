@@ -107,6 +107,12 @@ footer {
                 text-decoration: none;
             }
 
+        .wfm-list ul > li .wfm-slc-menu-item {
+            background-color: #777;
+            color: #fff;
+            font-weight: bold;
+        }
+
         .wfm-list ul > li a {
             padding: 4px;
             display: block;
