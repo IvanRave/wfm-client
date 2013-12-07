@@ -1,4 +1,4 @@
-﻿<div data-bind="if: selectedSectionId() === 'summary'">
+﻿<div>
   <div data-ng-if="!isEdt">
     <div data-bind="foreach: wellPropertyList">
       <div data-bind="if: $parent[id]">
@@ -20,6 +20,11 @@
     </div>
   </div>
   <div data-ng-if="isEdt">
+    <div class="text-right">
+      <button class="btn btn-xs btn-default" type="button" data-bind="click: $parent.deleteWell">
+        <i class="glyphicon glyphicon-remove"></i> {{capitalizeFirst lang.toDeleteWell}}
+      </button>
+    </div>
     <div data-bind="foreach: wellPropertyList">
       <div>
         <label data-bind="text: ttl"></label>
@@ -39,9 +44,6 @@
           <button class="btn btn-sm btn-default" data-bind="click: $parent.putWell">{{capitalizeFirst lang.toSave}}</button>
         </span>
       </div>
-    </div>
-    <div class="text-right">
-      <button class="btn btn-default" type="button" data-bind="click: $parent.deleteWell">{{capitalizeFirst lang.toDeleteWell}}</button>
     </div>
   </div>
 </div>

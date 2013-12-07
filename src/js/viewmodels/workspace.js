@@ -188,11 +188,11 @@
                                 tmpWell.isOpenItem(true);
                                 // todo: change logic - when change selected id - need to execute additional logic
                                 if (choosedObj.sectionId) {
-                                    tmpWell.selectedSectionId(choosedObj.sectionId);
+                                    tmpWell.selectedSectionByPatternId(choosedObj.sectionId);
                                 }
                                 else {
                                     // Null - show dashboard: load all widget layouts and data
-                                    tmpWell.selectedSectionId(null);
+                                    tmpWell.unselectSection();
                                 }
                                 // Apchive: previously - set summary as a default page
                                 ////else {

@@ -9,11 +9,12 @@ define([
     'moment',
     'models/well-partials/perfomance-partial',
     'models/well-partials/history-view',
+    'models/section-of-well',
     'models/well-file',
     'models/column-attribute',
     'models/well-history',
     'models/test-scope'
-], function ($, ko, datacontext, fileHelper, bootstrapModal, appHelper, appMoment, wellPerfomancePartial, HistoryView) {
+], function ($, ko, datacontext, fileHelper, bootstrapModal, appHelper, appMoment, wellPerfomancePartial, HistoryView, SectionOfWell) {
     'use strict';
 
     /** WellFiles (convert data objects into array) */
@@ -27,6 +28,11 @@ define([
 
     /** Test scope */
     function importTestScopeDtoList(data, wellItem) { return $.map(data || [], function (item) { return datacontext.createTestScope(item, wellItem); }); }
+
+    /** Import all sections of well */
+    function importSectionList(data, wellItem) {
+        return $.map(data || [], function (item) { return new SectionOfWell(item, wellItem); });
+    }
 
     /** Get well map list from well field maps with need well id */
     function getWellMapList(wellFieldMapList, wellId) {
@@ -144,15 +150,23 @@ define([
             owner: this
         });
 
+        /**
+        * List of data transfer objects of sections of well
+        * @type {Array.<module:models/section-of-well>}
+        */
+        this.ListOfSectionOfWellDto = ko.observableArray();
+
         var self = this;
 
+        /** Every section has files: filter files only for current section */
+        // TODO: Change to new realization
         self.sectionWellFiles = ko.computed({
             read: function () {
-                if (ko.unwrap(self.selectedSectionId)) {
-                    return $.grep(ko.unwrap(self.WellFiles), function (wellFile) {
-                        return ko.unwrap(wellFile.Purpose) === ko.unwrap(self.selectedSectionId);
-                    });
-                }
+                ////if (ko.unwrap(self.selectedSection)) {
+                ////    return $.grep(ko.unwrap(self.WellFiles), function (wellFile) {
+                ////        return ko.unwrap(wellFile.Purpose) === ko.unwrap(self.selectedSectionId);
+                ////    });
+                ////}
             },
             deferEvaluation: true
         });
@@ -195,7 +209,7 @@ define([
 
             // By default - no template - show widget page
             // Previous - by default - summary self.sectionList[0].id;
-            var previousSelectedSectionId;
+            var previousSelectedSection;
 
             var prevSlcWellRegion = ko.unwrap(self.getAppViewModel().selectedWellRegion);
 
@@ -208,7 +222,7 @@ define([
                         // previous selected well
                         var prevSlcWell = ko.unwrap(prevSlcWellGroup.selectedWell);
                         if (prevSlcWell) {
-                            previousSelectedSectionId = ko.unwrap(prevSlcWell.selectedSectionId);
+                            previousSelectedSection = ko.unwrap(prevSlcWell.selectedSection);
 
                             // If selected perfomance section
                             var tmpSelectedAttrGroupId = ko.unwrap(prevSlcWell.mainPerfomanceView.selectedAttrGroupId);
@@ -238,9 +252,16 @@ define([
             // set selected well field
             slcWellRegion.selectedWellField(slcWellField);
 
-            console.log(previousSelectedSectionId);
+            ////console.log(previousSelectedSectionId);
             // if null - then select Dashboard
-            self.selectedSectionId(previousSelectedSectionId || null);
+            //self.selectedSectionId(previousSelectedSectionId || null);
+
+            if (previousSelectedSection) {
+                self.selectSectionByPatternId(previousSelectedSection.SectionPatternId);
+            }
+            else {
+                self.unselectSection();
+            }
         };
 
         // ======================= file manager section ======================
@@ -253,21 +274,135 @@ define([
 
         // ========================= view section ===========================
         // section, which user select on the well view
-        self.selectedSectionId = ko.observable();
+        ////self.selectedSectionId = ko.observable();
+
+        /**
+        * Selected section
+        * @type {module:models/section-of-well}
+        */
+        self.selectedSection = ko.observable();
 
         ///<param>attrGroup - when select PD section need to point attrGroup</param>
-        self.selectSection = function (sectionId) {
-            window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
-                region: self.getWellGroup().getWellField().getWellRegion().Id,
-                field: self.getWellGroup().getWellField().Id,
-                group: self.getWellGroup().Id,
-                well: self.Id,
-                section: sectionId
-            });
+        self.selectSection = function (sectionToSelect) {
+            ////window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
+            ////    region: self.getWellGroup().getWellField().getWellRegion().Id,
+            ////    field: self.getWellGroup().getWellField().Id,
+            ////    group: self.getWellGroup().Id,
+            ////    well: self.Id,
+            ////    section: sectionToSelect
+            ////});
 
-            self.selectedSectionId(sectionId);
+            self.selectedSection(sectionToSelect);
+
+            switch (sectionToSelect.SectionPatternId) {
+                // Dashboard: from undefined to null
+                case 'well-history': {
+                    self.getWellHistoryList();
+                    break;
+                }
+                case 'well-perfomance': {
+                    self.getWellGroup().getWellGroupWfmParameterList();
+                    self.perfomancePartial.forecastEvolution.getDict();
+                    self.perfomancePartial.getHstProductionDataSet();
+                    break;
+                }
+                case 'well-nodalanalysis': {
+                    self.isLoadedNodal(false);
+
+                    self.getWellFileList(function () {
+                        var mainWellFile = null;
+                        if (self.WellFiles().length > 0) {
+                            mainWellFile = self.WellFiles()[0];
+                        }
+
+                        self.selectedWellFileNodal(mainWellFile);
+                        self.isLoadedNodal(true);
+                    }, 'nodalanalysis', 'work');
+
+                    break;
+                }
+                case 'well-integrity': {
+                    self.isLoadedIntegrity(false);
+
+                    self.getWellFileList(function () {
+                        var mainWellFile = null;
+                        if (self.WellFiles().length > 0) {
+                            mainWellFile = self.WellFiles()[0];
+                        }
+
+                        self.selectedWellFileIntegrity(mainWellFile);
+                        self.isLoadedIntegrity(true);
+                    }, 'integrity', 'work');
+
+                    break;
+                }
+                case 'well-log': {
+                    self.wellLogSelectedFile(null);
+
+                    self.getWellFileList(function () {
+                        if (self.logImageList().length > 0) { self.logImageList()[0].showLogImage(); }
+                    }, 'log', 'work');
+
+                    break;
+                }
+                case 'well-test': {
+                    self.getTestScopeList();
+                    self.getWellGroup().getWellGroupWfmParameterList();
+                    break;
+                }
+                case 'well-map': {
+                    // find wellfield_id 
+                    var wellFieldItem = self.getWellGroup().getWellField();
+
+                    wellFieldItem.getWellFieldMaps(function () {
+                        var arr = ko.unwrap(wellFieldItem.WellFieldMaps);
+                        // TODO:???
+                        ////arr = $.grep(arr, function (arrElem, arrIndex) {
+                        ////    var cnt = 0;
+                        ////    $.each(arrElem.WellInWellFieldMaps(), function(wwfIndex, wwfElem){
+                        ////        if (wwfElem.Id === self.Id) {
+                        ////            cnt++;
+                        ////        }
+                        ////    });
+
+                        ////    return cnt > 0;
+                        ////});
+
+                        if (arr.length > 0) {
+                            arr[0].showWellFieldMap();
+                        }
+                    });
+
+                    break;
+                    // no well in new map
+                    ////wellFieldParent.initMapFileUpload();
+                    // find wellfieldmap from wellfield where id = 
+                    // get all WellInWellFieldMap where wellid = self.wellId
+                    // get all maps
+                    // get only maps where well_id == self.Id
+                    // get all maps
+                    // in WellInWellFieldMaps
+                }
+            }
         };
 
+        /**
+        * Select section using their pattern id: wrap for function "selectSection"
+        * @param {string} sectionPatternId - Section pattern id, like well-summary etc.
+        */
+        self.selectSectionByPatternId = function (sectionPatternId) {
+            // Find section from list
+            var tmpSectionList = ko.unwrap(self.ListOfSectionOfWellDto);
+            var needSection = $.grep(tmpSectionList, function (arrElem) {
+                return arrElem.SectionPatternId === sectionPatternId;
+            })[0];
+
+            if (needSection) {
+                self.selectSection(needSection);
+            }
+        };
+
+        /** Unselect section: show dashboard with widgets */
         self.unselectSection = function () {
             window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
                 region: self.getWellGroup().getWellField().getWellRegion().Id,
@@ -276,7 +411,14 @@ define([
                 well: self.Id
             });
 
-            self.selectedSectionId(null);
+            self.selectedSection(null);
+
+            self.getWellWidgoutList();
+            // TODO: load data only if there is one or more perfomance widgets (only once) for entire well
+            self.getWellGroup().getWellGroupWfmParameterList();
+            self.perfomancePartial.forecastEvolution.getDict();
+            self.perfomancePartial.getHstProductionDataSet();
+            self.getWellHistoryList();
         };
 
         self.filteredWellFileList = ko.computed(function () {
@@ -1098,109 +1240,8 @@ define([
             }
         };
 
-        // ============================================================ Change tab section =========================================================
-        self.selectedSectionId.subscribe(function (sectionId) {
-            switch (sectionId) {
-                // Dashboard: from undefined to null
-                case null: {
-                    // Get all widgouts for well
-                    self.getWellWidgoutList();
-                    // TODO: load data only if there is one or more perfomance widgets (only once) for entire well
-                    self.getWellGroup().getWellGroupWfmParameterList();
-                    self.perfomancePartial.forecastEvolution.getDict();
-                    self.perfomancePartial.getHstProductionDataSet();
-                    self.getWellHistoryList();
-                    break;
-                }
-                case 'history': {
-                    self.getWellHistoryList();
-                    break;
-                }
-                case 'pd': {
-                    self.getWellGroup().getWellGroupWfmParameterList();
-                    self.perfomancePartial.forecastEvolution.getDict();
-                    self.perfomancePartial.getHstProductionDataSet();
-                    break;
-                }
-                case 'nodalanalysis': {
-                    self.isLoadedNodal(false);
-
-                    self.getWellFileList(function () {
-                        var mainWellFile = null;
-                        if (self.WellFiles().length > 0) {
-                            mainWellFile = self.WellFiles()[0];
-                        }
-
-                        self.selectedWellFileNodal(mainWellFile);
-                        self.isLoadedNodal(true);
-                    }, 'nodalanalysis', 'work');
-
-                    break;
-                }
-                case 'integrity': {
-                    self.isLoadedIntegrity(false);
-
-                    self.getWellFileList(function () {
-                        var mainWellFile = null;
-                        if (self.WellFiles().length > 0) {
-                            mainWellFile = self.WellFiles()[0];
-                        }
-
-                        self.selectedWellFileIntegrity(mainWellFile);
-                        self.isLoadedIntegrity(true);
-                    }, 'integrity', 'work');
-
-                    break;
-                }
-                case 'log': {
-                    self.wellLogSelectedFile(null);
-
-                    self.getWellFileList(function () {
-                        if (self.logImageList().length > 0) { self.logImageList()[0].showLogImage(); }
-                    }, 'log', 'work');
-
-                    break;
-                }
-                case 'test': {
-                    self.getTestScopeList();
-                    self.getWellGroup().getWellGroupWfmParameterList();
-                    break;
-                }
-                case 'map': {
-                    // find wellfield_id 
-                    var wellFieldItem = self.getWellGroup().getWellField();
-
-                    wellFieldItem.getWellFieldMaps(function () {
-                        var arr = ko.unwrap(wellFieldItem.WellFieldMaps);
-                        // TODO:???
-                        ////arr = $.grep(arr, function (arrElem, arrIndex) {
-                        ////    var cnt = 0;
-                        ////    $.each(arrElem.WellInWellFieldMaps(), function(wwfIndex, wwfElem){
-                        ////        if (wwfElem.Id === self.Id) {
-                        ////            cnt++;
-                        ////        }
-                        ////    });
-
-                        ////    return cnt > 0;
-                        ////});
-
-                        if (arr.length > 0) {
-                            arr[0].showWellFieldMap();
-                        }
-                    });
-
-                    break;
-                    // no well in new map
-                    ////wellFieldParent.initMapFileUpload();
-                    // find wellfieldmap from wellfield where id = 
-                    // get all WellInWellFieldMap where wellid = self.wellId
-                    // get all maps
-                    // get only maps where well_id == self.Id
-                    // get all maps
-                    // in WellInWellFieldMaps
-                }
-            }
-        });
+        /** Load well sections */
+        self.ListOfSectionOfWellDto(importSectionList(data.ListOfSectionOfWellDto, self));
 
         // ==================================================================== Well perfomance section end ========================================
 

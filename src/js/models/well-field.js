@@ -182,7 +182,6 @@ define(['jquery',
 
         self.selectItem = function () {
             self.isOpenItem(true);
-            ////self.selectedWellFieldMap(null);
 
             self.getWellRegion().clearSetSelectedWellRegion();
             self.getWellRegion().selectedWellField(self);
@@ -191,6 +190,15 @@ define(['jquery',
                 region: self.getWellRegion().Id,
                 field: self.Id
             });
+
+            // Select section by default (or selected section from prevous selected field)
+            var mapSection = $.grep(ko.unwrap(self.ListOfSectionOfWieldDto), function (arrElem) {
+                return (arrElem.SectionPatternId === 'wield-map');
+            })[0];
+
+            if (mapSection) {
+                self.selectSection(mapSection);
+            }
         };
 
         self.addWellGroup = function () {

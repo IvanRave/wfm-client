@@ -49,8 +49,8 @@
             read: function () {
                 var tmpWell = self.getWell();
                 var tmpSelectedWellFile = ko.unwrap(tmpWell.selectedWellFileNodal);
-                var tmpSelectedSectionId = ko.unwrap(tmpWell.selectedSectionId);
-                if (tmpSelectedWellFile && tmpSelectedSectionId) {
+                var tmpSelectedSection = ko.unwrap(tmpWell.selectedSection);
+                if (tmpSelectedWellFile && tmpSelectedSection) {
                     if (tmpSelectedWellFile === self) {
                         return true;
                     }
@@ -63,8 +63,8 @@
             read: function () {
                 var tmpWell = self.getWell();
                 var tmpSelectedWellFile = ko.unwrap(tmpWell.selectedWellFileIntegrity);
-                var tmpSelectedSectionId = ko.unwrap(tmpWell.selectedSectionId);
-                if (tmpSelectedWellFile && tmpSelectedSectionId) {
+                var tmpSelectedSection = ko.unwrap(tmpWell.selectedSection);
+                if (tmpSelectedWellFile && tmpSelectedSection) {
                     if (tmpSelectedWellFile === self) {
                         return true;
                     }

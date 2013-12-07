@@ -14,45 +14,31 @@
 
   <div class="wfm-tab-panel clearfix">
     <div class="pull-left">
-      <ul class="nav nav-pills" data-bind="template: {foreach: sectionList, as: 'section'}">
-        <!-- ko if: (section.id !== 'volume' && section.id !== 'sketch' && section.id !== 'pd') -->
-        <li data-bind="css: {'active': section.id === $parent.selectedSectionId() }">
-          <div data-bind="click: function() { $parent.selectSection(section.id); }">
-            <span data-bind="text: section.name"></span>
+      <ul class="nav nav-pills" data-bind="foreach: ListOfSectionOfWellDto">
+        <!-- ko if: (SectionPatternId !== 'well-perfomance') -->
+        <li data-bind="css: {'active': isSectionSelected }">
+          <div data-bind="click: $parent.selectSection">
+            <span data-bind="with: SectionPattern">
+              <span data-bind="text: Name"></span>
+            </span>
             <br />
-            <i class="wfmicon" data-bind="css: 'wfmicon-' + section.id"></i>
+            <i class="wfmicon" data-bind="css: 'wfmicon-summary'"></i>
           </div>
         </li>
         <!-- /ko -->
-        <!-- ko if: section.id === 'sketch' -->
-        <li class="dropup" data-bind="css: {'active': section.id === $parent.selectedSectionId() }">
-          <div class="dropdown-toggle" title="Sketch and volume" data-toggle="dropdown" data-bind="drpdwn: {}">
-            <span data-bind="text: section.name"></span>
+        <!-- ko if: (SectionPatternId === 'well-perfomance') -->
+        <li class="dropup" data-bind="css: {'active': isSectionSelected }">
+          <div class="dropdown-toggle" data-toggle="dropdown" data-bind="drpdwn:{}">
+            <span data-bind="with: SectionPattern">
+              <span data-bind="text: Name"></span>
+            </span>
             <br />
-            <i class="wfmicon" data-bind="css: 'wfmicon-'+section.id"></i>
-            <span class="caret"></span>
-          </div>
-          <ul class="dropdown-menu">
-            <li>
-              <div data-bind="click: function() { $parent.selectSection('sketch'); }">{{capitalizeFirst lang.sketch}}</div>
-            </li>
-            <li>
-              <div data-bind="click: function() { $parent.selectSection('volume'); }">{{capitalizeFirst lang.volume}}</div>
-            </li>
-          </ul>
-        </li>
-        <!-- /ko -->
-        <!-- ko if: section.id === 'pd' -->
-        <li class="dropup" data-bind="css: {'active': section.id === $parent.selectedSectionId() }">
-          <div class="dropdown-toggle" title="Decline curve analysis" data-toggle="dropdown" data-bind="drpdwn:{}">
-            <span data-bind="text: section.name"></span>
-            <br />
-            <i class="wfmicon" data-bind="css: 'wfmicon-' + section.id"></i>
+            <i class="wfmicon" data-bind="css: 'wfmicon-pd'"></i>
             <span class="caret"></span>
           </div>
           <ul class="dropdown-menu" data-bind="foreach: $root.wfmParamSquadList">
             <li>
-              <div data-bind="click: function() { $parents[1].selectSection(section.id); $parents[1].mainPerfomanceView.selectAttrGroupId($data.id); }">
+              <div data-bind="click: function() { $parents[1].selectSectionByPatternId('well-perfomance'); $parents[1].mainPerfomanceView.selectAttrGroupId($data.id); }">
                 <span data-bind="text: id"></span>
               </div>
             </li>
@@ -64,24 +50,46 @@
   </div>
 
   <div class="tab-content-pad">
-    {{> well-history}}
-    {{> well-integrity}}
-    {{> well-log}}
-    {{> well-map}}
-    {{> well-nodalanalysis}}
-    {{> well-pd}}
-    {{> well-report}}
-    {{> well-sketch}}
-    {{> well-summary}}
-    {{> well-test}}
-    {{> well-volume}}
-
-    {{> widget-perfomance}}
-    {{> widget-sketch}}
-    {{> widget-summary}}
-    {{> widget-history}}
-
-    {{> well-widget-scope}}
+    <div data-bind="if: selectedSection">
+      <div data-bind="if: selectedSection().SectionPatternId === 'well-history'">
+        {{> well-history}}
+      </div>
+      <div data-bind="if: selectedSection().SectionPatternId === 'well-integrity'">
+        {{> well-integrity}}
+      </div>
+      <div data-bind="if: selectedSection().SectionPatternId === 'well-log'">
+        {{> well-log}}
+      </div>
+      <div data-bind="if: selectedSection().SectionPatternId === 'well-map'">
+        {{> well-map}}
+      </div>
+      <div data-bind="if: selectedSection().SectionPatternId === 'well-nodalanalysis'">
+        {{> well-nodalanalysis}}
+      </div>
+      <div data-bind="if: selectedSection().SectionPatternId === 'well-perfomance'">
+        {{> well-pd}}
+      </div>
+      <div data-bind="if: selectedSection().SectionPatternId === 'well-report'">
+        {{> well-report}}
+      </div>
+      <div data-bind="if: selectedSection().SectionPatternId === 'well-sketch'">
+        {{> well-sketch}}
+      </div>
+      <div data-bind="if: selectedSection().SectionPatternId === 'well-summary'">
+        {{> well-summary}}
+      </div>
+      <div data-bind="if: selectedSection().SectionPatternId === 'well-test'">
+        {{> well-test}}
+      </div>
+      <div data-bind="if: selectedSection().SectionPatternId === 'well-volume'">
+        {{> well-volume}}
+      </div>
+    </div>
+    <div data-bind="ifnot: selectedSection">
+      <div data-bind="if: selectedSection() === null">
+        {{> well-widget-scope}}
+      </div>
+    </div>
   </div>
   {{> modal-file-manager}}
 </div>

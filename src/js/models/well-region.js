@@ -65,10 +65,6 @@ define(['jquery',
                     if (slcWellGroup()) {
                         var slcWell = slcWellGroup().selectedWell;
                         if (slcWell()) {
-                            var slcSectionId = slcWell().selectedSectionId;
-                            if (slcSectionId()) {
-                                slcSectionId(null);
-                            }
                             slcWell(null);
                         }
                         slcWellGroup(null);
