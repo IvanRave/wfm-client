@@ -143,14 +143,13 @@
         };
 
         self.deleteWellRegion = function (wellRegionForDelete) {
-            if (wellRegionForDelete.WellFields().length > 0) {
-                alert('Need to remove all well fields from this region.');
-                return;
-            }
-
             if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(wellRegionForDelete.Name) + '"?')) {
                 datacontext.deleteWellRegion(wellRegionForDelete).done(function () {
                     self.wellRegionList.remove(wellRegionForDelete);
+
+                    self.selectedWellRegion(null);
+
+                    window.location.hash = window.location.hash.split('?')[0];
                 });
             }
         };

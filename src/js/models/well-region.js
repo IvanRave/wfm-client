@@ -71,11 +71,12 @@ define(['jquery',
                 window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({ region: self.Id });
             };
 
-            self.deleteWellField = function () {
-                var wellFieldForDelete = this;
-                if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + wellFieldForDelete.Name() + '"?')) {
+            self.deleteWellField = function (wellFieldForDelete) {
+                if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(wellFieldForDelete.Name) + '"?')) {
                     datacontext.deleteWellField(wellFieldForDelete.Id).done(function () {
                         self.WellFields.remove(wellFieldForDelete);
+                        // Set parent as selected
+                        self.selectItem();
                     });
                 }
             };

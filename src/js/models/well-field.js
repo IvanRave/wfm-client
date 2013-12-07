@@ -138,6 +138,9 @@ define(['jquery',
             }
         };
 
+        /** 
+        * Options for file loader (files loaded to the map-section)
+        */
         self.mapFiloader = {
             callback: function (result) {
                 self.WellFieldMaps.push(new WellFieldMap(result[0], self));
@@ -145,13 +148,6 @@ define(['jquery',
             url: datacontext.getWieldMapsUrl(self.Id),
             fileFormats: ['image/jpeg', 'image/png']
         };
-
-        ////self.initMapFileUpload = function () {
-        ////    var mapFileInput = document.getElementById('map_file_upload');
-        ////    fileHelper.initFileUpload(mapFileInput, datacontext.getWieldMapsUrl(self.Id), ['image/jpeg', 'image/png'], function (result) {
-        ////        self.WellFieldMaps.push(new WellFieldMap(result[0], self));
-        ////    });
-        ////};
 
         self.isOpenItem = ko.observable(false);
 
@@ -203,11 +199,11 @@ define(['jquery',
             bootstrapModal.openModalWindow("Well group", innerDiv, submitFunction);
         };
 
-        self.deleteWellGroup = function () {
-            var wellGroupForDelete = this;
-            if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + wellGroupForDelete.Name() + '"?')) {
+        self.deleteWellGroup = function (wellGroupForDelete) {
+            if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(wellGroupForDelete.Name) + '"?')) {
                 datacontext.deleteWellGroup(wellGroupForDelete).done(function () {
                     self.WellGroups.remove(wellGroupForDelete);
+                    self.selectItem();
                 });
             }
         };

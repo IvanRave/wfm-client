@@ -167,11 +167,12 @@ define(['jquery',
                 bootstrapModal.openModalWindow('Well', innerDiv, submitFunction);
             };
 
-            self.deleteWell = function () {
-                var wellForDelete = this;
-                if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + wellForDelete.Name() + '"?')) {
+            self.deleteWell = function (wellForDelete) {
+                if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(wellForDelete.Name) + '"?')) {
                     datacontext.deleteWell(wellForDelete).done(function () {
                         self.Wells.remove(wellForDelete);
+
+                        self.selectItem();
                     });
                 }
             };
