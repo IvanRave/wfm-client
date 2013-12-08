@@ -5,9 +5,8 @@ define([
     'services/datacontext',
     'helpers/modal-helper',
     'helpers/app-helper',
-    'models/job-type',
     'models/user-profile',
-    'helpers/knockout-lazy'], function ($, ko, datacontext, bootstrapModal, appHelper, JobType, UserProfile) {
+    'helpers/knockout-lazy'], function ($, ko, datacontext, bootstrapModal, appHelper, UserProfile) {
     'use strict';
 
     var exports = function (companyId, choosedObj) {
@@ -76,29 +75,6 @@ define([
                 });
             });
         }, self);
-
-        self.jobTypeList = ko.lazyObservableArray(function () {
-            datacontext.getJobTypeList(companyId).done(function (r) {
-                function importJobTypeList(data) {
-                    return $.map(data || [], function (item) { return new JobType(item); });
-                }
-
-                self.jobTypeList(importJobTypeList(r));
-            });
-        }, self);
-
-        self.goToPostingJobType = function () {
-            var jobTypeNewName = window.prompt('{{capitalizeFirst lang.toAddJobTypeToList}}');
-            if (jobTypeNewName) {
-                datacontext.postCompanyJobType(companyId, {
-                    name: jobTypeNewName,
-                    description: '',
-                    companyId: companyId
-                }).done(function (jobTypeCreated) {
-                    self.jobTypeList.push(new JobType(jobTypeCreated));
-                });
-            }
-        };
 
         // Get all parameters from all groups as one dimensional array
         self.wfmParameterList = ko.computed({
