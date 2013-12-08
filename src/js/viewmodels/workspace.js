@@ -1,30 +1,27 @@
-﻿define([
+﻿/** @module */
+define([
     'jquery',
     'knockout',
     'services/datacontext',
     'helpers/modal-helper',
     'helpers/app-helper',
     'models/job-type',
-    'helpers/knockout-lazy',
-    'models/well-region'
-], function ($, ko, datacontext, bootstrapModal, appHelper, JobType) {
+    'models/user-profile',
+    'helpers/knockout-lazy'], function ($, ko, datacontext, bootstrapModal, appHelper, JobType, UserProfile) {
     'use strict';
 
-    function WorkspaceViewModel(companyId, choosedObj) {
+    var exports = function (companyId, choosedObj) {
         // Test company Id with Guid format (this checks retry server check in WorkSpace view of Home controller
         if (!appHelper.isGuidValid(companyId)) {
             var errValidMsg = 'Company id is not valid GUID';
             alert(errValidMsg);
             throw new TypeError(errValidMsg);
-        }
+        }        
 
         var self = this;
 
         // Left tree menu with well regions, groups, fields, wells
         self.isVisibleMenu = ko.observable(true);
-        self.wellRegionList = ko.observableArray();
-        self.selectedWellRegion = ko.observable();
-        self.isStructureLoaded = ko.observable(false);
 
         // Left tree menu with well regions, groups, fields, wells
         self.toggleIsVisibleMenu = function () {
@@ -70,7 +67,7 @@
         self.ListOfSectionPatternDto = ko.lazyObservableArray(function () {
             datacontext.getListOfSectionPattern().done(function (r) {
                 require(['models/section-pattern'], function (SectionPattern) {
-                    
+
                     function importListOfSectionPattern(data) {
                         return $.map(data || [], function (item) { return new SectionPattern(item); });
                     }
@@ -116,107 +113,78 @@
         });
         // =====================================Wfm parameters end==========================================================
 
-        self.addWellRegion = function () {
-            ////var self = this;
-
-            var inputName = document.createElement('input');
-            inputName.type = 'text';
-            $(inputName).prop({ 'required': true }).addClass('form-control');
-
-            var innerDiv = document.createElement('div');
-            $(innerDiv).addClass('form-horizontal').append(
-                bootstrapModal.gnrtDom('Name', inputName)
-            );
-
-            bootstrapModal.openModalWindow('Well region', innerDiv, function () {
-                var wellRegionItem = datacontext.createWellRegion({
-                    Name: $(inputName).val(),
-                    CompanyId: companyId
-                }, self);
-
-                datacontext.saveNewWellRegion(wellRegionItem).done(function (result) {
-                    self.wellRegionList.push(datacontext.createWellRegion(result, self));
-                });
-
-                bootstrapModal.closeModalWindow();
-            });
-        };
-
-        self.deleteWellRegion = function (wellRegionForDelete) {
-            if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(wellRegionForDelete.Name) + '"?')) {
-                datacontext.deleteWellRegion(wellRegionForDelete).done(function () {
-                    self.wellRegionList.remove(wellRegionForDelete);
-
-                    self.selectedWellRegion(null);
-
-                    window.location.hash = window.location.hash.split('?')[0];
-                });
-            }
-        };
-
         // TODO: back after repair getUserProfile();    
         // TODO: move selectItem() logic to parent objects:
         // well.selectWell() => wellGroup.selectWell()
 
+        console.log(choosedObj);
+
         // load list of well region, well field...
-        function loadStructure() {
-            function getSucceeded(data) {
-                var mappedStructure = $.map(data, function (list) {
-                    return new datacontext.createWellRegion(list, self);
-                });
+        ////function loadStructure() {
+        ////    function getSucceeded(data) {
+        ////        var mappedStructure = $.map(data, function (list) {
+        ////            return new WellRegion(list, self);
+        ////        });
 
-                self.wellRegionList(mappedStructure);
+        ////        self.wellRegionList(mappedStructure);
 
-                // route region/id/field/id/group/id/well/id
-                ////var choosedObj = getChoosedIdFromHash();
-                console.log(choosedObj);
-                var tmpRegion = appHelper.getElementByPropertyValue(self.wellRegionList(), 'Id', choosedObj.regionId);
-                if (tmpRegion) {
-                    self.selectedWellRegion(tmpRegion);
-                    tmpRegion.isOpenItem(true);
-                    var tmpField = appHelper.getElementByPropertyValue(self.selectedWellRegion().WellFields(), 'Id', choosedObj.fieldId);
-                    if (tmpField) {
-                        self.selectedWellRegion().selectedWellField(tmpField);
-                        tmpField.isOpenItem(true);
-                        var tmpGroup = appHelper.getElementByPropertyValue(self.selectedWellRegion().selectedWellField().WellGroups(), 'Id', choosedObj.groupId);
-                        if (tmpGroup) {
-                            self.selectedWellRegion().selectedWellField().selectedWellGroup(tmpGroup);
-                            tmpGroup.isOpenItem(true);
-                            var tmpWell = appHelper.getElementByPropertyValue(self.selectedWellRegion().selectedWellField().selectedWellGroup().Wells(), 'Id', choosedObj.wellId);
-                            if (tmpWell) {
-                                self.selectedWellRegion().selectedWellField().selectedWellGroup().selectedWell(tmpWell);
-                                tmpWell.isOpenItem(true);
-                                // todo: change logic - when change selected id - need to execute additional logic
-                                if (choosedObj.sectionId) {
-                                    tmpWell.selectedSectionByPatternId(choosedObj.sectionId);
-                                }
-                                else {
-                                    // Null - show dashboard: load all widget layouts and data
-                                    tmpWell.unselectSection();
-                                }
-                                // Apchive: previously - set summary as a default page
-                                ////else {
-                                ////    tmpWell.selectedSectionId(tmpWell.sectionList[0].id);
-                                ////}
+        ////        // route region/id/field/id/group/id/well/id
+        ////        ////var choosedObj = getChoosedIdFromHash();
+        ////        console.log(choosedObj);
+        ////        var tmpRegion = appHelper.getElementByPropertyValue(self.wellRegionList(), 'Id', choosedObj.regionId);
+        ////        if (tmpRegion) {
+        ////            self.selectedWellRegion(tmpRegion);
+        ////            tmpRegion.isOpenItem(true);
+        ////            var tmpField = appHelper.getElementByPropertyValue(self.selectedWellRegion().WellFields(), 'Id', choosedObj.fieldId);
+        ////            if (tmpField) {
+        ////                self.selectedWellRegion().selectedWellField(tmpField);
+        ////                tmpField.isOpenItem(true);
+        ////                var tmpGroup = appHelper.getElementByPropertyValue(self.selectedWellRegion().selectedWellField().WellGroups(), 'Id', choosedObj.groupId);
+        ////                if (tmpGroup) {
+        ////                    self.selectedWellRegion().selectedWellField().selectedWellGroup(tmpGroup);
+        ////                    tmpGroup.isOpenItem(true);
+        ////                    var tmpWell = appHelper.getElementByPropertyValue(self.selectedWellRegion().selectedWellField().selectedWellGroup().Wells(), 'Id', choosedObj.wellId);
+        ////                    if (tmpWell) {
+        ////                        self.selectedWellRegion().selectedWellField().selectedWellGroup().selectedWell(tmpWell);
+        ////                        tmpWell.isOpenItem(true);
+        ////                        // todo: change logic - when change selected id - need to execute additional logic
+        ////                        if (choosedObj.sectionId) {
+        ////                            tmpWell.selectedSectionByPatternId(choosedObj.sectionId);
+        ////                        }
+        ////                        else {
+        ////                            // Null - show dashboard: load all widget layouts and data
+        ////                            tmpWell.unselectSection();
+        ////                        }
+        ////                        // Apchive: previously - set summary as a default page
+        ////                        ////else {
+        ////                        ////    tmpWell.selectedSectionId(tmpWell.sectionList[0].id);
+        ////                        ////}
 
-                                // this set selected well
-                                ////console.log(self.selectedWellRegion().selectedWellField().selectedWellGroup().selectedWell());
-                            }
-                        }
-                    }
-                }
+        ////                        // this set selected well
+        ////                        ////console.log(self.selectedWellRegion().selectedWellField().selectedWellGroup().selectedWell());
+        ////                    }
+        ////                }
+        ////            }
+        ////        }
+        ////    }
 
-                self.isStructureLoaded(true);
-            }
+        ////    datacontext.getWellRegionList({
+        ////        company_id: companyId,
+        ////        is_inclusive: true
+        ////    }).done(getSucceeded);
+        ////}
 
-            datacontext.getWellRegionList({
-                company_id: companyId,
-                is_inclusive: true
-            }).done(getSucceeded);
-        }
+        //     loadStructure();
 
-        loadStructure();
-    }
+        /** 
+        * User profile
+        * @type {module:models/user-profile}
+        */
+        self.userProfile = new UserProfile(self);
 
-    return WorkspaceViewModel;
+        /** Load employees for user profile */
+        self.userProfile.loadEmployees(companyId);
+    };
+
+    return exports;
 });

@@ -13,7 +13,7 @@ define(['jquery',
             });
         }
 
-        function WellRegion(data, parentViewModel) {
+        var exports = function (data, company) {
             var self = this;
             data = data || {};
 
@@ -23,8 +23,12 @@ define(['jquery',
             self.Name = ko.observable(data.Name);
             self.WellFields = ko.observableArray();
 
+            self.getCompany = function () {
+                return company;
+            };
+
             self.getParentViewModel = function () {
-                return parentViewModel;
+                return self.getCompany().getRootViewModel();
             };
 
             self.isOpenItem = ko.observable(false);
@@ -37,7 +41,7 @@ define(['jquery',
             /** Is selected item */
             self.isSelectedItem = ko.computed({
                 read: function () {
-                    return (self === ko.unwrap(self.getParentViewModel().selectedWellRegion));
+                    return (self === ko.unwrap(self.getCompany().selectedWegion));
                 },
                 deferEvaluation: true
             });
@@ -58,7 +62,7 @@ define(['jquery',
 
             // well.selectedGroup.selectedField.selectedRegion.clear() instead every prop
             self.clearSetSelectedWellRegion = function () {
-                self.getParentViewModel().selectedWellRegion(null);
+                self.getCompany().selectedWegion(null);
                 var slcWellField = self.selectedWellField;
                 if (slcWellField()) {
                     var slcWellGroup = slcWellField().selectedWellGroup;
@@ -72,7 +76,7 @@ define(['jquery',
                     slcWellField(null);
                 }
 
-                self.getParentViewModel().selectedWellRegion(self);
+                self.getCompany().selectedWegion(self);
             };
 
             // select menu - open menu and show content
@@ -135,9 +139,9 @@ define(['jquery',
 
             // load well fields
             self.WellFields(importWellFieldsDto(data.WellFieldsDto, self));
-        }
+        };
 
-        WellRegion.prototype.addWellField = function () {
+        exports.prototype.addWellField = function () {
             var parentItem = this;
 
             var inputName = document.createElement('input');
@@ -164,7 +168,5 @@ define(['jquery',
             bootstrapModal.openModalWindow('Well field', innerDiv, submitFunction);
         };
 
-        datacontext.createWellRegion = function (data, parentViewModel) {
-            return new WellRegion(data, parentViewModel);
-        };
+        return exports;
     });

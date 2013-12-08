@@ -1,6 +1,6 @@
 ﻿<div class="wfm-list">
   <ul class="list-unstyled">
-    <!-- ko foreach: wellRegionList -->
+    <!-- ko foreach: wegions -->
     <li>
       <div class="clearfix">
         <i class="glyphicon" data-bind="css:{ 'glyphicon-circle-arrow-down' : isOpenItem, 'glyphicon-circle-arrow-right' : !isOpenItem() }, click: toggleItem"></i>
@@ -83,7 +83,7 @@
     </li>
     <!-- /ko -->
     <li data-ng-if="isEdt">
-      <button class="btn btn-xs" data-bind="click: addWellRegion" type="button">Add region</button>
+      <button class="btn btn-xs" data-bind="click: postWegion" type="button">Add region</button>
     </li>
   </ul>
 </div>

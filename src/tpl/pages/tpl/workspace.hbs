@@ -1,36 +1,42 @@
 ﻿<div id="workspace-project">
-  <div data-bind="ifnot: isStructureLoaded" class="text-center">
-    <span>{{lang.loading}}...</span>
-  </div>
-
-  <div style="display:none" data-bind="visible: isStructureLoaded">
-    <div class="clearfix">
-      <div class="sidebar-toggle" data-bind="css: $root.sidebarToggleCss" >
-        <button type="button" data-bind="click: toggleIsVisibleMenu" title="Hide/show menu">
-          <i class="glyphicon glyphicon-chevron-left" data-bind="visible: $root.isVisibleMenu"></i>
-          <i class="glyphicon glyphicon-chevron-right" data-bind="hidden: $root.isVisibleMenu"></i>
-        </button>
-      </div>
-      <div class="sidebar-wrap" data-bind="css: $root.sidebarWrapCss">
-        <div data-bind="scroller: { }">
-          {{> workspace-menu }}
+  <div data-bind="with: userProfile">
+    <div data-bind="with: selectedEmployee">
+      <div data-bind="with: company">
+        <div class="text-center" data-bind="ifnot: isLoadedWegions">
+          <span>{{lang.loading}}...</span>
         </div>
-      </div>
-      <div class="workspace-container" data-bind="css: $root.workAreaCss">
-        <div data-bind="with: selectedWellRegion">
-          <div data-bind="ifnot: selectedWellField">
-            {{> wegion }}
-          </div>
-          <div data-bind="with: selectedWellField">
-            <div data-bind="ifnot: selectedWellGroup">
-              {{> wield }}
+
+        <div style="display:none" data-bind="visible: isLoadedWegions">
+          <div class="clearfix">
+            <div class="sidebar-toggle" data-bind="css: $root.sidebarToggleCss" >
+              <button type="button" data-bind="click: $root.toggleIsVisibleMenu" title="Hide/show menu">
+                <i class="glyphicon glyphicon-chevron-left" data-bind="visible: $root.isVisibleMenu"></i>
+                <i class="glyphicon glyphicon-chevron-right" data-bind="hidden: $root.isVisibleMenu"></i>
+              </button>
             </div>
-            <div data-bind="with: selectedWellGroup">
-              <div data-bind="ifnot: selectedWell">
-                {{> wroup }}
+            <div class="sidebar-wrap" data-bind="css: $root.sidebarWrapCss">
+              <div data-bind="scroller: { }">
+                {{> workspace-menu }}
               </div>
-              <div data-bind="with: selectedWell">
-                {{> well }}
+            </div>
+            <div class="workspace-container" data-bind="css: $root.workAreaCss">
+              <div data-bind="with: selectedWegion">
+                <div data-bind="ifnot: selectedWellField">
+                  {{> wegion }}
+                </div>
+                <div data-bind="with: selectedWellField">
+                  <div data-bind="ifnot: selectedWellGroup">
+                    {{> wield }}
+                  </div>
+                  <div data-bind="with: selectedWellGroup">
+                    <div data-bind="ifnot: selectedWell">
+                      {{> wroup }}
+                    </div>
+                    <div data-bind="with: selectedWell">
+                      {{> well }}
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

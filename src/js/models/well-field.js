@@ -32,7 +32,7 @@ define(['jquery',
         * Well field
         * @constructor
         * @param {object} data - Field data
-        * @param {module:models/well-region} wellRegion - Region (parent)
+        * @param {module:models/wegion} wellRegion - Region (parent)
         */
         var exports = function (data, wellRegion) {
             data = data || {};

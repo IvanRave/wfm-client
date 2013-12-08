@@ -212,7 +212,7 @@ define([
             // Previous - by default - summary self.sectionList[0].id;
             var previousSelectedSection;
 
-            var prevSlcWellRegion = ko.unwrap(self.getAppViewModel().selectedWellRegion);
+            var prevSlcWellRegion = ko.unwrap(self.getWellGroup().getWellField().getWellRegion().getCompany().selectedWegion);
 
             // get previous selected section (if exists)
             if (prevSlcWellRegion) {
