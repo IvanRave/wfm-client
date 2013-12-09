@@ -1,3 +1,27 @@
+<a name="v0.8.0"></a>
+## v0.8.0 (2013-12-09)
+
+
+#### Bug Fixes
+
+* **fieldMap:**
+  * fix map upload button ([64403f51](https://github.com/IvanRave/wfm/commit/64403f519e30e722e4b27e00707f00c870417f1a))
+  * get name from file ([db28d79b](https://github.com/IvanRave/wfm/commit/db28d79bac486b6896c7dfc769a0f5b1cf44980e))
+* **fieldMaps:** fix for new file-section struct ([23f64028](https://github.com/IvanRave/wfm/commit/23f6402845d654623951c8c5f760a66000ac3f13))
+* **wfmStages:** clear selection when delete ([1b232d3b](https://github.com/IvanRave/wfm/commit/1b232d3b423de0df6d8e9185c0b962b074d7bb58))
+
+
+#### Features
+
+* **companyFile:** add file model, link with maps ([d69dbd55](https://github.com/IvanRave/wfm/commit/d69dbd553e76f9dd2bb0eac16e536e6214941d82))
+* **fieldSection:** add view with selection ([9ee5fc9f](https://github.com/IvanRave/wfm/commit/9ee5fc9f0e7d4b1b00bb3041ec8b6f0f1bf96c15))
+* **fieldSections:**
+  * add empty templates ([3910d403](https://github.com/IvanRave/wfm/commit/3910d4037466205aa4558a19f7fbc77be70db0db))
+  * add model and properties ([ed10c263](https://github.com/IvanRave/wfm/commit/ed10c263346a807614244eeaeb0cefc6bc4e77a0))
+* **menu:** highlight selected item of menu ([7357b2cc](https://github.com/IvanRave/wfm/commit/7357b2cc392fa3e58629b9204ac3b8ccee7c0712))
+* **sectionPattern:** add model, load to fields ([17ecbdcb](https://github.com/IvanRave/wfm/commit/17ecbdcb9df778dcd2d7b1524f15b41ee3ce7caa))
+* **well:** load sections from server ([e238c42a](https://github.com/IvanRave/wfm/commit/e238c42a362b7ca129bd090a4eb320b1948be6f8))
+
 <a name="v0.7.4"></a>
 ### v0.7.4 (2013-12-03)
 
