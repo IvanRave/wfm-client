@@ -90,29 +90,27 @@ contains words (with translation) for all WFM services
 
 ### Constants
 #### File purposes (array)
-```[
-        { id: 'summary', name: 'Summary', formatList: ['*'] }, // any file type (main well files)
-        { id: 'sketch', name: 'Sketch', formatList: ['image/jpeg', 'image/png'] },
-        { id: 'volume', name: 'Volume', formatList: ['image/jpeg', 'image/png'] },
-        { id: 'history', name: 'History', formatList: ['*'] }, // any file type
-        { id: 'map', name: 'Map', formatList: [] }, // file loading forbidden
-        { id: 'log', name: 'Log', formatList: [''] }, // las files has empty mime type
-        { id: 'pd', name: 'Perfomance', formatList: ['text/plain', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel'] },
-        { id: 'test', name: 'Test', formatList: [] }, // file loading forbidden
-        { id: 'integrity', name: 'Integrity', formatList: ['image/jpeg', 'image/png', 'application/pdf'] },
-        { id: 'nodalanalysis', name: 'Nodal analysis', formatList: ['image/jpeg', 'image/png'] },
-        { id: 'report', name: 'Report', formatList: ['application/pdf'] }
-]```
+    [{ id: 'summary', name: 'Summary', formatList: ['*'] }, // any file type (main well files)
+    { id: 'sketch', name: 'Sketch', formatList: ['image/jpeg', 'image/png'] },
+    { id: 'volume', name: 'Volume', formatList: ['image/jpeg', 'image/png'] },
+    { id: 'history', name: 'History', formatList: ['*'] }, // any file type
+    { id: 'map', name: 'Map', formatList: [] }, // file loading forbidden
+    { id: 'log', name: 'Log', formatList: [''] }, // las files has empty mime type
+    { id: 'pd', name: 'Perfomance', formatList: ['text/plain', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel'] },
+    { id: 'test', name: 'Test', formatList: [] }, // file loading forbidden
+    { id: 'integrity', name: 'Integrity', formatList: ['image/jpeg', 'image/png', 'application/pdf'] },
+    { id: 'nodalanalysis', name: 'Nodal analysis', formatList: ['image/jpeg', 'image/png'] },
+    { id: 'report', name: 'Report', formatList: ['application/pdf'] }]
 
 #### File statuses (array)
-```['work', 'archive']```
+    ['work', 'archive']
 
 #### Access levels for company user (JSON object)
-```{
+    {
     "CanManageAll":{"AccessCode":1,"Description":"Can manage"},
     "CanEditAll":{"AccessCode":2,"Description":"Can edit"},
     "CanViewAll":{"AccessCode":4,"Description":"Can view"}
-}```
+    }
 every user has a property "AccessLevel" (which equals SUM of AccessCode from the Enumerator above).
 For example: if user "Can view" and "Can edit" then AccessLevel = (4 + 2 = 6).
 To check "Whether the user has access to edit (or manage, or view..)?", you may use "bitwise AND":
@@ -123,12 +121,6 @@ To check "Whether the user has access to edit (or manage, or view..)?", you may 
 ### Guidelines
 * [Angular commit guidelines] (https://github.com/angular/angular.js/blob/master/CONTRIBUTING.md#commit-message-format)
 * [Javascript style guide] (http://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml)
-
-### AngularJs
-
-* for ngSrc and href - use ```{[{ my.value }]}``` - 
-standard double curly brackets ```{{value}}``` is used in Handlebars helpers in assemble.io library
-* for other elements use ```<span ng-bind="my.value"></span>```
 
 ### Localization
 
