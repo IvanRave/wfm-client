@@ -1,0 +1,51 @@
+﻿<div>
+  <div class="clearfix">
+    <div class="col-md-6 col-md-offset-1">
+      <h3>
+        {{capitalizeFirst lang.signIn}} {{lang.or}} <a href="#" data-bind="click: toggleIsRegistered">{{lang.toRegisterACompany}}</a>:
+      </h3>
+      <form class="form-horizontal" data-bind="submit: realLogOn">
+        <div class="form-group">
+          <label class="control-label col-sm-2">{{capitalizeFirst lang.email}}</label>
+          <div class="col-sm-6">
+            <input class="form-control" type="email" required="" autofocus="" data-bind="value: email"/>
+          </div>
+          <div class="col-sm-4 has-error">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="control-label col-sm-2">{{capitalizeFirst lang.password}}</label>
+          <div class="col-sm-6">
+            <input class="form-control" type="password" required="" pattern=".{6,18}" title="From 6 to 18 characters" data-bind="value: pwd" autocomplete="off" />
+          </div>
+          <div class="col-sm-4 has-error">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-sm-6 col-sm-offset-2">
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" data-bind="checked: rememberMe" /> {{lang.rememberMeInThisBrowser}}
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-sm-2 col-sm-offset-2">
+            <button class="btn btn-default" type="submit">{{capitalizeFirst lang.signIn}}</button>
+          </div>
+          <div class="col-sm-8 has-error">
+            <span class="help-block" data-bind="text: realLogOnError"></span>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="col-md-4">
+      <h3>{{capitalizeFirst lang.demo}} {{lang.signIn}}:</h3>
+      <div class="well text-center">
+        <p>{{capitalizeFirst lang.demoWfmCaution}}</p>
+        <button class="btn btn-default" data-bind="click: demoLogon">{{capitalizeFirst lang.demo}} {{lang.signIn}}</button>
+      </div>
+    </div>
+  </div>
+</div>

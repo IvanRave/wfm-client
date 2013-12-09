@@ -2,13 +2,13 @@
   <div class="clearfix">
     <div class="pull-left">
       <span class="bld" data-bind="text: Name"></span>
-      <span data-ng-if="isEdt">
+      <span data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
         <button class="btn btn-xs btn-default" data-bind="click: editWellField">
           <i class="glyphicon glyphicon-edit"></i>
         </button>
       </span>
     </div>
-    <div class="pull-right" data-ng-if="isEdt">
+    <div class="pull-right" data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
       <button class="btn btn-xs btn-default" data-bind="click: $parent.deleteWellField">
         <i class="glyphicon glyphicon-remove"></i> {{capitalizeFirst lang.toDelete}} {{lang.field}}
       </button>

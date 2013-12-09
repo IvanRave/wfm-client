@@ -1,5 +1,5 @@
 ﻿<div>
-  <div class="clearfix" data-ng-if="isEdt">
+  <div class="clearfix" data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
     <!-- ko with: testScopeNewStartUnixTime -->
     <div class="pull-left">
       {{capitalizeFirst lang.date}}:

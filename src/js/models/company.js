@@ -31,11 +31,23 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
             */
             this.id = data.Id;
 
-            this.name = data.Name;
+            /**
+            * Company name
+            * @type {string}
+            */
+            this.name = ko.observable(data.Name);
 
-            this.description = data.Description;
+            /**
+            * Company description
+            * @type {string}
+            */
+            this.description = ko.observable(data.Description);
 
-            this.logoUrl = data.LogoUrl;
+            /**
+            * Logo url
+            * @type {string}
+            */
+            this.logoUrl = ko.observable(data.LogoUrl || 'img/question.jpg');
 
             var me = this;
             /**
@@ -122,9 +134,6 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
                     me.isLoadedWegions(true);
                 });
             };
-
-            // TODO: move this event when click on company (select company)
-            me.loadWegions();
         };
 
         return exports;

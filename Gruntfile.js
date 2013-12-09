@@ -122,8 +122,7 @@ module.exports = function (grunt) {
                     flatten: true,
                     cwd: '<%= bowerFolder %>/',
                     dest: '<%= trgt %>/js/',
-                    src: ['jquery/jquery.js', 'moment/moment.js', 'angular/angular.js', 
-                        'angular-route/angular-route.js', 'bootstrap/dist/js/bootstrap.js',
+                    src: ['jquery/jquery.js', 'moment/moment.js', 'bootstrap/dist/js/bootstrap.js',
                         'requirejs/require.js', 'knockout/knockout.js', 
                         'console-shim/console-shim.js', 'es5-shim/es5-shim.js',
                         'pickadate/lib/picker.js', 'pickadate/lib/picker.date.js', 'pickadate/lib/picker.time.js',
@@ -232,21 +231,21 @@ module.exports = function (grunt) {
                     ////useSourceUrl: true,
                     //  wrap: true, // wrap in closure
                     // jQuery automatically excluded if it's loaded from CDN
-                    include: ['es5-shim', 'console-shim', 'jquery', 'jquery.bootstrap', 'angular', 'angular-route',
-                    'controllers/company', 'controllers/auth', 'controllers/register']
-                }
-            },
-            workspace: {
-                options: {
-                    baseUrl: '<%= trgt %>/js/',
-                    name: 'viewmodels/workspace-wrap',
-                    out: '<%= trgt %>/js/viewmodels/workspace-wrap-bundle-<%= pkg.version %>.js',
-                    mainConfigFile: '<%= trgt %>/js/require-config.js',
-                    optimize: 'uglify2',
-                    include: ['filters/bindings'],
-                    exclude: ['jquery', 'jquery.bootstrap']
+                    include: ['es5-shim', 'console-shim', 'jquery', 'jquery.bootstrap', 'jquery.panzoom', 'filters/bindings',
+                    'knockout', 'helpers/knockout-lazy', 'viewmodels/workspace', 'services/datacontext']
                 }
             }
+            // // ,workspace: {
+                // // options: {
+                    // // baseUrl: '<%= trgt %>/js/',
+                    // // name: 'viewmodels/workspace-wrap',
+                    // // out: '<%= trgt %>/js/viewmodels/workspace-wrap-bundle-<%= pkg.version %>.js',
+                    // // mainConfigFile: '<%= trgt %>/js/require-config.js',
+                    // // optimize: 'uglify2',
+                    // // include: ['filters/bindings'],
+                    // // exclude: ['jquery', 'jquery.bootstrap']
+                // // }
+            // // }
         },
         bump: {
           options: {
@@ -332,7 +331,7 @@ module.exports = function (grunt) {
     if (isProd) {
         // Bundle with r.js
         tasks.push('requirejs:main');
-        tasks.push('requirejs:workspace');
+        ////tasks.push('requirejs:workspace');
     }
 
     grunt.registerTask('default', tasks);

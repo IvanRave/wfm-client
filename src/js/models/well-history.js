@@ -25,6 +25,7 @@
 
             self.WfmImages = ko.observableArray();
             self.WellHistoryFiles = ko.observableArray(importWellHistoryFiles(data.WellHistoryFiles));
+
             // Load job type id
             // Extract from root.companyJobTypeList by id
             // Computed
@@ -32,7 +33,7 @@
                 read: function () {
                     var tmpJobTypeId = ko.unwrap(self.jobTypeId);
                     if (tmpJobTypeId) {
-                        var companyJobTypeList = ko.unwrap(self.getWell().getAppViewModel().jobTypeList);
+                        var companyJobTypeList = ko.unwrap(self.getWell().getWellGroup().getWellField().getWellRegion().getCompany().jobTypeList);
                         return appHelper.getElementByPropertyValue(companyJobTypeList, 'id', tmpJobTypeId);
                     }
                 },

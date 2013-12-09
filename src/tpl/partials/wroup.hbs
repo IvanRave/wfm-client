@@ -1,6 +1,6 @@
 ﻿<h4>
     <span data-bind="text: Name"></span>
-    <small data-ng-if="isEdt">
+    <small data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
         <button class="btn btn-xs btn-default" type="button" data-bind="click: editWellGroup">
             <i class="glyphicon glyphicon-edit"></i>
         </button>

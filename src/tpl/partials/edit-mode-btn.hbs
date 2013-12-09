@@ -1,0 +1,13 @@
+﻿<div style="position: fixed; right: 100px; top: 5px; z-index: 1031;">
+    <button class="btn btn-xs btn-inverse" data-bind="click: toggleEditMode">
+        <span data-bind="if: isEditMode">
+            <i class="glyphicon glyphicon-check"></i>
+        </span>
+        <span data-bind="ifnot: isEditMode">
+            <i class="glyphicon glyphicon-unchecked"></i>
+        </span>
+        <span>
+            Edit mode
+        </span>
+    </button>
+</div>

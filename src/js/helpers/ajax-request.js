@@ -70,17 +70,17 @@
                 // TODO: include notification system: https://github.com/Nijikokun/bootstrap-notify
                 switch (jqXHR.status) {
                     case 401:
-                        ////alert('Access is denied. Please login with right credentials.');
+                        ////alert('Access is denied. Please re-login with right credentials.');
                         
-                        var logonUrl = '{{syst.hashPref}}{{syst.logonUrl}}';
+                        ////var logonUrl = '{{syst.hashPref}}{{syst.logonUrl}}';
 
-                        var currentHash = window.location.hash;
-                        if (currentHash) {
-                            logonUrl += '?rurl=' + encodeURIComponent(currentHash.substring(1));
-                        }
-                        console.log('logurl', logonUrl);
+                        ////var currentHash = window.location.hash;
+                        ////if (currentHash) {
+                        ////    logonUrl += '?rurl=' + encodeURIComponent(currentHash.substring(1));
+                        ////}
+                        ////console.log('logurl', logonUrl);
 
-                        window.location.href = logonUrl;
+                        ////window.location.href = logonUrl;
                         break;
                         ////throw new Error('Access is denied');
                     case 404:

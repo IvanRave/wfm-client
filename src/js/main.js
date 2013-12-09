@@ -2,69 +2,42 @@
     'use strict';
 
     require(['console-shim', 'es5-shim'], function () {
-        require(['jquery', 'angular', 'controllers/company', 'controllers/auth', 'controllers/register',
-            'angular-route', 'jquery.bootstrap', 'jquery.panzoom'], function ($, angular) {
-                var PRJ_MODULE_NAME = 'ang-cabinet-project';
+        require(['jquery', 'knockout', 'viewmodels/workspace', 'filters/bindings', 'jquery.panzoom'], function ($, ko, WorkspaceViewModel) {
+            // Get company Id
+            ////'9cf09ba5-c049-4148-8e5f-869c1e26c330';
+            var workspaceViewModel = new WorkspaceViewModel();
+            ////angRouteParams.companyId, {
+            ////regionId: parseInt(angRouteParams['region']),
+            ////fieldId: parseInt(angRouteParams['field']),
+            ////groupId: parseInt(angRouteParams['group']),
+            ////wellId: parseInt(angRouteParams['well']),
+            ////sectionId: angRouteParams['section']
+            ////});
 
-                angular.module(PRJ_MODULE_NAME, ['ngRoute', 'ang-company-controllers', 'ang-auth-controllers', 'ang-register-controllers'])
-                .config(['$routeProvider', '$httpProvider', '$interpolateProvider', function (rpr, angHttpProvider, angInterpolateProvider) {
-                    rpr.when('{{syst.logonUrl}}', { controller: 'AccountLogonCtrl', templateUrl: '.{{syst.tplUrl}}{{syst.logonUrl}}{{syst.tplExt}}' })
-                        .when('{{syst.logoffUrl}}', { controller: 'AccountLogoffCtrl', templateUrl: '.{{syst.tplUrl}}{{syst.logoffUrl}}{{syst.tplExt}}' })
-                        .when('{{syst.registerUrl}}', { controller: 'AccountRegisterCtrl', templateUrl: '.{{syst.tplUrl}}{{syst.registerUrl}}{{syst.tplExt}}' })
-                        .when('{{syst.registerConfirmationUrl}}', { controller: 'AccountRegisterConfirmationCtrl', templateUrl: '.{{syst.tplUrl}}{{syst.registerConfirmationUrl}}{{syst.tplExt}}' })
-                        .when('{{syst.companyListUrl}}', { controller: 'CompanyUserCtrl', templateUrl: '.{{syst.tplUrl}}/cabinet/company-list.html' })
-                        .when('{{syst.companyListUrl}}/create', { controller: 'CompanyCreateCtrl', templateUrl: '.{{syst.tplUrl}}/cabinet/company-create.html' })
-                        .when('{{syst.companyListUrl}}/:companyId/manage-info', { controller: 'CompanyManageInfoCtrl', templateUrl: '.{{syst.tplUrl}}/cabinet/manage-info.html' })
-                        .when('{{syst.companyListUrl}}/:companyId/manage-users', { controller: 'CompanyManageUserCtrl', templateUrl: '.{{syst.tplUrl}}/cabinet/manage-user.html' })
-                        .when('{{syst.companyListUrl}}/:companyId', { controller: 'WorkspaceCtrl', templateUrl: '.{{syst.tplUrl}}/workspace.html', reloadOnSearch: false })
-                        .when('{{syst.companyListUrl}}/:companyId/manage', { controller: 'WorkspaceManageCtrl', templateUrl: '.{{syst.tplUrl}}/workspace.html', reloadOnSearch: false })
-                        .otherwise({ redirectTo: '{{syst.companyListUrl}}' });
-
-                    // Turn in CORS cookie support
-                    angHttpProvider.defaults.withCredentials = true;
-
-                    // Change standard curly braces tempate engine to {[{value}]}
-                    angInterpolateProvider.startSymbol('{[{').endSymbol('}]}');
-                }])
-                .run(['$rootScope', function (angRootScope) {
-                    angRootScope.isLogged = true;
-                }]);
-
-                // Configuration blocks - get executed during the provider registrations and configuration phase. 
-                // Only providers and constants can be injected into configuration blocks. 
-                // This is to prevent accidental instantiation of services before they have been fully configured.
-
-                // Run blocks - get executed after the injector is created and are used to kickstart the application. 
-                // Only instances and constants can be injected into run blocks. 
-                // This is to prevent further system configuration during application run time.
-
-                // Using jQuery dom ready because it will run this even if DOM load already happened
-                $(function () {
-                    var wfmProject = document.getElementById('wfm-project');
-                    angular.bootstrap(wfmProject, [PRJ_MODULE_NAME]);
-                    $(wfmProject).removeClass('hide');
-
-                    // ======================================= pan zoom =======================
-                    var $panzoom = $('.panzoom').panzoom({
-                        $zoomIn: $('.panzoom-in'),
-                        $zoomOut: $('.panzoom-out'),
-                        $reset: $('.panzoom-reset'),
-                        increment: 0.3,
-                        minScale: 0.0001,
-                        maxScale: 10000,
-                    });
-
-                    $panzoom.parent().on('mousewheel.focal', function (e) {
-                        e.preventDefault();
-                        var delta = e.delta || e.originalEvent.wheelDelta;
-                        var zoomOut = delta ? delta < 0 : e.originalEvent.deltaY > 0;
-                        $panzoom.panzoom('zoom', zoomOut, {
-                            increment: 0.1,
-                            focal: e
-                        });
-                    });
-                    // ======================================= pan zoom end =======================
+            $(function () {
+                // ======================================= pan zoom =======================
+                var $panzoom = $('.panzoom').panzoom({
+                    $zoomIn: $('.panzoom-in'),
+                    $zoomOut: $('.panzoom-out'),
+                    $reset: $('.panzoom-reset'),
+                    increment: 0.3,
+                    minScale: 0.0001,
+                    maxScale: 10000,
                 });
+
+                $panzoom.parent().on('mousewheel.focal', function (e) {
+                    e.preventDefault();
+                    var delta = e.delta || e.originalEvent.wheelDelta;
+                    var zoomOut = delta ? delta < 0 : e.originalEvent.deltaY > 0;
+                    $panzoom.panzoom('zoom', zoomOut, {
+                        increment: 0.1,
+                        focal: e
+                    });
+                });
+                // ======================================= pan zoom end =======================
+
+                ko.applyBindings(workspaceViewModel, document.getElementById('workspace-project'));
             });
+        });
     });
 });

@@ -1,0 +1,24 @@
+﻿<div class="min-margin">
+  <ul class="list-group" data-bind="foreach: employees">
+    <li class="list-group-item">
+      <div class="clearfix" data-bind="if: canViewAll">
+        <div class="pull-left">
+          <span class="pointer" data-bind="click: $parent.selectEmployee">
+            <img src="#" style="border:1px solid #ccc; width:100px" data-bind="attr: {src: company.logoUrl }" title="{{capitalizeFirst lang.toView}} {{lang.wfm}}" />
+          </span>
+        </div>
+        <div class="pull-left min-left-margin">
+          <h4>
+            <span data-bind="text: company.name"></span>
+          </h4>
+          <h5>
+            <span data-bind="text: company.description"></span>
+          </h5>
+        </div>
+      </div>
+    </li>
+  </ul>
+  <div data-bind="ifnot: isOwnerAlready">
+    <button class="btn btn-default">{{capitalizeFirst lang.toRegisterACompany}}</button>
+  </div>
+</div>

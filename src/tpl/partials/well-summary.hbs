@@ -1,5 +1,5 @@
 ﻿<div>
-  <div data-ng-if="!isEdt">
+  <div data-bind="ifnot: $root.userProfile.selectedEmployee().isEditMode">
     <div data-bind="foreach: wellPropertyList">
       <div data-bind="if: $parent[id]">
         <div>
@@ -19,7 +19,7 @@
       </div>
     </div>
   </div>
-  <div data-ng-if="isEdt">
+  <div data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
     <div class="text-right">
       <button class="btn btn-xs btn-default" type="button" data-bind="click: $parent.deleteWell">
         <i class="glyphicon glyphicon-remove"></i> {{capitalizeFirst lang.toDeleteWell}}

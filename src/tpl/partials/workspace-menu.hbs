@@ -64,25 +64,25 @@
                   </div>
                 </li>
                 <!-- /ko -->
-                <li data-ng-if="isEdt">
+                <li data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
                   <button class="btn btn-xs" data-bind="click: addWell" type="button">Add well</button>
                 </li>
               </ul>
             </li>
             <!-- /ko -->
-            <li data-ng-if="isEdt">
+            <li data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
               <button class="btn btn-xs" data-bind="click: addWellGroup" type="button">Add group</button>
             </li>
           </ul>
         </li>
         <!-- /ko -->
-        <li data-ng-if="isEdt">
+        <li data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
           <button class="btn btn-xs" data-bind="click: addWellField" type="button">Add field</button>
         </li>
       </ul>
     </li>
     <!-- /ko -->
-    <li data-ng-if="isEdt">
+    <li data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
       <button class="btn btn-xs" data-bind="click: postWegion" type="button">Add region</button>
     </li>
   </ul>

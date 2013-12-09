@@ -7,6 +7,9 @@
     function accountLogonUrl(uqp) {
         return '{{conf.requrl}}/api/account/logon/' + (uqp ? ('?' + $.param(uqp)) : '');
     }
+    function accountInfoUrl() {
+        return '{{conf.requrl}}/api/account/info';
+    }
 
     // Account logoff
     datacontext.accountLogoff = function (uqp) {
@@ -16,5 +19,10 @@
     // Account logon
     datacontext.accountLogon = function (uqp, data) {
         return ajaxRequest('POST', accountLogonUrl(uqp), data);
+    };
+
+    /** Get account info */
+    datacontext.getAccountInfo = function () {
+        return ajaxRequest('GET', accountInfoUrl());
     };
 });

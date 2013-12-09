@@ -26,8 +26,6 @@
     "jquery.panzoom": "~1.8.5",
     "jcrop": "~0.9.12",
     "blueimp-file-upload": "~9.5.0",
-    "angular": "~1.2.4",
-    "angular-route": "~1.2.4",
     "bootstrap": "~3.0.3"
   }
 }
