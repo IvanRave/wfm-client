@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: models/section-of-wield.js</title>
+    <title>JSDoc: Source: models/employee.js</title>
     
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Source: models/section-of-wield.js</h1>
+    <h1 class="page-title">Source: models/employee.js</h1>
     
     
 
@@ -26,76 +26,73 @@
     <section>
         <article>
             <pre class="prettyprint source"><code>﻿/** @module */
-define(['jquery', 'knockout'], function ($, ko) {
+define(['knockout','models/company'], function (ko, Company) {
     'use strict';
 
     /**
-    * Section of well field
-    * @param {object} data - section data
-    * @param {module:models/well-field} wield - well field (parent)
+    * Employee (user in company)
     * @constructor
+    * @param {object} data - Employee data
     */
-    var exports = function (data, wield) {
+    var exports = function (data, vm) {
         data = data || {};
 
-        /** Get parent (well field) */
-        this.getWield = function () {
-            return wield;
-        };
-
         /**
-        * Section guid
+        * Company guid
         * @type {string}
         */
-        this.Id = data.Id;
+        this.companyId = data.CompanyId;
 
         /**
-        * Whether the section is visible
-        * @type {boolean}
+        * Company
+        * @type {module:models/company}
         */
-        this.IsVisible = ko.observable(data.IsVisible);
+        this.company = new Company(data.CompanyDto, vm);
 
         /**
-        * Id of section pattern: contains info like section Name and other
+        * User guid
         * @type {string}
         */
-        this.SectionPatternId = data.SectionPatternId;
-
-
-        this.SectionPattern = ko.computed({
-            read: function () {
-                var tmpListOfSectionPattern = ko.unwrap(this.getWield().getWellRegion().getParentViewModel().ListOfSectionPatternDto);
-                var tmpSectionPatternId = this.SectionPatternId;
-                var byId = $.grep(tmpListOfSectionPattern, function (arrElem) {
-                    return arrElem.Id === tmpSectionPatternId;
-                });
-
-                if (byId.length === 1) {
-                    return byId[0];
-                }
-            },
-            deferEvaluation: true,
-            owner: this
-        });
-
+        this.userProfileId = data.UserProfileId;
 
         /**
-        * Id of well field
+        * Access level for user in this company
         * @type {number}
         */
-        this.WieldId = data.WieldId;
+        this.accessLevel = data.AccessLevel;
 
         /**
-        * Whether section is selected
+        * Can this user view all
         * @type {boolean}
         */
-        this.isSectionSelected = ko.computed({
-            read: function () {
-                return (ko.unwrap(this.getWield().selectedSection) === this);
-            },
-            deferEvaluation: true,
-            owner: this
-        });
+        this.canViewAll = (this.accessLevel & 4) === 4;
+
+        /**
+        * Can this user edit all: workspace, etc.
+        * @type {boolean}
+        */
+        this.canEditAll = (this.accessLevel & 2) === 2;
+
+        /**
+        * Can this user manage all: users, system settings for company, etc.
+        * @type {boolean}
+        */
+        this.canManageAll = (this.accessLevel & 1) === 1;
+
+        var me = this;
+
+        /**
+        * Whether edit mode is turn on
+        * @type {boolean}
+        */
+        me.isEditMode = ko.observable(false);
+
+        /** Toggle edit mode: only if user can edit all */
+        me.toggleEditMode = function () {
+            if (me.canEditAll) {
+                me.isEditMode(!ko.unwrap(me.isEditMode));
+            }
+        };
     };
 
     return exports;
