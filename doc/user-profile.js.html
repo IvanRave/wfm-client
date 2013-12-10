@@ -26,7 +26,7 @@
     <section>
         <article>
             <pre class="prettyprint source"><code>﻿/** @module */
-define(['jquery', 'knockout', 'models/employee', 'services/datacontext', 'services/auth'], function ($, ko, Employee, appDatacontext) {
+define(['jquery', 'knockout', 'models/employee', 'services/datacontext', 'helpers/history-helper', 'services/auth'], function ($, ko, Employee, appDatacontext, historyHelper) {
     'use strict';
 
     /** Import employees for this user */
@@ -41,8 +41,8 @@ define(['jquery', 'knockout', 'models/employee', 'services/datacontext', 'servic
     * @constructor
     */
     var exports = function (vm) {
-
-        var me = this;
+        /** Alternative for this */
+        var ths = this;
 
         /**
         * User email (name)
@@ -76,7 +76,7 @@ define(['jquery', 'knockout', 'models/employee', 'services/datacontext', 'servic
 
         /** Toggle registered state: login or registered page */
         this.toggleIsRegistered = function () {
-            me.isRegistered(!ko.unwrap(me.isRegistered));
+            ths.isRegistered(!ko.unwrap(ths.isRegistered));
         };
 
         /** Demo logon */
@@ -88,9 +88,9 @@ define(['jquery', 'knockout', 'models/employee', 'services/datacontext', 'servic
                 'email': demoEmail,
                 'password': demoPwd
             }).done(function () {
-                me.email(demoEmail);
-                me.isLogged(true);
-                me.loadEmployees();
+                ths.email(demoEmail);
+                ths.isLogged(true);
+                ths.loadEmployees();
             });
         };
 
@@ -98,25 +98,25 @@ define(['jquery', 'knockout', 'models/employee', 'services/datacontext', 'servic
 
         /** Logon with user data */
         this.realLogOn = function () {
-            me.realLogOnError('');
-            var tmpEmail = ko.unwrap(me.email),
-                tmpPwd = ko.unwrap(me.pwd),
-                tmpRememberMe = ko.unwrap(me.rememberMe);
+            ths.realLogOnError('');
+            var tmpEmail = ko.unwrap(ths.email),
+                tmpPwd = ko.unwrap(ths.pwd),
+                tmpRememberMe = ko.unwrap(ths.rememberMe);
 
             appDatacontext.accountLogon({}, {
                 'email': tmpEmail,
                 'password': tmpPwd,
                 'rememberMe': tmpRememberMe
             }).done(function () {
-                me.isLogged(true);
-                me.loadEmployees();
+                ths.isLogged(true);
+                ths.loadEmployees();
             }).fail(function (jqXHR) {
                 if (jqXHR.status === 422) {
                     var resJson = jqXHR.responseJSON;
                     var tmpProcessError = '*';
                     require(['helpers/lang-helper'], function (langHelper) {
                         tmpProcessError += (langHelper.translate(resJson.errId) || '{{lang.unknownError}}');
-                        me.realLogOnError(tmpProcessError);
+                        ths.realLogOnError(tmpProcessError);
                     });
                 }
             });
@@ -124,8 +124,8 @@ define(['jquery', 'knockout', 'models/employee', 'services/datacontext', 'servic
 
         /** Log out from app: clean objects, set isLogged to false */
         this.logOff = function () {
-            appDatacontext.accountLogoff().done(function () { 
-                me.isLogged(false);
+            appDatacontext.accountLogoff().done(function () {
+                ths.isLogged(false);
             });
         };
 
@@ -135,16 +135,21 @@ define(['jquery', 'knockout', 'models/employee', 'services/datacontext', 'servic
         */
         this.isLoadedAccountInfo = ko.observable(false);
 
-        /** Get account info: Email, Roles, IsLogged */
-        this.loadAccountInfo = function () {
-            me.isLoadedAccountInfo(false);
-            me.isLogged(false);
+        /**
+        * Get account info: Email, Roles, IsLogged
+        * @param {object} [initialData] - WFM default values from url, like companyId, wellId etc.
+        */
+        this.loadAccountInfo = function (initialData) {
+            initialData = initialData || {};
+
+            ths.isLoadedAccountInfo(false);
+            ths.isLogged(false);
             appDatacontext.getAccountInfo().done(function (r) {
-                me.email(r.Email);
-                me.isLogged(true);
-                me.loadEmployees();
+                ths.email(r.Email);
+                ths.isLogged(true);
+                ths.loadEmployees(initialData);
             }).always(function () {
-                me.isLoadedAccountInfo(true);
+                ths.isLoadedAccountInfo(true);
             });
         };
 
@@ -160,34 +165,57 @@ define(['jquery', 'knockout', 'models/employee', 'services/datacontext', 'servic
         */
         this.selectedEmployee = ko.observable();
 
-        /** Select employee */
-        me.selectEmployee = function (employeeToSelect) {
-            me.selectedEmployee(employeeToSelect);
+        /**
+        * Select employee
+        * @param {module:models/employee} employeeToSelect - Employee to select
+        * @param {object} [initialData] - Initial data
+        */
+        this.selectEmployee = function (employeeToSelect, initialData) {
+            initialData = initialData || {};
+
+            // Unselect child
+            employeeToSelect.company.selectedWegion(null);
+
+            // Select self
+            ths.selectedEmployee(employeeToSelect);
+
+            // Select parents (no need)
+
             // Load all regions for company of selected employee
-            ko.unwrap(me.selectedEmployee).company.loadWegions();
+            ko.unwrap(ths.selectedEmployee).company.loadWegions(initialData);
+
+            if (!initialData.isHistory) {
+                historyHelper.pushState('/companies/' + employeeToSelect.companyId);
+            }
         };
 
         /**
         * Whether employees are loaded 
         * @type {boolean}
         */
-        me.isLoadedEmployees = ko.observable(false);
+        this.isLoadedEmployees = ko.observable(false);
 
         /**
         * Load employee list for this user
-        * @param {string} [companyIdForSelect] - Company id for select
+        * @param {string} [initialData] - Default values to select, like company id, well id etc.
         */
-        me.loadEmployees = function (companyIdForSelect) {
-            me.isLoadedEmployees(false);
-            me.selectedEmployee(null);
+        this.loadEmployees = function (initialData) {
+            initialData = initialData || {};
+
+            ths.isLoadedEmployees(false);
+            ths.selectedEmployee(null);
             appDatacontext.getCompanyUserList().done(function (response) {
+                if (!initialData.isHistory) {
+                    historyHelper.pushState('/companies');
+                }
                 var emplArray = importEmployees(response, vm);
-                me.employees(emplArray);
-                me.isLoadedEmployees(true);
-                if (companyIdForSelect) {
+                ths.employees(emplArray);
+                ths.isLoadedEmployees(true);
+
+                if (initialData.companyId) {
                     emplArray.forEach(function (arrElem) {
-                        if (arrElem.companyId === companyIdForSelect) {
-                            me.selectedEmployee(arrElem);
+                        if (arrElem.companyId === initialData.companyId) {
+                            ths.selectEmployee(arrElem, initialData);
                         }
                     });
                 }
@@ -198,11 +226,11 @@ define(['jquery', 'knockout', 'models/employee', 'services/datacontext', 'servic
         * Whether user is owner already: block link "register company"
         * @type {boolean}
         */
-        me.isOwnerAlready = ko.computed({
+        ths.isOwnerAlready = ko.computed({
             read: function () {
                 var result = false;
 
-                var tmpEmployees = ko.unwrap(me.employees);
+                var tmpEmployees = ko.unwrap(ths.employees);
 
                 tmpEmployees.forEach(function (arrElem) {
                     if (ko.unwrap(arrElem.canManageAll)) {
@@ -227,13 +255,13 @@ define(['jquery', 'knockout', 'models/employee', 'services/datacontext', 'servic
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="section-of-well.html">models/section-of-well</a></li><li><a href="section-of-wield.html">models/section-of-wield</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-field.html">models/well-field</a></li><li><a href="well-field-map.html">models/well-field-map</a></li><li><a href="well-file.html">models/well-file</a></li><li><a href="well-group.html">models/well-group</a></li><li><a href="well-group-wfm-parameter.html">models/well-group-wfm-parameter</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="workspace.html">viewmodels/workspace</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="section-of-well.html">models/section-of-well</a></li><li><a href="section-of-wield.html">models/section-of-wield</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-field-map.html">models/well-field-map</a></li><li><a href="well-file.html">models/well-file</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="wield.html">models/wield</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="workspace.html">viewmodels/workspace</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0</a> on Mon Dec 09 2013 12:00:53 GMT+0200 (EET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0</a> on Tue Dec 10 2013 15:24:48 GMT+0200 (EET)
 </footer>
 
 <script> prettyPrint(); </script>
