@@ -88,6 +88,16 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
             */
             me.selectedWegion = ko.observable();
 
+            /**
+            * Select well region
+            * @param {module:models/wegion} wegionToSelect - Well region to select
+            */
+            me.selectWegion = function (wegionToSelect) {
+                wegionToSelect.isOpenItem(true);
+                // Clean children for previous object
+                wegionToSelect.clearSetSelectedWellRegion();
+            };
+
             /** Delete well region */
             me.deleteWegion = function (wellRegionForDelete) {
                 if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(wellRegionForDelete.Name) + '"?')) {
@@ -96,7 +106,7 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
 
                         me.selectedWegion(null);
 
-                        window.location.hash = window.location.hash.split('?')[0];
+                        ////window.location.hash = window.location.hash.split('?')[0];
                     });
                 }
             };
@@ -124,14 +134,23 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
                 });
             };
 
-            /** Load wegions of this company */
-            me.loadWegions = function () {
+            /** 
+            * Load wegions of this company
+            * @param {object} [initialData] - Initial data
+            */
+            me.loadWegions = function (initialData) {
+                initialData = initialData || {};
+
                 appDatacontext.getWellRegionList({
                     company_id: me.id,
                     is_inclusive: true
                 }).done(function (response) {
                     me.wegions(importWegions(response, me));
                     me.isLoadedWegions(true);
+                    if ($.isNumeric(initialData.wegionId)) {
+
+                        // select Wegion
+                    }
                 });
             };
         };

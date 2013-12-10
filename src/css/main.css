@@ -69,6 +69,20 @@ footer {
     margin-bottom: 0 !important;
 }
 
+    .nav > li > span {
+        position: relative;
+        display: block;
+        padding: 10px 15px;
+        cursor: pointer;
+        color: #1F98C7;
+    }
+
+        .nav > li > span:hover,
+        .nav > li > span:focus {
+            text-decoration: none;
+            background-color: #eeeeee;
+        }
+
 
 .wfm-list ul {
     /*padding-top: 4px;*/
@@ -183,6 +197,26 @@ footer {
 .pointer {
     cursor: pointer;
 }
+
+.link-view {
+    border-bottom: 1px dashed #1F98C7;
+    color: #1F98C7;
+    cursor: pointer;
+}
+
+    .link-view:hover {
+        border-bottom: 1px dashed #78C1DD;
+        color: #78C1DD;
+    }
+
+.link-view-inverse {
+    color: #efefef;
+    cursor: pointer;
+}
+
+    .link-view-inverse:hover {
+        color: #fff;
+    }
 
 .link-icon {
     cursor: pointer;

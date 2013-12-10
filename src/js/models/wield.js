@@ -6,7 +6,7 @@ define(['jquery',
     'helpers/modal-helper',
     'models/well-field-map',
     'models/section-of-wield',
-    'models/well-group'], function ($, ko, datacontext,
+    'models/wroup'], function ($, ko, datacontext,
         fileHelper, bootstrapModal, WellFieldMap, SectionOfWield, WellGroup) {
         'use strict';
 
@@ -36,6 +36,8 @@ define(['jquery',
         */
         var exports = function (data, wellRegion) {
             data = data || {};
+
+            var self = this;
 
             /** Get region (parent) */
             this.getWellRegion = function () {
@@ -68,12 +70,53 @@ define(['jquery',
 
             /**
             * List of groups
-            * @type {Array.<module:models/well-group>}
+            * @type {Array.<module:models/wroup>}
             */
             this.WellGroups = ko.observableArray();
 
             /** Selected group */
-            this.selectedWellGroup = ko.observable();
+            this.selectedWroup = ko.observable();
+
+            this.selectWroup = function (wroupToSelect) {
+                ////window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
+                ////    region: self.getWellField().getWellRegion().Id,
+                ////    field: self.getWellField().Id,
+                ////    group: self.Id
+                ////});
+
+                wroupToSelect.isOpenItem(true);
+                var parentWellRegion = self.getWellRegion();
+                parentWellRegion.clearSetSelectedWellRegion();
+                parentWellRegion.selectedWield(self);
+                parentWellRegion.selectedWield().selectedWroup(wroupToSelect);
+
+                // get last approved scopes of every well (one request)
+                // insert in every well
+                // get all test data for every with total
+
+                var wellIdList = wroupToSelect.Wells().map(function (el) {
+                    return el.Id;
+                });
+
+                if (wellIdList.length === 0) { return; }
+
+                wroupToSelect.getWellGroupWfmParameterList();
+
+                datacontext.getTestScope({ wellIdList: wellIdList }).done(function (result) {
+                    if (result.length > 0) {
+                        //for (var w = 0, wMax = self.Wells().length; w < wMax; w++) {
+                        $.each(wroupToSelect.Wells(), function (wellIndex, wellValue) {
+                            //for (var i = 0, iMax = objSet.length; i < iMax; i++) {
+                            $.each(result, function (objIndex, objValue) {
+                                if (wellValue.Id === objValue.WellId) {
+                                    wellValue.lastTestScope(datacontext.createTestScope(objValue, wellValue));
+                                    return false;
+                                }
+                            });
+                        });
+                    }
+                });
+            };
 
             /**
             * List of maps
@@ -82,15 +125,13 @@ define(['jquery',
             this.WellFieldMaps = ko.observableArray();
 
             /** Selected map */
-            this.selectedWellFieldMap = ko.observable();
+            this.selectedWieldMap = ko.observable();
 
             /**
             * Selected section
             * @type {module:models/section-of-wield}
             */
             this.selectedSection = ko.observable();
-
-            var self = this;
 
             /** Set this section as selected */
             self.selectSection = function (sectionToSelect) {
@@ -160,7 +201,7 @@ define(['jquery',
                 read: function () {
                     var tmpRegion = self.getWellRegion();
                     if (ko.unwrap(tmpRegion.isSelectedItem)) {
-                        if (self === ko.unwrap(tmpRegion.selectedWellField)) {
+                        if (self === ko.unwrap(tmpRegion.selectedWield)) {
                             return true;
                         }
                     }
@@ -172,34 +213,13 @@ define(['jquery',
             self.isShowedItem = ko.computed({
                 read: function () {
                     if (ko.unwrap(self.isSelectedItem)) {
-                        if (!ko.unwrap(self.selectedWellGroup)) {
+                        if (!ko.unwrap(self.selectedWroup)) {
                             return true;
                         }
                     }
                 },
                 deferEvaluation: true
             });
-
-            self.selectItem = function () {
-                self.isOpenItem(true);
-
-                self.getWellRegion().clearSetSelectedWellRegion();
-                self.getWellRegion().selectedWellField(self);
-
-                window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
-                    region: self.getWellRegion().Id,
-                    field: self.Id
-                });
-
-                // Select section by default (or selected section from prevous selected field)
-                var mapSection = $.grep(ko.unwrap(self.ListOfSectionOfWieldDto), function (arrElem) {
-                    return (arrElem.SectionPatternId === 'wield-map');
-                })[0];
-
-                if (mapSection) {
-                    self.selectSection(mapSection);
-                }
-            };
 
             self.addWellGroup = function () {
                 var inputName = document.createElement('input');
@@ -229,7 +249,8 @@ define(['jquery',
                 if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(wellGroupForDelete.Name) + '"?')) {
                     datacontext.deleteWellGroup(wellGroupForDelete).done(function () {
                         self.WellGroups.remove(wellGroupForDelete);
-                        self.selectItem();
+                        // Set parent as selected item
+                        self.getWellRegion().selectWield(self);
                     });
                 }
             };

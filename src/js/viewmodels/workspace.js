@@ -88,12 +88,6 @@ define([
             });
             // =====================================Wfm parameters end==========================================================
 
-            // TODO: back after repair getUserProfile();    
-            // TODO: move selectItem() logic to parent objects:
-            // well.selectWell() => wellGroup.selectWell()
-
-            ////console.log(choosedObj);
-
             // load list of well region, well field...
             ////function loadStructure() {
             ////    function getSucceeded(data) {
@@ -112,15 +106,15 @@ define([
             ////            tmpRegion.isOpenItem(true);
             ////            var tmpField = appHelper.getElementByPropertyValue(self.selectedWellRegion().WellFields(), 'Id', choosedObj.fieldId);
             ////            if (tmpField) {
-            ////                self.selectedWellRegion().selectedWellField(tmpField);
+            ////                self.selectedWellRegion().selectedWield(tmpField);
             ////                tmpField.isOpenItem(true);
-            ////                var tmpGroup = appHelper.getElementByPropertyValue(self.selectedWellRegion().selectedWellField().WellGroups(), 'Id', choosedObj.groupId);
+            ////                var tmpGroup = appHelper.getElementByPropertyValue(self.selectedWellRegion().selectedWield().WellGroups(), 'Id', choosedObj.groupId);
             ////                if (tmpGroup) {
-            ////                    self.selectedWellRegion().selectedWellField().selectedWellGroup(tmpGroup);
+            ////                    self.selectedWellRegion().selectedWield().selectedWroup(tmpGroup);
             ////                    tmpGroup.isOpenItem(true);
-            ////                    var tmpWell = appHelper.getElementByPropertyValue(self.selectedWellRegion().selectedWellField().selectedWellGroup().Wells(), 'Id', choosedObj.wellId);
+            ////                    var tmpWell = appHelper.getElementByPropertyValue(self.selectedWellRegion().selectedWield().selectedWroup().Wells(), 'Id', choosedObj.wellId);
             ////                    if (tmpWell) {
-            ////                        self.selectedWellRegion().selectedWellField().selectedWellGroup().selectedWell(tmpWell);
+            ////                        self.selectedWellRegion().selectedWield().selectedWroup().selectedWell(tmpWell);
             ////                        tmpWell.isOpenItem(true);
             ////                        // todo: change logic - when change selected id - need to execute additional logic
             ////                        if (choosedObj.sectionId) {
@@ -136,7 +130,7 @@ define([
             ////                        ////}
 
             ////                        // this set selected well
-            ////                        ////console.log(self.selectedWellRegion().selectedWellField().selectedWellGroup().selectedWell());
+            ////                        ////console.log(self.selectedWellRegion().selectedWield().selectedWroup().selectedWell());
             ////                    }
             ////                }
             ////            }
@@ -157,8 +151,29 @@ define([
             */
             self.userProfile = new UserProfile(self);
 
+            var initialData = {};
+            var initialHash = document.location.hash;
+            if (initialHash) {
+                initialHash = initialHash.substring(1);
+                var hashArr = initialHash.split('/');
+                if (hashArr[0] === 'companies') {
+                    if (hashArr[1]) {
+                        initialData.companyId = hashArr[1];
+                    }
+                }
+            }
+
             /** Auth user profile and load data if successful */
-            self.userProfile.loadAccountInfo();
+            self.userProfile.loadAccountInfo(initialData);
+
+            /** Back, forward, refresh browser navigation */
+            window.onpopstate = function (event) {
+                var popInitialData = event.state;
+                popInitialData.isHistory = true;
+                // Reload all data
+                self.userProfile.loadAccountInfo(popInitialData);
+                console.log('location: ' + document.location + ', state: ' + JSON.stringify(event.state));
+            };
         };
 
         return exports;

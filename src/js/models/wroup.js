@@ -4,7 +4,7 @@ define(['jquery',
     'services/datacontext',
     'helpers/modal-helper',
     'models/well',
-    'models/well-group-wfm-parameter'], function ($, ko, datacontext, bootstrapModal, Well, WellGroupWfmParameter) {
+    'models/wfm-parameter-of-wroup'], function ($, ko, datacontext, bootstrapModal, Well, WellGroupWfmParameter) {
         'use strict';
 
         // 18. WellGroupWfmParameter
@@ -17,14 +17,17 @@ define(['jquery',
         * Well group
         * @constructor
         * @param {object} data - Group data
-        * @param {module:models/well-field} wellField - Well field (parent)
+        * @param {module:models/wield} wellField - Well field (parent)
         */
         var exports = function (data, wellField) {
             data = data || {};
 
+            /** Alternative of this context: for closures etc. */
+            var self = this;
+
             /**
             * Get well field (parent)
-            * @returns {module:models/well-field}
+            * @returns {module:models/wield}
             */
             this.getWellField = function () {
                 return wellField;
@@ -61,8 +64,76 @@ define(['jquery',
             this.selectedWell = ko.observable();
 
             /**
+            * Select well (child)
+            * @param {module:models/well} wellToSelect - Well to select
+            */
+            this.selectWell = function (wellToSelect) {
+                ////window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
+                ////    region: self.getWellGroup().getWellField().getWellRegion().Id,
+                ////    field: self.getWellGroup().getWellField().Id,
+                ////    group: self.getWellGroup().Id,
+                ////    well: self.Id
+                ////});
+
+                // By default - no template - show widget page
+                // Previous - by default - summary self.sectionList[0].id;
+                var previousSelectedSection;
+
+                var prevSlcWellRegion = ko.unwrap(self.getWellField().getWellRegion().getCompany().selectedWegion);
+
+                // get previous selected section (if exists)
+                if (prevSlcWellRegion) {
+                    var prevSlcWellField = ko.unwrap(prevSlcWellRegion.selectedWield);
+                    if (prevSlcWellField) {
+                        var prevSlcWellGroup = ko.unwrap(prevSlcWellField.selectedWroup);
+                        if (prevSlcWellGroup) {
+                            // previous selected well
+                            var prevSlcWell = ko.unwrap(prevSlcWellGroup.selectedWell);
+                            if (prevSlcWell) {
+                                previousSelectedSection = ko.unwrap(prevSlcWell.selectedSection);
+
+                                // If selected perfomance section
+                                var tmpSelectedAttrGroupId = ko.unwrap(prevSlcWell.mainPerfomanceView.selectedAttrGroupId);
+                                if (tmpSelectedAttrGroupId) {
+                                    wellToSelect.mainPerfomanceView.selectedAttrGroupId(tmpSelectedAttrGroupId);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // set new selected data (plus region in the end)
+                var slcWellGroup = self;
+                var slcWellField = self.getWellField();
+                var slcWellRegion = slcWellField.getWellRegion();
+
+                slcWellRegion.clearSetSelectedWellRegion();
+
+                // set selected items in DESC order (can be redraw each time if ASC order)
+                // set selected well
+                slcWellGroup.selectedWell(wellToSelect);
+
+                // set selected well group
+                slcWellField.selectedWroup(slcWellGroup);
+
+                // set selected well field
+                slcWellRegion.selectedWield(slcWellField);
+
+                ////console.log(previousSelectedSectionId);
+                // if null - then select Dashboard
+                //self.selectedSectionId(previousSelectedSectionId || null);
+
+                if (previousSelectedSection) {
+                    wellToSelect.selectSectionByPatternId(previousSelectedSection.SectionPatternId);
+                }
+                else {
+                    wellToSelect.unselectSection();
+                }
+            };
+
+            /**
             * List of wfm parameters for this group
-            * @type {Array.<module:models/well-group-wfm-parameter>}
+            * @type {Array.<module:models/wfm-parameter-of-wroup>}
             */
             this.wellGroupWfmParameterList = ko.observableArray();
 
@@ -71,8 +142,6 @@ define(['jquery',
             * @type {boolean}
             */
             this.isLoadWellGroupWfmParameterList = ko.observable(false);
-
-            var self = this;
 
             self.getWellGroupWfmParameterList = function () {
                 if (ko.unwrap(self.isLoadWellGroupWfmParameterList) === false) {
@@ -207,8 +276,8 @@ define(['jquery',
                 if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(wellForDelete.Name) + '"?')) {
                     datacontext.deleteWell(wellForDelete).done(function () {
                         self.Wells.remove(wellForDelete);
-
-                        self.selectItem();
+                        // Select this wroup
+                        self.getWellField().selectWroup(self);
                     });
                 }
             };
@@ -243,7 +312,7 @@ define(['jquery',
                 read: function () {
                     var tmpField = self.getWellField();
                     if (ko.unwrap(tmpField.isSelectedItem)) {
-                        if (self === ko.unwrap(tmpField.selectedWellGroup)) {
+                        if (self === ko.unwrap(tmpField.selectedWroup)) {
                             return true;
                         }
                     }
@@ -262,47 +331,6 @@ define(['jquery',
                 },
                 deferEvaluation: true
             });
-
-            self.selectItem = function () {
-                window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
-                    region: self.getWellField().getWellRegion().Id,
-                    field: self.getWellField().Id,
-                    group: self.Id
-                });
-
-                self.isOpenItem(true);
-                var parentWellRegion = self.getWellField().getWellRegion();
-                parentWellRegion.clearSetSelectedWellRegion();
-                parentWellRegion.selectedWellField(self.getWellField());
-                parentWellRegion.selectedWellField().selectedWellGroup(self);
-
-                // get last approved scopes of every well (one request)
-                // insert in every well
-                // get all test data for every with total
-
-                var wellIdList = self.Wells().map(function (el) {
-                    return el.Id;
-                });
-
-                if (wellIdList.length === 0) { return; }
-
-                self.getWellGroupWfmParameterList();
-
-                datacontext.getTestScope({ wellIdList: wellIdList }).done(function (result) {
-                    console.log(result);
-                    if (result.length === 0) { return; }
-                    //for (var w = 0, wMax = self.Wells().length; w < wMax; w++) {
-                    $.each(self.Wells(), function (wellIndex, wellValue) {
-                        //for (var i = 0, iMax = objSet.length; i < iMax; i++) {
-                        $.each(result, function (objIndex, objValue) {
-                            if (wellValue.Id === objValue.WellId) {
-                                wellValue.lastTestScope(datacontext.createTestScope(objValue, wellValue));
-                                return false;
-                            }
-                        });
-                    });
-                });
-            };
 
             self.toPlainJson = function () {
                 ////var copy = ko.toJS(self);

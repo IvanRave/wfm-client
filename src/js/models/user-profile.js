@@ -97,7 +97,7 @@ define(['jquery', 'knockout', 'models/employee', 'services/datacontext', 'servic
 
         /** Log out from app: clean objects, set isLogged to false */
         this.logOff = function () {
-            appDatacontext.accountLogoff().done(function () { 
+            appDatacontext.accountLogoff().done(function () {
                 me.isLogged(false);
             });
         };
@@ -108,14 +108,19 @@ define(['jquery', 'knockout', 'models/employee', 'services/datacontext', 'servic
         */
         this.isLoadedAccountInfo = ko.observable(false);
 
-        /** Get account info: Email, Roles, IsLogged */
-        this.loadAccountInfo = function () {
+        /**
+        * Get account info: Email, Roles, IsLogged
+        * @param {object} [initialData] - WFM default values from url, like companyId, wellId etc.
+        */
+        this.loadAccountInfo = function (initialData) {
+            initialData = initialData || {};
+
             me.isLoadedAccountInfo(false);
             me.isLogged(false);
             appDatacontext.getAccountInfo().done(function (r) {
                 me.email(r.Email);
                 me.isLogged(true);
-                me.loadEmployees();
+                me.loadEmployees(initialData);
             }).always(function () {
                 me.isLoadedAccountInfo(true);
             });
@@ -133,11 +138,21 @@ define(['jquery', 'knockout', 'models/employee', 'services/datacontext', 'servic
         */
         this.selectedEmployee = ko.observable();
 
-        /** Select employee */
-        me.selectEmployee = function (employeeToSelect) {
+        /**
+        * Select employee
+        * @param {module:models/employee} employeeToSelect - Employee to select
+        * @param {object} [initialData] - Initial data
+        */
+        me.selectEmployee = function (employeeToSelect, initialData) {
+            initialData = initialData || {};
+
             me.selectedEmployee(employeeToSelect);
             // Load all regions for company of selected employee
-            ko.unwrap(me.selectedEmployee).company.loadWegions();
+            ko.unwrap(me.selectedEmployee).company.loadWegions(initialData);
+
+            if (!initialData.isHistory) {
+                history.pushState({ companyId: employeeToSelect.companyId }, ko.unwrap(employeeToSelect.company.name), '#companies/' + employeeToSelect.companyId + '/well-regions');
+            }
         };
 
         /**
@@ -148,19 +163,25 @@ define(['jquery', 'knockout', 'models/employee', 'services/datacontext', 'servic
 
         /**
         * Load employee list for this user
-        * @param {string} [companyIdForSelect] - Company id for select
+        * @param {string} [initialData] - Default values to select, like company id, well id etc.
         */
-        me.loadEmployees = function (companyIdForSelect) {
+        me.loadEmployees = function (initialData) {
+            initialData = initialData || {};
+
             me.isLoadedEmployees(false);
             me.selectedEmployee(null);
             appDatacontext.getCompanyUserList().done(function (response) {
+                if (!initialData.isHistory) {
+                    history.pushState({}, 'Companies', '#companies');
+                }
                 var emplArray = importEmployees(response, vm);
                 me.employees(emplArray);
                 me.isLoadedEmployees(true);
-                if (companyIdForSelect) {
+
+                if (initialData.companyId) {
                     emplArray.forEach(function (arrElem) {
-                        if (arrElem.companyId === companyIdForSelect) {
-                            me.selectedEmployee(arrElem);
+                        if (arrElem.companyId === initialData.companyId) {
+                            me.selectEmployee(arrElem, initialData);
                         }
                     });
                 }

@@ -2,7 +2,7 @@
   <thead>
     <tr>
       <th>Time</th>
-      <!-- ko foreach: {data: selectedWellGroupWfmParameterList, as: 'groupParam'} -->
+      <!-- ko foreach: {data: selectedWroupWfmParameterList, as: 'groupParam'} -->
       <th>
         <div>
           <small>
@@ -44,7 +44,7 @@
       <td>
         (<span title="Production days" data-bind="text: wpd.ProdDays"></span>)&nbsp;<span data-bind="text: wpd.prfYear + '-' + wpd.prfMonthStr"></span>
       </td>
-      <!-- ko foreach: {data: $parent.selectedWellGroupWfmParameterList, as: 'groupParam'} -->
+      <!-- ko foreach: {data: $parent.selectedWroupWfmParameterList, as: 'groupParam'} -->
       <td>
         <span data-bind="visible: isVisible, prec: {value: wpd[groupParam.wfmParameterId], coef: groupParam.wfmParameter().uomCoef}"></span>
       </td>

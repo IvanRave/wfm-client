@@ -3,7 +3,7 @@ define(['jquery',
     'knockout',
     'services/datacontext',
     'helpers/modal-helper',
-    'models/well-field'], function ($, ko, datacontext, bootstrapModal, WellField) {
+    'models/wield'], function ($, ko, datacontext, bootstrapModal, WellField) {
         'use strict';
 
         // 2. WellField (convert data objects into array)
@@ -50,7 +50,7 @@ define(['jquery',
             self.isShowedItem = ko.computed({
                 read: function () {
                     if (ko.unwrap(self.isSelectedItem)) {
-                        if (!ko.unwrap(self.selectedWellField)) {
+                        if (!ko.unwrap(self.selectedWield)) {
                             return true;
                         }
                     }
@@ -58,14 +58,35 @@ define(['jquery',
                 deferEvaluation: true
             });
 
-            self.selectedWellField = ko.observable();
+            self.selectedWield = ko.observable();
+
+            self.selectWield = function (wieldToSelect) {
+                wieldToSelect.isOpenItem(true);
+
+                self.clearSetSelectedWellRegion();
+                self.selectedWield(wieldToSelect);
+
+                ////window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
+                ////    region: self.getWellRegion().Id,
+                ////    field: self.Id
+                ////});
+
+                // Select section by default (or selected section from prevous selected field)
+                var mapSection = $.grep(ko.unwrap(wieldToSelect.ListOfSectionOfWieldDto), function (arrElem) {
+                    return (arrElem.SectionPatternId === 'wield-map');
+                })[0];
+
+                if (mapSection) {
+                    wieldToSelect.selectSection(mapSection);
+                }
+            };
 
             // well.selectedGroup.selectedField.selectedRegion.clear() instead every prop
             self.clearSetSelectedWellRegion = function () {
                 self.getCompany().selectedWegion(null);
-                var slcWellField = self.selectedWellField;
+                var slcWellField = self.selectedWield;
                 if (slcWellField()) {
-                    var slcWellGroup = slcWellField().selectedWellGroup;
+                    var slcWellGroup = slcWellField().selectedWroup;
                     if (slcWellGroup()) {
                         var slcWell = slcWellGroup().selectedWell;
                         if (slcWell()) {
@@ -79,20 +100,12 @@ define(['jquery',
                 self.getCompany().selectedWegion(self);
             };
 
-            // select menu - open menu and show content
-            self.selectItem = function () {
-                // Set to null all children
-                self.isOpenItem(true);
-                self.clearSetSelectedWellRegion();
-                window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({ region: self.Id });
-            };
-
             self.deleteWellField = function (wellFieldForDelete) {
                 if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(wellFieldForDelete.Name) + '"?')) {
                     datacontext.deleteWellField(wellFieldForDelete.Id).done(function () {
                         self.WellFields.remove(wellFieldForDelete);
                         // Set parent as selected
-                        self.selectItem();
+                        self.getCompany().selectWegion(self);
                     });
                 }
             };

@@ -5,7 +5,7 @@ define(['jquery', 'knockout'], function ($, ko) {
     /**
     * Section of well field
     * @param {object} data - section data
-    * @param {module:models/well-field} wield - well field (parent)
+    * @param {module:models/wield} wield - well field (parent)
     * @constructor
     */
     var exports = function (data, wield) {

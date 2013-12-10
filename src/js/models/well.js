@@ -200,71 +200,6 @@ define([
             deferEvaluation: true
         });
 
-        self.selectItem = function () {
-            window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
-                region: self.getWellGroup().getWellField().getWellRegion().Id,
-                field: self.getWellGroup().getWellField().Id,
-                group: self.getWellGroup().Id,
-                well: self.Id
-            });
-
-            // By default - no template - show widget page
-            // Previous - by default - summary self.sectionList[0].id;
-            var previousSelectedSection;
-
-            var prevSlcWellRegion = ko.unwrap(self.getWellGroup().getWellField().getWellRegion().getCompany().selectedWegion);
-
-            // get previous selected section (if exists)
-            if (prevSlcWellRegion) {
-                var prevSlcWellField = ko.unwrap(prevSlcWellRegion.selectedWellField);
-                if (prevSlcWellField) {
-                    var prevSlcWellGroup = ko.unwrap(prevSlcWellField.selectedWellGroup);
-                    if (prevSlcWellGroup) {
-                        // previous selected well
-                        var prevSlcWell = ko.unwrap(prevSlcWellGroup.selectedWell);
-                        if (prevSlcWell) {
-                            previousSelectedSection = ko.unwrap(prevSlcWell.selectedSection);
-
-                            // If selected perfomance section
-                            var tmpSelectedAttrGroupId = ko.unwrap(prevSlcWell.mainPerfomanceView.selectedAttrGroupId);
-                            if (tmpSelectedAttrGroupId) {
-                                self.mainPerfomanceView.selectedAttrGroupId(tmpSelectedAttrGroupId);
-                            }
-                        }
-                    }
-                }
-            }
-
-            // set new selected data (plus region in the end)
-            var slcWell = self;
-            var slcWellGroup = slcWell.getWellGroup();
-            var slcWellField = slcWellGroup.getWellField();
-            var slcWellRegion = slcWellField.getWellRegion();
-
-            slcWellRegion.clearSetSelectedWellRegion();
-
-            // set selected items in DESC order (can be redraw each time if ASC order)
-            // set selected well
-            slcWellGroup.selectedWell(slcWell);
-
-            // set selected well group
-            slcWellField.selectedWellGroup(slcWellGroup);
-
-            // set selected well field
-            slcWellRegion.selectedWellField(slcWellField);
-
-            ////console.log(previousSelectedSectionId);
-            // if null - then select Dashboard
-            //self.selectedSectionId(previousSelectedSectionId || null);
-
-            if (previousSelectedSection) {
-                self.selectSectionByPatternId(previousSelectedSection.SectionPatternId);
-            }
-            else {
-                self.unselectSection();
-            }
-        };
-
         // ======================= file manager section ======================
         // file manager section: like above section but in file manager view
         self.selectedFmgSectionId = ko.observable(null);
@@ -405,12 +340,12 @@ define([
 
         /** Unselect section: show dashboard with widgets */
         self.unselectSection = function () {
-            window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
-                region: self.getWellGroup().getWellField().getWellRegion().Id,
-                field: self.getWellGroup().getWellField().Id,
-                group: self.getWellGroup().Id,
-                well: self.Id
-            });
+            ////window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
+            ////    region: self.getWellGroup().getWellField().getWellRegion().Id,
+            ////    field: self.getWellGroup().getWellField().Id,
+            ////    group: self.getWellGroup().Id,
+            ////    well: self.Id
+            ////});
 
             self.selectedSection(null);
 

@@ -5,7 +5,7 @@
       <g class="axis x" data-bind="attr: { transform: 'translate(0,' + prfGraph.viewBox.height + ')' }"></g>
       <g class="axis y"></g>
       <g class="svg-prf-graph-g">
-        <!-- ko foreach: {data: selectedWellGroupWfmParameterList, as: 'groupParam'} -->
+        <!-- ko foreach: {data: selectedWroupWfmParameterList, as: 'groupParam'} -->
         <path d="M0 0" clip-path="url(#graph-clip)" data-bind="attr: {id: 'grp-'+ groupParam.wfmParameterId, stroke: groupParam.color }, visible: groupParam.isVisible"></path>
         <!-- /ko -->
       </g>

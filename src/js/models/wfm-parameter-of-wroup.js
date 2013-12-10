@@ -6,14 +6,14 @@ define(['knockout', 'services/datacontext', 'models/wfm-parameter'], function (k
     * Parameter (union) for test or perfomance data. Every well group has own array of wfm parameters. 
     * @constructor
     * @param {object} data - Parameter data
-    * @param {module:models/well-group} wellGroupItem - Well group (parent of parameter)
+    * @param {module:models/wroup} wellGroupItem - Well group (parent of parameter)
     */
     var exports = function (data, wellGroupItem) {
         data = data || {};
 
         /**
         * Get well group (parent)
-        * @returns {module:models/well-group} Well group (parent)
+        * @returns {module:models/wroup} Well group (parent)
         */
         this.getWellGroup = function () {
             return wellGroupItem;

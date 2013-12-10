@@ -24,10 +24,13 @@
         <div data-bind="with: userProfile">
             <nav class="wfm-nav clearfix navbar-inverse">
                 <div class="pull-left">
-                    <a href="#" data-bind="click: loadAccountInfo">{{lang.wfm}}</a>
+                    <span class="link-view-inverse" data-bind="click: loadAccountInfo">{{lang.wfm}}</span>
                 </div>
                 <div class="pull-right" style="display:none" data-bind="visible: isLogged">
-					<a href="#" data-bind="click: logOff">{{capitalizeFirst lang.logOut}}</a>
+                    <button type="button" class="btn btn-xs btn-inverse" data-bind="click: logOff">
+                        <i class="glyphicon glyphicon-off"></i>
+                        {{capitalizeFirst lang.logOut}}
+                    </button>
                 </div>
             </nav>
             <div class="wfm-content-wrap">
@@ -70,14 +73,14 @@
                                                 </div>
                                                 <div class="workspace-container" data-bind="css: $root.workAreaCss">
                                                     <div data-bind="with: selectedWegion">
-                                                        <div data-bind="ifnot: selectedWellField">
+                                                        <div data-bind="ifnot: selectedWield">
                                                             {{> wegion }}
                                                         </div>
-                                                        <div data-bind="with: selectedWellField">
-                                                            <div data-bind="ifnot: selectedWellGroup">
+                                                        <div data-bind="with: selectedWield">
+                                                            <div data-bind="ifnot: selectedWroup">
                                                                 {{> wield }}
                                                             </div>
-                                                            <div data-bind="with: selectedWellGroup">
+                                                            <div data-bind="with: selectedWroup">
                                                                 <div data-bind="ifnot: selectedWell">
                                                                     {{> wroup }}
                                                                 </div>

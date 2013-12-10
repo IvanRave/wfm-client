@@ -34,9 +34,9 @@
     }
 
     /** 
-    * Well-field maps url
-    * @param {number} wieldId - Well-field id
-    * @param {number} [mapId] - Well-field map id
+    * Well field maps url
+    * @param {number} wieldId - Well field id
+    * @param {number} [mapId] - Id of map of well field
     */
     function wieldMapsUrl(wieldId, mapId) {
         return '{{conf.requrl}}/api/well-fields/' + wieldId + '/maps' + (mapId ? ('/' + mapId) : '');
@@ -550,20 +550,20 @@
         return ajaxRequest('POST', companyJobTypeUrl(companyId), jobTypeData);
     };
 
-    /** Get well-field maps url */
+    /** Get url of map of well field */
     datacontext.getWieldMapsUrl = function (wieldId, mapId) {
         return wieldMapsUrl(wieldId, mapId);
     };
 
-    /** Get well-field maps */
+    /** Get list of maps of well field */
     datacontext.getWellFieldMaps = function (wieldId) {
         return ajaxRequest('GET', wieldMapsUrl(wieldId));
     };
 
     /** 
-    * Save changed well-field map 
-    * @param {number} wieldId - Well-field (parent) id
-    * @param {number} mapId - Well-field map id (primary key)
+    * Save changed map of well field
+    * @param {number} wieldId - Well field (parent) id
+    * @param {number} mapId - Well field map id (primary key)
     * @param {Object.<WellFieldMap>} item - Map object to change
     */
     datacontext.putWieldMap = function (wieldId, mapId, mapData) {
@@ -571,8 +571,8 @@
     };
 
     /** 
-    * Delete well-field map
-    * @param {number} wieldId - Well-field id (parent of the map)
+    * Delete map of well field
+    * @param {number} wieldId - Id of well field (parent of the map)
     * @param {number} id - Map id
     */
     datacontext.deleteWellFieldMap = function (wieldId, mapId) {

@@ -615,7 +615,7 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
             }
 
             self.showWellFieldMap = function () {
-                self.getWellField().selectedWellFieldMap(self);
+                self.getWellField().selectedWieldMap(self);
             };
 
             self.afterRenderMapObj = function () {

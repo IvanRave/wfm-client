@@ -62,7 +62,7 @@
         };
 
         // Well group parameters for selected squad
-        vw.selectedWellGroupWfmParameterList = ko.computed({
+        vw.selectedWroupWfmParameterList = ko.computed({
             read: function () {
                 var resultArr = [];
                 var tmpSelectedAttrGroup = ko.unwrap(vw.selectedAttrGroup);
@@ -168,7 +168,7 @@
                 var minValue, maxValue;
 
                 $.each(ko.unwrap(vw.filteredByDateProductionDataSet), function (prfIndex, prfElem) {
-                    $.each(ko.unwrap(vw.selectedWellGroupWfmParameterList), function (clmIndex, clmElem) {
+                    $.each(ko.unwrap(vw.selectedWroupWfmParameterList), function (clmIndex, clmElem) {
                         if (ko.unwrap(clmElem.isVisible)) {
                             if ($.isNumeric(ko.unwrap(prfElem[clmElem.wfmParameterId]))) {
                                 var tmpValue = ko.unwrap(prfElem[clmElem.wfmParameterId]) * ko.unwrap(clmElem.wfmParameter().uomCoef);
@@ -297,7 +297,7 @@
         ///<return>{'WaterRate': d3Line, ...}</return>
         vw.productionDataSetSvgPath = ko.computed(function () {
             return getSvgPath(
-                    ko.unwrap(vw.selectedWellGroupWfmParameterList),
+                    ko.unwrap(vw.selectedWroupWfmParameterList),
                     ko.unwrap(vw.filteredByDateProductionDataSetTimeBorder),
                     ko.unwrap(vw.filteredByDateProductionDataSetValueBorder));
         });
