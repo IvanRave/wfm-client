@@ -1,3 +1,11 @@
+<a name="v0.8.1"></a>
+### v0.8.1 (2013-12-10)
+
+
+#### Features
+
+* **company:** move to workspace menu ([6cd1d9bf](https://github.com/IvanRave/wfm/commit/6cd1d9bfa134f928d54576f7c1578fef6278651f))
+
 <a name="v0.8.0"></a>
 ## v0.8.0 (2013-12-09)
 
