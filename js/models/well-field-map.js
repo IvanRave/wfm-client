@@ -1,5 +1,8 @@
-define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper', 'helpers/app-helper', 'models/well-field-map-area', 'models/well-in-well-field-map'],
-    function ($, ko, datacontext, bootstrapModal, appHelper) {
+/** @module */
+define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
+    'helpers/app-helper', 'models/file-spec',
+    'models/well-field-map-area', 'models/well-in-well-field-map'],
+    function ($, ko, datacontext, bootstrapModal, appHelper, FileSpec) {
         'use strict';
 
         function importWellFieldMapAreasDto(items, parent) {
@@ -16,33 +19,93 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper', 'h
                 });
         }
 
-        function WellFieldMap(data, wellField) {
-            var self = this;
+        /**
+        * Well field map model
+        * @param {object} data - Map data
+        * @param {WellField} wellField - Well field
+        * @constructor
+        */
+        var exports = function (data, wellField) {
             data = data || {};
 
-            self.getWellField = function () {
+            /** Get well field (parent) */
+            this.getWellField = function () {
                 return wellField;
             };
 
-            self.Id = data.Id;
-            self.Name = ko.observable(data.Name);
-            self.Description = ko.observable(data.Description);
-            //// 'http://wfm-client.azurewebsites.net/api/wellfieldmap?img_url=' + data.ImgUrl;
-            self.ImgUrl = data.ImgUrl;
+            /** 
+            * Map id
+            * @type {number}
+            */
+            this.Id = data.Id;
 
-            self.fullImgUrl = datacontext.getWellFieldMapUrl({ img_url: self.ImgUrl });
+            /**
+            * Id of file specification (guid)
+            * @type {string}
+            */
+            this.IdOfFileSpec = data.IdOfFileSpec;
 
-            self.ScaleCoefficient = ko.observable(data.ScaleCoefficient);
-            self.WellFieldId = data.WellFieldId;
-            self.Width = data.Width;
-            self.Height = data.Height;
+            /**
+            * Map file specification
+            * @type {module:models/file-spec}
+            */
+            this.FileSpec = new FileSpec(data.FileSpecDto);
 
-            // coef width to height
-            self.coefWH = data.Width / data.Height;
+            /** 
+            * Map description
+            * @type {string}
+            */
+            this.Description = ko.observable(data.Description);
 
-            self.WellFieldMapAreas = ko.observableArray();
+            /** 
+            * Map image (full url)
+            * @type {string}
+            */
+            this.fullImgUrl = datacontext.getWellFieldMapUrl({ img_url: this.IdOfFileSpec });
 
-            self.WellInWellFieldMaps = ko.observableArray();
+            /** 
+            * Map scale coefficient
+            * @type {number}
+            */
+            this.ScaleCoefficient = ko.observable(data.ScaleCoefficient);
+
+            /** 
+            * Well field (parent) id
+            * @type {number}
+            */
+            this.WellFieldId = data.WellFieldId;
+
+            /** 
+            * Map width
+            * @type {number}
+            */
+            this.Width = data.Width;
+
+            /** 
+            * Map height
+            * @type {number}
+            */
+            this.Height = data.Height;
+
+            /** 
+            * Map ratio (width / height)
+            * @type {number}
+            */
+            this.coefWH = this.Width / this.Height;
+
+            /** 
+            * Map areas
+            * @type {Array.<WellFieldMapArea>}
+            */
+            this.WellFieldMapAreas = ko.observableArray();
+
+            /** 
+            * Wells on this map
+            * @type {Array.<Well>}
+            */
+            this.WellInWellFieldMaps = ko.observableArray();
+
+            var self = this;
 
             function initYandexMap(wellFieldMapItem, wellFieldItem) {
                 ////if (myMap) { myMap.destroy(); }
@@ -77,7 +140,6 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper', 'h
 
                             ////var cropCoords = [x1, y1, x2, y2];
                             ////return 'http://wfm-client.azurewebsites.net/api/wellfile/?well_id=80&purpose=history&status=work&file_name=fid20130213003420656_Map2560x1600.jpg&crop=(' + cropCoords.join(',') + ')&map_size=250'
-                            ////return 'imgUrl + '&crop=(' + cropCoords.join(',') + ')';
                             return wellFieldMapItem.fullImgUrl + '&x1=' + x1 + '&y1=' + y1 + '&x2=' + x2 + '&y2=' + y2;
                         });
 
@@ -553,7 +615,7 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper', 'h
             }
 
             self.showWellFieldMap = function () {
-                self.getWellField().selectedWellFieldMap(self);
+                self.getWellField().selectedWieldMap(self);
             };
 
             self.afterRenderMapObj = function () {
@@ -623,7 +685,7 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper', 'h
             };
 
             self.setScaleCoefficient = function () {
-                datacontext.saveChangedWellFieldMap(self);
+                datacontext.putWieldMap(self.WellFieldId, self.Id, self.toPlainJson());
             };
 
             self.editWellFieldMap = function () {
@@ -652,7 +714,7 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper', 'h
                     self.Name($(inputName).val());
                     self.Description($(inputDescription).val());
                     self.ScaleCoefficient($(inputScaleCoefficient).val());
-                    datacontext.saveChangedWellFieldMap(self).done(function (result) {
+                    datacontext.putWieldMap(self.WellFieldId, self.Id, self.toPlainJson()).done(function (result) {
                         self.Name(result.Name);
                         self.Description(result.Description);
                         self.ScaleCoefficient(result.ScaleCoefficient);
@@ -668,9 +730,7 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper', 'h
             // get areas
             self.WellFieldMapAreas(importWellFieldMapAreasDto(data.WellFieldMapAreasDto, self));
             self.WellInWellFieldMaps(importWellInWellFieldMapsDto(data.WellInWellFieldMapsDto, self));
-        }
-
-        datacontext.createWellFieldMap = function (item, wellField) {
-            return new WellFieldMap(item, wellField);
         };
+
+        return exports;
     });

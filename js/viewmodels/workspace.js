@@ -1,209 +1,181 @@
+/** @module */
 define([
     'jquery',
     'knockout',
     'services/datacontext',
     'helpers/modal-helper',
     'helpers/app-helper',
-    'models/job-type',
+    'models/user-profile',
+    'helpers/history-helper',
     'helpers/knockout-lazy',
-    'models/well-region'
-], function ($, ko, datacontext, bootstrapModal, appHelper, JobType) {
-    'use strict';
+    'models/wfm-param-squad'], function ($, ko, datacontext, bootstrapModal, appHelper, UserProfile, historyHelper) {
+        'use strict';
 
-    function WorkspaceViewModel(companyId, choosedObj) {
-        // Test company Id with Guid format (this checks retry server check in WorkSpace view of Home controller
-        if (!appHelper.isGuidValid(companyId)) {
-            var errValidMsg = 'Company id is not valid GUID';
-            alert(errValidMsg);
-            throw new TypeError(errValidMsg);
-        }
+        /**
+        * Root view model
+        * @constructor
+        */
+        var exports = function () {
+            /** Alternative for this */
+            var ths = this;
 
-        var self = this;
+            /** 
+            * Whether left tree menu with well regions, groups, fields, wells is visible
+            * @type {boolean}
+            */
+            this.isVisibleMenu = ko.observable(true);
 
-        // Left tree menu with well regions, groups, fields, wells
-        self.isVisibleMenu = ko.observable(true);
-        self.wellRegionList = ko.observableArray();
-        self.selectedWellRegion = ko.observable();
-        self.isStructureLoaded = ko.observable(false);
+            // Left tree menu with well regions, groups, fields, wells
+            this.toggleIsVisibleMenu = function () {
+                ths.isVisibleMenu(!ko.unwrap(ths.isVisibleMenu));
+            };
 
-        // Left tree menu with well regions, groups, fields, wells
-        self.toggleIsVisibleMenu = function () {
-            self.isVisibleMenu(!ko.unwrap(self.isVisibleMenu));
-        };
+            this.sidebarWrapCss = ko.computed({
+                read: function () {
+                    return ko.unwrap(ths.isVisibleMenu) ? 'sidebar-wrap-visible' : 'hidden';
+                },
+                deferEvaluation: true
+            });
 
-        self.sidebarWrapCss = ko.computed({
-            read: function () {
-                return ko.unwrap(self.isVisibleMenu) ? 'sidebar-wrap-visible' : 'hidden';
-            },
-            deferEvaluation: true
-        });
+            this.workAreaCss = ko.computed({
+                read: function () {
+                    return ko.unwrap(ths.isVisibleMenu) ? 'work-area' : '';
+                },
+                deferEvaluation: true
+            });
 
-        self.workAreaCss = ko.computed({
-            read: function () {
-                return ko.unwrap(self.isVisibleMenu) ? 'work-area' : '';
-            },
-            deferEvaluation: true
-        });
+            this.sidebarToggleCss = ko.computed({
+                read: function () {
+                    return ko.unwrap(ths.isVisibleMenu) ? 'sidebar-toggle-visible' : 'sidebar-toggle-hidden';
+                },
+                deferEvaluation: true
+            });
 
-        self.sidebarToggleCss = ko.computed({
-            read: function () {
-                return ko.unwrap(self.isVisibleMenu) ? 'sidebar-toggle-visible' : 'sidebar-toggle-hidden';
-            },
-            deferEvaluation: true
-        });
-
-        // =====================================Wfm parameters begin==========================================================
-        self.wfmParamSquadList = ko.lazyObservableArray(function () {
-            datacontext.getWfmParamSquadList({ is_inclusive: true }).done(function (r) {
-                require(['models/wfm-param-squad'], function () {
+            // =====================================Wfm parameters begin==========================================================
+            this.wfmParamSquadList = ko.lazyObservableArray(function () {
+                datacontext.getWfmParamSquadList({ is_inclusive: true }).done(function (r) {
                     // WfmParamSquadList (convert data objects into array)
                     function importWfmParamSquadList(data) {
                         return $.map(data || [], function (item) { return datacontext.createWfmParamSquad(item); });
                     }
 
-                    self.wfmParamSquadList(importWfmParamSquadList(r));
+                    ths.wfmParamSquadList(importWfmParamSquadList(r));
                 });
-            });
-        }, self);
+            }, this);
 
-        self.jobTypeList = ko.lazyObservableArray(function () {
-            datacontext.getJobTypeList(companyId).done(function (r) {
-                function importJobTypeList(data) {
-                    return $.map(data || [], function (item) { return new JobType(item); });
-                }
+            /** Get list of section patterns: lazy loading by first request */
+            this.ListOfSectionPatternDto = ko.lazyObservableArray(function () {
+                datacontext.getListOfSectionPattern().done(function (r) {
+                    require(['models/section-pattern'], function (SectionPattern) {
 
-                self.jobTypeList(importJobTypeList(r));
-            });
-        }, self);
+                        function importListOfSectionPattern(data) {
+                            return $.map(data || [], function (item) { return new SectionPattern(item); });
+                        }
 
-        self.goToPostingJobType = function () {
-            var jobTypeNewName = window.prompt('Add job type to list');
-            if (jobTypeNewName) {
-                datacontext.postCompanyJobType(companyId, {
-                    name: jobTypeNewName,
-                    description: '',
-                    companyId: companyId
-                }).done(function (jobTypeCreated) {
-                    self.jobTypeList.push(new JobType(jobTypeCreated));
-                });
-            }
-        };
-
-        // Get all parameters from all groups as one dimensional array
-        self.wfmParameterList = ko.computed({
-            read: function () {
-                return $.map(ko.unwrap(self.wfmParamSquadList), function (sqdElem) {
-                    return $.map(ko.unwrap(sqdElem.wfmParameterList), function (prmElem) {
-                        return prmElem;
+                        ths.ListOfSectionPatternDto(importListOfSectionPattern(r));
                     });
                 });
-            },
-            deferEvaluation: true
-        });
-        // =====================================Wfm parameters end==========================================================
+            }, this);
 
-        self.addWellRegion = function () {
-            ////var self = this;
-
-            var inputName = document.createElement('input');
-            inputName.type = 'text';
-            $(inputName).prop({ 'required': true }).addClass('form-control');
-
-            var innerDiv = document.createElement('div');
-            $(innerDiv).addClass('form-horizontal').append(
-                bootstrapModal.gnrtDom('Name', inputName)
-            );
-
-            bootstrapModal.openModalWindow('Well region', innerDiv, function () {
-                var wellRegionItem = datacontext.createWellRegion({
-                    Name: $(inputName).val(),
-                    CompanyId: companyId
-                }, self);
-
-                datacontext.saveNewWellRegion(wellRegionItem).done(function (result) {
-                    self.wellRegionList.push(datacontext.createWellRegion(result, self));
-                });
-
-                bootstrapModal.closeModalWindow();
+            // Get all parameters from all groups as one dimensional array
+            this.wfmParameterList = ko.computed({
+                read: function () {
+                    return $.map(ko.unwrap(ths.wfmParamSquadList), function (sqdElem) {
+                        return $.map(ko.unwrap(sqdElem.wfmParameterList), function (prmElem) {
+                            return prmElem;
+                        });
+                    });
+                },
+                deferEvaluation: true
             });
+            // =====================================Wfm parameters end==========================================================
+
+            // Test company Id with Guid format (this checks retry server check in WorkSpace view of Home controller
+            ////if (!appHelper.isGuidValid(companyId)) {
+            ////    var errValidMsg = 'Company id is not valid GUID';
+            ////    alert(errValidMsg);
+            ////    throw new TypeError(errValidMsg);
+            ////}        
+
+
+            // load list of well region, well field...
+            ////function loadStructure() {
+            ////    function getSucceeded(data) {
+            ////        var mappedStructure = $.map(data, function (list) {
+            ////            return new WellRegion(list, ths);
+            ////        });
+
+            ////        ths.wellRegionList(mappedStructure);
+
+            ////        // route region/id/field/id/group/id/well/id
+            ////        ////var choosedObj = getChoosedIdFromHash();
+            ////        console.log(choosedObj);
+            ////        var tmpRegion = appHelper.getElementByPropertyValue(ths.wellRegionList(), 'Id', choosedObj.regionId);
+            ////        if (tmpRegion) {
+            ////            ths.selectedWellRegion(tmpRegion);
+            ////            tmpRegion.isOpenItem(true);
+            ////            var tmpField = appHelper.getElementByPropertyValue(ths.selectedWellRegion().WellFields(), 'Id', choosedObj.fieldId);
+            ////            if (tmpField) {
+            ////                ths.selectedWellRegion().selectedWield(tmpField);
+            ////                tmpField.isOpenItem(true);
+            ////                var tmpGroup = appHelper.getElementByPropertyValue(ths.selectedWellRegion().selectedWield().WellGroups(), 'Id', choosedObj.groupId);
+            ////                if (tmpGroup) {
+            ////                    ths.selectedWellRegion().selectedWield().selectedWroup(tmpGroup);
+            ////                    tmpGroup.isOpenItem(true);
+            ////                    var tmpWell = appHelper.getElementByPropertyValue(ths.selectedWellRegion().selectedWield().selectedWroup().Wells(), 'Id', choosedObj.wellId);
+            ////                    if (tmpWell) {
+            ////                        ths.selectedWellRegion().selectedWield().selectedWroup().selectedWell(tmpWell);
+            ////                        tmpWell.isOpenItem(true);
+            ////                        // todo: change logic - when change selected id - need to execute additional logic
+            ////                        if (choosedObj.sectionId) {
+            ////                            tmpWell.selectedSectionByPatternId(choosedObj.sectionId);
+            ////                        }
+            ////                        else {
+            ////                            // Null - show dashboard: load all widget layouts and data
+            ////                            tmpWell.unselectSection();
+            ////                        }
+            ////                        // Apchive: previously - set summary as a default page
+            ////                        ////else {
+            ////                        ////    tmpWell.selectedSectionId(tmpWell.sectionList[0].id);
+            ////                        ////}
+
+            ////                        // this set selected well
+            ////                        ////console.log(ths.selectedWellRegion().selectedWield().selectedWroup().selectedWell());
+            ////                    }
+            ////                }
+            ////            }
+            ////        }
+            ////    }
+
+            ////    datacontext.getWellRegionList({
+            ////        company_id: companyId,
+            ////        is_inclusive: true
+            ////    }).done(getSucceeded);
+            ////}
+
+            //     loadStructure();
+
+            /** 
+            * User profile
+            * @type {module:models/user-profile}
+            */
+            this.userProfile = new UserProfile(ths);
+
+            //var initialData = getInitialData(document.location.hash);
+
+            /** Auth user profile and load data if successful */
+            this.userProfile.loadAccountInfo(historyHelper.getInitialData(document.location.hash.substring(1)));
+
+            /** Back, forward, refresh browser navigation */
+            window.onpopstate = function () {
+                var stateData = historyHelper.getInitialData(document.location.hash.substring(1));
+                // When load any info - do not push info to history again
+                stateData.isHistory = true;
+                // Reload all data
+                ths.userProfile.loadAccountInfo(stateData);
+                console.log('location: ' + document.location.hash + ', state: ' + JSON.stringify(stateData));
+            };
         };
 
-        self.deleteWellRegion = function (wellRegionForDelete) {
-            if (wellRegionForDelete.WellFields().length > 0) {
-                alert('Need to remove all well fields from this region.');
-                return;
-            }
-
-            if (confirm('Are you sure you want to delete "' + ko.unwrap(wellRegionForDelete.Name) + '"?')) {
-                datacontext.deleteWellRegion(wellRegionForDelete).done(function () {
-                    self.wellRegionList.remove(wellRegionForDelete);
-                });
-            }
-        };
-
-        // TODO: back after repair getUserProfile();    
-        // TODO: move selectItem() logic to parent objects:
-        // well.selectWell() => wellGroup.selectWell()
-
-        // load list of well region, well field...
-        function loadStructure() {
-            function getSucceeded(data) {
-                var mappedStructure = $.map(data, function (list) {
-                    return new datacontext.createWellRegion(list, self);
-                });
-
-                self.wellRegionList(mappedStructure);
-
-                // route region/id/field/id/group/id/well/id
-                ////var choosedObj = getChoosedIdFromHash();
-                console.log(choosedObj);
-                var tmpRegion = appHelper.getElementByPropertyValue(self.wellRegionList(), 'Id', choosedObj.regionId);
-                if (tmpRegion) {
-                    self.selectedWellRegion(tmpRegion);
-                    tmpRegion.isOpenItem(true);
-                    var tmpField = appHelper.getElementByPropertyValue(self.selectedWellRegion().WellFields(), 'Id', choosedObj.fieldId);
-                    if (tmpField) {
-                        self.selectedWellRegion().selectedWellField(tmpField);
-                        tmpField.isOpenItem(true);
-                        var tmpGroup = appHelper.getElementByPropertyValue(self.selectedWellRegion().selectedWellField().WellGroups(), 'Id', choosedObj.groupId);
-                        if (tmpGroup) {
-                            self.selectedWellRegion().selectedWellField().selectedWellGroup(tmpGroup);
-                            tmpGroup.isOpenItem(true);
-                            var tmpWell = appHelper.getElementByPropertyValue(self.selectedWellRegion().selectedWellField().selectedWellGroup().Wells(), 'Id', choosedObj.wellId);
-                            if (tmpWell) {
-                                self.selectedWellRegion().selectedWellField().selectedWellGroup().selectedWell(tmpWell);
-                                tmpWell.isOpenItem(true);
-                                // todo: change logic - when change selected id - need to execute additional logic
-                                if (choosedObj.sectionId) {
-                                    tmpWell.selectedSectionId(choosedObj.sectionId);
-                                }
-                                else {
-                                    // Null - show dashboard: load all widget layouts and data
-                                    tmpWell.selectedSectionId(null);
-                                }
-                                // Apchive: previously - set summary as a default page
-                                ////else {
-                                ////    tmpWell.selectedSectionId(tmpWell.sectionList[0].id);
-                                ////}
-
-                                // this set selected well
-                                ////console.log(self.selectedWellRegion().selectedWellField().selectedWellGroup().selectedWell());
-                            }
-                        }
-                    }
-                }
-
-                self.isStructureLoaded(true);
-            }
-
-            datacontext.getWellRegionList({
-                company_id: companyId,
-                is_inclusive: true
-            }).done(getSucceeded);
-        }
-
-        loadStructure();
-    }
-
-    return WorkspaceViewModel;
-});
+        return exports;
+    });

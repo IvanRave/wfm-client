@@ -1,4 +1,5 @@
-define(['knockout', 'services/datacontext'], function (ko, datacontext) {
+/** @module */
+define(['knockout'], function (ko) {
     'use strict';
 
     var uomCoefDict = {
@@ -66,13 +67,33 @@ define(['knockout', 'services/datacontext'], function (ko, datacontext) {
         return readyMatrix;
     }
 
-    function WfmParameter(data) {
-        var self = this;
+    /**
+    * Parameter, like OilRate, WaterRate etc.
+    * @constructor
+    * @param {object} data - Parameter data
+    */
+    var exports = function (data) {
         data = data || {};
 
-        self.id = data.Id;
-        self.name = ko.observable(data.Name);
-        self.uom = ko.observable(data.Uom);
+        /**
+        * Parameter id (OilRate, WaterRate, etc.)
+        * @type {string}
+        */
+        this.id = data.Id;
+
+        /**
+        * Parameter name (Oil rate, water rate, etc.)
+        * @type {string}
+        */
+        this.name = ko.observable(data.Name);
+
+        /**
+        * Unit of measurement (scf, barrels, etc.)
+        * @type {string}
+        */
+        this.uom = ko.observable(data.Uom);
+
+        var self = this;
 
         // Todo: need to store in db as this array
         // For Newton: [[kg,m],[s,s]]
@@ -151,9 +172,7 @@ define(['knockout', 'services/datacontext'], function (ko, datacontext) {
         });
 
         self.toPlainJson = function () { return ko.toJS(this); };
-    }
-
-    datacontext.createWfmParameter = function (data) {
-        return new WfmParameter(data);
     };
+
+    return exports;
 });

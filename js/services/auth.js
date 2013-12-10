@@ -7,6 +7,9 @@ define(['jquery', 'services/datacontext', 'helpers/ajax-request'], function ($, 
     function accountLogonUrl(uqp) {
         return 'http://wfm-client.azurewebsites.net/api/account/logon/' + (uqp ? ('?' + $.param(uqp)) : '');
     }
+    function accountInfoUrl() {
+        return 'http://wfm-client.azurewebsites.net/api/account/info';
+    }
 
     // Account logoff
     datacontext.accountLogoff = function (uqp) {
@@ -16,5 +19,10 @@ define(['jquery', 'services/datacontext', 'helpers/ajax-request'], function ($, 
     // Account logon
     datacontext.accountLogon = function (uqp, data) {
         return ajaxRequest('POST', accountLogonUrl(uqp), data);
+    };
+
+    /** Get account info */
+    datacontext.getAccountInfo = function () {
+        return ajaxRequest('GET', accountInfoUrl());
     };
 });

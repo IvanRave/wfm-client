@@ -52,7 +52,7 @@ define(['jquery', 'knockout', 'services/datacontext', 'moment', 'models/test-dat
         };
 
         self.deleteTestData = function (testDataItem) {
-            if (confirm("Are you sure to delete?") === true) {
+            if (confirm('Are you sure you want to delete?') === true) {
                 datacontext.deleteTestData(testDataItem).done(function () {
                     self.testDataList.remove(testDataItem);
                 });

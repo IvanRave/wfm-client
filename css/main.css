@@ -69,6 +69,20 @@ footer {
     margin-bottom: 0 !important;
 }
 
+    .nav > li > span {
+        position: relative;
+        display: block;
+        padding: 10px 15px;
+        cursor: pointer;
+        color: #1F98C7;
+    }
+
+        .nav > li > span:hover,
+        .nav > li > span:focus {
+            text-decoration: none;
+            background-color: #eeeeee;
+        }
+
 
 .wfm-list ul {
     /*padding-top: 4px;*/
@@ -106,6 +120,16 @@ footer {
                 color: #fcfcfc;
                 text-decoration: none;
             }
+
+        .wfm-list ul > li .wfm-menu-header {
+            margin-left: 2px !important;
+        }
+
+        .wfm-list ul > li .wfm-slc-menu-item {
+            background-color: #777;
+            color: #fff;
+            font-weight: bold;
+        }
 
         .wfm-list ul > li a {
             padding: 4px;
@@ -177,6 +201,26 @@ footer {
 .pointer {
     cursor: pointer;
 }
+
+.link-view {
+    border-bottom: 1px dashed #1F98C7;
+    color: #1F98C7;
+    cursor: pointer;
+}
+
+    .link-view:hover {
+        border-bottom: 1px dashed #78C1DD;
+        color: #78C1DD;
+    }
+
+.link-view-inverse {
+    color: #efefef;
+    cursor: pointer;
+}
+
+    .link-view-inverse:hover {
+        color: #fff;
+    }
 
 .link-icon {
     cursor: pointer;
@@ -305,11 +349,12 @@ footer {
     background-color: #333;
 }
 
-.wfm-workspace-well-tab {
+/* Well, field, group, region tab links to sections */
+.wfm-tab-panel {
     background-color: #222;
 }
 
-    .wfm-workspace-well-tab .nav-pills > li > div {
+    .wfm-tab-panel .nav-pills > li > div {
         border-radius: 0;
         padding: 0;
         color: #a1a1a1;
@@ -319,17 +364,17 @@ footer {
         cursor: pointer;
     }
 
-        .wfm-workspace-well-tab .nav-pills > li > div:focus {
+        .wfm-tab-panel .nav-pills > li > div:focus {
             background-color: #000;
             color: #c0c0c0;
         }
 
-        .wfm-workspace-well-tab .nav-pills > li > div:hover {
+        .wfm-tab-panel .nav-pills > li > div:hover {
             background-color: #111;
             color: #c8c8c8;
         }
 
-        .wfm-workspace-well-tab .nav-pills > li > div .caret {
+        .wfm-tab-panel .nav-pills > li > div .caret {
             position: absolute;
             bottom: 4px;
             right: 4px;
@@ -337,15 +382,15 @@ footer {
             border-bottom-color: #ccc;
         }
 
-        .wfm-workspace-well-tab .nav-pills > li > div > span {
+        .wfm-tab-panel .nav-pills > li > div > span {
             font-size: 70%;
         }
 
-        .wfm-workspace-well-tab .nav-pills > li > div > i {
+        .wfm-tab-panel .nav-pills > li > div > i {
             font-size: 150%;
         }
 
-    .wfm-workspace-well-tab .nav-pills > li.active > div {
+    .wfm-tab-panel .nav-pills > li.active > div {
         background-color: #000;
         color: #c0c0c0;
     }
@@ -396,7 +441,7 @@ footer {
         /*z-index for scroll - 99*/
     }
 
-    .wfm-workspace-well-tab {
+    .wfm-tab-panel {
         position: fixed;
         bottom: 0;
         z-index: 1031;
@@ -431,7 +476,7 @@ footer {
         padding: 4px 16px 0 16px;
     }
 
-.well-content-pad {
+.tab-content-pad {
     padding: 8px 15px 0 0;
 }
 
@@ -505,6 +550,14 @@ footer {
 
 .min-left-margin {
     margin-left: 8px;
+}
+
+.min-right-margin {
+    margin-right: 8px;
+}
+
+.min-margin {
+    margin: 8px;
 }
 
 .btn-tile {

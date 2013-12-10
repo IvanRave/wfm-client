@@ -14,8 +14,8 @@ define(['jquery', 'knockout', 'services/datacontext'], function ($, ko, datacont
         // Set list of well file manager parameters to group (if exists)
         // Get requests for squads can be inclusive and non-inclusive: if inclusive then this list exists
         if (data.WfmParameterDtoList) {
-            require(['models/wfm-parameter'], function () {
-                function importWfmParameterDtoList(data) { return $.map(data || [], function (item) { return datacontext.createWfmParameter(item); }); }
+            require(['models/wfm-parameter'], function (WfmParameter) {
+                function importWfmParameterDtoList(data) { return $.map(data || [], function (item) { return new WfmParameter(item); }); }
                 self.wfmParameterList(importWfmParameterDtoList(data.WfmParameterDtoList));
             });
         }

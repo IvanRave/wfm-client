@@ -1,4 +1,5 @@
-define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'jquery.slimscroll', 'jquery.bootstrap', 'picker.date'], function ($, ko, appMoment, bootstrapModal) {
+define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-helper',
+    'jquery.slimscroll', 'jquery.bootstrap', 'picker.date'], function ($, ko, appMoment, bootstrapModal, fileHelper) {
     'use strict';
 
     // Controls whether or not the text in a textbox is selected based on a model property
@@ -320,6 +321,13 @@ define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'jquery.slimscro
                 e.preventDefault();
                 bootstrapModal.openModalPanzoomWindow(imgSrc);
             });
+        }
+    };
+
+    ko.bindingHandlers.filoader = {
+        init: function (element, valueAccessor) {
+            var tmpFiloader = valueAccessor();
+            fileHelper.initFileUpload(element, tmpFiloader.url, tmpFiloader.fileFormats, tmpFiloader.callback);
         }
     };
 
