@@ -1,6 +1,7 @@
 ﻿/** @module */
 define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/datacontext',
-    'helpers/modal-helper', 'helpers/knockout-lazy'], function ($, ko, Wegion, JobType, appDatacontext, modalHelper) {
+    'helpers/modal-helper', 'helpers/history-helper',
+    'helpers/knockout-lazy'], function ($, ko, Wegion, JobType, appDatacontext, modalHelper, historyHelper) {
         'use strict';
 
         /** Import well regions for company */
@@ -20,6 +21,8 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
         */
         var exports = function (data, rootViewModel) {
             data = data || {};
+
+            var ths = this;
 
             this.getRootViewModel = function () {
                 return rootViewModel;
@@ -49,35 +52,34 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
             */
             this.logoUrl = ko.observable(data.LogoUrl || 'img/question.jpg');
 
-            var me = this;
             /**
             * List of well regions
             * @type {module:models/wegion}
             */
-            me.wegions = ko.observableArray();
+            this.wegions = ko.observableArray();
 
             /**
             * Whether well regions are loaded
             * @type {boolean}
             */
-            me.isLoadedWegions = ko.observable(false);
+            this.isLoadedWegions = ko.observable(false);
 
-            me.jobTypeList = ko.lazyObservableArray(function () {
-                appDatacontext.getJobTypeList(me.id).done(function (r) {
-                    me.jobTypeList(importJobTypeList(r));
+            this.jobTypeList = ko.lazyObservableArray(function () {
+                appDatacontext.getJobTypeList(ths.id).done(function (r) {
+                    ths.jobTypeList(importJobTypeList(r));
                 });
-            }, me);
+            }, this);
 
             /** Modal window for adding job type */
-            me.goToPostingJobType = function () {
+            this.goToPostingJobType = function () {
                 var jobTypeNewName = window.prompt('{{capitalizeFirst lang.toAddJobTypeToList}}');
                 if (jobTypeNewName) {
-                    appDatacontext.postCompanyJobType(me.id, {
+                    appDatacontext.postCompanyJobType(ths.id, {
                         name: jobTypeNewName,
                         description: '',
-                        companyId: me.id
+                        companyId: ths.id
                     }).done(function (jobTypeCreated) {
-                        me.jobTypeList.push(new JobType(jobTypeCreated));
+                        ths.jobTypeList.push(new JobType(jobTypeCreated));
                     });
                 }
             };
@@ -86,25 +88,59 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
             * Selected region
             * @type {module:models/wegion}
             */
-            me.selectedWegion = ko.observable();
+            this.selectedWegion = ko.observable();
 
             /**
             * Select well region
             * @param {module:models/wegion} wegionToSelect - Well region to select
+            * @param {object} [initialData] - Initial data
             */
-            me.selectWegion = function (wegionToSelect) {
+            this.selectWegion = function (wegionToSelect, initialData) {
+                initialData = initialData || {};
+
                 wegionToSelect.isOpenItem(true);
-                // Clean children for previous object
-                wegionToSelect.clearSetSelectedWellRegion();
+
+                // Unselect child
+                wegionToSelect.selectedWield(null);
+
+                // Select self
+                ths.selectedWegion(wegionToSelect);
+
+                // Select parents (not need)
+
+                if (!initialData.isHistory) {
+                    historyHelper.pushState('/companies/' + ths.id + '/well-regions/' + wegionToSelect.Id);
+                }
+
+                ////if (initialData.wieldId) {
+                ////    wegionToSelect.selectWieldById(initialData.wieldId);
+                ////}
+            };
+
+            /**
+            * Select region by id: wrap for select wegion function
+            * @param {number} wegionId - Id of well region
+            * @param {object} initialData - Initial data
+            */
+            this.selectWegionById = function (wegionId, initialData) {
+                if ($.isNumeric(wegionId)) {
+                    var tmpWegions = ko.unwrap(ths.wegions);
+
+                    tmpWegions.forEach(function (tmpWegion) {
+                        if (tmpWegion.Id === wegionId) {
+                            ths.selectWegion(tmpWegion, initialData);
+                        }
+                    });
+                }
             };
 
             /** Delete well region */
-            me.deleteWegion = function (wellRegionForDelete) {
+            this.deleteWegion = function (wellRegionForDelete) {
                 if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(wellRegionForDelete.Name) + '"?')) {
                     appDatacontext.deleteWellRegion(wellRegionForDelete).done(function () {
-                        me.wegions.remove(wellRegionForDelete);
+                        ths.wegions.remove(wellRegionForDelete);
 
-                        me.selectedWegion(null);
+                        ths.selectedWegion(null);
 
                         ////window.location.hash = window.location.hash.split('?')[0];
                     });
@@ -112,7 +148,7 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
             };
 
             /** Create and post new well region */
-            me.postWegion = function () {
+            this.postWegion = function () {
                 var inputName = document.createElement('input');
                 inputName.type = 'text';
                 $(inputName).prop({ 'required': true }).addClass('form-control');
@@ -125,9 +161,9 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
                 modalHelper.openModalWindow('Well region', innerDiv, function () {
                     appDatacontext.saveNewWellRegion({
                         Name: $(inputName).val(),
-                        CompanyId: me.id
+                        CompanyId: ths.id
                     }).done(function (result) {
-                        me.wegions.push(new Wegion(result, me));
+                        ths.wegions.push(new Wegion(result, ths));
                     });
 
                     modalHelper.closeModalWindow();
@@ -138,20 +174,27 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
             * Load wegions of this company
             * @param {object} [initialData] - Initial data
             */
-            me.loadWegions = function (initialData) {
+            this.loadWegions = function (initialData) {
                 initialData = initialData || {};
 
-                appDatacontext.getWellRegionList({
-                    company_id: me.id,
-                    is_inclusive: true
-                }).done(function (response) {
-                    me.wegions(importWegions(response, me));
-                    me.isLoadedWegions(true);
-                    if ($.isNumeric(initialData.wegionId)) {
+                if (!ko.unwrap(ths.isLoadedWegions)) {
+                    appDatacontext.getWellRegionList({
+                        company_id: ths.id,
+                        is_inclusive: true
+                    }).done(function (response) {
+                        ths.wegions(importWegions(response, ths));
+                        ths.isLoadedWegions(true);
 
-                        // select Wegion
+                        if ($.isNumeric(initialData.wegionId)) {
+                            ths.selectWegionById(initialData.wegionId, initialData);
+                        }
+                    });
+                }
+                else {
+                    if ($.isNumeric(initialData.wegionId)) {
+                        ths.selectWegionById(initialData.wegionId, initialData);
                     }
-                });
+                }
             };
         };
 

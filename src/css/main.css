@@ -121,6 +121,10 @@ footer {
                 text-decoration: none;
             }
 
+        .wfm-list ul > li .wfm-menu-header {
+            margin-left: 2px !important;
+        }
+
         .wfm-list ul > li .wfm-slc-menu-item {
             background-color: #777;
             color: #fff;

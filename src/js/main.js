@@ -3,17 +3,7 @@
 
     require(['console-shim', 'es5-shim'], function () {
         require(['jquery', 'knockout', 'viewmodels/workspace', 'filters/bindings', 'jquery.panzoom'], function ($, ko, WorkspaceViewModel) {
-            // Get company Id
-            ////'9cf09ba5-c049-4148-8e5f-869c1e26c330';
-
             var workspaceViewModel = new WorkspaceViewModel();
-            ////angRouteParams.companyId, {
-            ////regionId: parseInt(angRouteParams['region']),
-            ////fieldId: parseInt(angRouteParams['field']),
-            ////groupId: parseInt(angRouteParams['group']),
-            ////wellId: parseInt(angRouteParams['well']),
-            ////sectionId: angRouteParams['section']
-            ////});
 
             $(function () {
                 // ======================================= pan zoom =======================

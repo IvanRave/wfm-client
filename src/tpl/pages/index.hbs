@@ -54,39 +54,42 @@
                                     <div data-bind="if: canEditAll">
                                         {{> edit-mode-btn }}
                                     </div>
-                                    <div data-bind="with: company">
-                                        <div class="text-center" data-bind="ifnot: isLoadedWegions">
-                                            <span>{{lang.loading}}...</span>
-                                        </div>
-                                        <div style="display:none" data-bind="visible: isLoadedWegions">
-                                            <div class="clearfix">
-                                                <div class="sidebar-toggle" data-bind="css: $root.sidebarToggleCss">
-                                                    <button type="button" data-bind="click: $root.toggleIsVisibleMenu" title="Hide/show menu">
-                                                        <i class="glyphicon glyphicon-chevron-left" data-bind="visible: $root.isVisibleMenu"></i>
-                                                        <i class="glyphicon glyphicon-chevron-right" data-bind="hidden: $root.isVisibleMenu"></i>
-                                                    </button>
+                                    <div>
+                                        <div class="clearfix">
+                                            <div class="sidebar-toggle" data-bind="css: $root.sidebarToggleCss">
+                                                <button type="button" data-bind="click: $root.toggleIsVisibleMenu" title="Hide/show menu">
+                                                    <i class="glyphicon glyphicon-chevron-left" data-bind="visible: $root.isVisibleMenu"></i>
+                                                    <i class="glyphicon glyphicon-chevron-right" data-bind="hidden: $root.isVisibleMenu"></i>
+                                                </button>
+                                            </div>
+                                            <div class="sidebar-wrap" data-bind="css: $root.sidebarWrapCss">
+                                                <div data-bind="scroller: { }">
+                                                    {{> workspace-menu }}
                                                 </div>
-                                                <div class="sidebar-wrap" data-bind="css: $root.sidebarWrapCss">
-                                                    <div data-bind="scroller: { }">
-                                                        {{> workspace-menu }}
+                                            </div>
+                                            <div class="workspace-container" data-bind="with: company, css: $root.workAreaCss">
+												{{> modal-file-mgr }}
+												<div data-bind="ifnot: selectedWegion">
+													<h4 data-bind="text: name"></h4>
+													<h5 data-bind="text: description"></h5>
+												</div>
+												<div class="text-center" data-bind="ifnot: isLoadedWegions">
+                                                    <span>{{lang.loading}}...</span>
+                                                </div>
+                                                <div data-bind="with: selectedWegion">
+                                                    <div data-bind="ifnot: selectedWield">
+                                                        {{> wegion }}
                                                     </div>
-                                                </div>
-                                                <div class="workspace-container" data-bind="css: $root.workAreaCss">
-                                                    <div data-bind="with: selectedWegion">
-                                                        <div data-bind="ifnot: selectedWield">
-                                                            {{> wegion }}
+                                                    <div data-bind="with: selectedWield">
+                                                        <div data-bind="ifnot: selectedWroup">
+                                                            {{> wield }}
                                                         </div>
-                                                        <div data-bind="with: selectedWield">
-                                                            <div data-bind="ifnot: selectedWroup">
-                                                                {{> wield }}
+                                                        <div data-bind="with: selectedWroup">
+                                                            <div data-bind="ifnot: selectedWell">
+                                                                {{> wroup }}
                                                             </div>
-                                                            <div data-bind="with: selectedWroup">
-                                                                <div data-bind="ifnot: selectedWell">
-                                                                    {{> wroup }}
-                                                                </div>
-                                                                <div data-bind="with: selectedWell">
-                                                                    {{> well }}
-                                                                </div>
+                                                            <div data-bind="with: selectedWell">
+                                                                {{> well }}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -103,7 +106,6 @@
             </div>
         </div>
         {{> modal-standard }}
-        {{> modal-file-mgr }}
         {{> modal-panzoom }}
         {{> modal-wide }}
         {{> clip-path-perfomance }}

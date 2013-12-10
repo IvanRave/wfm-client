@@ -85,11 +85,15 @@ define(['jquery',
                 ////});
 
                 wroupToSelect.isOpenItem(true);
-                var parentWellRegion = self.getWellRegion();
-                parentWellRegion.clearSetSelectedWellRegion();
-                parentWellRegion.selectedWield(self);
-                parentWellRegion.selectedWield().selectedWroup(wroupToSelect);
+                // Unselect all wells
+                wroupToSelect.selectedWell(null);
+                // Set group as selected
+                self.selectedWroup(wroupToSelect);
 
+                // Set all parents as selected
+                self.getWellRegion().selectedWield(self);
+                self.getWellRegion().getCompany().selectedWegion(self.getWellRegion());
+               
                 // get last approved scopes of every well (one request)
                 // insert in every well
                 // get all test data for every with total

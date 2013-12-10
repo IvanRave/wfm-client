@@ -1,5 +1,5 @@
 ﻿/** @module */
-define(['jquery', 'knockout', 'models/employee', 'services/datacontext', 'services/auth'], function ($, ko, Employee, appDatacontext) {
+define(['jquery', 'knockout', 'models/employee', 'services/datacontext', 'helpers/history-helper', 'services/auth'], function ($, ko, Employee, appDatacontext, historyHelper) {
     'use strict';
 
     /** Import employees for this user */
@@ -14,8 +14,8 @@ define(['jquery', 'knockout', 'models/employee', 'services/datacontext', 'servic
     * @constructor
     */
     var exports = function (vm) {
-
-        var me = this;
+        /** Alternative for this */
+        var ths = this;
 
         /**
         * User email (name)
@@ -49,7 +49,7 @@ define(['jquery', 'knockout', 'models/employee', 'services/datacontext', 'servic
 
         /** Toggle registered state: login or registered page */
         this.toggleIsRegistered = function () {
-            me.isRegistered(!ko.unwrap(me.isRegistered));
+            ths.isRegistered(!ko.unwrap(ths.isRegistered));
         };
 
         /** Demo logon */
@@ -61,9 +61,9 @@ define(['jquery', 'knockout', 'models/employee', 'services/datacontext', 'servic
                 'email': demoEmail,
                 'password': demoPwd
             }).done(function () {
-                me.email(demoEmail);
-                me.isLogged(true);
-                me.loadEmployees();
+                ths.email(demoEmail);
+                ths.isLogged(true);
+                ths.loadEmployees();
             });
         };
 
@@ -71,25 +71,25 @@ define(['jquery', 'knockout', 'models/employee', 'services/datacontext', 'servic
 
         /** Logon with user data */
         this.realLogOn = function () {
-            me.realLogOnError('');
-            var tmpEmail = ko.unwrap(me.email),
-                tmpPwd = ko.unwrap(me.pwd),
-                tmpRememberMe = ko.unwrap(me.rememberMe);
+            ths.realLogOnError('');
+            var tmpEmail = ko.unwrap(ths.email),
+                tmpPwd = ko.unwrap(ths.pwd),
+                tmpRememberMe = ko.unwrap(ths.rememberMe);
 
             appDatacontext.accountLogon({}, {
                 'email': tmpEmail,
                 'password': tmpPwd,
                 'rememberMe': tmpRememberMe
             }).done(function () {
-                me.isLogged(true);
-                me.loadEmployees();
+                ths.isLogged(true);
+                ths.loadEmployees();
             }).fail(function (jqXHR) {
                 if (jqXHR.status === 422) {
                     var resJson = jqXHR.responseJSON;
                     var tmpProcessError = '*';
                     require(['helpers/lang-helper'], function (langHelper) {
                         tmpProcessError += (langHelper.translate(resJson.errId) || '{{lang.unknownError}}');
-                        me.realLogOnError(tmpProcessError);
+                        ths.realLogOnError(tmpProcessError);
                     });
                 }
             });
@@ -98,7 +98,7 @@ define(['jquery', 'knockout', 'models/employee', 'services/datacontext', 'servic
         /** Log out from app: clean objects, set isLogged to false */
         this.logOff = function () {
             appDatacontext.accountLogoff().done(function () {
-                me.isLogged(false);
+                ths.isLogged(false);
             });
         };
 
@@ -115,14 +115,14 @@ define(['jquery', 'knockout', 'models/employee', 'services/datacontext', 'servic
         this.loadAccountInfo = function (initialData) {
             initialData = initialData || {};
 
-            me.isLoadedAccountInfo(false);
-            me.isLogged(false);
+            ths.isLoadedAccountInfo(false);
+            ths.isLogged(false);
             appDatacontext.getAccountInfo().done(function (r) {
-                me.email(r.Email);
-                me.isLogged(true);
-                me.loadEmployees(initialData);
+                ths.email(r.Email);
+                ths.isLogged(true);
+                ths.loadEmployees(initialData);
             }).always(function () {
-                me.isLoadedAccountInfo(true);
+                ths.isLoadedAccountInfo(true);
             });
         };
 
@@ -143,15 +143,22 @@ define(['jquery', 'knockout', 'models/employee', 'services/datacontext', 'servic
         * @param {module:models/employee} employeeToSelect - Employee to select
         * @param {object} [initialData] - Initial data
         */
-        me.selectEmployee = function (employeeToSelect, initialData) {
+        this.selectEmployee = function (employeeToSelect, initialData) {
             initialData = initialData || {};
 
-            me.selectedEmployee(employeeToSelect);
+            // Unselect child
+            employeeToSelect.company.selectedWegion(null);
+
+            // Select self
+            ths.selectedEmployee(employeeToSelect);
+
+            // Select parents (no need)
+
             // Load all regions for company of selected employee
-            ko.unwrap(me.selectedEmployee).company.loadWegions(initialData);
+            ko.unwrap(ths.selectedEmployee).company.loadWegions(initialData);
 
             if (!initialData.isHistory) {
-                history.pushState({ companyId: employeeToSelect.companyId }, ko.unwrap(employeeToSelect.company.name), '#companies/' + employeeToSelect.companyId + '/well-regions');
+                historyHelper.pushState('/companies/' + employeeToSelect.companyId);
             }
         };
 
@@ -159,29 +166,29 @@ define(['jquery', 'knockout', 'models/employee', 'services/datacontext', 'servic
         * Whether employees are loaded 
         * @type {boolean}
         */
-        me.isLoadedEmployees = ko.observable(false);
+        this.isLoadedEmployees = ko.observable(false);
 
         /**
         * Load employee list for this user
         * @param {string} [initialData] - Default values to select, like company id, well id etc.
         */
-        me.loadEmployees = function (initialData) {
+        this.loadEmployees = function (initialData) {
             initialData = initialData || {};
 
-            me.isLoadedEmployees(false);
-            me.selectedEmployee(null);
+            ths.isLoadedEmployees(false);
+            ths.selectedEmployee(null);
             appDatacontext.getCompanyUserList().done(function (response) {
                 if (!initialData.isHistory) {
-                    history.pushState({}, 'Companies', '#companies');
+                    historyHelper.pushState('/companies');
                 }
                 var emplArray = importEmployees(response, vm);
-                me.employees(emplArray);
-                me.isLoadedEmployees(true);
+                ths.employees(emplArray);
+                ths.isLoadedEmployees(true);
 
                 if (initialData.companyId) {
                     emplArray.forEach(function (arrElem) {
                         if (arrElem.companyId === initialData.companyId) {
-                            me.selectEmployee(arrElem, initialData);
+                            ths.selectEmployee(arrElem, initialData);
                         }
                     });
                 }
@@ -192,11 +199,11 @@ define(['jquery', 'knockout', 'models/employee', 'services/datacontext', 'servic
         * Whether user is owner already: block link "register company"
         * @type {boolean}
         */
-        me.isOwnerAlready = ko.computed({
+        ths.isOwnerAlready = ko.computed({
             read: function () {
                 var result = false;
 
-                var tmpEmployees = ko.unwrap(me.employees);
+                var tmpEmployees = ko.unwrap(ths.employees);
 
                 tmpEmployees.forEach(function (arrElem) {
                     if (ko.unwrap(arrElem.canManageAll)) {

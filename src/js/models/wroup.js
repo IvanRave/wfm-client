@@ -106,29 +106,29 @@ define(['jquery',
                 var slcWellGroup = self;
                 var slcWellField = self.getWellField();
                 var slcWellRegion = slcWellField.getWellRegion();
+                var slcCompany = slcWellRegion.getCompany();
 
-                slcWellRegion.clearSetSelectedWellRegion();
-
-                // set selected items in DESC order (can be redraw each time if ASC order)
-                // set selected well
-                slcWellGroup.selectedWell(wellToSelect);
-
-                // set selected well group
-                slcWellField.selectedWroup(slcWellGroup);
-
-                // set selected well field
-                slcWellRegion.selectedWield(slcWellField);
-
-                ////console.log(previousSelectedSectionId);
-                // if null - then select Dashboard
-                //self.selectedSectionId(previousSelectedSectionId || null);
-
+                // 1. Section
                 if (previousSelectedSection) {
                     wellToSelect.selectSectionByPatternId(previousSelectedSection.SectionPatternId);
                 }
                 else {
                     wellToSelect.unselectSection();
                 }
+
+                // 2. Well
+                // set selected items in DESC order (can be redraw each time if ASC order)
+                // set selected well
+                slcWellGroup.selectedWell(wellToSelect);
+
+                // 3. Group: set selected well group
+                slcWellField.selectedWroup(slcWellGroup);
+
+                // 4: Field: set selected well field
+                slcWellRegion.selectedWield(slcWellField);
+
+                // 5. Region
+                slcCompany.selectedWegion(slcWellRegion);
             };
 
             /**

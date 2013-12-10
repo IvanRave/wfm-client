@@ -10,6 +10,9 @@ define(['knockout','models/company'], function (ko, Company) {
     var exports = function (data, vm) {
         data = data || {};
 
+        /** Alternative of this */
+        var ths = this;
+
         /**
         * Company guid
         * @type {string}
@@ -52,18 +55,16 @@ define(['knockout','models/company'], function (ko, Company) {
         */
         this.canManageAll = (this.accessLevel & 1) === 1;
 
-        var me = this;
-
         /**
         * Whether edit mode is turn on
         * @type {boolean}
         */
-        me.isEditMode = ko.observable(false);
+        this.isEditMode = ko.observable(false);
 
         /** Toggle edit mode: only if user can edit all */
-        me.toggleEditMode = function () {
-            if (me.canEditAll) {
-                me.isEditMode(!ko.unwrap(me.isEditMode));
+        this.toggleEditMode = function () {
+            if (ths.canEditAll) {
+                ths.isEditMode(!ko.unwrap(ths.isEditMode));
             }
         };
     };

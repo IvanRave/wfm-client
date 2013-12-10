@@ -13,41 +13,51 @@ define(['jquery',
             });
         }
 
+        /**
+        * Well region
+        * @constructor
+        * @param {object} data - Region data
+        * @param {module:models/company} company - Region company (parent)
+        */
         var exports = function (data, company) {
-            var self = this;
             data = data || {};
 
-            // Persisted properties
-            self.Id = data.Id;
-            self.CompanyId = data.CompanyId;
-            self.Name = ko.observable(data.Name);
-            self.WellFields = ko.observableArray();
+            var self = this;
 
-            self.getCompany = function () {
+            // Persisted properties
+            this.Id = data.Id;
+            this.CompanyId = data.CompanyId;
+            this.Name = ko.observable(data.Name);
+            this.WellFields = ko.observableArray();
+
+            this.getCompany = function () {
                 return company;
             };
 
-            self.getParentViewModel = function () {
+            this.getParentViewModel = function () {
                 return self.getCompany().getRootViewModel();
             };
 
-            self.isOpenItem = ko.observable(false);
+            this.isOpenItem = ko.observable(false);
 
             // toggle item - only open menu tree (show inner object without content)
-            self.toggleItem = function () {
+            this.toggleItem = function () {
                 self.isOpenItem(!self.isOpenItem());
             };
 
             /** Is selected item */
-            self.isSelectedItem = ko.computed({
+            this.isSelectedItem = ko.computed({
                 read: function () {
                     return (self === ko.unwrap(self.getCompany().selectedWegion));
                 },
                 deferEvaluation: true
             });
 
-            /** Is item selected and showed on the page */
-            self.isShowedItem = ko.computed({
+            /** 
+            * Is item selected and showed on the page 
+            * @type {boolean}
+            */
+            this.isShowedItem = ko.computed({
                 read: function () {
                     if (ko.unwrap(self.isSelectedItem)) {
                         if (!ko.unwrap(self.selectedWield)) {
@@ -62,9 +72,15 @@ define(['jquery',
 
             self.selectWield = function (wieldToSelect) {
                 wieldToSelect.isOpenItem(true);
+                
+                // Unselect child
+                wieldToSelect.selectedWroup(null);
 
-                self.clearSetSelectedWellRegion();
+                // Select self
                 self.selectedWield(wieldToSelect);
+                
+                // Select parents
+                self.getCompany().selectedWegion(self);
 
                 ////window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
                 ////    region: self.getWellRegion().Id,
@@ -79,25 +95,6 @@ define(['jquery',
                 if (mapSection) {
                     wieldToSelect.selectSection(mapSection);
                 }
-            };
-
-            // well.selectedGroup.selectedField.selectedRegion.clear() instead every prop
-            self.clearSetSelectedWellRegion = function () {
-                self.getCompany().selectedWegion(null);
-                var slcWellField = self.selectedWield;
-                if (slcWellField()) {
-                    var slcWellGroup = slcWellField().selectedWroup;
-                    if (slcWellGroup()) {
-                        var slcWell = slcWellGroup().selectedWell;
-                        if (slcWell()) {
-                            slcWell(null);
-                        }
-                        slcWellGroup(null);
-                    }
-                    slcWellField(null);
-                }
-
-                self.getCompany().selectedWegion(self);
             };
 
             self.deleteWellField = function (wellFieldForDelete) {

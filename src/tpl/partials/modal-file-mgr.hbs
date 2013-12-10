@@ -1,7 +1,23 @@
-﻿<div class="modal fade" role="dialog" tabindex="-1" aria-hidden="true">
+﻿<!-- Block with company context -->
+<div class="modal fade" role="dialog" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-wide">
     <div class="modal-content">
       <div class="modal-body">
+        <div>
+          Header navigation string: Wells (folders with well names) > 123 (one folder - sections) > Sections (folder for every section) > History (show all history files) or
+          WellField43 > WellGroup123 (show wells folder and groupsections folder)
+          
+          Need new checker (Items or Sections folder)
+        </div>
+        <div>
+          <span>Wegions</span>
+          <span>CompanySections</span>
+        </div>
+        <div data-bind="with: selectedWegion">
+          Show two folders: Sections and Fields (no Selected Wield, no Selected Section)
+          <div data-bind="if: selectedWield">
+          </div>
+        </div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-primary modal-ok" type="button">OK</button>

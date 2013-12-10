@@ -1,5 +1,13 @@
 ﻿<div class="wfm-list">
   <ul class="list-unstyled">
+    <li>
+      <div class="wfm-menu-item wfm-menu-header" data-bind="click: $parent.selectEmployee">
+        <span data-bind="with: company">
+          <span data-bind="text: name, attr: {title: name}"></span>
+        </span>
+      </div>
+    </li>
+    <!-- ko with: company -->
     <!-- ko foreach: wegions -->
     <li>
       <div class="clearfix">
@@ -85,5 +93,6 @@
     <li data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
       <button class="btn btn-xs" data-bind="click: postWegion" type="button">Add region</button>
     </li>
+    <!-- /ko -->
   </ul>
 </div>

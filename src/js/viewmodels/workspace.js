@@ -6,63 +6,65 @@ define([
     'helpers/modal-helper',
     'helpers/app-helper',
     'models/user-profile',
+    'helpers/history-helper',
     'helpers/knockout-lazy',
-    'models/wfm-param-squad'], function ($, ko, datacontext, bootstrapModal, appHelper, UserProfile) {
+    'models/wfm-param-squad'], function ($, ko, datacontext, bootstrapModal, appHelper, UserProfile, historyHelper) {
         'use strict';
 
+        /**
+        * Root view model
+        * @constructor
+        */
         var exports = function () {
-            // Test company Id with Guid format (this checks retry server check in WorkSpace view of Home controller
-            ////if (!appHelper.isGuidValid(companyId)) {
-            ////    var errValidMsg = 'Company id is not valid GUID';
-            ////    alert(errValidMsg);
-            ////    throw new TypeError(errValidMsg);
-            ////}        
+            /** Alternative for this */
+            var ths = this;
 
-            var self = this;
-
-            // Left tree menu with well regions, groups, fields, wells
-            self.isVisibleMenu = ko.observable(true);
+            /** 
+            * Whether left tree menu with well regions, groups, fields, wells is visible
+            * @type {boolean}
+            */
+            this.isVisibleMenu = ko.observable(true);
 
             // Left tree menu with well regions, groups, fields, wells
-            self.toggleIsVisibleMenu = function () {
-                self.isVisibleMenu(!ko.unwrap(self.isVisibleMenu));
+            this.toggleIsVisibleMenu = function () {
+                ths.isVisibleMenu(!ko.unwrap(ths.isVisibleMenu));
             };
 
-            self.sidebarWrapCss = ko.computed({
+            this.sidebarWrapCss = ko.computed({
                 read: function () {
-                    return ko.unwrap(self.isVisibleMenu) ? 'sidebar-wrap-visible' : 'hidden';
+                    return ko.unwrap(ths.isVisibleMenu) ? 'sidebar-wrap-visible' : 'hidden';
                 },
                 deferEvaluation: true
             });
 
-            self.workAreaCss = ko.computed({
+            this.workAreaCss = ko.computed({
                 read: function () {
-                    return ko.unwrap(self.isVisibleMenu) ? 'work-area' : '';
+                    return ko.unwrap(ths.isVisibleMenu) ? 'work-area' : '';
                 },
                 deferEvaluation: true
             });
 
-            self.sidebarToggleCss = ko.computed({
+            this.sidebarToggleCss = ko.computed({
                 read: function () {
-                    return ko.unwrap(self.isVisibleMenu) ? 'sidebar-toggle-visible' : 'sidebar-toggle-hidden';
+                    return ko.unwrap(ths.isVisibleMenu) ? 'sidebar-toggle-visible' : 'sidebar-toggle-hidden';
                 },
                 deferEvaluation: true
             });
 
             // =====================================Wfm parameters begin==========================================================
-            self.wfmParamSquadList = ko.lazyObservableArray(function () {
+            this.wfmParamSquadList = ko.lazyObservableArray(function () {
                 datacontext.getWfmParamSquadList({ is_inclusive: true }).done(function (r) {
                     // WfmParamSquadList (convert data objects into array)
                     function importWfmParamSquadList(data) {
                         return $.map(data || [], function (item) { return datacontext.createWfmParamSquad(item); });
                     }
 
-                    self.wfmParamSquadList(importWfmParamSquadList(r));
+                    ths.wfmParamSquadList(importWfmParamSquadList(r));
                 });
-            }, self);
+            }, this);
 
             /** Get list of section patterns: lazy loading by first request */
-            self.ListOfSectionPatternDto = ko.lazyObservableArray(function () {
+            this.ListOfSectionPatternDto = ko.lazyObservableArray(function () {
                 datacontext.getListOfSectionPattern().done(function (r) {
                     require(['models/section-pattern'], function (SectionPattern) {
 
@@ -70,15 +72,15 @@ define([
                             return $.map(data || [], function (item) { return new SectionPattern(item); });
                         }
 
-                        self.ListOfSectionPatternDto(importListOfSectionPattern(r));
+                        ths.ListOfSectionPatternDto(importListOfSectionPattern(r));
                     });
                 });
-            }, self);
+            }, this);
 
             // Get all parameters from all groups as one dimensional array
-            self.wfmParameterList = ko.computed({
+            this.wfmParameterList = ko.computed({
                 read: function () {
-                    return $.map(ko.unwrap(self.wfmParamSquadList), function (sqdElem) {
+                    return $.map(ko.unwrap(ths.wfmParamSquadList), function (sqdElem) {
                         return $.map(ko.unwrap(sqdElem.wfmParameterList), function (prmElem) {
                             return prmElem;
                         });
@@ -88,33 +90,41 @@ define([
             });
             // =====================================Wfm parameters end==========================================================
 
+            // Test company Id with Guid format (this checks retry server check in WorkSpace view of Home controller
+            ////if (!appHelper.isGuidValid(companyId)) {
+            ////    var errValidMsg = 'Company id is not valid GUID';
+            ////    alert(errValidMsg);
+            ////    throw new TypeError(errValidMsg);
+            ////}        
+
+
             // load list of well region, well field...
             ////function loadStructure() {
             ////    function getSucceeded(data) {
             ////        var mappedStructure = $.map(data, function (list) {
-            ////            return new WellRegion(list, self);
+            ////            return new WellRegion(list, ths);
             ////        });
 
-            ////        self.wellRegionList(mappedStructure);
+            ////        ths.wellRegionList(mappedStructure);
 
             ////        // route region/id/field/id/group/id/well/id
             ////        ////var choosedObj = getChoosedIdFromHash();
             ////        console.log(choosedObj);
-            ////        var tmpRegion = appHelper.getElementByPropertyValue(self.wellRegionList(), 'Id', choosedObj.regionId);
+            ////        var tmpRegion = appHelper.getElementByPropertyValue(ths.wellRegionList(), 'Id', choosedObj.regionId);
             ////        if (tmpRegion) {
-            ////            self.selectedWellRegion(tmpRegion);
+            ////            ths.selectedWellRegion(tmpRegion);
             ////            tmpRegion.isOpenItem(true);
-            ////            var tmpField = appHelper.getElementByPropertyValue(self.selectedWellRegion().WellFields(), 'Id', choosedObj.fieldId);
+            ////            var tmpField = appHelper.getElementByPropertyValue(ths.selectedWellRegion().WellFields(), 'Id', choosedObj.fieldId);
             ////            if (tmpField) {
-            ////                self.selectedWellRegion().selectedWield(tmpField);
+            ////                ths.selectedWellRegion().selectedWield(tmpField);
             ////                tmpField.isOpenItem(true);
-            ////                var tmpGroup = appHelper.getElementByPropertyValue(self.selectedWellRegion().selectedWield().WellGroups(), 'Id', choosedObj.groupId);
+            ////                var tmpGroup = appHelper.getElementByPropertyValue(ths.selectedWellRegion().selectedWield().WellGroups(), 'Id', choosedObj.groupId);
             ////                if (tmpGroup) {
-            ////                    self.selectedWellRegion().selectedWield().selectedWroup(tmpGroup);
+            ////                    ths.selectedWellRegion().selectedWield().selectedWroup(tmpGroup);
             ////                    tmpGroup.isOpenItem(true);
-            ////                    var tmpWell = appHelper.getElementByPropertyValue(self.selectedWellRegion().selectedWield().selectedWroup().Wells(), 'Id', choosedObj.wellId);
+            ////                    var tmpWell = appHelper.getElementByPropertyValue(ths.selectedWellRegion().selectedWield().selectedWroup().Wells(), 'Id', choosedObj.wellId);
             ////                    if (tmpWell) {
-            ////                        self.selectedWellRegion().selectedWield().selectedWroup().selectedWell(tmpWell);
+            ////                        ths.selectedWellRegion().selectedWield().selectedWroup().selectedWell(tmpWell);
             ////                        tmpWell.isOpenItem(true);
             ////                        // todo: change logic - when change selected id - need to execute additional logic
             ////                        if (choosedObj.sectionId) {
@@ -130,7 +140,7 @@ define([
             ////                        ////}
 
             ////                        // this set selected well
-            ////                        ////console.log(self.selectedWellRegion().selectedWield().selectedWroup().selectedWell());
+            ////                        ////console.log(ths.selectedWellRegion().selectedWield().selectedWroup().selectedWell());
             ////                    }
             ////                }
             ////            }
@@ -149,30 +159,21 @@ define([
             * User profile
             * @type {module:models/user-profile}
             */
-            self.userProfile = new UserProfile(self);
+            this.userProfile = new UserProfile(ths);
 
-            var initialData = {};
-            var initialHash = document.location.hash;
-            if (initialHash) {
-                initialHash = initialHash.substring(1);
-                var hashArr = initialHash.split('/');
-                if (hashArr[0] === 'companies') {
-                    if (hashArr[1]) {
-                        initialData.companyId = hashArr[1];
-                    }
-                }
-            }
+            //var initialData = getInitialData(document.location.hash);
 
             /** Auth user profile and load data if successful */
-            self.userProfile.loadAccountInfo(initialData);
+            this.userProfile.loadAccountInfo(historyHelper.getInitialData(document.location.hash.substring(1)));
 
             /** Back, forward, refresh browser navigation */
-            window.onpopstate = function (event) {
-                var popInitialData = event.state;
-                popInitialData.isHistory = true;
+            window.onpopstate = function () {
+                var stateData = historyHelper.getInitialData(document.location.hash.substring(1));
+                // When load any info - do not push info to history again
+                stateData.isHistory = true;
                 // Reload all data
-                self.userProfile.loadAccountInfo(popInitialData);
-                console.log('location: ' + document.location + ', state: ' + JSON.stringify(event.state));
+                ths.userProfile.loadAccountInfo(stateData);
+                console.log('location: ' + document.location.hash + ', state: ' + JSON.stringify(stateData));
             };
         };
 
