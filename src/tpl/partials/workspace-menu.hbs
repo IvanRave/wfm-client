@@ -8,6 +8,13 @@
       </div>
     </li>
     <!-- ko with: company -->
+    <!-- ko ifnot: isLoadedWegions -->
+    <li>
+      <div class="wfm-menu-item wfm-menu-header text-center">
+        <img src="img/ajax-line-loader.gif" alt="{{lang.loading}}"/>
+      </div>
+    </li>
+    <!-- /ko -->
     <!-- ko foreach: wegions -->
     <li>
       <div class="clearfix">

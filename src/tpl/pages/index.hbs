@@ -73,9 +73,6 @@
 													<h4 data-bind="text: name"></h4>
 													<h5 data-bind="text: description"></h5>
 												</div>
-												<div class="text-center" data-bind="ifnot: isLoadedWegions">
-                                                    <span>{{lang.loading}}...</span>
-                                                </div>
                                                 <div data-bind="with: selectedWegion">
                                                     <div data-bind="ifnot: selectedWield">
                                                         {{> wegion }}
