@@ -44,9 +44,30 @@ contains words (with translation) for all WFM services
 * Well regions divides by fields
 * Well field divides by groups
 * Well group divides by wells
-* Each well contains sections and widgets (widgets for each section and more)
+* Each stage (company, region, field, group, well) contains sections and widgets (widgets per section and more).
 
-### Well sections
+### Sections
+
+Section - it is a part of page view (or part of file manager like a folder).
+
+* Id
+* ListOfFiles {Array.<File>} - Files from file table
+* IdOfSectionPattern
+
+Name, color, icon, visibility, and other properties of section defined in patterns on admin level.
+If needed, properties can be moved from pattern to the section level: for example every section can have own name.
+
+### Section patterns
+
+* IdOfPattern
+* Name {string}
+* IconUrl {string} - Icon url
+* IsVisibleOnPage {boolean} - Is visible on a page. Some sections can be showed only like folders in file manager: do not show on a page.
+* IsVisibleAsFolder {boolean} - Is visible in a file manager (as a folder). Some sections (like summary) can't include files: do not show as a folders
+* FileFormatRegularExpression {string} - Regular expression for available file formats
+
+#### Well sections
+
 * Summary (main well parameters)
 * Sketch and volumes
 * History

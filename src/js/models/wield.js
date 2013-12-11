@@ -66,7 +66,7 @@ define(['jquery',
             * List of sections
             * @type {Array.<module:models/section-of-wield>}
             */
-            this.ListOfSectionOfWieldDto = ko.observableArray();
+            this.listOfSectionOfWieldDto = ko.observableArray();
 
             /**
             * List of groups
@@ -140,7 +140,7 @@ define(['jquery',
             /** Set this section as selected */
             self.selectSection = function (sectionToSelect) {
                 if (sectionToSelect) {
-                    switch (sectionToSelect.SectionPatternId) {
+                    switch (sectionToSelect.sectionPatternId) {
                         case 'wield-map':
                             // Get all maps from this field
                             self.getWellFieldMaps(function () {
@@ -159,7 +159,7 @@ define(['jquery',
             };
 
             self.deleteWellFieldMap = function (itemToDelete) {
-                if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(itemToDelete.FileSpec.Name) + '"?')) {
+                if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(itemToDelete.fileSpec.name) + '"?')) {
                     datacontext.deleteWellFieldMap(self.Id, itemToDelete.Id).done(function () {
                         self.WellFieldMaps.remove(itemToDelete);
                     });
@@ -293,7 +293,7 @@ define(['jquery',
             self.WellGroups(importWellGroupsDto(data.WellGroupsDto, self));
 
             /** Load sections */
-            self.ListOfSectionOfWieldDto(importListOfSectionOfWieldDto(data.ListOfSectionOfWieldDto, self));
+            self.listOfSectionOfWieldDto(importListOfSectionOfWieldDto(data.ListOfSectionOfWieldDto, self));
         };
 
         return exports;

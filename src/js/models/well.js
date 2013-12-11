@@ -155,7 +155,7 @@ define([
         * List of data transfer objects of sections of well
         * @type {Array.<module:models/section-of-well>}
         */
-        this.ListOfSectionOfWellDto = ko.observableArray();
+        this.listOfSectionOfWellDto = ko.observableArray();
 
         var self = this;
 
@@ -230,7 +230,7 @@ define([
 
             self.selectedSection(sectionToSelect);
 
-            switch (sectionToSelect.SectionPatternId) {
+            switch (sectionToSelect.sectionPatternId) {
                 // Dashboard: from undefined to null
                 case 'well-history': {
                     self.getWellHistoryList();
@@ -328,9 +328,9 @@ define([
         */
         self.selectSectionByPatternId = function (sectionPatternId) {
             // Find section from list
-            var tmpSectionList = ko.unwrap(self.ListOfSectionOfWellDto);
+            var tmpSectionList = ko.unwrap(self.listOfSectionOfWellDto);
             var needSection = $.grep(tmpSectionList, function (arrElem) {
-                return arrElem.SectionPatternId === sectionPatternId;
+                return arrElem.sectionPatternId === sectionPatternId;
             })[0];
 
             if (needSection) {
@@ -1177,7 +1177,7 @@ define([
         };
 
         /** Load well sections */
-        self.ListOfSectionOfWellDto(importSectionList(data.ListOfSectionOfWellDto, self));
+        self.listOfSectionOfWellDto(importSectionList(data.ListOfSectionOfWellDto, self));
 
         // ==================================================================== Well perfomance section end ========================================
 

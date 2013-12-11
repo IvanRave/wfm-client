@@ -110,7 +110,7 @@ define(['jquery',
 
                 // 1. Section
                 if (previousSelectedSection) {
-                    wellToSelect.selectSectionByPatternId(previousSelectedSection.SectionPatternId);
+                    wellToSelect.selectSectionByPatternId(previousSelectedSection.sectionPatternId);
                 }
                 else {
                     wellToSelect.unselectSection();

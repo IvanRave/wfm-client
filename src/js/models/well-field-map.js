@@ -28,6 +28,9 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
         var exports = function (data, wellField) {
             data = data || {};
 
+            /** Alternative of this */
+            var self = this;
+
             /** Get well field (parent) */
             this.getWellField = function () {
                 return wellField;
@@ -49,7 +52,7 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
             * Map file specification
             * @type {module:models/file-spec}
             */
-            this.FileSpec = new FileSpec(data.FileSpecDto);
+            this.fileSpec = new FileSpec(data.FileSpecDto);
 
             /** 
             * Map description
@@ -104,8 +107,6 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
             * @type {Array.<Well>}
             */
             this.WellInWellFieldMaps = ko.observableArray();
-
-            var self = this;
 
             function initYandexMap(wellFieldMapItem, wellFieldItem) {
                 ////if (myMap) { myMap.destroy(); }

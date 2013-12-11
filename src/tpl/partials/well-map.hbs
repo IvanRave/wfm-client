@@ -21,7 +21,7 @@
             <i class="glyphicon glyphicon-circle-arrow-down" data-bind="visible: $data === $parent.getWellGroup().getWellField().selectedWieldMap()"></i>
             <i class="glyphicon glyphicon-circle-arrow-right" data-bind="visible: $data != $parent.getWellGroup().getWellField().selectedWieldMap()"></i>
             <a href="#" data-bind="click: showWellFieldMap, attr: { title: Description }">
-              <span data-bind="text: FileSpec.Name"></span>
+              <span data-bind="text: fileSpec.name"></span>
             </a>
           </div>
           <div class="pull-right">

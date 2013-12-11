@@ -10,11 +10,11 @@ define([], function () {
     var exports = function (data) {
         data = data || {};
 
-        this.Id = data.Id;
+        this.id = data.Id;
 
-        this.Name = data.Name;
+        this.name = data.Name;
 
-        this.FileFormatRegExp = data.FileFormatRegExp;
+        this.fileFormatRegExp = data.FileFormatRegExp;
     };
 
     return exports;

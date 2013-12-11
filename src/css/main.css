@@ -350,11 +350,11 @@ footer {
 }
 
 /* Well, field, group, region tab links to sections */
-.wfm-tab-panel {
+.wfm-bottom-tab-panel {
     background-color: #222;
 }
 
-    .wfm-tab-panel .nav-pills > li > div {
+    .wfm-bottom-tab-panel .nav-pills > li > div {
         border-radius: 0;
         padding: 0;
         color: #a1a1a1;
@@ -364,17 +364,17 @@ footer {
         cursor: pointer;
     }
 
-        .wfm-tab-panel .nav-pills > li > div:focus {
+        .wfm-bottom-tab-panel .nav-pills > li > div:focus {
             background-color: #000;
             color: #c0c0c0;
         }
 
-        .wfm-tab-panel .nav-pills > li > div:hover {
+        .wfm-bottom-tab-panel .nav-pills > li > div:hover {
             background-color: #111;
             color: #c8c8c8;
         }
 
-        .wfm-tab-panel .nav-pills > li > div .caret {
+        .wfm-bottom-tab-panel .nav-pills > li > div .caret {
             position: absolute;
             bottom: 4px;
             right: 4px;
@@ -382,15 +382,15 @@ footer {
             border-bottom-color: #ccc;
         }
 
-        .wfm-tab-panel .nav-pills > li > div > span {
+        .wfm-bottom-tab-panel .nav-pills > li > div > span {
             font-size: 70%;
         }
 
-        .wfm-tab-panel .nav-pills > li > div > i {
+        .wfm-bottom-tab-panel .nav-pills > li > div > i {
             font-size: 150%;
         }
 
-    .wfm-tab-panel .nav-pills > li.active > div {
+    .wfm-bottom-tab-panel .nav-pills > li.active > div {
         background-color: #000;
         color: #c0c0c0;
     }
@@ -441,13 +441,13 @@ footer {
         /*z-index for scroll - 99*/
     }
 
-    .wfm-tab-panel {
+    .wfm-bottom-tab-panel {
         position: fixed;
         bottom: 0;
         z-index: 1031;
     }
 
-    .wfm-workspace-well-top-tab {
+    .wfm-top-tab-panel {
         position: fixed;
         top: 0;
         z-index: 1031;

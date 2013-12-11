@@ -170,6 +170,10 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
                 });
             };
 
+            this.showFileMgr = function () {
+                modalHelper.modalFileMgr.show();
+            };
+
             /** 
             * Load wegions of this company
             * @param {object} [initialData] - Initial data

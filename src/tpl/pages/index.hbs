@@ -68,11 +68,18 @@
                                                 </div>
                                             </div>
                                             <div class="workspace-container" data-bind="with: company, css: $root.workAreaCss">
-												{{> modal-file-mgr }}
-												<div data-bind="ifnot: selectedWegion">
-													<h4 data-bind="text: name"></h4>
-													<h5 data-bind="text: description"></h5>
-												</div>
+                                                <div class="wfm-top-tab-panel clearfix">
+                                                    <div class="pull-left" style="margin-top:1px">
+                                                        <button class="btn btn-inverse btn-sm" type="button" data-bind="click: showFileMgr">
+                                                            <i class="glyphicon glyphicon-folder-open"></i>&nbsp;&nbsp;<span>{{capitalizeFirst lang.fileManager}}</span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                {{> modal-file-mgr }}
+                                                <div data-bind="ifnot: selectedWegion">
+                                                    <h4 data-bind="text: name"></h4>
+                                                    <h5 data-bind="text: description"></h5>
+                                                </div>
                                                 <div data-bind="with: selectedWegion">
                                                     <div data-bind="ifnot: selectedWield">
                                                         {{> wegion }}

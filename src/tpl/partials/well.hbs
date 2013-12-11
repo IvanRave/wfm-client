@@ -1,5 +1,5 @@
 ﻿<div>
-  <div class="wfm-workspace-well-top-tab clearfix">
+  <div class="wfm-top-tab-panel clearfix">
     <div class="pull-left" style="margin-top:1px">
       <button class="btn btn-inverse btn-sm" type="button" data-bind="click: unselectSection">
         <i class="glyphicon glyphicon-th"></i>&nbsp;&nbsp;<span>{{capitalizeFirst lang.well}} {{lang.dashboard}}</span>
@@ -12,25 +12,25 @@
     </div>
   </div>
 
-  <div class="wfm-tab-panel clearfix">
+  <div class="wfm-bottom-tab-panel clearfix">
     <div class="pull-left">
-      <ul class="nav nav-pills" data-bind="foreach: ListOfSectionOfWellDto">
-        <!-- ko if: (SectionPatternId !== 'well-perfomance') -->
+      <ul class="nav nav-pills" data-bind="foreach: listOfSectionOfWellDto">
+        <!-- ko if: (sectionPatternId !== 'well-perfomance') -->
         <li data-bind="css: {'active': isSectionSelected }">
           <div data-bind="click: $parent.selectSection">
-            <span data-bind="with: SectionPattern">
-              <span data-bind="text: Name"></span>
+            <span data-bind="with: sectionPattern">
+              <span data-bind="text: name"></span>
             </span>
             <br />
             <i class="wfmicon" data-bind="css: 'wfmicon-summary'"></i>
           </div>
         </li>
         <!-- /ko -->
-        <!-- ko if: (SectionPatternId === 'well-perfomance') -->
+        <!-- ko if: (sectionPatternId === 'well-perfomance') -->
         <li class="dropup" data-bind="css: {'active': isSectionSelected }">
           <div class="dropdown-toggle" data-toggle="dropdown" data-bind="drpdwn:{}">
-            <span data-bind="with: SectionPattern">
-              <span data-bind="text: Name"></span>
+            <span data-bind="with: sectionPattern">
+              <span data-bind="text: name"></span>
             </span>
             <br />
             <i class="wfmicon" data-bind="css: 'wfmicon-pd'"></i>
@@ -51,37 +51,37 @@
 
   <div class="tab-content-pad">
     <div data-bind="if: selectedSection">
-      <div data-bind="if: selectedSection().SectionPatternId === 'well-history'">
+      <div data-bind="if: selectedSection().sectionPatternId === 'well-history'">
         {{> well-history}}
       </div>
-      <div data-bind="if: selectedSection().SectionPatternId === 'well-integrity'">
+      <div data-bind="if: selectedSection().sectionPatternId === 'well-integrity'">
         {{> well-integrity}}
       </div>
-      <div data-bind="if: selectedSection().SectionPatternId === 'well-log'">
+      <div data-bind="if: selectedSection().sectionPatternId === 'well-log'">
         {{> well-log}}
       </div>
-      <div data-bind="if: selectedSection().SectionPatternId === 'well-map'">
+      <div data-bind="if: selectedSection().sectionPatternId === 'well-map'">
         {{> well-map}}
       </div>
-      <div data-bind="if: selectedSection().SectionPatternId === 'well-nodalanalysis'">
+      <div data-bind="if: selectedSection().sectionPatternId === 'well-nodalanalysis'">
         {{> well-nodalanalysis}}
       </div>
-      <div data-bind="if: selectedSection().SectionPatternId === 'well-perfomance'">
+      <div data-bind="if: selectedSection().sectionPatternId === 'well-perfomance'">
         {{> well-pd}}
       </div>
-      <div data-bind="if: selectedSection().SectionPatternId === 'well-report'">
+      <div data-bind="if: selectedSection().sectionPatternId === 'well-report'">
         {{> well-report}}
       </div>
-      <div data-bind="if: selectedSection().SectionPatternId === 'well-sketch'">
+      <div data-bind="if: selectedSection().sectionPatternId === 'well-sketch'">
         {{> well-sketch}}
       </div>
-      <div data-bind="if: selectedSection().SectionPatternId === 'well-summary'">
+      <div data-bind="if: selectedSection().sectionPatternId === 'well-summary'">
         {{> well-summary}}
       </div>
-      <div data-bind="if: selectedSection().SectionPatternId === 'well-test'">
+      <div data-bind="if: selectedSection().sectionPatternId === 'well-test'">
         {{> well-test}}
       </div>
-      <div data-bind="if: selectedSection().SectionPatternId === 'well-volume'">
+      <div data-bind="if: selectedSection().sectionPatternId === 'well-volume'">
         {{> well-volume}}
       </div>
     </div>

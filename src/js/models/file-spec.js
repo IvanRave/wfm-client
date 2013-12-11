@@ -14,25 +14,25 @@ define(['knockout'], function (ko) {
         * File guid
         * @type {string}
         */
-        this.Id = data.Id;
+        this.id = data.Id;
 
         /**
         * File name (255)
         * @type {string}
         */
-        this.Name = ko.observable(data.Name);
+        this.name = ko.observable(data.Name);
 
         /**
         * File extension
         * @type {string}
         */
-        this.Extension = data.Extension;
+        this.extension = data.Extension;
 
         /**
         * Content type
         * @type {string}
         */
-        this.ContentType = data.ContentType;
+        this.contentType = data.ContentType;
 
         // TODO: add other properties
     };

@@ -1,21 +1,43 @@
 ﻿<!-- Block with company context -->
-<div class="modal fade" role="dialog" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="modal-file-mgr" role="dialog" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-wide">
     <div class="modal-content">
       <div class="modal-body">
-        <div>
-          Header navigation string: Wells (folders with well names) > 123 (one folder - sections) > Sections (folder for every section) > History (show all history files) or
-          WellField43 > WellGroup123 (show wells folder and groupsections folder)
-          
-          Need new checker (Items or Sections folder)
-        </div>
-        <div>
-          <span>Wegions</span>
-          <span>CompanySections</span>
+        <div data-bind="ifnot: selectedWegion">
+          Show all company sections (and files for each section)
         </div>
         <div data-bind="with: selectedWegion">
-          Show two folders: Sections and Fields (no Selected Wield, no Selected Section)
-          <div data-bind="if: selectedWield">
+          <div data-bind="ifnot: selectedWield">
+            Show all region sections and files
+          </div>
+          <div data-bind="with: selectedWield">
+            <div data-bind="ifnot: selectedWroup">
+              Show all field sections and files
+              <div data-bind="foreach: listOfSectionOfWieldDto">
+                <span data-bind="with: sectionPattern">
+                  <span data-bind="text: name"></span>
+                </span>
+                <button class="btn" data-bind="click: loadListOfFileSpec">Load list</button>
+                <span class="btn btn-xs btn-default fileinput-button">
+                  <i class="glyphicon glyphicon-plus"></i>
+                  <span>Add file...</span>
+                  <input data-bind="filoader: sectionFiloader" type="file" name="smth_files[]"></input>
+                </span>
+              </div>
+            </div>
+            <div data-bind="with: selectedWroup">
+              <div data-bind="ifnot: selectedWell">
+                Show all group sections and files
+              </div>
+              <div data-bind="with: selectedWell">
+                Show all well sections and files
+                <div data-bind="foreach: listOfSectionOfWellDto">
+                  <span data-bind="with: sectionPattern">
+                    <span data-bind="text: name"></span>
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

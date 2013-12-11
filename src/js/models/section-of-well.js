@@ -20,30 +20,30 @@ define(['jquery', 'knockout'], function ($, ko) {
         * Section guid
         * @type {string}
         */
-        this.Id = data.Id;
+        this.id = data.Id;
 
         /**
         * Whether the section is visible
         * @type {boolean}
         */
-        this.IsVisible = ko.observable(data.IsVisible);
+        this.isVisible = ko.observable(data.IsVisible);
 
         /**
         * Id of section pattern: contains info like section Name and other
         * @type {string}
         */
-        this.SectionPatternId = data.SectionPatternId;
+        this.sectionPatternId = data.SectionPatternId;
 
         /**
         * Section pattern (default name, file formats and other params for section)
         * @type {module:models/section-pattern}
         */
-        this.SectionPattern = ko.computed({
+        this.sectionPattern = ko.computed({
             read: function () {
                 var tmpListOfSectionPattern = ko.unwrap(this.getWell().getWellGroup().getWellField().getWellRegion().getParentViewModel().ListOfSectionPatternDto);
-                var tmpSectionPatternId = this.SectionPatternId;
+                var tmpSectionPatternId = this.sectionPatternId;
                 var byId = $.grep(tmpListOfSectionPattern, function (arrElem) {
-                    return arrElem.Id === tmpSectionPatternId;
+                    return arrElem.id === tmpSectionPatternId;
                 });
 
                 if (byId.length === 1) {
@@ -59,7 +59,7 @@ define(['jquery', 'knockout'], function ($, ko) {
         * Id of well
         * @type {number}
         */
-        this.WellId = data.WellId;
+        this.wellId = data.WellId;
 
         /**
         * Whether section is selected
