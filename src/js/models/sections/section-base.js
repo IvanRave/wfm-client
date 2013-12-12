@@ -96,7 +96,9 @@
         this.readyListOfFileSpec = ko.computed({
             read: function () {
                 var tmpList = ko.unwrap(ths.listOfFileSpec);
-                return tmpList;
+                return tmpList.sort(function (a, b) {
+                    return b.createdUnixTime - a.createdUnixTime;
+                });
             },
             deferEvaluation: true
         });
@@ -124,7 +126,7 @@
         this.getSectionFiloader = function () {
             return {
                 callback: function (result) {
-                    ths.listOfFileSpec.push(new FileSpec(result));
+                    ths.listOfFileSpec.push(new FileSpec(result[0]));
                 },
                 url: fileSpecService[typeOfStage].getUrl(this.id),
                 fileTypeRegExp: ko.unwrap(ths.sectionPattern).fileTypeRegExp
