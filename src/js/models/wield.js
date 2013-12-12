@@ -209,7 +209,7 @@ define(['jquery',
                     self.WellFieldMaps.push(new WellFieldMap(result[0], self));
                 },
                 url: datacontext.getWieldMapsUrl(self.Id),
-                fileFormats: ['image/jpeg', 'image/png']
+                fileTypeRegExp: '^image/jpeg|image/png'
             };
 
             self.isOpenItem = ko.observable(false);

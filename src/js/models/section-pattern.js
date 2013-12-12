@@ -14,7 +14,7 @@ define([], function () {
 
         this.name = data.Name;
 
-        this.fileFormatRegExp = data.FileFormatRegExp;
+        this.fileTypeRegExp = data.FileFormatRegExp;
     };
 
     return exports;

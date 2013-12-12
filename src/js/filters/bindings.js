@@ -335,7 +335,7 @@
     ko.bindingHandlers.filoader = {
         init: function (element, valueAccessor) {
             var tmpFiloader = valueAccessor();
-            fileHelper.initFileUpload(element, tmpFiloader.url, tmpFiloader.fileFormats, tmpFiloader.callback);
+            fileHelper.initRegExpFileUpload(element, tmpFiloader.url, tmpFiloader.fileTypeRegExp, tmpFiloader.callback);
         }
     };
 

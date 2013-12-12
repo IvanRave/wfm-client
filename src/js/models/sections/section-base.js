@@ -90,6 +90,18 @@
         this.listOfFileSpec = ko.observableArray();
 
         /**
+        * Sorted and filtered list of files: ready to view
+        * @type {Array.<module:models/file-spec}
+        */
+        this.readyListOfFileSpec = ko.computed({
+            read: function () {
+                var tmpList = ko.unwrap(ths.listOfFileSpec);
+                return tmpList;
+            },
+            deferEvaluation: true
+        });
+
+        /**
         * Whether files are loaded
         * @type {boolean}
         */
@@ -108,13 +120,15 @@
             });
         };
 
-        /** Settings for file loader */
-        this.sectionFiloader = {
-            callback: function (result) {
-                console.log('add to the section file list', result);
-            },
-            url: fileSpecService[typeOfStage].getUrl(this.id),
-            fileFormats: ['image/jpeg', 'image/png'] // get from sectionPattern
+        /** Get settings for file loader: only after defining of SectionPattern */
+        this.getSectionFiloader = function () {
+            return {
+                callback: function (result) {
+                    ths.listOfFileSpec.push(new FileSpec(result));
+                },
+                url: fileSpecService[typeOfStage].getUrl(this.id),
+                fileTypeRegExp: ko.unwrap(ths.sectionPattern).fileTypeRegExp
+            };
         };
     };
 
