@@ -489,7 +489,7 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
             function drawWellInWellFieldMap(needMap, wellInWellFieldMapItem) {
                 var divString = '<div style="padding: 0 8px">' +
                     '<h5 class="text-center">$[properties.name]</h5>' +
-                    '<p style="word-wrap: break-word; max-height: 40px; overflow: auto">$[properties.description]</p>' +
+                    '<p class="break-word" style="max-height: 40px; overflow: auto">$[properties.description]</p>' +
                     '<div class="text-center">' +
                     '<button class="btn btn-xs btn-default" id="del_well_from_map">Remove from this map</button>' +
                     '</div>' +

@@ -1,20 +1,4 @@
 ﻿<div>
-  <div class="wfm-bottom-tab-panel clearfix">
-    <div class="pull-left">
-      <ul class="nav nav-pills" data-bind="foreach: listOfSectionOfWieldDto">
-        <li data-bind="css: {'active': isSectionSelected }">
-          <div data-bind="click: $parent.selectSection">
-            <span data-bind="with: sectionPattern">
-              <span data-bind="text: name"></span>
-            </span>
-            <br />
-            <i class="wfmicon" data-bind="css: 'wfmicon-summary'"></i>
-          </div>
-        </li>
-      </ul>
-    </div>
-  </div>
-
   <div class="tab-content-pad">
     <div data-bind="if: selectedSection">
       <div data-bind="if: selectedSection().sectionPatternId === 'wield-map'">

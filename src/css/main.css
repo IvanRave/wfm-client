@@ -350,11 +350,11 @@ footer {
 }
 
 /* Well, field, group, region tab links to sections */
-.wfm-bottom-tab-panel {
+.wfm-section-panel {
     background-color: #222;
 }
 
-    .wfm-bottom-tab-panel .nav-pills > li > div {
+    .wfm-section-panel .nav-pills > li > div {
         border-radius: 0;
         padding: 0;
         color: #a1a1a1;
@@ -364,17 +364,17 @@ footer {
         cursor: pointer;
     }
 
-        .wfm-bottom-tab-panel .nav-pills > li > div:focus {
+        .wfm-section-panel .nav-pills > li > div:focus {
             background-color: #000;
             color: #c0c0c0;
         }
 
-        .wfm-bottom-tab-panel .nav-pills > li > div:hover {
+        .wfm-section-panel .nav-pills > li > div:hover {
             background-color: #111;
             color: #c8c8c8;
         }
 
-        .wfm-bottom-tab-panel .nav-pills > li > div .caret {
+        .wfm-section-panel .nav-pills > li > div .caret {
             position: absolute;
             bottom: 4px;
             right: 4px;
@@ -382,15 +382,15 @@ footer {
             border-bottom-color: #ccc;
         }
 
-        .wfm-bottom-tab-panel .nav-pills > li > div > span {
+        .wfm-section-panel .nav-pills > li > div > span {
             font-size: 70%;
         }
 
-        .wfm-bottom-tab-panel .nav-pills > li > div > i {
+        .wfm-section-panel .nav-pills > li > div > i {
             font-size: 150%;
         }
 
-    .wfm-bottom-tab-panel .nav-pills > li.active > div {
+    .wfm-section-panel .nav-pills > li.active > div {
         background-color: #000;
         color: #c0c0c0;
     }
@@ -441,7 +441,7 @@ footer {
         /*z-index for scroll - 99*/
     }
 
-    .wfm-bottom-tab-panel {
+    .wfm-bottom-fix {
         position: fixed;
         bottom: 0;
         z-index: 1031;
@@ -776,9 +776,10 @@ footer {
 
 
 .btn-modal-close {
+    font-size: 1.1em;
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 6px;
+    right: 6px;
 }
 
 .panzoom-controls {
@@ -799,4 +800,9 @@ footer {
 
 .panzoom-reset {
     top: 130px;
+}
+
+.break-word {
+    -ms-word-wrap: break-word;
+    word-wrap: break-word;
 }

@@ -23,7 +23,7 @@
         </button>
       </div>
       <div data-bind="visible: !IsEditSketchDesc()">
-        <div data-bind="html: SketchDesc" style="-ms-word-wrap: break-word; word-wrap: break-word; padding: 8px 2px;"></div>
+        <div class="break-word" data-bind="html: SketchDesc" style="padding: 8px 2px;"></div>
         <div class="btn-group">
           <button class="btn btn-default" data-bind="click: turnEditSketchDesc">
             <i class="glyphicon glyphicon-edit"></i>&nbsp;<span>Edit sketch description</span>

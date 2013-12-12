@@ -1,0 +1,59 @@
+﻿<div>
+  <div class="wfm-section-panel clearfix">
+    <ul class="nav nav-pills" data-bind="foreach: listOfSectionOfWieldDto">
+      <li data-bind="css: {'active': isSelectedFileSection }">
+        <div data-bind="click: $parent.selectFileSection">
+          <span data-bind="with: sectionPattern">
+            <span data-bind="text: name"></span>
+          </span>
+          <br />
+          <i class="wfmicon" data-bind="css: 'wfmicon-summary'"></i>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div data-bind="with: selectedFileSection">
+    <div>
+      <span class="btn btn-sm btn-default fileinput-button">
+        <i class="glyphicon glyphicon-plus"></i>
+        <span>Add file...</span>
+        <input data-bind="filoader: sectionFiloader" type="file"></input>
+      </span>
+    </div>
+    <div class="clearfix">
+      <div class="col-sm-8">
+        <span class="bld" title="File name">Name</span>
+      </div>
+      <div class="col-sm-1 hidden-xs">
+        <span class="bld" title="Extension">Ext</span>
+      </div>
+      <div class="col-sm-2 hidden-xs">
+        <span class="bld" title="Created date and time">Created</span>
+      </div>
+      <div class="col-sm-1 hidden-xs">
+        <span class="bld" title="Size, kilobytes">kB</span>
+      </div>
+    </div>
+    <div data-bind="foreach: listOfFileSpec">
+      <div class="clearfix">
+        <div class="col-sm-8">
+          <div class="checkbox">
+            <label>
+              <input type="checkbox"></input>
+              <span class="break-word" data-bind="text: name, attr: {title: fullTitle }"></span>
+            </label>
+          </div>
+        </div>
+        <div class="col-sm-1">
+          <span data-bind="text: extension"></span>
+        </div>
+        <div class="col-sm-2">
+          <span data-bind="unixTime: createdUnixTime"></span>
+        </div>
+        <div class="col-sm-1">
+          <span data-bind="text: lengthInKb, attr:{title: length + ' bytes'}"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

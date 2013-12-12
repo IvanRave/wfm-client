@@ -12,11 +12,11 @@
     </div>
   </div>
 
-  <div class="wfm-bottom-tab-panel clearfix">
+  <div class="wfm-section-panel wfm-bottom-fix clearfix">
     <div class="pull-left">
       <ul class="nav nav-pills" data-bind="foreach: listOfSectionOfWellDto">
         <!-- ko if: (sectionPatternId !== 'well-perfomance') -->
-        <li data-bind="css: {'active': isSectionSelected }">
+        <li data-bind="css: {'active': isSelectedSection }">
           <div data-bind="click: $parent.selectSection">
             <span data-bind="with: sectionPattern">
               <span data-bind="text: name"></span>
@@ -27,7 +27,7 @@
         </li>
         <!-- /ko -->
         <!-- ko if: (sectionPatternId === 'well-perfomance') -->
-        <li class="dropup" data-bind="css: {'active': isSectionSelected }">
+        <li class="dropup" data-bind="css: {'active': isSelectedSection }">
           <div class="dropdown-toggle" data-toggle="dropdown" data-bind="drpdwn:{}">
             <span data-bind="with: sectionPattern">
               <span data-bind="text: name"></span>

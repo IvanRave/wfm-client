@@ -1,5 +1,5 @@
 ﻿/** @module */
-define(['knockout'], function (ko) {
+define(['knockout', 'moment'], function (ko, appMoment) {
     'use strict';
 
     /**
@@ -34,7 +34,31 @@ define(['knockout'], function (ko) {
         */
         this.contentType = data.ContentType;
 
-        // TODO: add other properties
+        /**
+        * File creation datetime, unix timestamp, in seconds
+        * @type {number}
+        */
+        this.createdUnixTime = data.CreatedUnixTime;
+
+        /**
+        * File size, bytes,
+        * @type {number}
+        */
+        this.length = data.Length;
+
+        /**
+        * File size, kilobytes
+        * @type {number}
+        */
+        this.lengthInKb = parseInt(this.length / 1024, 10);
+
+        /**
+        * Full file decription for files on small screen
+        * @type {string}
+        */
+        this.fullTitle = 'Size: ' + this.length +
+            ' bytes\nExtension: ' + this.extension +
+            '\nCreated: ' + appMoment(ko.unwrap(this.createdUnixTime) * 1000).format('YYYY-MM-DD HH:mm:ss');
     };
 
     return exports;

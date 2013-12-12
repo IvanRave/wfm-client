@@ -70,7 +70,7 @@
                                             <div class="workspace-container" data-bind="with: company, css: $root.workAreaCss">
                                                 <div class="wfm-top-tab-panel clearfix">
                                                     <div class="pull-left" style="margin-top:1px">
-                                                        <button class="btn btn-inverse btn-sm" type="button" data-bind="click: showFileMgr">
+                                                        <button class="btn btn-inverse btn-sm" type="button" data-bind="click: modalFileMgr.show">
                                                             <i class="glyphicon glyphicon-folder-open"></i>&nbsp;&nbsp;<span>{{capitalizeFirst lang.fileManager}}</span>
                                                         </button>
                                                     </div>
@@ -86,6 +86,7 @@
                                                     </div>
                                                     <div data-bind="with: selectedWield">
                                                         <div data-bind="ifnot: selectedWroup">
+															{{> wield-panel }}
                                                             {{> wield }}
                                                         </div>
                                                         <div data-bind="with: selectedWroup">

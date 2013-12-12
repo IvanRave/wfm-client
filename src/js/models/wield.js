@@ -5,7 +5,7 @@ define(['jquery',
     'helpers/file-helper',
     'helpers/modal-helper',
     'models/well-field-map',
-    'models/section-of-wield',
+    'models/sections/section-of-wield',
     'models/wroup'], function ($, ko, datacontext,
         fileHelper, bootstrapModal, WellFieldMap, SectionOfWield, WellGroup) {
         'use strict';
@@ -64,7 +64,7 @@ define(['jquery',
 
             /** 
             * List of sections
-            * @type {Array.<module:models/section-of-wield>}
+            * @type {Array.<module:models/sections/section-of-wield>}
             */
             this.listOfSectionOfWieldDto = ko.observableArray();
 
@@ -133,12 +133,12 @@ define(['jquery',
 
             /**
             * Selected section
-            * @type {module:models/section-of-wield}
+            * @type {module:models/sections/section-of-wield}
             */
             this.selectedSection = ko.observable();
 
             /** Set this section as selected */
-            self.selectSection = function (sectionToSelect) {
+            this.selectSection = function (sectionToSelect) {
                 if (sectionToSelect) {
                     switch (sectionToSelect.sectionPatternId) {
                         case 'wield-map':
@@ -158,7 +158,25 @@ define(['jquery',
                 }
             };
 
-            self.deleteWellFieldMap = function (itemToDelete) {
+            /**
+            * Selected section in file manager
+            * @type {module:models/sections/section-of-wield}
+            */
+            this.selectedFileSection = ko.observable();
+
+            /**
+            * Select file section (in file manager)
+            * @param {module:models/sections/section-of-wield} fileSectionToSelect
+            */
+            this.selectFileSection = function (fileSectionToSelect) {
+                // Load files from server (if not loaded)
+                fileSectionToSelect.loadListOfFileSpec();
+
+                // Set as a selected to show files
+                self.selectedFileSection(fileSectionToSelect);
+            };
+
+            this.deleteWellFieldMap = function (itemToDelete) {
                 if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(itemToDelete.fileSpec.name) + '"?')) {
                     datacontext.deleteWellFieldMap(self.Id, itemToDelete.Id).done(function () {
                         self.WellFieldMaps.remove(itemToDelete);

@@ -170,8 +170,9 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
                 });
             };
 
-            this.showFileMgr = function () {
-                modalHelper.modalFileMgr.show();
+            this.modalFileMgr = {
+                show: function () { modalHelper.modalFileMgr.show(); },
+                hide: function () { modalHelper.modalFileMgr.hide(); }
             };
 
             /** 

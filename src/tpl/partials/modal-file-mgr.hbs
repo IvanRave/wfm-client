@@ -1,6 +1,6 @@
 ﻿<!-- Block with company context -->
 <div class="modal fade" id="modal-file-mgr" role="dialog" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-wide">
+  <div class="modal-dialog modal-fullscreen">
     <div class="modal-content">
       <div class="modal-body">
         <div data-bind="ifnot: selectedWegion">
@@ -12,18 +12,7 @@
           </div>
           <div data-bind="with: selectedWield">
             <div data-bind="ifnot: selectedWroup">
-              Show all field sections and files
-              <div data-bind="foreach: listOfSectionOfWieldDto">
-                <span data-bind="with: sectionPattern">
-                  <span data-bind="text: name"></span>
-                </span>
-                <button class="btn" data-bind="click: loadListOfFileSpec">Load list</button>
-                <span class="btn btn-xs btn-default fileinput-button">
-                  <i class="glyphicon glyphicon-plus"></i>
-                  <span>Add file...</span>
-                  <input data-bind="filoader: sectionFiloader" type="file" name="smth_files[]"></input>
-                </span>
-              </div>
+              {{> wield-panel-file }}
             </div>
             <div data-bind="with: selectedWroup">
               <div data-bind="ifnot: selectedWell">
@@ -41,10 +30,13 @@
           </div>
         </div>
       </div>
-      <div class="modal-footer">
-        <button class="btn btn-primary modal-ok" type="button">OK</button>
-        <button class="btn btn-default modal-close" type="button">Cancel</button>
-      </div>
+      <button class="btn btn-xs btn-link btn-modal-close" data-bind="click: modalFileMgr.hide" type="button" aria-hidden="true">
+        <i class="glyphicon glyphicon-remove"></i>
+      </button>
+      <!--<div class="modal-footer">-->
+      <!--<button class="btn btn-primary modal-ok" type="button">OK</button>-->
+      <!--<button class="btn btn-default modal-close" type="button" data-bind="">Cancel</button>-->
+      <!--</div>-->
     </div>
   </div>
 </div>

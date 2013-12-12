@@ -9,7 +9,7 @@ define([
     'moment',
     'models/well-partials/perfomance-partial',
     'models/well-partials/history-view',
-    'models/section-of-well',
+    'models/sections/section-of-well',
     'models/well-file',
     'models/column-attribute',
     'models/well-history',
@@ -56,6 +56,8 @@ define([
      */
     var exports = function (data, wellGroup) {
         data = data || {};
+
+        var self = this;
 
         /** Get well group */
         this.getWellGroup = function () {
@@ -153,11 +155,9 @@ define([
 
         /**
         * List of data transfer objects of sections of well
-        * @type {Array.<module:models/section-of-well>}
+        * @type {Array.<module:models/sections/section-of-well>}
         */
         this.listOfSectionOfWellDto = ko.observableArray();
-
-        var self = this;
 
         /** Every section has files: filter files only for current section */
         // TODO: Change to new realization
@@ -214,9 +214,15 @@ define([
 
         /**
         * Selected section
-        * @type {module:models/section-of-well}
+        * @type {module:models/sections/section-of-well}
         */
         self.selectedSection = ko.observable();
+
+        /**
+        * Selected file section (in file manager)
+        * @type {module:models/sections/section-of-well}
+        */
+        self.selectedFileSection = ko.observable();
 
         ///<param>attrGroup - when select PD section need to point attrGroup</param>
         self.selectSection = function (sectionToSelect) {
