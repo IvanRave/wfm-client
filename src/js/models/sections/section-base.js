@@ -132,6 +132,47 @@
                 fileTypeRegExp: ko.unwrap(ths.sectionPattern).fileTypeRegExp
             };
         };
+
+        /**
+        * Delete selected files
+        */
+        this.deleteSelectedFileSpecs = function () {
+            var tmpList = ko.unwrap(ths.listOfFileSpec);
+            
+            // Choose selected files
+            var tmpSelectedList = tmpList.filter(function (elem) {
+                return ko.unwrap(elem.isSelected);
+            });
+            
+            // Need to send to the server (only ids - to define and remove files on the server)
+            var tmpIdList = tmpSelectedList.map(function (elem) {
+                return { id: elem.id };
+            });
+
+            // Remove from server
+            fileSpecService[typeOfStage].deleteArray(ths.id, tmpIdList).done(function () {
+                // If success
+                // Remove from client file list (all selected files)
+                tmpSelectedList.forEach(function (elem) {
+                    ths.listOfFileSpec.remove(elem);
+                });
+            });
+        };
+
+        /**
+        * Whether any file is selected: to activate delete button or smth else
+        * @type {boolean}
+        */
+        this.isSelectedAnyFile = ko.computed({
+            read: function () {
+                var tmpList = ko.unwrap(ths.listOfFileSpec);
+
+                return tmpList.filter(function (elem) {
+                    return ko.unwrap(elem.isSelected);
+                }).length > 0;
+            },
+            deferEvaluation: true
+        });
     };
 
     return exports;

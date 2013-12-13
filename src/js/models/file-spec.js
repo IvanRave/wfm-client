@@ -59,6 +59,19 @@ define(['knockout', 'moment'], function (ko, appMoment) {
         this.fullTitle = 'Size: ' + this.length +
             ' bytes\nExtension: ' + this.extension +
             '\nCreated: ' + appMoment(ko.unwrap(this.createdUnixTime) * 1000).format('YYYY-MM-DD HH:mm:ss');
+
+        /**
+        * Whether file is selected (in file manager)
+        * @type {boolean}
+        */
+        this.isSelected = ko.observable();
+
+        /////** Convert to plain object: without ko bindings and only needed properties */
+        ////this.toPlainJson = function () {
+        ////    return {
+        ////        id: this.id
+        ////    };
+        ////};
     };
 
     return exports;

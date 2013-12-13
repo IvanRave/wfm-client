@@ -20,8 +20,8 @@
         <span>Add file...</span>
         <input data-bind="filoader: getSectionFiloader()" type="file"></input>
       </span>
-      <button class="btn btn-sm btn-inverse">
-        Delete
+      <button class="btn btn-sm btn-inverse" data-bind="click: deleteSelectedFileSpecs, enable: isSelectedAnyFile">
+        <i class="glyphicon glyphicon-remove"></i> Delete
       </button>
     </div>
     <div class="clearfix">
@@ -44,7 +44,7 @@
         <div class="col-sm-8">
           <div class="checkbox">
             <label>
-              <input type="checkbox"></input>
+              <input type="checkbox" data-bind="checked: isSelected"></input>
               <span class="break-word" data-bind="text: name, attr: {title: fullTitle }"></span>
             </label>
           </div>

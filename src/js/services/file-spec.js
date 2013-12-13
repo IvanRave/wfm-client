@@ -34,6 +34,9 @@
             },
             get: function (idOfSection) {
                 return ajaxRequest('GET', urls.wield(idOfSection));
+            },
+            deleteArray: function (idOfSection, listOfFileSpec) {
+                return ajaxRequest('DELETE', urls.wield(idOfSection), listOfFileSpec);
             }
         },
         wegion: {},
