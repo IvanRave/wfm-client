@@ -1,3 +1,25 @@
+<a name="v0.8.2"></a>
+### v0.8.2 (2013-12-13)
+
+
+#### Bug Fixes
+
+* **fieldMap:**
+  * load map tiles using map id ([2f5a6d30](https://github.com/IvanRave/wfm/commit/2f5a6d30c6aea097997cf8609c75c17c3a96743d))
+  * create map from selected file ([25447a5c](https://github.com/IvanRave/wfm/commit/25447a5c6de900b3652c84d11e801f6bef5acb6b))
+* **fileManager:** set scroll for file list ([d9e11813](https://github.com/IvanRave/wfm/commit/d9e11813d329bee3ba05935e0ba843506f67abc0))
+
+
+#### Features
+
+* **fileManager:**
+  * add callback to submit button ([14bd148e](https://github.com/IvanRave/wfm/commit/14bd148e7af4a8fbae775e650404f40210d16876))
+  * delete few files in one click ([e15c4cfb](https://github.com/IvanRave/wfm/commit/e15c4cfbff94dd48c9b7bd6caeec0d41f1a4aa5b))
+  * add file type restrictions ([f9b506b8](https://github.com/IvanRave/wfm/commit/f9b506b8f90b44a410feb8fb23d07d762d4d2b40))
+  * add view, load file list ([f1bd278c](https://github.com/IvanRave/wfm/commit/f1bd278c987dbad586fcac20bec072521e74e78f))
+  * structurize, add data services ([a0ce8022](https://github.com/IvanRave/wfm/commit/a0ce802298f24f3fc6cfc3d3e9bbdda4b3fb9eb5))
+* **sections:** add base model for sections ([7dbd49fa](https://github.com/IvanRave/wfm/commit/7dbd49fa6b85b32c2353666ccabc6366466fe3b4))
+
 <a name="v0.8.1"></a>
 ### v0.8.1 (2013-12-10)
 
