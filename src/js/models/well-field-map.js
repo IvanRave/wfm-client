@@ -43,6 +43,12 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
             this.Id = data.Id;
 
             /**
+            * Map name (by default - file name)
+            * @type {string}
+            */
+            this.name = ko.observable(data.Name);
+
+            /**
             * Id of file specification (guid)
             * @type {string}
             */
@@ -61,12 +67,6 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
             this.Description = ko.observable(data.Description);
 
             /** 
-            * Map image (full url)
-            * @type {string}
-            */
-            this.fullImgUrl = datacontext.getWellFieldMapUrl({ img_url: this.IdOfFileSpec });
-
-            /** 
             * Map scale coefficient
             * @type {number}
             */
@@ -77,6 +77,12 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
             * @type {number}
             */
             this.WellFieldId = data.WellFieldId;
+
+            /** 
+            * Map image (full url)
+            * @type {string}
+            */
+            this.fullImgUrl = datacontext.getWieldMapsUrl(this.WellFieldId, this.Id); //img_url: this.IdOfFileSpec
 
             /** 
             * Map width
@@ -111,6 +117,9 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
             function initYandexMap(wellFieldMapItem, wellFieldItem) {
                 ////if (myMap) { myMap.destroy(); }
 
+                // clear map object: redraw again
+                $('#map').empty();
+
                 var imgWidth = wellFieldMapItem.Width;
                 var imgHeight = wellFieldMapItem.Height;
 
@@ -141,7 +150,7 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
 
                             ////var cropCoords = [x1, y1, x2, y2];
                             ////return '{{conf.requrl}}/api/wellfile/?well_id=80&purpose=history&status=work&file_name=fid20130213003420656_Map2560x1600.jpg&crop=(' + cropCoords.join(',') + ')&map_size=250'
-                            return wellFieldMapItem.fullImgUrl + '&x1=' + x1 + '&y1=' + y1 + '&x2=' + x2 + '&y2=' + y2;
+                            return wellFieldMapItem.fullImgUrl + '?x1=' + x1 + '&y1=' + y1 + '&x2=' + x2 + '&y2=' + y2;
                         });
 
 
@@ -692,15 +701,15 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
             self.editWellFieldMap = function () {
                 var inputName = document.createElement('input');
                 inputName.type = 'text';
-                $(inputName).val(self.Name()).prop({ 'required': true });
+                $(inputName).val(ko.unwrap(self.name)).prop({ 'required': true });
 
                 var inputDescription = document.createElement('input');
                 inputDescription.type = 'text';
-                $(inputDescription).val(self.Description());
+                $(inputDescription).val(ko.unwrap(self.Description));
 
                 var inputScaleCoefficient = document.createElement('input');
                 inputScaleCoefficient.type = 'text';
-                $(inputScaleCoefficient).val(self.ScaleCoefficient()).prop({
+                $(inputScaleCoefficient).val(ko.unwrap(self.ScaleCoefficient)).prop({
                     'required': true
                 });
 
@@ -712,18 +721,18 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
                 );
 
                 function submitFunction() {
-                    self.Name($(inputName).val());
+                    self.name($(inputName).val());
                     self.Description($(inputDescription).val());
                     self.ScaleCoefficient($(inputScaleCoefficient).val());
                     datacontext.putWieldMap(self.WellFieldId, self.Id, self.toPlainJson()).done(function (result) {
-                        self.Name(result.Name);
+                        self.name(result.Name);
                         self.Description(result.Description);
                         self.ScaleCoefficient(result.ScaleCoefficient);
                     });
                     bootstrapModal.closeModalWindow();
                 }
 
-                bootstrapModal.openModalWindow("Well field map", innerDiv, submitFunction);
+                bootstrapModal.openModalWindow('Well field map', innerDiv, submitFunction);
             };
 
             self.toPlainJson = function () { return ko.toJS(self); };

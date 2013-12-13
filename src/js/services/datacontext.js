@@ -25,10 +25,6 @@
     function wfmImageUrl(uqp) {
         return '{{conf.requrl}}/api/wfmimage/' + (uqp ? ('?' + $.param(uqp)) : '');
     }
-    function wellFieldMapUrl(uqp) {
-        return '{{conf.requrl}}/api/wellfieldmap/' + (uqp ? ('?' + $.param(uqp)) : '');
-    }
-
     function sectionPatternsUrl() {
         return '{{conf.requrl}}/api/section-patterns';
     }
@@ -272,11 +268,6 @@
         return ajaxRequest('DELETE', wfmImageUrl({ id: item.Id }));
     }
 
-    // 10. WellFieldMap
-    function getWellFieldMapUrl(urlQueryParams) {
-        return wellFieldMapUrl(urlQueryParams);
-    }
-
     // 11. WellFieldMapArea
     function getWellFieldMapAreas(urlQueryParams) {
         return ajaxRequest('GET', wellFieldMapAreaUrl(urlQueryParams));
@@ -447,8 +438,6 @@
         // WfmImage
         saveNewWfmImage: saveNewWfmImage,
         deleteWfmImage: deleteWfmImage,
-        // WellFieldMap
-        getWellFieldMapUrl: getWellFieldMapUrl,
         // WellFieldMapArea
         getWellFieldMapAreas: getWellFieldMapAreas,
         saveNewWellFieldMapArea: saveNewWellFieldMapArea,

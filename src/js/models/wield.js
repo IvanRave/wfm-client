@@ -214,17 +214,6 @@ define(['jquery',
                 }
             };
 
-            /////** 
-            ////* Options for file loader (files loaded to the map-section)
-            ////*/
-            ////self.mapFiloader = {
-            ////    callback: function (result) {
-            ////        self.WellFieldMaps.push(new WellFieldMap(result[0], self));
-            ////    },
-            ////    url: datacontext.getWieldMapsUrl(self.Id),
-            ////    fileTypeRegExp: '^image/jpeg|image/png'
-            ////};
-
             /**
             * Create map from file
             */
@@ -255,6 +244,8 @@ define(['jquery',
                         WellFieldId: self.Id,
                         ScaleCoefficient: 1,
                         Description: '',
+                        // by default - map name = file name
+                        Name: ko.unwrap(selectedFileSpecs[0].name),
                         IdOfFileSpec: selectedFileSpecs[0].id
                     }).done(function (r) {
                         self.WellFieldMaps.push(new WellFieldMap(r, self));

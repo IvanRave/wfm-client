@@ -12,12 +12,7 @@
     <div class="col-md-4">
       <div class="clearfix">
         <h4 class="pull-right">
-          <button data-bind="click: createMapFromFile">Add map...</button>
-          <!--<span class="btn btn-xs btn-default fileinput-button">
-                        <i class="glyphicon glyphicon-plus"></i>
-                        <span>Add map...</span>
-                        <input data-bind="filoader: mapFiloader" type="file" name="map_files[]"></input>
-                    </span>-->
+          <button class="btn btn-default" data-bind="click: createMapFromFile">Add map...</button>
         </h4>
       </div>
       <!-- ko foreach: WellFieldMaps -->
@@ -27,7 +22,7 @@
             <i class="glyphicon glyphicon-circle-arrow-down" data-bind="visible: $data === $parent.selectedWieldMap()"></i>
             <i class="glyphicon glyphicon-circle-arrow-right" data-bind="visible: $data != $parent.selectedWieldMap()"></i>
             <a href="#" data-bind="click: showWellFieldMap, attr: { title: Description }">
-              <span data-bind="text: fileSpec.name"></span>
+              <span data-bind="text: name"></span>
             </a>
           </div>
           <div class="pull-right">

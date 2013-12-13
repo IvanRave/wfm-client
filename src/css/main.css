@@ -347,13 +347,12 @@ footer {
 
 .wfm-mgr-file-list {
     height: 100%;
-    /*padding-bottom: 100px;*/
+    padding-bottom: 100px;
 }
 
     .wfm-mgr-file-list .inner-list {
         height: 100%;
         overflow: auto;
-        border:2px solid #333;
     }
 
 .workspace-container {

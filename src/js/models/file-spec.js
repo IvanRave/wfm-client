@@ -65,13 +65,6 @@ define(['knockout', 'moment'], function (ko, appMoment) {
         * @type {boolean}
         */
         this.isSelected = ko.observable();
-
-        /////** Convert to plain object: without ko bindings and only needed properties */
-        ////this.toPlainJson = function () {
-        ////    return {
-        ////        id: this.id
-        ////    };
-        ////};
     };
 
     return exports;

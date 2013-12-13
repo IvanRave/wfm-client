@@ -21,10 +21,13 @@
         <input data-bind="filoader: getSectionFiloader()" type="file"></input>
       </span>
       <button class="btn btn-sm btn-inverse" data-bind="click: deleteSelectedFileSpecs, enable: isSelectedAnyFile">
-        <i class="glyphicon glyphicon-remove"></i> Delete
+        <i class="glyphicon glyphicon-remove"></i> {{capitalizeFirst lang.toDelete}}
       </button>
     </div>
-    <div class="clearfix">
+    <div class="text-center" data-bind="visible: readyListOfFileSpec().length === 0">
+      <span>No files</span>
+    </div>
+    <div class="clearfix" data-bind="visible: readyListOfFileSpec().length > 0">
       <div class="col-sm-8">
         <span class="bld" title="File name">Name</span>
       </div>
