@@ -555,6 +555,16 @@
         return wieldMapsUrl(wieldId, mapId);
     };
 
+    /**
+    * Post map of well field
+    * @param {number} wieldId - Well field id
+    * @param {number} mapId - Map id
+    * @param {object} mapData - Map data
+    */
+    datacontext.postMapOfWield = function (wieldId, mapData) {
+        return ajaxRequest('POST', wieldMapsUrl(wieldId), mapData);
+    };
+
     /** Get list of maps of well field */
     datacontext.getWellFieldMaps = function (wieldId) {
         return ajaxRequest('GET', wieldMapsUrl(wieldId));

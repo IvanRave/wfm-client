@@ -1,6 +1,6 @@
 ﻿<div class="wfm-mgr-file-list">
   <div class="inner-list">
-    <div class="wfm-section-panel clearfix">
+    <div class="wfm-section-panel clearfix" data-bind="hidden: $parents[1].modalFileMgr.okCallback">
       <ul class="nav nav-pills" data-bind="foreach: listOfSectionOfWieldDto">
         <li data-bind="css: {'active': isSelectedFileSection }">
           <div data-bind="click: $parent.selectFileSection">

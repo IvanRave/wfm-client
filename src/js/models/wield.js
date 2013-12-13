@@ -239,25 +239,37 @@ define(['jquery',
                 // Calback for selected file
                 // Click "Select file for map" ... (only image files)
                 function mgrCallback() {
+                    tmpModalFileMgr.okError('');
                     // Select file from file manager
                     var selectedFileSpecs = ko.unwrap(mapSection.listOfFileSpec).filter(function (elem) {
                         return ko.unwrap(elem.isSelected);
                     });
 
-                    ////if (selectedFileSpecs.length !== 1) {
-
-                    ////}
-
-                    console.log(selectedFileSpecs);
+                    if (selectedFileSpecs.length !== 1) {
+                        tmpModalFileMgr.okError('need to select one file');
+                        return;
+                    }
 
                     // Create map on the server with this file
-                    // Push to well field map list
+                    datacontext.postMapOfWield(self.Id, {
+                        WellFieldId: self.Id,
+                        ScaleCoefficient: 1,
+                        Description: '',
+                        IdOfFileSpec: selectedFileSpecs[0].id
+                    }).done(function (r) {
+                        self.WellFieldMaps.push(new WellFieldMap(r, self));
 
-                    tmpModalFileMgr.hide();
+                        // Push to well field map list
+                        tmpModalFileMgr.hide();
+                    });                    
                 }
 
                 // Add to observable
                 tmpModalFileMgr.okCallback(mgrCallback);
+
+                // Notification
+                tmpModalFileMgr.okDescription('Please select a file for a map');
+
                 // Open file manager
                 tmpModalFileMgr.show();
             };

@@ -172,6 +172,8 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
 
             this.modalFileMgr = {
                 isOpen: ko.observable(false),
+                okDescription: ko.observable(''),
+                okError: ko.observable(''),
                 // Callback for Ok button
                 okCallback: ko.observable(),
                 // When click from view using data-bind click event, then first argument - it is context
@@ -184,6 +186,8 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
                 },
                 hiddenCallback: function () {
                     ths.modalFileMgr.isOpen(false);
+                    ths.modalFileMgr.okDescription('');
+                    ths.modalFileMgr.okError('');
                     ths.modalFileMgr.okCallback(null);
                 }
             };
