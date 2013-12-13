@@ -339,6 +339,26 @@
         }
     };
 
+    ko.bindingHandlers.modalWindow = {
+        init: function (element, valueAccessor) {
+            var tmpValue = valueAccessor();
+
+            $(element).on('hidden.bs.modal', function () {
+                tmpValue.fileMgrHiddenCallback();
+            });
+        },
+        update: function (element, valueAccessor) {
+            var tmpValue = valueAccessor();
+
+            if (ko.unwrap(tmpValue.isOpenFileMgr)) {
+                $(element).modal('show');
+            }
+            else {
+                $(element).modal('hide');
+            }
+        }
+    };
+
     ko.bindingHandlers.svgZoomGraph = {
         update: function (element, valueAccessor) {
             var dataSet = ko.unwrap(valueAccessor().filteredByDateProductionDataSet);

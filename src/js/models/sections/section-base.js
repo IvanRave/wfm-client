@@ -112,8 +112,18 @@
         /** Load list of file spec from the server */
         this.loadListOfFileSpec = function () {
             // Do not load if loaded already
-            if (ko.unwrap(ths.isLoadedListOfFileSpec)) { return; }
+            if (ko.unwrap(ths.isLoadedListOfFileSpec)) {
+                // Unselect all files in this section
+                var tmpListOfFileSpec = ko.unwrap(ths.listOfFileSpec);
 
+                tmpListOfFileSpec.forEach(function (elem) {
+                    elem.isSelected(false);
+                });
+
+                return;
+            }
+
+            // Loaded files are unselected by default
             fileSpecService[typeOfStage].get(this.id).done(function (r) {
                 // Import data to objects
                 ths.listOfFileSpec(importFileSpecs(r));
@@ -138,12 +148,12 @@
         */
         this.deleteSelectedFileSpecs = function () {
             var tmpList = ko.unwrap(ths.listOfFileSpec);
-            
+
             // Choose selected files
             var tmpSelectedList = tmpList.filter(function (elem) {
                 return ko.unwrap(elem.isSelected);
             });
-            
+
             // Need to send to the server (only ids - to define and remove files on the server)
             var tmpIdList = tmpSelectedList.map(function (elem) {
                 return { id: elem.id };

@@ -1,5 +1,5 @@
 ﻿<!-- Block with company context -->
-<div class="modal fade" id="modal-file-mgr" role="dialog" tabindex="-1" aria-hidden="true">
+<div class="modal fade" role="dialog" tabindex="-1" aria-hidden="true" data-bind="modalWindow: {isOpenFileMgr: modalFileMgr.isOpen, fileMgrHiddenCallback: modalFileMgr.hiddenCallback}">
   <div class="modal-dialog modal-fullscreen">
     <div class="modal-content">
       <div class="modal-body">
@@ -20,7 +20,7 @@
         <!-- /ko -->
         <!-- ko with: selectedWell -->
         Show all well sections and files
-        <div data-bind="foreach: listOfSectionOfWellDto">
+        <div class="wfm-section-panel" data-bind="foreach: listOfSectionOfWellDto">
           <span data-bind="with: sectionPattern">
             <span data-bind="text: name"></span>
           </span>
@@ -30,13 +30,12 @@
         <!-- /ko -->
         <!-- /ko -->
       </div>
+      <div class="modal-footer" data-bind="visible: modalFileMgr.okCallback">
+        <button class="btn btn-default btn-sm modal-ok" type="button" data-bind="click: modalFileMgr.okCallback()">OK</button>
+      </div>
       <button class="btn btn-xs btn-link btn-modal-close" data-bind="click: modalFileMgr.hide" type="button" aria-hidden="true">
         <i class="glyphicon glyphicon-remove"></i>
       </button>
-      <!--<div class="modal-footer">-->
-      <!--<button class="btn btn-primary modal-ok" type="button">OK</button>-->
-      <!--<button class="btn btn-default modal-close" type="button" data-bind="">Cancel</button>-->
-      <!--</div>-->
     </div>
   </div>
 </div>

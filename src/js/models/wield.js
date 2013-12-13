@@ -93,7 +93,7 @@ define(['jquery',
                 // Set all parents as selected
                 self.getWellRegion().selectedWield(self);
                 self.getWellRegion().getCompany().selectedWegion(self.getWellRegion());
-               
+
                 // get last approved scopes of every well (one request)
                 // insert in every well
                 // get all test data for every with total
@@ -170,10 +170,23 @@ define(['jquery',
             */
             this.selectFileSection = function (fileSectionToSelect) {
                 // Load files from server (if not loaded)
+                // If loaded - clean selected states
                 fileSectionToSelect.loadListOfFileSpec();
 
                 // Set as a selected to show files
                 self.selectedFileSection(fileSectionToSelect);
+            };
+
+            /**
+            * Get section by section pattern id: wrap for selectFileSection function
+            * @param {string} idOfPattern - Id of section pattern, like 'wield-map', 'wield-summary'
+            */
+            this.getSectionByPatternId = function (idOfPattern) {
+                var tmpList = ko.unwrap(self.listOfSectionOfWieldDto);
+
+                return tmpList.filter(function (elem) {
+                    return elem.sectionPatternId === idOfPattern;
+                })[0];
             };
 
             this.deleteWellFieldMap = function (itemToDelete) {
@@ -201,15 +214,52 @@ define(['jquery',
                 }
             };
 
-            /** 
-            * Options for file loader (files loaded to the map-section)
+            /////** 
+            ////* Options for file loader (files loaded to the map-section)
+            ////*/
+            ////self.mapFiloader = {
+            ////    callback: function (result) {
+            ////        self.WellFieldMaps.push(new WellFieldMap(result[0], self));
+            ////    },
+            ////    url: datacontext.getWieldMapsUrl(self.Id),
+            ////    fileTypeRegExp: '^image/jpeg|image/png'
+            ////};
+
+            /**
+            * Create map from file
             */
-            self.mapFiloader = {
-                callback: function (result) {
-                    self.WellFieldMaps.push(new WellFieldMap(result[0], self));
-                },
-                url: datacontext.getWieldMapsUrl(self.Id),
-                fileTypeRegExp: '^image/jpeg|image/png'
+            self.createMapFromFile = function () {
+                var mapSection = self.getSectionByPatternId('wield-map');
+                
+                // Select file section with maps (load and unselect files)
+                self.selectFileSection(mapSection);
+
+                var tmpModalFileMgr = self.getWellRegion().getCompany().modalFileMgr;
+
+                // Calback for selected file
+                // Click "Select file for map" ... (only image files)
+                function mgrCallback() {
+                    // Select file from file manager
+                    var selectedFileSpecs = ko.unwrap(mapSection.listOfFileSpec).filter(function (elem) {
+                        return ko.unwrap(elem.isSelected);
+                    });
+
+                    ////if (selectedFileSpecs.length !== 1) {
+
+                    ////}
+
+                    console.log(selectedFileSpecs);
+
+                    // Create map on the server with this file
+                    // Push to well field map list
+
+                    tmpModalFileMgr.hide();
+                }
+
+                // Add to observable
+                tmpModalFileMgr.okCallback(mgrCallback);
+                // Open file manager
+                tmpModalFileMgr.show();
             };
 
             self.isOpenItem = ko.observable(false);

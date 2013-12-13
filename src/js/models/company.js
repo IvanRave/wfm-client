@@ -171,8 +171,21 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
             };
 
             this.modalFileMgr = {
-                show: function () { modalHelper.modalFileMgr.show(); },
-                hide: function () { modalHelper.modalFileMgr.hide(); }
+                isOpen: ko.observable(false),
+                // Callback for Ok button
+                okCallback: ko.observable(),
+                // When click from view using data-bind click event, then first argument - it is context
+                show: function () {
+                    // TODO: add ok callback description: 'choose map file...'
+                    ths.modalFileMgr.isOpen(true);
+                },
+                hide: function () {
+                    ths.modalFileMgr.isOpen(false);
+                },
+                hiddenCallback: function () {
+                    ths.modalFileMgr.isOpen(false);
+                    ths.modalFileMgr.okCallback(null);
+                }
             };
 
             /** 
