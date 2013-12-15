@@ -69,8 +69,5 @@
         $modalBlock.modal('show');
     };
 
-    // ================= MODAL FILE MANAGER ==========================
-    bootstrapModal.modalFileMgr = {};
-
     return bootstrapModal;
 });

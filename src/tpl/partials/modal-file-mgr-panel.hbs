@@ -1,0 +1,71 @@
+﻿<div class="modal-header clearfix" data-bind="hidden: $root.userProfile.selectedEmployee().company.modalFileMgr.okCallback">
+  <div class="clearfix">
+    <div class="pull-right min-right-margin">
+      <button class="btn btn-primary btn-sm" type="button" data-bind="click: $root.userProfile.selectedEmployee().company.modalFileMgr.hide">Close</button>
+    </div>
+    <div class="pull-left">
+      <div class="btn-group" data-bind="foreach: listOfSection">
+        <button class="btn btn-sm btn-default" data-bind="css: {'active': isSelectedFileSection }, click: $parent.selectFileSection">
+          <span data-bind="with: sectionPattern">
+            <span data-bind="text: name"></span>
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-body">
+  <!-- ko with: selectedFileSection -->
+  <!-- ko if: sectionPattern -->
+  <div>
+    <span class="btn btn-sm btn-inverse fileinput-button">
+      <i class="glyphicon glyphicon-plus"></i>
+      <span>Add file...</span>
+      <input data-bind="filoader: getSectionFiloader()" type="file"></input>
+    </span>
+    <button class="btn btn-sm btn-inverse" data-bind="click: deleteSelectedFileSpecs, enable: isSelectedAnyFile">
+      <i class="glyphicon glyphicon-remove"></i> {{capitalizeFirst lang.toDelete}}
+    </button>
+  </div>
+  <div class="text-center" data-bind="visible: readyListOfFileSpec().length === 0">
+    <span>No files</span>
+  </div>
+  <div class="clearfix" data-bind="visible: readyListOfFileSpec().length > 0">
+    <div class="col-sm-8">
+      <span class="bld" title="File name">Name</span>
+    </div>
+    <div class="col-sm-1 hidden-xs">
+      <span class="bld" title="Extension">Ext</span>
+    </div>
+    <div class="col-sm-2 hidden-xs">
+      <span class="bld" title="Created date and time">Created</span>
+    </div>
+    <div class="col-sm-1 hidden-xs">
+      <span class="bld" title="Size, kilobytes">kB</span>
+    </div>
+  </div>
+
+  <div data-bind="foreach: readyListOfFileSpec">
+    <div class="clearfix">
+      <div class="col-sm-8">
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" data-bind="checked: isSelected"></input>
+            <span class="break-word" data-bind="text: name, attr: {title: fullTitle }"></span>
+          </label>
+        </div>
+      </div>
+      <div class="col-sm-1">
+        <span data-bind="text: extension"></span>
+      </div>
+      <div class="col-sm-2">
+        <span data-bind="unixTime: createdUnixTime"></span>
+      </div>
+      <div class="col-sm-1">
+        <span data-bind="text: lengthInKb, attr:{title: length + ' bytes'}"></span>
+      </div>
+    </div>
+  </div>
+  <!-- /ko -->
+  <!-- /ko -->
+</div>

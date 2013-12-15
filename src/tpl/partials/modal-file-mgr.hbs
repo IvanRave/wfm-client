@@ -10,37 +10,27 @@
           <button class="btn btn-primary btn-sm" type="button" data-bind="click: modalFileMgr.hide">Cancel</button>
         </div>
       </div>
-      <div class="modal-body">
-        <!-- ko ifnot: selectedWegion -->
-        Show all company sections (and files for each section)
-        <!-- /ko -->
-        <!-- ko with: selectedWegion -->
-        <!-- ko ifnot: selectedWield -->
-        Show all region sections and files
-        <!-- /ko -->
-        <!-- ko with: selectedWield -->
-        <!-- ko ifnot: selectedWroup -->
-        {{> wield-panel-file }}
-        <!-- /ko -->
-        <!-- ko with: selectedWroup-->
-        <!-- ko ifnot: selectedWell-->
-        Show all group sections and files
-        <!-- /ko -->
-        <!-- ko with: selectedWell -->
-        Show all well sections and files
-        <div class="wfm-section-panel" data-bind="foreach: listOfSectionOfWellDto">
-          <span data-bind="with: sectionPattern">
-            <span data-bind="text: name"></span>
-          </span>
-        </div>
-        <!-- /ko -->
-        <!-- /ko -->
-        <!-- /ko -->
-        <!-- /ko -->
-      </div>
-      <button class="btn btn-xs btn-link btn-modal-close" data-bind="click: modalFileMgr.hide, hidden: modalFileMgr.okCallback" type="button" aria-hidden="true">
-        <i class="glyphicon glyphicon-remove"></i>
-      </button>
+      <!-- ko ifnot: selectedWegion -->
+      Show all company sections (and files for each section)
+      <!-- /ko -->
+      <!-- ko with: selectedWegion -->
+      <!-- ko ifnot: selectedWield -->
+      Show all region sections and files
+      <!-- /ko -->
+      <!-- ko with: selectedWield -->
+      <!-- ko ifnot: selectedWroup -->
+      {{> modal-file-mgr-panel }}
+      <!-- /ko -->
+      <!-- ko with: selectedWroup-->
+      <!-- ko ifnot: selectedWell-->
+      Show all group sections and files
+      <!-- /ko -->
+      <!-- ko with: selectedWell -->
+      {{> modal-file-mgr-panel }}
+      <!-- /ko -->
+      <!-- /ko -->
+      <!-- /ko -->
+      <!-- /ko -->
     </div>
   </div>
 </div>

@@ -66,7 +66,7 @@ define(['jquery',
             * List of sections
             * @type {Array.<module:models/sections/section-of-wield>}
             */
-            this.listOfSectionOfWieldDto = ko.observableArray();
+            this.listOfSection = ko.observableArray();
 
             /**
             * List of groups
@@ -182,7 +182,7 @@ define(['jquery',
             * @param {string} idOfPattern - Id of section pattern, like 'wield-map', 'wield-summary'
             */
             this.getSectionByPatternId = function (idOfPattern) {
-                var tmpList = ko.unwrap(self.listOfSectionOfWieldDto);
+                var tmpList = ko.unwrap(self.listOfSection);
 
                 return tmpList.filter(function (elem) {
                     return elem.sectionPatternId === idOfPattern;
@@ -364,7 +364,7 @@ define(['jquery',
             self.WellGroups(importWellGroupsDto(data.WellGroupsDto, self));
 
             /** Load sections */
-            self.listOfSectionOfWieldDto(importListOfSectionOfWieldDto(data.ListOfSectionOfWieldDto, self));
+            self.listOfSection(importListOfSectionOfWieldDto(data.ListOfSectionOfWieldDto, self));
         };
 
         return exports;

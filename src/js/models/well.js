@@ -157,7 +157,7 @@ define([
         * List of data transfer objects of sections of well
         * @type {Array.<module:models/sections/section-of-well>}
         */
-        this.listOfSectionOfWellDto = ko.observableArray();
+        this.listOfSection = ko.observableArray();
 
         /** Every section has files: filter files only for current section */
         // TODO: Change to new realization
@@ -334,7 +334,7 @@ define([
         */
         self.selectSectionByPatternId = function (sectionPatternId) {
             // Find section from list
-            var tmpSectionList = ko.unwrap(self.listOfSectionOfWellDto);
+            var tmpSectionList = ko.unwrap(self.listOfSection);
             var needSection = $.grep(tmpSectionList, function (arrElem) {
                 return arrElem.sectionPatternId === sectionPatternId;
             })[0];
@@ -1183,7 +1183,7 @@ define([
         };
 
         /** Load well sections */
-        self.listOfSectionOfWellDto(importSectionList(data.ListOfSectionOfWellDto, self));
+        self.listOfSection(importSectionList(data.ListOfSectionOfWellDto, self));
 
         // ==================================================================== Well perfomance section end ========================================
 

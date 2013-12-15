@@ -338,14 +338,13 @@ footer {
 
     .modal-fullscreen .modal-content {
         height: 100% !important;
-        /*border-radius: 0 !important;*/
     }
 
-        .modal-fullscreen .modal-content .modal-body {
+        /*.modal-fullscreen .modal-content .modal-body {
             height: 100% !important;
-        }
+        }*/
 
-.wfm-mgr-file-list {
+/*.wfm-mgr-file-list {
     height: 100%;
     padding-bottom: 100px;
 }
@@ -353,7 +352,7 @@ footer {
     .wfm-mgr-file-list .inner-list {
         height: 100%;
         overflow: auto;
-    }
+    }*/
 
 .workspace-container {
     padding-left: 21px;

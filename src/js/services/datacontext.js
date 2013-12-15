@@ -175,7 +175,7 @@
     }
 
     function deleteWellProductionData(wellId) {
-        return ajaxRequest('DELETE', productionDataUrl({ "well_id": wellId }));
+        return ajaxRequest('DELETE', productionDataUrl({ 'well_id': wellId }));
     }
 
     // 7. Column attribute
