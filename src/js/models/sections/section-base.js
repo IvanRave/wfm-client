@@ -1,4 +1,4 @@
-﻿define(['jquery', 'knockout', 'models/file-spec', 'services/file-spec'], function ($, ko, FileSpec, fileSpecService) {
+﻿define(['knockout', 'models/file-spec', 'services/file-spec'], function (ko, FileSpec, fileSpecService) {
     'use strict';
 
     /**
@@ -6,9 +6,7 @@
     * @param {object} data - Server data with file specs
     */
     function importFileSpecs(data) {
-        return $.map(data, function (item) {
-            return new FileSpec(item);
-        });
+        return data.map(function (item) { return new FileSpec(item); });
     }
 
     /**
@@ -47,7 +45,7 @@
             read: function () {
                 var tmpListOfSectionPattern = this.getListOfSectionPattern();
                 var tmpSectionPatternId = this.sectionPatternId;
-                var byId = $.grep(tmpListOfSectionPattern, function (arrElem) {
+                var byId = tmpListOfSectionPattern.filter(function (arrElem) {
                     return arrElem.id === tmpSectionPatternId;
                 });
 
@@ -124,7 +122,7 @@
             }
 
             // Loaded files are unselected by default
-            fileSpecService[typeOfStage].get(this.id).done(function (r) {
+            fileSpecService.get(typeOfStage, this.id).done(function (r) {
                 // Import data to objects
                 ths.listOfFileSpec(importFileSpecs(r));
                 // Set flag (do not load again)
@@ -138,14 +136,12 @@
                 callback: function (result) {
                     ths.listOfFileSpec.push(new FileSpec(result[0]));
                 },
-                url: fileSpecService[typeOfStage].getUrl(this.id),
+                url: fileSpecService.getUrl(typeOfStage, this.id),
                 fileTypeRegExp: ko.unwrap(ths.sectionPattern).fileTypeRegExp
             };
         };
 
-        /**
-        * Delete selected files
-        */
+        /** Delete selected files */
         this.deleteSelectedFileSpecs = function () {
             var tmpList = ko.unwrap(ths.listOfFileSpec);
 
@@ -160,7 +156,7 @@
             });
 
             // Remove from server
-            fileSpecService[typeOfStage].deleteArray(ths.id, tmpIdList).done(function () {
+            fileSpecService.deleteArray(typeOfStage, ths.id, tmpIdList).done(function () {
                 // If success
                 // Remove from client file list (all selected files)
                 tmpSelectedList.forEach(function (elem) {

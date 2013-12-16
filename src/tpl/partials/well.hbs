@@ -1,5 +1,5 @@
 ﻿<div>
-  <div class="wfm-top-tab-panel clearfix">
+  <div class="wfm-top-tab-panel clearfix" style="left: 500px">
     <div class="pull-left" style="margin-top:1px">
       <button class="btn btn-inverse btn-sm" type="button" data-bind="click: unselectSection">
         <i class="glyphicon glyphicon-th"></i>&nbsp;&nbsp;<span>{{capitalizeFirst lang.well}} {{lang.dashboard}}</span>
@@ -38,7 +38,7 @@
           </div>
           <ul class="dropdown-menu" data-bind="foreach: $root.wfmParamSquadList">
             <li>
-              <div data-bind="click: function() { $parents[1].selectSectionByPatternId('well-perfomance'); $parents[1].mainPerfomanceView.selectAttrGroupId($data.id); }">
+              <div data-bind="click: function() { $parents[1].selectSection($parents[1].getSectionByPatternId('well-perfomance')); $parents[1].mainPerfomanceView.selectAttrGroupId($data.id); }">
                 <span data-bind="text: id"></span>
               </div>
             </li>

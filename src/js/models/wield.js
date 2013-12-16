@@ -4,10 +4,11 @@ define(['jquery',
     'services/datacontext',
     'helpers/file-helper',
     'helpers/modal-helper',
+    'models/stage-base',
     'models/well-field-map',
     'models/sections/section-of-wield',
     'models/wroup'], function ($, ko, datacontext,
-        fileHelper, bootstrapModal, WellFieldMap, SectionOfWield, WellGroup) {
+        fileHelper, bootstrapModal, StageBase, WellFieldMap, SectionOfWield, WellGroup) {
         'use strict';
 
         // 10. WellFieldMaps (convert data objects into array)
@@ -61,12 +62,6 @@ define(['jquery',
             * @type {number}
             */
             this.WellRegionId = data.WellRegionId;
-
-            /** 
-            * List of sections
-            * @type {Array.<module:models/sections/section-of-wield>}
-            */
-            this.listOfSection = ko.observableArray();
 
             /**
             * List of groups
@@ -131,11 +126,8 @@ define(['jquery',
             /** Selected map */
             this.selectedWieldMap = ko.observable();
 
-            /**
-            * Selected section
-            * @type {module:models/sections/section-of-wield}
-            */
-            this.selectedSection = ko.observable();
+            // Add identical properties for all stages (well, field, group, regions, company)
+            StageBase.call(this);
 
             /** Set this section as selected */
             this.selectSection = function (sectionToSelect) {
@@ -156,37 +148,6 @@ define(['jquery',
 
                     self.selectedSection(sectionToSelect);
                 }
-            };
-
-            /**
-            * Selected section in file manager
-            * @type {module:models/sections/section-of-wield}
-            */
-            this.selectedFileSection = ko.observable();
-
-            /**
-            * Select file section (in file manager)
-            * @param {module:models/sections/section-of-wield} fileSectionToSelect
-            */
-            this.selectFileSection = function (fileSectionToSelect) {
-                // Load files from server (if not loaded)
-                // If loaded - clean selected states
-                fileSectionToSelect.loadListOfFileSpec();
-
-                // Set as a selected to show files
-                self.selectedFileSection(fileSectionToSelect);
-            };
-
-            /**
-            * Get section by section pattern id: wrap for selectFileSection function
-            * @param {string} idOfPattern - Id of section pattern, like 'wield-map', 'wield-summary'
-            */
-            this.getSectionByPatternId = function (idOfPattern) {
-                var tmpList = ko.unwrap(self.listOfSection);
-
-                return tmpList.filter(function (elem) {
-                    return elem.sectionPatternId === idOfPattern;
-                })[0];
             };
 
             this.deleteWellFieldMap = function (itemToDelete) {
@@ -218,10 +179,10 @@ define(['jquery',
             * Create map from file
             */
             self.createMapFromFile = function () {
-                var mapSection = self.getSectionByPatternId('wield-map');
+                var needSection = self.getSectionByPatternId('wield-map');
                 
                 // Select file section with maps (load and unselect files)
-                self.selectFileSection(mapSection);
+                self.selectFileSection(needSection);
 
                 var tmpModalFileMgr = self.getWellRegion().getCompany().modalFileMgr;
 
@@ -230,7 +191,7 @@ define(['jquery',
                 function mgrCallback() {
                     tmpModalFileMgr.okError('');
                     // Select file from file manager
-                    var selectedFileSpecs = ko.unwrap(mapSection.listOfFileSpec).filter(function (elem) {
+                    var selectedFileSpecs = ko.unwrap(needSection.listOfFileSpec).filter(function (elem) {
                         return ko.unwrap(elem.isSelected);
                     });
 

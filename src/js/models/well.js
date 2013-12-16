@@ -7,15 +7,17 @@ define([
     'helpers/modal-helper',
     'helpers/app-helper',
     'moment',
+    'models/stage-base',
     'models/well-partials/perfomance-partial',
     'models/well-partials/history-view',
     'models/sections/section-of-well',
     'models/well-file',
+    'services/well/sketch',
     'models/column-attribute',
     'models/well-history',
     'models/test-scope'
 ], function ($, ko, datacontext, fileHelper, bootstrapModal,
-    appHelper, appMoment, wellPerfomancePartial, HistoryView, SectionOfWell, WellFile) {
+    appHelper, appMoment, StageBase, wellPerfomancePartial, HistoryView, SectionOfWell, WellFile, sketchOfWellService) {
     'use strict';
 
     /** WellFiles (convert data objects into array) */
@@ -153,78 +155,9 @@ define([
             owner: this
         });
 
-        /**
-        * List of data transfer objects of sections of well
-        * @type {Array.<module:models/sections/section-of-well>}
-        */
-        this.listOfSection = ko.observableArray();
+        StageBase.call(this);
 
-        /** Every section has files: filter files only for current section */
-        // TODO: Change to new realization
-        self.sectionWellFiles = ko.computed({
-            read: function () {
-                ////if (ko.unwrap(self.selectedSection)) {
-                ////    return $.grep(ko.unwrap(self.WellFiles), function (wellFile) {
-                ////        return ko.unwrap(wellFile.Purpose) === ko.unwrap(self.selectedSectionId);
-                ////    });
-                ////}
-            },
-            deferEvaluation: true
-        });
-
-        self.isExistsSectionWellFiles = ko.computed({
-            read: function () {
-                if (ko.unwrap(self.sectionWellFiles)) {
-                    return ko.unwrap(self.sectionWellFiles).length > 0;
-                }
-            },
-            deferEvaluation: true
-        });
-
-        self.isOpenItem = ko.observable(false);
-
-        self.toggleItem = function () {
-            self.isOpenItem(!self.isOpenItem());
-        };
-
-        /** Whether item and parent are selected */
-        self.isSelectedItem = ko.computed({
-            read: function () {
-                var tmpGroup = self.getWellGroup();
-                if (ko.unwrap(tmpGroup.isSelectedItem)) {
-                    if (self === ko.unwrap(tmpGroup.selectedWell)) {
-                        return true;
-                    }
-                }
-            },
-            deferEvaluation: true
-        });
-
-        // ======================= file manager section ======================
-        // file manager section: like above section but in file manager view
-        self.selectedFmgSectionId = ko.observable(null);
-
-        self.selectFmgSection = function (item) {
-            self.selectedFmgSectionId(item.id);
-        };
-
-        // ========================= view section ===========================
-        // section, which user select on the well view
-        ////self.selectedSectionId = ko.observable();
-
-        /**
-        * Selected section
-        * @type {module:models/sections/section-of-well}
-        */
-        self.selectedSection = ko.observable();
-
-        /**
-        * Selected file section (in file manager)
-        * @type {module:models/sections/section-of-well}
-        */
-        self.selectedFileSection = ko.observable();
-
-        ///<param>attrGroup - when select PD section need to point attrGroup</param>
+        /** Select section */
         self.selectSection = function (sectionToSelect) {
             ////window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
             ////    region: self.getWellGroup().getWellField().getWellRegion().Id,
@@ -328,22 +261,6 @@ define([
             }
         };
 
-        /**
-        * Select section using their pattern id: wrap for function "selectSection"
-        * @param {string} sectionPatternId - Section pattern id, like well-summary etc.
-        */
-        self.selectSectionByPatternId = function (sectionPatternId) {
-            // Find section from list
-            var tmpSectionList = ko.unwrap(self.listOfSection);
-            var needSection = $.grep(tmpSectionList, function (arrElem) {
-                return arrElem.sectionPatternId === sectionPatternId;
-            })[0];
-
-            if (needSection) {
-                self.selectSection(needSection);
-            }
-        };
-
         /** Unselect section: show dashboard with widgets */
         self.unselectSection = function () {
             ////window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
@@ -361,6 +278,55 @@ define([
             self.perfomancePartial.forecastEvolution.getDict();
             self.perfomancePartial.getHstProductionDataSet();
             self.getWellHistoryList();
+        };
+
+        /** Every section has files: filter files only for current section */
+        // TODO: Change to new realization
+        self.sectionWellFiles = ko.computed({
+            read: function () {
+                ////if (ko.unwrap(self.selectedSection)) {
+                ////    return $.grep(ko.unwrap(self.WellFiles), function (wellFile) {
+                ////        return ko.unwrap(wellFile.Purpose) === ko.unwrap(self.selectedSectionId);
+                ////    });
+                ////}
+            },
+            deferEvaluation: true
+        });
+
+        self.isExistsSectionWellFiles = ko.computed({
+            read: function () {
+                if (ko.unwrap(self.sectionWellFiles)) {
+                    return ko.unwrap(self.sectionWellFiles).length > 0;
+                }
+            },
+            deferEvaluation: true
+        });
+
+        self.isOpenItem = ko.observable(false);
+
+        self.toggleItem = function () {
+            self.isOpenItem(!self.isOpenItem());
+        };
+
+        /** Whether item and parent are selected */
+        self.isSelectedItem = ko.computed({
+            read: function () {
+                var tmpGroup = self.getWellGroup();
+                if (ko.unwrap(tmpGroup.isSelectedItem)) {
+                    if (self === ko.unwrap(tmpGroup.selectedWell)) {
+                        return true;
+                    }
+                }
+            },
+            deferEvaluation: true
+        });
+
+        // ======================= file manager section ======================
+        // file manager section: like above section but in file manager view
+        self.selectedFmgSectionId = ko.observable(null);
+
+        self.selectFmgSection = function (item) {
+            self.selectedFmgSectionId(item.id);
         };
 
         self.filteredWellFileList = ko.computed(function () {
@@ -806,6 +772,64 @@ define([
 
             ////    bootstrapModal.openModalWideWindow(innerDiv, submitFunction);
             ////});
+        };
+
+        this.createSketchFromFile = function () {
+            var needSection = self.getSectionByPatternId('well-sketch');
+
+            // Select file section with sketches (load and unselect files)
+            self.selectFileSection(needSection);
+
+            var tmpModalFileMgr = self.getWellGroup().getWellField().getWellRegion().getCompany().modalFileMgr;
+
+            // Calback for selected file
+            // Click "Select file for map" ... (only image files)
+            function mgrCallback() {
+                tmpModalFileMgr.okError('');
+                // Select file from file manager
+                var selectedFileSpecs = ko.unwrap(needSection.listOfFileSpec).filter(function (elem) {
+                    return ko.unwrap(elem.isSelected);
+                });
+
+                if (selectedFileSpecs.length !== 1) {
+                    tmpModalFileMgr.okError('need to select one file');
+                    return;
+                }
+
+                // Change sketch (create if not exists)
+                sketchOfWellService.put(self.Id, selectedFileSpecs[0].id, {
+                    idOfWell: self.Id,
+                    idOfFileSpec: selectedFileSpecs[0].id,
+                    name: ko.unwrap(selectedFileSpecs[0].name),
+                    description: ''
+                }).done(function (r) {
+                    console.log(r);
+                });
+
+                ////// Create map on the server with this file
+                ////datacontext.postMapOfWield(self.Id, {
+                ////    WellFieldId: self.Id,
+                ////    ScaleCoefficient: 1,
+                ////    Description: '',
+                ////    // by default - map name = file name
+                ////    Name: ko.unwrap(selectedFileSpecs[0].name),
+                ////    IdOfFileSpec: selectedFileSpecs[0].id
+                ////}).done(function (r) {
+                ////    self.WellFieldMaps.push(new WellFieldMap(r, self));
+
+                ////    // Push to well field map list
+                ////    tmpModalFileMgr.hide();
+                ////});
+            }
+
+            // Add to observable
+            tmpModalFileMgr.okCallback(mgrCallback);
+
+            // Notification
+            tmpModalFileMgr.okDescription('Please select a file for a sketch');
+
+            // Open file manager
+            tmpModalFileMgr.show();
         };
 
         self.sketchHashString = ko.observable(new Date().getTime());

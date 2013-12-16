@@ -88,12 +88,12 @@ define(['jquery',
                 ////});
 
                 // Select section by default (or selected section from prevous selected field)
-                var mapSection = $.grep(ko.unwrap(wieldToSelect.listOfSection), function (arrElem) {
+                var needSection = $.grep(ko.unwrap(wieldToSelect.listOfSection), function (arrElem) {
                     return (arrElem.sectionPatternId === 'wield-map');
                 })[0];
 
-                if (mapSection) {
-                    wieldToSelect.selectSection(mapSection);
+                if (needSection) {
+                    wieldToSelect.selectSection(needSection);
                 }
             };
 

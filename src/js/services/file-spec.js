@@ -21,26 +21,15 @@
     };
 
     var exports = {
-        well: {
-            getUrl: function (idOfSection, idOfFileSpec) {
-                return urls.well(idOfSection, idOfFileSpec);
-            }
+        getUrl: function (typeOfStage, idOfSection, idOfFileSpec) {
+            return urls[typeOfStage](idOfSection, idOfFileSpec);
         },
-        wroup: {},
-        wield: {
-            // For file uploader
-            getUrl: function (idOfSection, idOfFileSpec) {
-                return urls.wield(idOfSection, idOfFileSpec);
-            },
-            get: function (idOfSection) {
-                return ajaxRequest('GET', urls.wield(idOfSection));
-            },
-            deleteArray: function (idOfSection, listOfFileSpec) {
-                return ajaxRequest('DELETE', urls.wield(idOfSection), listOfFileSpec);
-            }
+        get: function (typeOfStage, idOfSection) {
+            return ajaxRequest('GET', urls[typeOfStage](idOfSection));
         },
-        wegion: {},
-        company: {}
+        deleteArray: function (typeOfStage, idOfSection, listOfFileSpec) {
+            return ajaxRequest('DELETE', urls[typeOfStage](idOfSection), listOfFileSpec);
+        }
     };
 
     return exports;
