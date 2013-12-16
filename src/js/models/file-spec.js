@@ -17,6 +17,12 @@ define(['knockout', 'moment'], function (ko, appMoment) {
         this.id = data.Id;
 
         /**
+        * File url: generating on the server
+        * @type {string}
+        */
+        this.fileUrl = data.FileUrl;
+
+        /**
         * File name (255)
         * @type {string}
         */

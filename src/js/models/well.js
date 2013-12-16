@@ -13,11 +13,12 @@ define([
     'models/sections/section-of-well',
     'models/well-file',
     'services/well/sketch',
+    'models/well/sketch',
     'models/column-attribute',
     'models/well-history',
     'models/test-scope'
 ], function ($, ko, datacontext, fileHelper, bootstrapModal,
-    appHelper, appMoment, StageBase, wellPerfomancePartial, HistoryView, SectionOfWell, WellFile, sketchOfWellService) {
+    appHelper, appMoment, StageBase, wellPerfomancePartial, HistoryView, SectionOfWell, WellFile, sketchOfWellService, SketchOfWell) {
     'use strict';
 
     /** WellFiles (convert data objects into array) */
@@ -120,12 +121,6 @@ define([
         }, this);
 
         /** 
-        * Sketch description
-        * @type {string}
-        */
-        this.SketchDesc = ko.observable(data.SketchDesc);
-
-        /** 
         * Well comment
         * @type {string}
         */
@@ -173,6 +168,10 @@ define([
                 // Dashboard: from undefined to null
                 case 'well-history': {
                     self.getWellHistoryList();
+                    break;
+                }
+                case 'well-sketch': {
+                    self.loadSketchOfWell();
                     break;
                 }
                 case 'well-perfomance': {
@@ -271,7 +270,7 @@ define([
             ////});
 
             self.selectedSection(null);
-
+            self.loadSketchOfWell();
             self.getWellWidgoutList();
             // TODO: load data only if there is one or more perfomance widgets (only once) for entire well
             self.getWellGroup().getWellGroupWfmParameterList();
@@ -623,11 +622,9 @@ define([
         ////                        // sketch
         ////                        if ($.inArray('sketch', self.reportSectionIdList()) >= 0) {
         ////                            // no string position (new page)
-        ////                            pdfHelper.writeSketchImg(doc, sketchBase64, 'Sketch');
+        ////                            pdfHelper.writeSketchImg(doc, sketchBase64, 'Sketch'); // sketch description
 
-        ////                            if (self.SketchDesc()) {
-        ////                                pdfHelper.writeSketchDesc(doc, self.SketchDesc(), 'Sketch description');
-        ////                            }
+        
         ////                        }
 
         ////                        if (mapBase64.length > 0) {
@@ -774,6 +771,35 @@ define([
             ////});
         };
 
+        this.sketchOfWell = ko.observable();
+
+        this.isLoadedSketchOfWell = ko.observable(false);
+
+        /** Load well sketches: get only first elem of array: one sketch per well */
+        this.loadSketchOfWell = function () {
+            // Load only if not loaded already
+            if (!ko.unwrap(self.isLoadedSketchOfWell)) {
+                // return array of sketch: get only first
+                sketchOfWellService.get(self.Id).done(function (r) {
+                    if (r.length > 0) {
+                        self.sketchOfWell(new SketchOfWell(r[0]));
+                    }
+                    self.isLoadedSketchOfWell(true);
+                });
+            }
+        };
+
+        this.deleteSketchOfWell = function () {
+            var tmpSketch = ko.unwrap(self.sketchOfWell);
+            if (tmpSketch) {
+                sketchOfWellService.remove(self.Id, tmpSketch.idOfFileSpec).done(function () {
+                    // Remove from well on the client
+                    self.sketchOfWell(null);
+                });
+            }
+        };
+
+        /** Create sketch from file: select file and create sketch */
         this.createSketchFromFile = function () {
             var needSection = self.getSectionByPatternId('well-sketch');
 
@@ -783,7 +809,6 @@ define([
             var tmpModalFileMgr = self.getWellGroup().getWellField().getWellRegion().getCompany().modalFileMgr;
 
             // Calback for selected file
-            // Click "Select file for map" ... (only image files)
             function mgrCallback() {
                 tmpModalFileMgr.okError('');
                 // Select file from file manager
@@ -803,23 +828,9 @@ define([
                     name: ko.unwrap(selectedFileSpecs[0].name),
                     description: ''
                 }).done(function (r) {
-                    console.log(r);
+                    self.sketchOfWell(new SketchOfWell(r));
+                    tmpModalFileMgr.hide();
                 });
-
-                ////// Create map on the server with this file
-                ////datacontext.postMapOfWield(self.Id, {
-                ////    WellFieldId: self.Id,
-                ////    ScaleCoefficient: 1,
-                ////    Description: '',
-                ////    // by default - map name = file name
-                ////    Name: ko.unwrap(selectedFileSpecs[0].name),
-                ////    IdOfFileSpec: selectedFileSpecs[0].id
-                ////}).done(function (r) {
-                ////    self.WellFieldMaps.push(new WellFieldMap(r, self));
-
-                ////    // Push to well field map list
-                ////    tmpModalFileMgr.hide();
-                ////});
             }
 
             // Add to observable
@@ -936,20 +947,6 @@ define([
             },
             deferEvaluation: true
         });
-
-        self.IsEditSketchDesc = ko.observable(false);
-
-        self.turnEditSketchDesc = function () {
-            self.IsEditSketchDesc(!self.IsEditSketchDesc());
-        };
-
-        self.saveSketchDesc = function () {
-            self.SketchDesc($('#sketch_desc').val());
-            datacontext.saveChangedWell(self).done(function (result) {
-                self.SketchDesc(result.SketchDesc);
-            });
-            self.IsEditSketchDesc(false);
-        };
 
         self.editWell = function () {
             var inputName = document.createElement('input');
@@ -1215,12 +1212,11 @@ define([
             // add other props
             ////public int Id { get; set; }
             ////public int WellGroupId { get; set; }
-            ////public string SketchDesc { get; set; }
             ////public string WellType { get; set; }
             ////public string FlowType { get; set; }
             ////public string Comment { get; set; }
             // Join two property arrays
-            var tmpPropList = ['Id', 'WellGroupId', 'SketchDesc', 'WellType', 'FlowType', 'Comment'];
+            var tmpPropList = ['Id', 'WellGroupId', 'WellType', 'FlowType', 'Comment'];
             $.each(self.wellPropertyList, function (propIndex, propValue) {
                 tmpPropList.push(propValue.id);
             });

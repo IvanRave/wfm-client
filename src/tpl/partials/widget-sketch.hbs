@@ -12,13 +12,18 @@
   <div class="widget-content">
     <div data-bind="with: $parents[3]">
       <div data-bind="if: widget.isVisImg">
-        <!--attr: { src: MainSketchUrl }-->
-        <span class="pointer" data-bind="panzoomImg: { src: MainSketchUrl}">
-          <img class="img-responsive" src="#" data-bind="attr: { src: MainSketchUrl }" alt="Sketch image" />
-        </span>
+        <div data-bind="with: sketchOfWell">
+          <div data-bind="with: fileSpec">
+            <span class="pointer" data-bind="panzoomImg: { src: fileUrl }">
+              <img class="img-responsive" src="#" data-bind="attr: { src: fileUrl }" alt="Sketch image" />
+            </span>
+          </div>
+        </div>
       </div>
       <div data-bind="if: widget.isVisDescription">
-        <div class="break-word" data-bind="html: SketchDesc" style="padding: 8px 2px;"></div>
+        <div data-bind="with: sketchOfWell">
+          <div class="break-word" data-bind="html: description" style="padding: 8px 2px;"></div>
+        </div>
       </div>
     </div>
   </div>

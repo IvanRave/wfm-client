@@ -1,36 +1,18 @@
 ﻿<div>
   <div class="row">
     <div class="col-sm-4 text-center">
-      <div>
-        <!--<button class="btn btn-default btn-sm btn-block" data-bind="click: function(){ chooseMainFile('sketch'); }">Choose sketch...</button>-->
+      <div data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
         <button class="btn btn-default btn-sm btn-block" data-bind="click: createSketchFromFile">Choose sketch...</button>
       </div>
-      <div>
-        <span class="pointer" data-bind="panzoomImg: {src: MainSketchUrl}">
-          <img src="#" class="img-responsive" data-bind="attr: { src: MainSketchUrl }" alt="Sketch image" />
-        </span>
+      <div data-bind="with: sketchOfWell">
+        <div data-bind="with: fileSpec">
+          <span class="pointer" data-bind="panzoomImg: {src: fileUrl}">
+            <img src="#" class="img-responsive" data-bind="attr: { src: fileUrl }" alt="Sketch image" />
+          </span>
+        </div>
       </div>
     </div>
     <div class="col-sm-8">
-      <div data-bind="visible: IsEditSketchDesc" class="clearfix">
-        <div>
-          <textarea id="sketch_desc" class="form-control" placeholder="Enter sketch description..." data-bind="text: SketchDesc"></textarea>
-        </div>
-        <button class="btn btn-success" data-bind="click: saveSketchDesc">
-          <i class="glyphicon glyphicon-ok-circle"></i>&nbsp;<span>Save</span>
-        </button>
-        <button class="btn btn-default" data-bind="click: turnEditSketchDesc">
-          <i class="glyphicon glyphicon-ban-circle"></i>&nbsp;<span>Cancel</span>
-        </button>
-      </div>
-      <div data-bind="visible: !IsEditSketchDesc()">
-        <div class="break-word" data-bind="html: SketchDesc" style="padding: 8px 2px;"></div>
-        <div class="btn-group">
-          <button class="btn btn-default" data-bind="click: turnEditSketchDesc">
-            <i class="glyphicon glyphicon-edit"></i>&nbsp;<span>Edit sketch description</span>
-          </button>
-        </div>
-      </div>
     </div>
   </div>
 </div>
