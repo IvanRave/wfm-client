@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: models/wfm-parameter.js</title>
+    
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+    
+    <h1 class="page-title">Source: models/wfm-parameter.js</h1>
+    
+    
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source"><code>﻿/** @module */
+define(['knockout'], function (ko) {
+    'use strict';
+
+    var uomCoefDict = {
+        time: {
+            sec: 1,
+            min: 60,
+            hr: 3600,
+            d: 86400
+        },
+        volume: {
+            m3: 1,
+            bbl: 0.159159637116027, //? approximately
+            Mbbl: 159.159637116027, // 1 000 barrels
+            MMbbl: 159159.637116027, // 1 000 000 barrels
+            scf: 0.028316846592, // Math.Pow(0.3048, 3);
+            Mcf: 28.316846592, // Math.Pow(0.3048, 3) * 1000
+            MMcf: 28316.846592, // Math.Pow(0.3048, 3) * 1000000
+            in3: 0.000016387064, // Math.Pow(0.3048 / 12, 3);
+            L: 0.001,
+            galUS: 0.003785411784, // 231 * Math.Pow(0.3048 / 12, 3);// 231 * cui
+            galUK: 0.00454609 // (4.54609 / 1000);//// official in litres
+        },
+        temperature: {
+            '°F': 1
+        }
+    };
+
+    function getUomCoefFromDict(needUom, needCoefDict) {
+        var result;
+        for (var coefGroup in needCoefDict) {
+            for (var coefItem in needCoefDict[coefGroup]) {
+                if (needUom === coefItem) {
+                    result = needCoefDict[coefGroup][coefItem];
+                }
+            }
+        }
+
+        return result;
+    }
+
+    // [['bbl'],['d']] -> bbl/d
+    // [['kg','m'], ['s']] -> kg*m/s
+    function convertMatrixToStr(uomMatrix) {
+        // [['kg','m'], ['s']] -> ['kg*m','s']
+        var groupArr = [];
+        for (var i = 0; i &lt; uomMatrix.length; i += 1) {
+            groupArr.push(uomMatrix[i].join('*'));
+        }
+
+        // ['kg*m','s'] -> kg*m/s
+        return groupArr.join('/');
+    }
+
+    // bbl/d -> [['bbl'],['d']]
+    // kg*m/s -> [['kg','m'], ['s']]
+    function convertStrToMatrix(uomStr) {
+        // divide by numerator and denominator
+        var tmpList = uomStr.split('/');
+
+        var readyMatrix = [];
+        for (var i = 0; i &lt; tmpList.length; i += 1) {
+            readyMatrix.push(tmpList[i].split('*'));
+        }
+
+        return readyMatrix;
+    }
+
+    /**
+    * Parameter, like OilRate, WaterRate etc.
+    * @constructor
+    * @param {object} data - Parameter data
+    */
+    var exports = function (data) {
+        data = data || {};
+
+        /**
+        * Parameter id (OilRate, WaterRate, etc.)
+        * @type {string}
+        */
+        this.id = data.Id;
+
+        /**
+        * Parameter name (Oil rate, water rate, etc.)
+        * @type {string}
+        */
+        this.name = ko.observable(data.Name);
+
+        /**
+        * Unit of measurement (scf, barrels, etc.)
+        * @type {string}
+        */
+        this.uom = ko.observable(data.Uom);
+
+        var self = this;
+
+        // Todo: need to store in db as this array
+        // For Newton: [[kg,m],[s,s]]
+        // For Speed: [[m],[s,s]]
+        // For Gas: [[f, f, f]] or [[scf]] - standard cubic feet
+        self.sourceUomMatrix = convertStrToMatrix(data.Uom);
+        self.uomMatrix = ko.computed(function () { return convertStrToMatrix(self.uom()); });
+
+        self.defaultColor = ko.observable(data.DefaultColor);
+        self.isCumulative = ko.observable(data.IsCumulative);
+        self.isSystem = ko.observable(data.IsSystem);
+
+        // well file manager parameter group id
+        self.wfmParamSquadId = ko.observable(data.WfmParamSquadId);
+
+        // List of possible units of measurements (for choosed uom)
+        self.getPossibleUomListForSelectedUom = function (selectedUom) {
+            // choose group for need unit of measurement
+            var needGroup;
+            for (var uomCoefGroup in uomCoefDict) {
+                for (var uomCoefItem in uomCoefDict[uomCoefGroup]) {
+                    if (uomCoefItem === selectedUom) {
+                        needGroup = uomCoefDict[uomCoefGroup];
+                    }
+                }
+            }
+
+            var resultList = [];
+            // convert group to array (exclude need uom)
+            if (needGroup) {
+                for (var uomCoefMain in needGroup) {
+                    if (uomCoefMain !== selectedUom) {
+                        resultList.push(uomCoefMain);
+                    }
+                }
+            }
+
+            return resultList;
+        };
+
+        self.changeSelectedUom = function (selectedUom, selectedUomSquadPosition, selectedUomPosition) {
+            ////var prevSelectedUom = self.uomMatrix()[selectedUomSquadPosition][selectedUomPosition];
+            var uomMatrixNew = self.uomMatrix().slice();
+            uomMatrixNew[selectedUomSquadPosition][selectedUomPosition] = selectedUom;
+            self.uom(convertMatrixToStr(uomMatrixNew));
+        };
+
+        // If user wants to remember coef state than use cookies and change after initialization
+        self.uomCoef = ko.computed({
+            read: function () {
+                var coef = 1;
+
+                var currentUomMatrix = self.uomMatrix();
+                for (var i = 0; i &lt; self.sourceUomMatrix.length; i += 1) {
+                    for (var j = 0; j &lt; self.sourceUomMatrix[i].length; j += 1) {
+                        var curItem = currentUomMatrix[i][j];
+                        var srcItem = self.sourceUomMatrix[i][j];
+
+                        if (curItem !== srcItem) {
+                            // get coef (only for changed values)
+                            if (i === 0) {
+                                // If numerator (first value in array)
+                                coef *= getUomCoefFromDict(srcItem, uomCoefDict) / getUomCoefFromDict(curItem, uomCoefDict);
+                            }
+                            else if (i === 1) {
+                                // If denominator (second value in array)
+                                coef /= getUomCoefFromDict(srcItem, uomCoefDict) / getUomCoefFromDict(curItem, uomCoefDict);
+                            }
+                        }
+                    }
+                }
+
+                return coef;
+            },
+            deferEvaluation: true
+        });
+
+        self.toPlainJson = function () { return ko.toJS(this); };
+    };
+
+    return exports;
+});</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="stage-base.html">models/stage-base</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-field-map.html">models/well-field-map</a></li><li><a href="well-file.html">models/well-file</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="wield.html">models/wield</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="section-base.html">sections/section-base</a></li><li><a href="section-of-company.html">sections/section-of-company</a></li><li><a href="section-of-wegion.html">sections/section-of-wegion</a></li><li><a href="section-of-well.html">sections/section-of-well</a></li><li><a href="section-of-wield.html">sections/section-of-wield</a></li><li><a href="section-of-wroup.html">sections/section-of-wroup</a></li><li><a href="workspace.html">viewmodels/workspace</a></li><li><a href="sketch.html">well/sketch</a></li><li><a href="volume.html">well/volume</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0</a> on Tue Dec 17 2013 20:02:16 GMT+0200 (EET)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
