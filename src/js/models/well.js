@@ -12,13 +12,12 @@ define([
     'models/well-partials/history-view',
     'models/sections/section-of-well',
     'models/well-file',
-    'services/well/sketch',
     'models/well/sketch',
     'models/column-attribute',
     'models/well-history',
     'models/test-scope'
 ], function ($, ko, datacontext, fileHelper, bootstrapModal,
-    appHelper, appMoment, StageBase, wellPerfomancePartial, HistoryView, SectionOfWell, WellFile, sketchOfWellService, SketchOfWell) {
+    appHelper, appMoment, StageBase, wellPerfomancePartial, HistoryView, SectionOfWell, WellFile, SketchOfWell) {
     'use strict';
 
     /** WellFiles (convert data objects into array) */
@@ -171,7 +170,7 @@ define([
                     break;
                 }
                 case 'well-sketch': {
-                    self.loadSketchOfWell();
+                    self.sketchOfWell.load();
                     break;
                 }
                 case 'well-perfomance': {
@@ -270,7 +269,7 @@ define([
             ////});
 
             self.selectedSection(null);
-            self.loadSketchOfWell();
+            self.sketchOfWell.load();
             self.getWellWidgoutList();
             // TODO: load data only if there is one or more perfomance widgets (only once) for entire well
             self.getWellGroup().getWellGroupWfmParameterList();
@@ -624,7 +623,7 @@ define([
         ////                            // no string position (new page)
         ////                            pdfHelper.writeSketchImg(doc, sketchBase64, 'Sketch'); // sketch description
 
-        
+
         ////                        }
 
         ////                        if (mapBase64.length > 0) {
@@ -771,77 +770,8 @@ define([
             ////});
         };
 
-        this.sketchOfWell = ko.observable();
-
-        this.isLoadedSketchOfWell = ko.observable(false);
-
-        /** Load well sketches: get only first elem of array: one sketch per well */
-        this.loadSketchOfWell = function () {
-            // Load only if not loaded already
-            if (!ko.unwrap(self.isLoadedSketchOfWell)) {
-                // return array of sketch: get only first
-                sketchOfWellService.get(self.Id).done(function (r) {
-                    if (r.length > 0) {
-                        self.sketchOfWell(new SketchOfWell(r[0]));
-                    }
-                    self.isLoadedSketchOfWell(true);
-                });
-            }
-        };
-
-        this.deleteSketchOfWell = function () {
-            var tmpSketch = ko.unwrap(self.sketchOfWell);
-            if (tmpSketch) {
-                sketchOfWellService.remove(self.Id, tmpSketch.idOfFileSpec).done(function () {
-                    // Remove from well on the client
-                    self.sketchOfWell(null);
-                });
-            }
-        };
-
-        /** Create sketch from file: select file and create sketch */
-        this.createSketchFromFile = function () {
-            var needSection = self.getSectionByPatternId('well-sketch');
-
-            // Select file section with sketches (load and unselect files)
-            self.selectFileSection(needSection);
-
-            var tmpModalFileMgr = self.getWellGroup().getWellField().getWellRegion().getCompany().modalFileMgr;
-
-            // Calback for selected file
-            function mgrCallback() {
-                tmpModalFileMgr.okError('');
-                // Select file from file manager
-                var selectedFileSpecs = ko.unwrap(needSection.listOfFileSpec).filter(function (elem) {
-                    return ko.unwrap(elem.isSelected);
-                });
-
-                if (selectedFileSpecs.length !== 1) {
-                    tmpModalFileMgr.okError('need to select one file');
-                    return;
-                }
-
-                // Change sketch (create if not exists)
-                sketchOfWellService.put(self.Id, selectedFileSpecs[0].id, {
-                    idOfWell: self.Id,
-                    idOfFileSpec: selectedFileSpecs[0].id,
-                    name: ko.unwrap(selectedFileSpecs[0].name),
-                    description: ''
-                }).done(function (r) {
-                    self.sketchOfWell(new SketchOfWell(r));
-                    tmpModalFileMgr.hide();
-                });
-            }
-
-            // Add to observable
-            tmpModalFileMgr.okCallback(mgrCallback);
-
-            // Notification
-            tmpModalFileMgr.okDescription('Please select a file for a sketch');
-
-            // Open file manager
-            tmpModalFileMgr.show();
-        };
+        /** Sketch of well: by default - empty */
+        this.sketchOfWell = new SketchOfWell(self);
 
         self.sketchHashString = ko.observable(new Date().getTime());
 

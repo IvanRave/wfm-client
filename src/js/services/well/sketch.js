@@ -2,16 +2,19 @@
 define(['helpers/ajax-request'], function (ajaxRequest) {
     'use strict';
 
-    function sketchOfWellUrl(idOfWell, idOfFileSpec) {
-        return '{{conf.requrl}}/api/wells/' + idOfWell + '/sketches' + (idOfFileSpec ? ('/' + idOfFileSpec) : '');
+    function sketchOfWellUrl(idOfWell) {
+        return '{{conf.requrl}}/api/well/' + idOfWell + '/sketch';
     }
 
     var exports = {
-        get: function (idOfWell, idOfFileSpec) {
-            return ajaxRequest('GET', sketchOfWellUrl(idOfWell, idOfFileSpec));
+        get: function (idOfWell) {
+            return ajaxRequest('GET', sketchOfWellUrl(idOfWell));
         },
-        put: function (idOfWell, idOfFileSpec, modelData) {
-            return ajaxRequest('PUT', sketchOfWellUrl(idOfWell, idOfFileSpec), modelData);
+        put: function (idOfWell, modelData) {
+            return ajaxRequest('PUT', sketchOfWellUrl(idOfWell), modelData);
+        },
+        remove: function (idOfWell) {
+            return ajaxRequest('DELETE', sketchOfWellUrl(idOfWell));
         }
     };
 

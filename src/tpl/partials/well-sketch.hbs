@@ -1,18 +1,38 @@
-﻿<div>
+﻿<div data-bind="with: sketchOfWell">
   <div class="row">
+    <div data-bind="isLoaded">
+      <div data-bind="ifnot: fileSpec">
+        <div class="alert alert-warning">
+          No sketch. Use edit mode to load new sketch.
+        </div>
+      </div>
+    </div>
     <div class="col-sm-4 text-center">
       <div data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
         <button class="btn btn-default btn-sm btn-block" data-bind="click: createSketchFromFile">Choose sketch...</button>
       </div>
-      <div data-bind="with: sketchOfWell">
-        <div data-bind="with: fileSpec">
-          <span class="pointer" data-bind="panzoomImg: {src: fileUrl}">
-            <img src="#" class="img-responsive" data-bind="attr: { src: fileUrl }" alt="Sketch image" />
-          </span>
-        </div>
+      <div data-bind="with: fileSpec">
+        <span class="pointer" data-bind="panzoomImg: {src: fileUrl}">
+          <img src="#" class="img-responsive" data-bind="attr: { src: fileUrl }" alt="Sketch image" />
+        </span>
       </div>
     </div>
-    <div class="col-sm-8">
+    <div class="col-sm-8" data-bind="if: fileSpec">
+      <div data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
+        <div class="text-right">
+          <button class="btn btn-xs btn-default" data-bind="click: remove">
+            <i class="glyphicon glyphicon-remove"></i>
+            Delete sketch
+          </button>
+        </div>
+      </div>
+      <div data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
+        <textarea class="form-control" rows="10" data-bind="value: description"></textarea>
+        <button class="btn btn-default btn-sm" data-bind="click: save">{{capitalizeFirst lang.toSave}} description</button>
+      </div>
+      <div data-bind="ifnot: $root.userProfile.selectedEmployee().isEditMode">
+        <span class="pre-wrap-text" data-bind="text: description"></span>
+      </div>
     </div>
   </div>
 </div>
