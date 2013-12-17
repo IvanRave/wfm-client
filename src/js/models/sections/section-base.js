@@ -89,7 +89,7 @@
 
         /**
         * Sorted and filtered list of files: ready to view
-        * @type {Array.<module:models/file-spec}
+        * @type {Array.<module:models/file-spec>}
         */
         this.readyListOfFileSpec = ko.computed({
             read: function () {
