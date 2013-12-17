@@ -4,14 +4,25 @@ define(['jquery',
     'services/datacontext',
     'helpers/modal-helper',
     'models/well',
-    'models/wfm-parameter-of-wroup'], function ($, ko, datacontext, bootstrapModal, Well, WellGroupWfmParameter) {
+    'models/wfm-parameter-of-wroup',
+    'models/sections/section-of-wroup',
+    'models/stage-base'], function ($, ko, datacontext, bootstrapModal, Well, WellGroupWfmParameter, SectionOfWroup, StageBase) {
         'use strict';
 
         // 18. WellGroupWfmParameter
-        function importWellGroupWfmParameterDtoList(data, wellGroupItem) { return $.map(data || [], function (item) { return new WellGroupWfmParameter(item, wellGroupItem); }); }
+        function importWellGroupWfmParameterDtoList(data, wellGroupItem) {
+            return $.map(data || [], function (item) { return new WellGroupWfmParameter(item, wellGroupItem); });
+        }
 
         // 4. Wells (convert data objects into array)
-        function importWellsDto(data, parent) { return $.map(data || [], function (item) { return new Well(item, parent); }); }
+        function importWellsDto(data, parent) {
+            return $.map(data || [], function (item) { return new Well(item, parent); });
+        }
+
+        /** Import sections */
+        function importListOfSectionOfWroupDto(data, parent) {
+            return data.map(function (item) { return new SectionOfWroup(item, parent); });
+        }
 
         /**
         * Well group
@@ -56,6 +67,17 @@ define(['jquery',
             * @type {Array.<module:models/well>}
             */
             this.Wells = ko.observableArray();
+
+            /** Base for all stages */
+            StageBase.call(this);
+
+            /** 
+            * Select section
+            * @param {object} sectionToSelect
+            */
+            this.selectSection = function (sectionToSelect) {
+                self.selectedSection(sectionToSelect);
+            };
 
             /**
             * Selected well
@@ -152,7 +174,7 @@ define(['jquery',
                 }
             };
 
-            var appViewModel = self.getWellField().getWellRegion().getParentViewModel();
+            var appViewModel = self.getWellField().getWellRegion().getCompany().getRootViewModel();
 
             // wfm parameter from main source which is not in this group
             self.unselectedWfmParameterList = ko.computed({
@@ -347,7 +369,10 @@ define(['jquery',
             };
 
             // load wells
-            self.Wells(importWellsDto(data.WellsDto, self));
+            this.Wells(importWellsDto(data.WellsDto, self));
+
+            /** Load sections */
+            this.listOfSection(importListOfSectionOfWroupDto(data.ListOfSectionOfWroupDto, self));
         };
 
         return exports;

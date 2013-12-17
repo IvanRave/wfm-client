@@ -1,6 +1,10 @@
-﻿define(['knockout'], function (ko) {
+﻿/** @module */
+define(['knockout'], function (ko) {
     'use strict';
 
+    /**
+    * Base for all stages: well, group, region etc.
+    */
     var exports = function () {
         var ths = this;
 

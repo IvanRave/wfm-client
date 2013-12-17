@@ -6,7 +6,7 @@
     }
 
     var exports = {
-        getVolumeOfWell: function (idOfWell, idOfFileSpec) {
+        get: function (idOfWell, idOfFileSpec) {
             return ajaxRequest('GET', volumeOfWellUrl(idOfWell, idOfFileSpec));
         }
     };

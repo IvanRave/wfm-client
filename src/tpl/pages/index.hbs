@@ -77,23 +77,27 @@
                                                 </div>
                                                 {{> modal-file-mgr }}
                                                 <div data-bind="ifnot: selectedWegion">
+													{{> section-panel-standard }}
                                                     <h4 data-bind="text: name"></h4>
                                                     <h5 data-bind="text: description"></h5>
                                                 </div>
                                                 <div data-bind="with: selectedWegion">
                                                     <div data-bind="ifnot: selectedWield">
+														{{> section-panel-standard }}
                                                         {{> wegion }}
                                                     </div>
                                                     <div data-bind="with: selectedWield">
                                                         <div data-bind="ifnot: selectedWroup">
-															{{> wield-panel }}
+															{{> section-panel-standard }}
                                                             {{> wield }}
                                                         </div>
                                                         <div data-bind="with: selectedWroup">
                                                             <div data-bind="ifnot: selectedWell">
+																{{> section-panel-standard }}
                                                                 {{> wroup }}
                                                             </div>
                                                             <div data-bind="with: selectedWell">
+																{{> section-panel-well }}
                                                                 {{> well }}
                                                             </div>
                                                         </div>

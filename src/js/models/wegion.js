@@ -3,14 +3,18 @@ define(['jquery',
     'knockout',
     'services/datacontext',
     'helpers/modal-helper',
-    'models/wield'], function ($, ko, datacontext, bootstrapModal, WellField) {
+    'models/wield', 'models/stage-base',
+    'models/sections/section-of-wegion'], function ($, ko, datacontext, bootstrapModal,
+        WellField, StageBase, SectionOfWegion) {
         'use strict';
 
         // 2. WellField (convert data objects into array)
         function importWellFieldsDto(data, parent) {
-            return $.map(data || [], function (item) {
-                return new WellField(item, parent);
-            });
+            return data.map(function (item) { return new WellField(item, parent); });
+        }
+
+        function importListOfSectionOfWegionDto(data, parent) {
+            return data.map(function (item) { return new SectionOfWegion(item, parent); });
         }
 
         /**
@@ -34,8 +38,15 @@ define(['jquery',
                 return company;
             };
 
-            this.getParentViewModel = function () {
-                return self.getCompany().getRootViewModel();
+            /** Base for all stages */
+            StageBase.call(this);
+
+            /** 
+            * Select section
+            * @param {object} sectionToSelect
+            */
+            this.selectSection = function (sectionToSelect) {
+                self.selectedSection(sectionToSelect);
             };
 
             this.isOpenItem = ko.observable(false);
@@ -72,13 +83,13 @@ define(['jquery',
 
             self.selectWield = function (wieldToSelect) {
                 wieldToSelect.isOpenItem(true);
-                
+
                 // Unselect child
                 wieldToSelect.selectedWroup(null);
 
                 // Select self
                 self.selectedWield(wieldToSelect);
-                
+
                 // Select parents
                 self.getCompany().selectedWegion(self);
 
@@ -148,7 +159,10 @@ define(['jquery',
             };
 
             // load well fields
-            self.WellFields(importWellFieldsDto(data.WellFieldsDto, self));
+            this.WellFields(importWellFieldsDto(data.WellFieldsDto, self));
+
+            /** Load sections */
+            this.listOfSection(importListOfSectionOfWegionDto(data.ListOfSectionOfWegionDto, self));
         };
 
         exports.prototype.addWellField = function () {

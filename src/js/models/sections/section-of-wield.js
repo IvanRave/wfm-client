@@ -1,5 +1,5 @@
 ﻿/** @module */
-define(['jquery', 'knockout', 'models/sections/section-base'], function ($, ko, SectionBase) {
+define(['knockout', 'models/sections/section-base'], function (ko, SectionBase) {
     'use strict';
 
     /**
@@ -24,7 +24,7 @@ define(['jquery', 'knockout', 'models/sections/section-base'], function ($, ko, 
 
         /** Get list from root */
         this.getListOfSectionPattern = function () {
-            return ko.unwrap(this.getParent().getWellRegion().getParentViewModel().ListOfSectionPatternDto);
+            return ko.unwrap(this.getParent().getWellRegion().getCompany().getRootViewModel().ListOfSectionPatternDto);
         };
 
         // Add shared props

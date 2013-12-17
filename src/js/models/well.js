@@ -68,7 +68,7 @@ define([
 
         /** Get workspace view model */
         this.getAppViewModel = function () {
-            return this.getWellGroup().getWellField().getWellRegion().getParentViewModel();
+            return this.getWellGroup().getWellField().getWellRegion().getCompany().getRootViewModel();
         };
 
         /**

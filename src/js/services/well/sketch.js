@@ -3,7 +3,7 @@ define(['helpers/ajax-request'], function (ajaxRequest) {
     'use strict';
 
     function sketchOfWellUrl(idOfWell) {
-        return '{{conf.requrl}}/api/well/' + idOfWell + '/sketch';
+        return '{{conf.requrl}}/api/wells/' + idOfWell + '/sketches';
     }
 
     var exports = {

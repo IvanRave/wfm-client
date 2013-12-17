@@ -3,32 +3,32 @@ define(['knockout', 'models/sections/section-base'], function (ko, SectionBase) 
     'use strict';
 
     /**
-    * Section of well
+    * Section of well group
     * @param {object} data - section data
-    * @param {module:models/well} well - well (parent)
+    * @param {module:models/wroup} wroup - well group (parent)
     * @constructor
     */
-    var exports = function (data, well) {
+    var exports = function (data, wroup) {
         data = data || {};
 
-        /** Get parent (well) */
+        /** Get parent */
         this.getParent = function () {
-            return well;
+            return wroup;
         };
 
         /**
-        * Id of well
+        * Id of parent
         * @type {number}
         */
-        this.wellId = data.WellId;
+        this.wroupId = data.WroupId;
 
         /** Get list of section patterns from root */
         this.getListOfSectionPattern = function () {
-            return ko.unwrap(this.getParent().getWellGroup().getWellField().getWellRegion().getCompany().getRootViewModel().ListOfSectionPatternDto);
+            return ko.unwrap(this.getParent().getWellField().getWellRegion().getCompany().getRootViewModel().ListOfSectionPatternDto);
         };
 
         /** Add shared props to the section */
-        SectionBase.call(this, data, 'well');
+        SectionBase.call(this, data, 'wroup');
     };
 
     return exports;

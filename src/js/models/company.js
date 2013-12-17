@@ -1,7 +1,7 @@
 ﻿/** @module */
 define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/datacontext',
-    'helpers/modal-helper', 'helpers/history-helper',
-    'helpers/knockout-lazy'], function ($, ko, Wegion, JobType, appDatacontext, modalHelper, historyHelper) {
+    'helpers/modal-helper', 'helpers/history-helper', 'models/stage-base', 'models/sections/section-of-company',
+    'helpers/knockout-lazy'], function ($, ko, Wegion, JobType, appDatacontext, modalHelper, historyHelper, StageBase, SectionOfCompany) {
         'use strict';
 
         /** Import well regions for company */
@@ -12,6 +12,13 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
         /** Import job types for this company (joined with global types) */
         function importJobTypeList(data) {
             return $.map(data || [], function (item) { return new JobType(item); });
+        }
+
+        /** Import company sections */
+        function importListOfSectionOfCompanyDto(data, parent) {
+            return data.map(function (item) {
+                return new SectionOfCompany(item, parent);
+            });
         }
 
         /**
@@ -57,6 +64,17 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
             * @type {module:models/wegion}
             */
             this.wegions = ko.observableArray();
+
+            /** Base for all stages */
+            StageBase.call(this);
+
+            /** 
+            * Select section
+            * @param {object} sectionToSelect
+            */
+            this.selectSection = function (sectionToSelect) {
+                ths.selectedSection(sectionToSelect);
+            };
 
             /**
             * Whether well regions are loaded
@@ -218,6 +236,9 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
                     }
                 }
             };
+
+            /** Load sections */
+            this.listOfSection(importListOfSectionOfCompanyDto(data.ListOfSectionOfCompanyDto, ths));
         };
 
         return exports;
