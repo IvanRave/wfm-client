@@ -1,3 +1,19 @@
+<a name="v0.8.3"></a>
+### v0.8.3 (2013-12-17)
+
+
+#### Bug Fixes
+
+* **wellSketch:**
+  * change file, remove sketch ([0d50782a](https://github.com/IvanRave/wfm/commit/0d50782a197f8696cd5afde51729cfd9e2d31576))
+  * create sketch from file ([40d6ab0d](https://github.com/IvanRave/wfm/commit/40d6ab0d0aa97fab68b93a4465612b0fd9bce825))
+  * fix for new file manager ([ed49d255](https://github.com/IvanRave/wfm/commit/ed49d25572ab79cb84ea902382e918f0ff0149fb))
+
+
+#### Features
+
+* **sections:** for companies, regions, groups ([da16db53](https://github.com/IvanRave/wfm/commit/da16db53b9d187597a6ff800af8cf6122ddd778f))
+
 <a name="v0.8.2"></a>
 ### v0.8.2 (2013-12-13)
 
