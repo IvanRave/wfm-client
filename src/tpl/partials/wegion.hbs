@@ -1,14 +1,7 @@
-﻿---
-layout: false
----
-<h4>
-    <span data-bind="text: Name"></span>
-    <small data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
-        <button type="button" class="btn btn-xs btn-default" data-bind="click: editWellRegion">
-            <i class="glyphicon glyphicon-edit"></i>
-        </button>
-        <button type="button" class="btn btn-xs btn-default" data-bind="click: $parent.deleteWegion">
-            <i class="glyphicon glyphicon-remove"></i>
-        </button>
-    </small>
-</h4>
+﻿<div class="tab-content-pad">
+    <div data-bind="if: selectedSection">
+        <div data-bind="if: selectedSection().sectionPatternId === 'wegion-summary'">
+            {{> wegion-summary }}
+        </div>
+    </div>
+</div>

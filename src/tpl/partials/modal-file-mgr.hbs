@@ -11,11 +11,11 @@
         </div>
       </div>
       <!-- ko ifnot: selectedWegion -->
-      Show all company sections (and files for each section)
+      {{> modal-file-mgr-panel }}
       <!-- /ko -->
       <!-- ko with: selectedWegion -->
       <!-- ko ifnot: selectedWield -->
-      Show all region sections and files
+      {{> modal-file-mgr-panel }}
       <!-- /ko -->
       <!-- ko with: selectedWield -->
       <!-- ko ifnot: selectedWroup -->
@@ -23,7 +23,7 @@
       <!-- /ko -->
       <!-- ko with: selectedWroup-->
       <!-- ko ifnot: selectedWell-->
-      Show all group sections and files
+      {{> modal-file-mgr-panel }}
       <!-- /ko -->
       <!-- ko with: selectedWell -->
       {{> modal-file-mgr-panel }}
