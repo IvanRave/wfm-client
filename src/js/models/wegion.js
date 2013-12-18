@@ -32,6 +32,7 @@ define(['jquery',
             this.Id = data.Id;
             this.CompanyId = data.CompanyId;
             this.Name = ko.observable(data.Name);
+            this.Description = ko.observable(data.Description);
             this.WellFields = ko.observableArray();
 
             this.getCompany = function () {
@@ -145,7 +146,7 @@ define(['jquery',
             /// </remarks>
             self.toPlainJson = function () {
                 ////var copy = ko.toJS(self);
-                var tmpPropList = ['Id', 'CompanyId', 'Name'];
+                var tmpPropList = ['Id', 'CompanyId', 'Name', 'Description'];
 
                 var objReady = {};
                 $.each(tmpPropList, function (propIndex, propValue) {

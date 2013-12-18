@@ -57,6 +57,12 @@ define(['jquery',
             this.Name = ko.observable(data.Name);
 
             /**
+            * Group description: nvarchar(max)
+            * @type {string}
+            */
+            this.Description = ko.observable(data.Description);
+
+            /**
             * Field (parent) id
             * @type {number}
             */
@@ -356,7 +362,7 @@ define(['jquery',
 
             self.toPlainJson = function () {
                 ////var copy = ko.toJS(self);
-                var tmpPropList = ['Id', 'Name', 'WellFieldId'];
+                var tmpPropList = ['Id', 'Name', 'WellFieldId', 'Description'];
                 var objReady = {};
                 $.each(tmpPropList, function (propIndex, propValue) {
                     // null can be sended to ovveride current value to null

@@ -1,8 +1,41 @@
-﻿<div>
-    <div>
-        <span class="bld" data-bind="text: name"></span>
+﻿<div data-bind="ifnot: $root.userProfile.selectedEmployee().isEditMode">
+  <div data-bind="foreach: propSpecList">
+    <div data-bind="if: $parent[clientId]">
+      <div>
+        <label data-bind="text: ttl"></label>
+      </div>
+      <div class="well well-sm">
+        <span data-bind="if: tpe === 'SingleLine'">
+          <span data-bind="text: $parent[clientId]"></span>
+        </span>
+        <span data-bind="if: tpe === 'MultiLine'">
+          <span class="pre-wrap-text" data-bind="text: $parent[clientId]"></span>
+        </span>
+        <span data-bind="if: tpe === 'DateLine'">
+          <span data-bind="unix: $parent[clientId]"></span>
+        </span>
+      </div>
     </div>
-    <div>
-        <span data-bind="text: description"></span>
+  </div>
+</div>
+<div data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
+  <button class="btn btn-sm btn-default" data-bind="click: save">{{capitalizeFirst lang.toSave}}</button>
+  <div data-bind="foreach: propSpecList">
+    <div data-bind="if: $parent[clientId]">
+      <div>
+        <label data-bind="text: ttl"></label>
+      </div>
+      <div class="well well-sm">
+        <span data-bind="if: tpe === 'SingleLine'">
+          <input class="form-control" type="text" data-bind="value: $parent[clientId], attr: {maxlength: maxLength}"></input>
+        </span>
+        <span data-bind="if: tpe === 'MultiLine'">
+          <textarea class="form-control" rows="5" data-bind="value: $parent[clientId]"></textarea>
+        </span>
+        <span data-bind="if: tpe === 'DateLine'">
+          <input class="input-sm" type="text" size="10" data-bind="datepicker: $parent[clientId], datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }" />
+        </span>
+      </div>
     </div>
+  </div>
 </div>

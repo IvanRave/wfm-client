@@ -1,7 +1,8 @@
 ﻿/** @module */
 define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/datacontext',
     'helpers/modal-helper', 'helpers/history-helper', 'models/stage-base', 'models/sections/section-of-company',
-    'helpers/knockout-lazy'], function ($, ko, Wegion, JobType, appDatacontext, modalHelper, historyHelper, StageBase, SectionOfCompany) {
+    'models/prop-spec', 'services/company',
+    'helpers/knockout-lazy'], function ($, ko, Wegion, JobType, appDatacontext, modalHelper, historyHelper, StageBase, SectionOfCompany, PropSpec, companyService) {
         'use strict';
 
         /** Import well regions for company */
@@ -20,6 +21,12 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
                 return new SectionOfCompany(item, parent);
             });
         }
+
+        /** Main properties for company: headers can be translated here if needed */
+        var companyPropSpecList = [
+            new PropSpec('name', 'Name', 'Company name', 'SingleLine', 255),
+            new PropSpec('description', 'Description', 'Company description', 'MultiLine')
+        ];
 
         /**
         * Company model
@@ -41,17 +48,13 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
             */
             this.id = data.Id;
 
-            /**
-            * Company name
-            * @type {string}
-            */
-            this.name = ko.observable(data.Name);
+            /** Props specifications */
+            this.propSpecList = companyPropSpecList;
 
-            /**
-            * Company description
-            * @type {string}
-            */
-            this.description = ko.observable(data.Description);
+            /** Props values: all observables */
+            this.propSpecList.forEach(function (prop) {
+                ths[prop.clientId] = ko.observable(data[prop.serverId]);
+            });
 
             /**
             * Logo url
@@ -125,6 +128,9 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
                 ths.selectedWegion(wegionToSelect);
 
                 // Select parents (not need)
+
+                // Select summary section
+                wegionToSelect.selectedSection(wegionToSelect.getSectionByPatternId('wegion-summary'));
 
                 if (!initialData.isHistory) {
                     historyHelper.pushState('/companies/' + ths.id + '/well-regions/' + wegionToSelect.Id);
@@ -210,6 +216,11 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
                 }
             };
 
+            /** Save properties */
+            this.save = function () {
+                companyService.put({ id: ths.id }, ths.toDto());
+            };
+
             /** 
             * Load wegions of this company
             * @param {object} [initialData] - Initial data
@@ -235,6 +246,20 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
                         ths.selectWegionById(initialData.wegionId, initialData);
                     }
                 }
+            };
+
+            /** Convert to data transfer object to sent to the server*/
+            this.toDto = function () {
+                var dtoObj = {
+                    Id: ths.id,
+                    LogoUrl: ko.unwrap(ths.logoUrl)
+                };
+
+                ths.propSpecList.forEach(function (prop) {
+                    dtoObj[prop.serverId] = ko.unwrap(ths[prop.clientId]);
+                });
+
+                return dtoObj;
             };
 
             /** Load sections */

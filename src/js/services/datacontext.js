@@ -71,9 +71,6 @@
     function companyUserUrl(uqp) {
         return '{{conf.requrl}}/api/companyuser/' + (uqp ? ('?' + $.param(uqp)) : '');
     }
-    function companyUrl(uqp) {
-        return '{{conf.requrl}}/api/company/' + (uqp ? ('?' + $.param(uqp)) : '');
-    }
     function wellWidgoutUrl(wellId, widgoutId) {
         return '{{conf.requrl}}/api/wells/' + wellId + '/widgouts' + (widgoutId ? ('/' + widgoutId) : '');
     }
@@ -475,19 +472,6 @@
         getWfmParamSquadList: getWfmParamSquadList,
         getForecastEvolution: getForecastEvolution,
         postForecastEvolution: postForecastEvolution
-    };
-
-    // api/company/
-    datacontext.postCompany = function (uqp, data) {
-        return ajaxRequest('POST', companyUrl(uqp), data);
-    };
-
-    datacontext.getCompany = function (uqp) {
-        return ajaxRequest('GET', companyUrl(uqp));
-    };
-
-    datacontext.putCompany = function (uqp, data) {
-        return ajaxRequest('PUT', companyUrl(uqp), data);
     };
 
     // api/companyuser/

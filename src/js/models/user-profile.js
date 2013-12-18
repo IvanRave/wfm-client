@@ -154,8 +154,13 @@ define(['jquery', 'knockout', 'models/employee', 'services/datacontext', 'helper
 
             // Select parents (no need)
 
+            var tmpCompany = ko.unwrap(ths.selectedEmployee).company;
+
             // Load all regions for company of selected employee
-            ko.unwrap(ths.selectedEmployee).company.loadWegions(initialData);
+            tmpCompany.loadWegions(initialData);
+
+            // Select summary section
+            tmpCompany.selectSection(tmpCompany.getSectionByPatternId('company-summary'));
 
             if (!initialData.isHistory) {
                 historyHelper.pushState('/companies/' + employeeToSelect.companyId);
