@@ -1,20 +1,29 @@
-﻿define(['jquery', 'services/datacontext', 'helpers/ajax-request'], function ($, datacontext, ajaxRequest) {
+﻿/** @module */
+define(['helpers/ajax-request'], function (ajaxRequest) {
     'use strict';
 
-    function accountRegisterUrl(uqp) {
-        return '{{conf.requrl}}/api/account/register/' + (uqp ? ('?' + $.param(uqp)) : '');
-    }
-    function accountRegisterConfirmationUrl(uqp) {
-        return '{{conf.requrl}}/api/account/register/confirmation/' + (uqp ? ('?' + $.param(uqp)) : '');
+    function accountRegisterUrl() {
+        return '{{conf.requrl}}/api/account/register';
     }
 
-    // Account register
-    datacontext.accountRegister = function (uqp, data) {
-        return ajaxRequest('POST', accountRegisterUrl(uqp), data);
+    function accountRegisterConfirmationUrl() {
+        return '{{conf.requrl}}/api/account/register/confirmation';
+    }
+
+    /**
+    * Register service
+    * @constructor
+    */
+    var exports = {
+        // Account register
+        accountRegister: function (data) {
+            return ajaxRequest('POST', accountRegisterUrl(), data);
+        },
+        // Confirm email after registration
+        accountRegisterConfirmation: function (data) {
+            return ajaxRequest('POST', accountRegisterConfirmationUrl(), data);
+        }
     };
 
-    // Confirm email after registration
-    datacontext.accountRegisterConfirmation = function (uqp, data) {
-        return ajaxRequest('POST', accountRegisterConfirmationUrl(uqp), data);
-    };
+    return exports;
 });
