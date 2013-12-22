@@ -4,10 +4,11 @@ module.exports = function (grunt) {
     var isProd = grunt.option('prod') ? true : false,
         isIpad = grunt.option('ipad') ? true : false,
 		isMetro = grunt.option('metro') ? true : false,
-        // Request url
-        requrl = grunt.option('requrl') || 'http://wfm-client.azurewebsites.net',
         // Build language: en, ru, es etc.
         lang = grunt.option('lang') || 'en';
+        
+    // API url (prod and dev)
+    var requrl = isProd ? 'http://wfm-client.azurewebsites.net' : 'http://localhost:17171';
         
     // Commit message for bump feature
     // var cmtheader = grunt.option('cmtheader') || 'fix(project): change',

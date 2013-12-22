@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: models/sections/section-of-wield.js</title>
+    <title>JSDoc: Module: helpers/ajax-request</title>
     
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,51 +17,87 @@
 
 <div id="main">
     
-    <h1 class="page-title">Source: models/sections/section-of-wield.js</h1>
+    <h1 class="page-title">Module: helpers/ajax-request</h1>
     
     
 
 
+
+<section>
     
-    <section>
-        <article>
-            <pre class="prettyprint source"><code>﻿/** @module */
-define(['knockout', 'models/sections/section-base'], function (ko, SectionBase) {
-    'use strict';
+<header>
+    <h2>
+    helpers/ajax-request
+    </h2>
+    
+</header>  
 
-    /**
-    * Section of well field
-    * @param {object} data - section data
-    * @param {module:models/wield} wield - well field (parent)
-    * @constructor
-    */
-    var exports = function (data, wield) {
-        data = data || {};
+<article>
+    <div class="container-overview">
+    
+    
+    
+        
+        
+        
+<dl class="details">
+    
+        
+    
+    
+    
 
-        /** Get parent (well field) */
-        this.getParent = function () {
-            return wield;
-        };
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="ajax-request.js.html">helpers/ajax-request.js</a>, <a href="ajax-request.js.html#line1">line 1</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
 
-        /**
-        * Id of well field
-        * @type {number}
-        */
-        this.wieldId = data.WieldId;
+        
+        
+    
+    </div>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</article>
 
-        /** Get list from root */
-        this.getListOfSectionPattern = function () {
-            return ko.unwrap(this.getParent().getWellRegion().getCompany().getRootViewModel().ListOfSectionPatternDto);
-        };
-
-        // Add shared props
-        SectionBase.call(this, data, 'wield');
-    };
-
-    return exports;
-});</code></pre>
-        </article>
-    </section>
+</section>  
 
 
 

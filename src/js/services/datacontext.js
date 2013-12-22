@@ -68,9 +68,6 @@
     function forecastEvolutionUrl(uqp) {
         return '{{conf.requrl}}/api/forecastevolution/' + (uqp ? ('?' + $.param(uqp)) : '');
     }
-    function companyUserUrl(uqp) {
-        return '{{conf.requrl}}/api/companyuser/' + (uqp ? ('?' + $.param(uqp)) : '');
-    }
     function wellWidgoutUrl(wellId, widgoutId) {
         return '{{conf.requrl}}/api/wells/' + wellId + '/widgouts' + (widgoutId ? ('/' + widgoutId) : '');
     }
@@ -472,11 +469,6 @@
         getWfmParamSquadList: getWfmParamSquadList,
         getForecastEvolution: getForecastEvolution,
         postForecastEvolution: postForecastEvolution
-    };
-
-    // api/companyuser/
-    datacontext.getCompanyUserList = function (uqp) {
-        return ajaxRequest('GET', companyUserUrl(uqp));
     };
 
     // Widget layouts for well=================================================================

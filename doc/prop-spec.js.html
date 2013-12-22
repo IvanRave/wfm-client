@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: models/sections/section-of-wield.js</title>
+    <title>JSDoc: Source: models/prop-spec.js</title>
     
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Source: models/sections/section-of-wield.js</h1>
+    <h1 class="page-title">Source: models/prop-spec.js</h1>
     
     
 
@@ -26,36 +26,49 @@
     <section>
         <article>
             <pre class="prettyprint source"><code>﻿/** @module */
-define(['knockout', 'models/sections/section-base'], function (ko, SectionBase) {
+define([], function () {
     'use strict';
 
     /**
-    * Section of well field
-    * @param {object} data - section data
-    * @param {module:models/wield} wield - well field (parent)
+    * Property specification
     * @constructor
     */
-    var exports = function (data, wield) {
-        data = data || {};
-
-        /** Get parent (well field) */
-        this.getParent = function () {
-            return wield;
-        };
+    var exports = function (clientId, serverId, ttl, tpe, maxLength, minLength) {
+        /**
+        * Id, used on the client side: can be different then server side id
+        * @type {string}
+        */
+        this.clientId = clientId;
 
         /**
-        * Id of well field
+        * Id, used on the server side: when server id is changed, then no need to change client id
+        * @type {string}
+        */
+        this.serverId = serverId;
+
+        /**
+        * Property title
+        * @type {string}
+        */
+        this.ttl = ttl;
+
+        /**
+        * Property type: SingleLine, MultiLine, DateLine, ImgUrl: defines representation of this property
+        * @type {string}
+        */
+        this.tpe = tpe;
+
+        /**
+        * Max length for string types
         * @type {number}
         */
-        this.wieldId = data.WieldId;
+        this.maxLength = maxLength;
 
-        /** Get list from root */
-        this.getListOfSectionPattern = function () {
-            return ko.unwrap(this.getParent().getWellRegion().getCompany().getRootViewModel().ListOfSectionPatternDto);
-        };
-
-        // Add shared props
-        SectionBase.call(this, data, 'wield');
+        /**
+        * Min length for string types 
+        * @type {number}
+        */
+        this.minLength = minLength;
     };
 
     return exports;

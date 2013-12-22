@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: models/sections/section-of-wield.js</title>
+    <title>JSDoc: Source: services/company.js</title>
     
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Source: models/sections/section-of-wield.js</h1>
+    <h1 class="page-title">Source: services/company.js</h1>
     
     
 
@@ -26,36 +26,23 @@
     <section>
         <article>
             <pre class="prettyprint source"><code>﻿/** @module */
-define(['knockout', 'models/sections/section-base'], function (ko, SectionBase) {
+define(['jquery', 'helpers/ajax-request'], function ($, ajaxRequest) {
     'use strict';
 
-    /**
-    * Section of well field
-    * @param {object} data - section data
-    * @param {module:models/wield} wield - well field (parent)
-    * @constructor
-    */
-    var exports = function (data, wield) {
-        data = data || {};
+    var companyUrl = function (uqp) {
+        return '{{conf.requrl}}/api/company/' + (uqp ? ('?' + $.param(uqp)) : '');
+    };
 
-        /** Get parent (well field) */
-        this.getParent = function () {
-            return wield;
-        };
-
-        /**
-        * Id of well field
-        * @type {number}
-        */
-        this.wieldId = data.WieldId;
-
-        /** Get list from root */
-        this.getListOfSectionPattern = function () {
-            return ko.unwrap(this.getParent().getWellRegion().getCompany().getRootViewModel().ListOfSectionPatternDto);
-        };
-
-        // Add shared props
-        SectionBase.call(this, data, 'wield');
+    var exports = {
+        post: function (uqp, data) {
+            return ajaxRequest('POST', companyUrl(uqp), data);
+        },
+        get: function (uqp) {
+            return ajaxRequest('GET', companyUrl(uqp));
+        },
+        put: function (uqp, data) {
+            return ajaxRequest('PUT', companyUrl(uqp), data);
+        }
     };
 
     return exports;

@@ -6,7 +6,7 @@ define([], function () {
     * Property specification
     * @constructor
     */
-    var exports = function (clientId, serverId, ttl, tpe, maxLength, minLength) {
+    var exports = function (clientId, serverId, ttl, tpe, addtData) {
         /**
         * Id, used on the client side: can be different then server side id
         * @type {string}
@@ -32,16 +32,10 @@ define([], function () {
         this.tpe = tpe;
 
         /**
-        * Max length for string types
-        * @type {number}
+        * Additional data, specific for every type
+        * @type {object}
         */
-        this.maxLength = maxLength;
-
-        /**
-        * Min length for string types 
-        * @type {number}
-        */
-        this.minLength = minLength;
+        this.addtData = addtData;
     };
 
     return exports;

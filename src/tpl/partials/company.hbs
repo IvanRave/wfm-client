@@ -1,7 +1,10 @@
 ﻿<div class="tab-content-pad">
-    <div data-bind="if: selectedSection">
-        <div data-bind="if: selectedSection().sectionPatternId === 'company-summary'">
-            {{> company-summary}}
-        </div>
+  <div data-bind="if: selectedSection">
+    <div data-bind="if: selectedSection().sectionPatternId === 'company-summary'">
+      {{> summary-standard}}
     </div>
+    <div data-bind="if: selectedSection().sectionPatternId === 'company-report'">
+      No reports
+    </div>
+  </div>
 </div>

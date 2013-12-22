@@ -1,5 +1,5 @@
 ﻿/** @module */
-define(['knockout','models/company'], function (ko, Company) {
+define(['knockout','models/company', 'services/company'], function (ko, Company, companyService) {
     'use strict';
 
     /**
@@ -65,6 +65,18 @@ define(['knockout','models/company'], function (ko, Company) {
         this.toggleEditMode = function () {
             if (ths.canEditAll) {
                 ths.isEditMode(!ko.unwrap(ths.isEditMode));
+            }
+        };
+
+        /** Remove company with employee */
+        this.removeChild = function (companyToRemove) {
+            var tmpCompanyId = ko.unwrap(companyToRemove.id);
+            if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(companyToRemove.name) + '"?')) {
+                companyService.remove(tmpCompanyId).done(function () {
+                    // Reload all employees
+                    vm.userProfile.isLoadedEmployees(false);
+                    vm.userProfile.loadEmployees();
+                });
             }
         };
     };

@@ -24,8 +24,10 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
 
         /** Main properties for company: headers can be translated here if needed */
         var companyPropSpecList = [
-            new PropSpec('name', 'Name', 'Company name', 'SingleLine', 255),
-            new PropSpec('description', 'Description', 'Company description', 'MultiLine')
+            new PropSpec('name', 'Name', 'Company name', 'SingleLine', { maxLength: 255 }),
+            new PropSpec('description', 'Description', 'Company description', 'MultiLine', {}),
+            new PropSpec('urlOfLogo', 'UrlOfLogo', 'Logo', 'ImgSrc', { width: 100, clientIdOfFileSpec: 'idOfFileSpecOfLogo' }),
+            new PropSpec('idOfFileSpecOfLogo', 'IdOfFileSpecOfLogo', '', '')
         ];
 
         /**
@@ -51,16 +53,19 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
             /** Props specifications */
             this.propSpecList = companyPropSpecList;
 
+            /** Get need property from array */
+            this.getPropSpecByClientId = function (clientId) {
+                var filteredProps = ths.propSpecList.filter(function (elem) {
+                    return elem.clientId === clientId;
+                });
+
+                return filteredProps[0];
+            };
+
             /** Props values: all observables */
             this.propSpecList.forEach(function (prop) {
                 ths[prop.clientId] = ko.observable(data[prop.serverId]);
             });
-
-            /**
-            * Logo url
-            * @type {string}
-            */
-            this.logoUrl = ko.observable(data.LogoUrl || 'img/question.jpg');
 
             /**
             * List of well regions
@@ -90,6 +95,49 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
                     ths.jobTypeList(importJobTypeList(r));
                 });
             }, this);
+
+            /** Select file for any image */
+            this.selectImgSrc = function (someElem) {
+                console.log(someElem);
+                var needSection = ths.getSectionByPatternId('company-summary');
+                // Select file section with logos (load and unselect files)
+                ths.selectFileSection(needSection);
+
+                function mgrCallback() {
+                    ths.modalFileMgr.okError('');
+                    // Select file from file manager
+                    var selectedFileSpecs = ko.unwrap(needSection.listOfFileSpec).filter(function (elem) {
+                        return ko.unwrap(elem.isSelected);
+                    });
+
+                    if (selectedFileSpecs.length !== 1) {
+                        ths.modalFileMgr.okError('need to select one file');
+                        return;
+                    }
+
+                    ths.idOfFileSpecOfLogo(selectedFileSpecs[0].id);
+                    ths.save();
+                    ths.modalFileMgr.hide();
+                    // Change sketch (create if not exists)
+                    ////sketchOfWellService.put(ths.idOfWell, {
+                    ////    idOfWell: ths.idOfWell,
+                    ////    idOfFileSpec: selectedFileSpecs[0].id,
+                    ////    name: ko.unwrap(selectedFileSpecs[0].name) || '',
+                    ////    description: ko.unwrap(ths.description) || ''
+                    ////}).done(function (resSketch) {
+                    ////    ths.name(resSketch.Name);
+                    ////    ths.description(resSketch.Description);
+                    ////    ths.idOfFileSpec(resSketch.IdOfFileSpec);
+                    ////    ths.fileSpec(new FileSpec(resSketch.FileSpecDto));
+                    ////    tmpModalFileMgr.hide();
+                    ////});
+                }
+
+                ths.modalFileMgr.okCallback(mgrCallback);
+                ths.modalFileMgr.okDescription('Please select image for company logo');
+
+                ths.modalFileMgr.show();
+            };
 
             /** Modal window for adding job type */
             this.goToPostingJobType = function () {
@@ -184,8 +232,9 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
 
                 modalHelper.openModalWindow('Well region', innerDiv, function () {
                     appDatacontext.saveNewWellRegion({
-                        Name: $(inputName).val(),
-                        CompanyId: ths.id
+                        'Name': $(inputName).val(),
+                        'Description': '',
+                        'CompanyId': ths.id
                     }).done(function (result) {
                         ths.wegions.push(new Wegion(result, ths));
                     });
@@ -218,7 +267,10 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
 
             /** Save properties */
             this.save = function () {
-                companyService.put({ id: ths.id }, ths.toDto());
+                companyService.put(ths.id, ths.toDto()).done(function (r) {
+                    // Calculated properties on the server
+                    ths.urlOfLogo(r.UrlOfLogo);
+                });
             };
 
             /** 
@@ -251,8 +303,7 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
             /** Convert to data transfer object to sent to the server*/
             this.toDto = function () {
                 var dtoObj = {
-                    Id: ths.id,
-                    LogoUrl: ko.unwrap(ths.logoUrl)
+                    Id: ths.id
                 };
 
                 ths.propSpecList.forEach(function (prop) {
