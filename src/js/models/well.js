@@ -14,11 +14,12 @@ define([
     'models/well-file',
     'models/well/sketch',
     'models/prop-spec',
+    'services/well',
     'models/column-attribute',
     'models/well-history',
     'models/test-scope'
 ], function ($, ko, datacontext, fileHelper, bootstrapModal,
-    appHelper, appMoment, StageBase, wellPerfomancePartial, HistoryView, SectionOfWell, WellFile, SketchOfWell, PropSpec) {
+    appHelper, appMoment, StageBase, wellPerfomancePartial, HistoryView, SectionOfWell, WellFile, SketchOfWell, PropSpec, wellService) {
     'use strict';
 
     /** WellFiles (convert data objects into array) */
@@ -51,23 +52,21 @@ define([
         });
     }
 
+    /** Well property specifications: will be good to manage this params on the server side */
     var wellPropSpecList = [
         new PropSpec('Name', 'Name', 'Well name', 'SingleLine', { maxLength: 255 }),
-        new PropSpec('Description', 'Description', 'Description', 'Multiline', {})
-
-    ////{ id: 'Name', ttl: 'Name', tpe: 'SingleLine' },
-    ////        { id: 'Description', ttl: 'Description', tpe: 'MultiLine' },
-    ////        { id: 'DrillingDate', ttl: 'Drilling date', tpe: 'DateLine' },
-    ////        { id: 'ProductionHistory', ttl: 'Production history', tpe: 'MultiLine' },
-    ////        { id: 'CompletionType', ttl: 'Completion type', tpe: 'MultiLine' },
-    ////        { id: 'FormationCompleteState', ttl: 'Formation complete state', tpe: 'MultiLine' },
-    ////        { id: 'IntegrityStatus', ttl: 'Integrity status', tpe: 'MultiLine' },
-    ////        { id: 'LastInterventionType', ttl: 'Last intervention type', tpe: 'MultiLine' },
-    ////        { id: 'LastInterventionDate', ttl: 'Last intervention date', tpe: 'DateLine' },
-    ////        { id: 'PerforationDepth', ttl: 'Perforation depth', tpe: 'MultiLine' },
-    ////        { id: 'PressureData', ttl: 'Pressure data', tpe: 'MultiLine' },
-    ////        { id: 'Pvt', ttl: 'PVT', tpe: 'MultiLine' },
-    ////        { id: 'ReservoirData', ttl: 'Reservoir data', tpe: 'MultiLine' }
+        new PropSpec('Description', 'Description', 'Description', 'MultiLine', {}),
+        new PropSpec('DrillingDate', 'DrillingDate', 'Drilling date', 'DateLine', {}),
+        new PropSpec('ProductionHistory', 'ProductionHistory', 'Production history', 'MultiLine', {}),
+        new PropSpec('CompletionType', 'CompletionType', 'Completion type', 'MultiLine', {}),
+        new PropSpec('FormationCompleteState', 'FormationCompleteState', 'Formation complete state', 'MultiLine', {}),
+        new PropSpec('IntegrityStatus', 'IntegrityStatus', 'Integrity status', 'MultiLine', {}),
+        new PropSpec('LastInterventionType', 'LastInterventionType', 'Last intervention type', 'MultiLine', {}),
+        new PropSpec('LastInterventionDate', 'LastInterventionDate', 'Last intervention date', 'DateLine', {}),
+        new PropSpec('PerforationDepth', 'PerforationDepth', 'Perforation depth', 'MultiLine', {}),
+        new PropSpec('PressureData', 'PressureData', 'Pressure data', 'MultiLine', {}),
+        new PropSpec('Pvt', 'Pvt', 'PVT', 'MultiLine', {}),
+        new PropSpec('ReservoirData', 'ReservoirData', 'Reservoir data', 'MultiLine', {})
     ];
 
     /**
@@ -109,28 +108,11 @@ define([
         */
         this.FlowType = ko.observable(data.FlowType);
 
+        /** Well property specifications */
         this.propSpecList = wellPropSpecList;
 
         /** Add props to constructor */
         StageBase.call(this, data);
-
-        // TODO: convert each well property to the wellProperty class
-        /**
-        * Well property list
-        * @type {Object.<string, string, string>}
-        */
-        ////this.wellPropertyList = [
-
-        ////];
-
-        /** Load other properties */
-        ////this.wellPropertyList.forEach(function (arrElem) {
-        ////    /** some member */
-        ////    this[arrElem.id] = ko.observable(data[arrElem.id]);
-
-        ////    /** some member title */
-        ////    this['ttl' + arrElem.id] = arrElem.ttl;
-        ////}, this);
 
         /** 
         * Well comment
@@ -290,7 +272,9 @@ define([
         };
 
         /** Save this well main properties */
-        this.save = function () { };
+        this.save = function () {
+            wellService.put(ths.Id, ths.toDto());
+        };
 
         /** Every section has files: filter files only for current section */
         // TODO: Change to new realization
@@ -792,7 +776,7 @@ define([
         this.volumeHashString = ko.observable(new Date().getTime());
 
         this.putWell = function () {
-            datacontext.saveChangedWell(ths);
+            wellService.put(ths.Id, ths.toDto());
         };
 
         this.chooseMainFile = function (purpose) {
@@ -915,11 +899,7 @@ define([
                 ths.Name($(inputName).val());
                 ths.Description($(inputDescription).val());
                 ths.ProductionHistory($(inputProductionHistory).val());
-                datacontext.saveChangedWell(ths).done(function (result) {
-                    ths.Name(result.Name);
-                    ths.Description(result.Description);
-                    ths.ProductionHistory(result.ProductionHistory);
-                });
+                ths.save();
                 bootstrapModal.closeModalWindow();
             }
 
@@ -1152,28 +1132,20 @@ define([
 
         // ==================================================================== Well perfomance section end ========================================
 
-        this.toPlainJson = function () {
-            // add other props
-            ////public int Id { get; set; }
-            ////public int WellGroupId { get; set; }
-            ////public string WellType { get; set; }
-            ////public string FlowType { get; set; }
-            ////public string Comment { get; set; }
-            // Join two property arrays
-            var tmpPropList = ['Id', 'WellGroupId', 'WellType', 'FlowType', 'Comment'];
-            $.each(ths.wellPropertyList, function (propIndex, propValue) {
-                tmpPropList.push(propValue.id);
+        this.toDto = function () {
+            var dtoObj = {
+                'Id': ths.Id,
+                'WellGroupId': ths.WellGroupId,
+                'WellType': ko.unwrap(ths.WellType),
+                'FlowType': ko.unwrap(ths.FlowType),
+                'Comment': ko.unwrap(ths.Comment)
+            };
+
+            ths.propSpecList.forEach(function (prop) {
+                dtoObj[prop.serverId] = ko.unwrap(ths[prop.clientId]);
             });
 
-            var objReady = {};
-            $.each(tmpPropList, function (propIndex, propValue) {
-                // null can be sended to ovveride current value to null
-                if (typeof ko.unwrap(ths[propValue]) !== 'undefined') {
-                    objReady[propValue] = ko.unwrap(ths[propValue]);
-                }
-            });
-
-            return objReady;
+            return dtoObj;
         };
     };
 

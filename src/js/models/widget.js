@@ -44,7 +44,7 @@
                 WidgetPerfomance.call(self, optsObj, self.getWidgock());
                 break;
             case 'summary':
-                WidgetSummary.call(self, optsObj, ko.unwrap(self.getWidgock().getWidgout().getParent().wellPropertyList));
+                WidgetSummary.call(self, optsObj, ko.unwrap(self.getWidgock().getWidgout().getParent().propSpecList));
                 break;
             case 'sketch':
                 WidgetSketch.call(self, optsObj);

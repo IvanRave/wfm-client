@@ -77,10 +77,6 @@
         return ajaxRequest('DELETE', wellUrl({ id: item.Id }));
     }
 
-    function saveChangedWell(item) {
-        return ajaxRequest('PUT', wellUrl({ id: item.Id }), item);
-    }
-
     // get list
     function getWellFiles(urlQueryParams) {
         return ajaxRequest('GET', wellFileUrl(urlQueryParams));
@@ -346,8 +342,6 @@
         postWell: postWell,
         // delete objects from db
         deleteWell: deleteWell,
-        // save changed objects in db
-        saveChangedWell: saveChangedWell,
         // WellFile
         getWellFiles: getWellFiles,
         getWellFileUrl: getWellFileUrl,

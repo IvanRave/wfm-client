@@ -25,11 +25,17 @@
 </div>
 <div data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
   <div class="clearfix">
-    <div class="pull-left">
-      <button class="btn btn-sm btn-default" data-bind="click: save">{{capitalizeFirst lang.toSave}}</button>
-    </div>
     <div class="pull-right">
-      <button class="btn btn-sm btn-default" data-bind="click: $parent.removeChild">{{capitalizeFirst lang.toDelete}}</button>
+      <button class="btn btn-sm btn-danger" data-bind="click: $parent.removeChild">
+        <i class="glyphicon glyphicon-remove-sign"></i>
+        {{capitalizeFirst lang.toDelete}}
+      </button>
+    </div>
+    <div class="pull-right min-right-margin">
+      <button class="btn btn-sm btn-success" data-bind="click: save">
+        <i class="glyphicon glyphicon-saved"></i>
+        {{capitalizeFirst lang.toSave}}
+      </button>
     </div>
   </div>
   <div data-bind="foreach: propSpecList">

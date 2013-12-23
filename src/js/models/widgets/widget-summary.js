@@ -1,24 +1,29 @@
-﻿define(['jquery', 'knockout'], function ($, ko) {
+﻿/** @module */
+define(['knockout'], function (ko) {
     'use strict';
 
-    // Widget for summary well info
-    function WidgetSummary(opts, wellPropertyList) {
-        var self = this;
+    /*
+    * Widget for summary well info
+    * @constructor
+    */
+    var exports = function (opts, propSpecList) {
+        var ths = this;
         opts = opts || {};
 
-        $.each(wellPropertyList, function (wellPropIndex, wellProp) {
-            self['isVis' + wellProp.id] = ko.observable(opts['IsVis' + wellProp.id]);
+        propSpecList.forEach(function (propSpec) {
+            ths['isVis' + propSpec.clientId] = ko.observable(opts['IsVis' + propSpec.serverId]);
         });
 
-        self.toPlainOpts = function () {
+        this.toPlainOpts = function () {
             var obj = {};
-            $.each(wellPropertyList, function (wellPropIndex, wellProp) {
-                obj['IsVis' + wellProp.id] = ko.unwrap(self['isVis' + wellProp.id]);
+
+            propSpecList.forEach(function (propSpec) {
+                obj['IsVis' + propSpec.serverId] = ko.unwrap(ths['isVis' + propSpec.clientId]);
             });
 
             return obj;
         };
-    }
+    };
 
-    return WidgetSummary;
+    return exports;
 });

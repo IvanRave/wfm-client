@@ -1,24 +1,24 @@
 ﻿<script type="text/html" id="summary-widget-tpl">
   <div data-bind="if: widget.isVisSettingPanel">
-    <div class="widget-setting-panel" data-bind="foreach: $parents[3].wellPropertyList">
+    <div class="widget-setting-panel" data-bind="foreach: $parents[3].propSpecList">
       <label style="font-weight: normal">
-        <input type="checkbox" data-bind="checked: widget['isVis' + id]" />
+        <input type="checkbox" data-bind="checked: widget['isVis' + clientId]" />
         <span data-bind="text: ttl"></span>
       </label>
     </div>
   </div>
   <div data-bind="with: $parents[3]">
-    <div class="widget-content" data-bind="foreach: wellPropertyList">
-      <div data-bind="if: widget['isVis' + id]">
+    <div class="widget-content" data-bind="foreach: propSpecList">
+      <div data-bind="if: widget['isVis' + clientId]">
         <small class="bld" data-bind="text: ttl"></small>:
         <span data-bind="if: tpe === 'SingleLine'">
-          <span data-bind="text: $parent[id]"></span>
+          <span data-bind="text: $parent[clientId]"></span>
         </span>
         <span data-bind="if: tpe === 'MultiLine'">
-          <span class="pre-wrap-text" data-bind="text: $parent[id]"></span>
+          <span class="pre-wrap-text" data-bind="text: $parent[clientId]"></span>
         </span>
         <span data-bind="if: tpe === 'DateLine'">
-          <span data-bind="date: $parent[id]"></span>
+          <span data-bind="unix: $parent[clientId]"></span>
         </span>
       </div>
     </div>
