@@ -26,12 +26,12 @@
             </small>
           </div>
           <div>
-            <span data-bind="text: Name, attr: {title: Name}"></span>
+            <span data-bind="text: name, attr: {title: name}"></span>
           </div>
         </div>
       </div>
       <ul class="list-unstyled wfm-child" data-bind="visible: isOpenItem">
-        <!-- ko foreach: WellFields -->
+        <!-- ko foreach: wields -->
         <li>
           <div class="clearfix">
             <i class="glyphicon" data-bind="css:{ 'glyphicon-circle-arrow-down' : isOpenItem, 'glyphicon-circle-arrow-right' : !isOpenItem() }, click: toggleItem"></i>
@@ -42,12 +42,12 @@
                 </small>
               </div>
               <div>
-                <span data-bind="text: Name, attr: {title: Name}"></span>
+                <span data-bind="text: name, attr: {title: name}"></span>
               </div>
             </div>
           </div>
           <ul class="list-unstyled wfm-child" data-bind="visible: isOpenItem">
-            <!-- ko foreach: WellGroups -->
+            <!-- ko foreach: wroups -->
             <li>
               <div class="clearfix">
                 <i class="glyphicon" data-bind="css:{ 'glyphicon-circle-arrow-down' : isOpenItem, 'glyphicon-circle-arrow-right' : !isOpenItem() }, click: toggleItem"></i>

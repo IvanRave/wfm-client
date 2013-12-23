@@ -211,7 +211,7 @@ define(['knockout', 'models/employee', 'services/register', 'helpers/lang-helper
                 // Unselect child
                 employeeToSelect.company.selectedWegion(null);
 
-                // Select self
+                // Select ths
                 ths.selectedEmployee(employeeToSelect);
 
                 // Select parents (no need)

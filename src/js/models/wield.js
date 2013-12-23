@@ -7,27 +7,32 @@ define(['jquery',
     'models/stage-base',
     'models/well-field-map',
     'models/sections/section-of-wield',
-    'models/wroup'], function ($, ko, datacontext,
-        fileHelper, bootstrapModal, StageBase, WellFieldMap, SectionOfWield, WellGroup) {
+    'models/wroup',
+    'models/prop-spec',
+    'services/wield',
+    'services/wroup'], function ($, ko, datacontext,
+        fileHelper, bootstrapModal, StageBase, WellFieldMap, SectionOfWield, WellGroup, PropSpec, wieldService, wroupService) {
         'use strict';
 
         // 10. WellFieldMaps (convert data objects into array)
         function importWellFieldMapsDto(data, parent) {
-            return $.map(data || [], function (item) {
-                return new WellFieldMap(item, parent);
-            });
+            return data.map(function (item) { return new WellFieldMap(item, parent); });
         }
 
         // 3. WellGroup (convert data objects into array)
-        function importWellGroupsDto(data, parent) {
-            return $.map(data || [], function (item) { return new WellGroup(item, parent); });
+        function importWroupDtoList(data, parent) {
+            return data.map(function (item) { return new WellGroup(item, parent); });
         }
 
         function importListOfSectionOfWieldDto(data, parent) {
-            return $.map(data || [], function (item) {
-                return new SectionOfWield(item, parent);
-            });
+            return data.map(function (item) { return new SectionOfWield(item, parent); });
         }
+
+        /** Main properties for company: headers can be translated here if needed */
+        var wieldPropSpecList = [
+            new PropSpec('name', 'Name', 'Field name', 'SingleLine', { maxLength: 255 }),
+            new PropSpec('description', 'Description', 'Description', 'MultiLine', {})
+        ];
 
         /**
         * Well field
@@ -38,12 +43,14 @@ define(['jquery',
         var exports = function (data, wellRegion) {
             data = data || {};
 
-            var self = this;
+            var ths = this;
 
             /** Get region (parent) */
             this.getWellRegion = function () {
                 return wellRegion;
             };
+
+            this.propSpecList = wieldPropSpecList;
 
             /**
             * Field id
@@ -52,48 +59,39 @@ define(['jquery',
             this.Id = data.Id;
 
             /**
-            * Field name
-            * @type {string}
-            */
-            this.Name = ko.observable(data.Name);
-
-            /**
-            * Field description: nvarchar(max)
-            * @type {string}
-            */
-            this.Description = ko.observable(data.Description);
-
-            /**
             * Id of region (parent): foreign key
             * @type {number}
             */
-            this.WellRegionId = data.WellRegionId;
+            this.idOfWegion = data.WellRegionId;
+
+            // Add identical properties for all stages (well, field, group, regions, company)
+            StageBase.call(this, data);
 
             /**
             * List of groups
             * @type {Array.<module:models/wroup>}
             */
-            this.WellGroups = ko.observableArray();
+            this.wroups = ko.observableArray();
 
             /** Selected group */
             this.selectedWroup = ko.observable();
 
             this.selectWroup = function (wroupToSelect) {
                 ////window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
-                ////    region: self.getWellField().getWellRegion().Id,
-                ////    field: self.getWellField().Id,
-                ////    group: self.Id
+                ////    region: ths.getWellField().getWellRegion().Id,
+                ////    field: ths.getWellField().Id,
+                ////    group: ths.Id
                 ////});
 
                 wroupToSelect.isOpenItem(true);
                 // Unselect all wells
                 wroupToSelect.selectedWell(null);
                 // Set group as selected
-                self.selectedWroup(wroupToSelect);
+                ths.selectedWroup(wroupToSelect);
 
                 // Set all parents as selected
-                self.getWellRegion().selectedWield(self);
-                self.getWellRegion().getCompany().selectedWegion(self.getWellRegion());
+                ths.getWellRegion().selectedWield(ths);
+                ths.getWellRegion().getCompany().selectedWegion(ths.getWellRegion());
 
                 // get last approved scopes of every well (one request)
                 // insert in every well
@@ -109,7 +107,7 @@ define(['jquery',
 
                 datacontext.getTestScope({ wellIdList: wellIdList }).done(function (result) {
                     if (result.length > 0) {
-                        //for (var w = 0, wMax = self.Wells().length; w < wMax; w++) {
+                        //for (var w = 0, wMax = ths.Wells().length; w < wMax; w++) {
                         $.each(wroupToSelect.Wells(), function (wellIndex, wellValue) {
                             //for (var i = 0, iMax = objSet.length; i < iMax; i++) {
                             $.each(result, function (objIndex, objValue) {
@@ -132,42 +130,39 @@ define(['jquery',
             /** Selected map */
             this.selectedWieldMap = ko.observable();
 
-            // Add identical properties for all stages (well, field, group, regions, company)
-            StageBase.call(this);
-
             /** Set this section as selected */
             this.selectSection = function (sectionToSelect) {
                 if (sectionToSelect) {
                     switch (sectionToSelect.sectionPatternId) {
                         case 'wield-map':
                             // Get all maps from this field
-                            self.getWellFieldMaps(function () {
-                                var arr = ko.unwrap(self.WellFieldMaps);
+                            ths.getWellFieldMaps(function () {
+                                var arr = ko.unwrap(ths.WellFieldMaps);
                                 if (arr.length > 0) {
                                     arr[0].showWellFieldMap();
                                 }
                             });
 
-                            //self.initMapFileUpload();
+                            //ths.initMapFileUpload();
                             break;
                     }
 
-                    self.selectedSection(sectionToSelect);
+                    ths.selectedSection(sectionToSelect);
                 }
             };
 
             this.deleteWellFieldMap = function (itemToDelete) {
                 if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(itemToDelete.fileSpec.name) + '"?')) {
-                    datacontext.deleteWellFieldMap(self.Id, itemToDelete.Id).done(function () {
-                        self.WellFieldMaps.remove(itemToDelete);
+                    datacontext.deleteWellFieldMap(ths.Id, itemToDelete.Id).done(function () {
+                        ths.WellFieldMaps.remove(itemToDelete);
                     });
                 }
             };
 
-            self.getWellFieldMaps = function (callbackFunction) {
-                if (self.WellFieldMaps().length === 0) {
-                    datacontext.getWellFieldMaps(self.Id).done(function (result) {
-                        self.WellFieldMaps(importWellFieldMapsDto(result, self));
+            this.getWellFieldMaps = function (callbackFunction) {
+                if (ths.WellFieldMaps().length === 0) {
+                    datacontext.getWellFieldMaps(ths.Id).done(function (result) {
+                        ths.WellFieldMaps(importWellFieldMapsDto(result, ths));
 
                         if ($.isFunction(callbackFunction) === true) {
                             callbackFunction();
@@ -184,13 +179,13 @@ define(['jquery',
             /**
             * Create map from file
             */
-            self.createMapFromFile = function () {
-                var needSection = self.getSectionByPatternId('wield-map');
-                
-                // Select file section with maps (load and unselect files)
-                self.selectFileSection(needSection);
+            this.createMapFromFile = function () {
+                var needSection = ths.getSectionByPatternId('wield-map');
 
-                var tmpModalFileMgr = self.getWellRegion().getCompany().modalFileMgr;
+                // Select file section with maps (load and unselect files)
+                ths.selectFileSection(needSection);
+
+                var tmpModalFileMgr = ths.getWellRegion().getCompany().modalFileMgr;
 
                 // Calback for selected file
                 // Click "Select file for map" ... (only image files)
@@ -207,19 +202,19 @@ define(['jquery',
                     }
 
                     // Create map on the server with this file
-                    datacontext.postMapOfWield(self.Id, {
-                        WellFieldId: self.Id,
+                    datacontext.postMapOfWield(ths.Id, {
+                        WellFieldId: ths.Id,
                         ScaleCoefficient: 1,
                         Description: '',
                         // by default - map name = file name
                         Name: ko.unwrap(selectedFileSpecs[0].name),
                         IdOfFileSpec: selectedFileSpecs[0].id
                     }).done(function (r) {
-                        self.WellFieldMaps.push(new WellFieldMap(r, self));
+                        ths.WellFieldMaps.push(new WellFieldMap(r, ths));
 
                         // Push to well field map list
                         tmpModalFileMgr.hide();
-                    });                    
+                    });
                 }
 
                 // Add to observable
@@ -232,18 +227,18 @@ define(['jquery',
                 tmpModalFileMgr.show();
             };
 
-            self.isOpenItem = ko.observable(false);
+            this.isOpenItem = ko.observable(false);
 
-            self.toggleItem = function () {
-                self.isOpenItem(!self.isOpenItem());
+            this.toggleItem = function () {
+                ths.isOpenItem(!ths.isOpenItem());
             };
 
             /** Whether item and parent are selected */
-            self.isSelectedItem = ko.computed({
+            this.isSelectedItem = ko.computed({
                 read: function () {
-                    var tmpRegion = self.getWellRegion();
+                    var tmpRegion = ths.getWellRegion();
                     if (ko.unwrap(tmpRegion.isSelectedItem)) {
-                        if (self === ko.unwrap(tmpRegion.selectedWield)) {
+                        if (ths === ko.unwrap(tmpRegion.selectedWield)) {
                             return true;
                         }
                     }
@@ -252,10 +247,10 @@ define(['jquery',
             });
 
             /** Is item selected and showed on the page */
-            self.isShowedItem = ko.computed({
+            this.isShowedItem = ko.computed({
                 read: function () {
-                    if (ko.unwrap(self.isSelectedItem)) {
-                        if (!ko.unwrap(self.selectedWroup)) {
+                    if (ko.unwrap(ths.isSelectedItem)) {
+                        if (!ko.unwrap(ths.selectedWroup)) {
                             return true;
                         }
                     }
@@ -263,7 +258,7 @@ define(['jquery',
                 deferEvaluation: true
             });
 
-            self.addWellGroup = function () {
+            this.addWellGroup = function () {
                 var inputName = document.createElement('input');
                 inputName.type = 'text';
                 $(inputName).prop({ 'required': true }).addClass('form-control');
@@ -274,11 +269,12 @@ define(['jquery',
                 );
 
                 function submitFunction() {
-                    datacontext.saveNewWellGroup({
-                        Name: $(inputName).val(),
-                        WellFieldId: self.Id
+                    wroupService.post({
+                        'Name': $(inputName).val(),
+                        'Description': '',
+                        'WellFieldId': ths.Id
                     }).done(function (result) {
-                        self.WellGroups.push(new WellGroup(result, self));
+                        ths.wroups.push(new WellGroup(result, ths));
                     });
 
                     bootstrapModal.closeModalWindow();
@@ -287,51 +283,40 @@ define(['jquery',
                 bootstrapModal.openModalWindow("Well group", innerDiv, submitFunction);
             };
 
-            self.deleteWellGroup = function (wellGroupForDelete) {
+            this.removeChild = function (wellGroupForDelete) {
                 if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(wellGroupForDelete.Name) + '"?')) {
-                    datacontext.deleteWellGroup(wellGroupForDelete).done(function () {
-                        self.WellGroups.remove(wellGroupForDelete);
+                    wroupService.remove(wellGroupForDelete.Id).done(function () {
+                        ths.wroups.remove(wellGroupForDelete);
                         // Set parent as selected item
-                        self.getWellRegion().selectWield(self);
+                        ths.getWellRegion().selectWield(ths);
                     });
                 }
             };
 
-            self.editWellField = function () {
-                var inputName = document.createElement('input');
-                inputName.type = 'text';
-                $(inputName).val(self.Name()).prop({ 'required': true }).addClass('form-control');
-
-                var innerDiv = document.createElement('div');
-                $(innerDiv).addClass('form-horizontal').append(
-                    bootstrapModal.gnrtDom('Name', inputName)
-                );
-
-                bootstrapModal.openModalWindow("Well field", innerDiv, function () {
-                    self.Name($(inputName).val());
-                    datacontext.saveChangedWellField(self).done(function (result) { self.Name(result.Name); });
-                    bootstrapModal.closeModalWindow();
-                });
+            /** Save non-reference properties, like groups, or region */
+            this.save = function () {
+                wieldService.put(ths.Id, ths.toDto());
             };
 
-            self.toPlainJson = function () {
-                var tmpPropList = ['Id', 'Name', 'WellRegionId', 'Description'];
-                var objReady = {};
-                $.each(tmpPropList, function (propIndex, propValue) {
-                    // null can be sended to ovveride current value to null
-                    if (typeof ko.unwrap(self[propValue]) !== 'undefined') {
-                        objReady[propValue] = ko.unwrap(self[propValue]);
-                    }
+            /** Convert to data transfer object: only simple props */
+            this.toDto = function () {
+                var dtoObj = {
+                    'Id': ths.Id,
+                    'WellRegionId': ths.idOfWegion
+                };
+
+                ths.propSpecList.forEach(function (prop) {
+                    dtoObj[prop.serverId] = ko.unwrap(ths[prop.clientId]);
                 });
 
-                return objReady;
+                return dtoObj;
             };
 
             /** Load groups */
-            self.WellGroups(importWellGroupsDto(data.WellGroupsDto, self));
+            this.wroups(importWroupDtoList(data.WellGroupsDto, ths));
 
             /** Load sections */
-            self.listOfSection(importListOfSectionOfWieldDto(data.ListOfSectionOfWieldDto, self));
+            this.listOfSection(importListOfSectionOfWieldDto(data.ListOfSectionOfWieldDto, ths));
         };
 
         return exports;

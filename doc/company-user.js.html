@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: models/sections/section-of-company.js</title>
+    <title>JSDoc: Source: services/company-user.js</title>
     
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Source: models/sections/section-of-company.js</h1>
+    <h1 class="page-title">Source: services/company-user.js</h1>
     
     
 
@@ -26,36 +26,21 @@
     <section>
         <article>
             <pre class="prettyprint source"><code>﻿/** @module */
-define(['knockout', 'models/sections/section-base'], function (ko, SectionBase) {
+define(['helpers/ajax-request'], function (ajaxRequest) {
     'use strict';
 
+    function companyUserUrl() {
+        return '{{conf.requrl}}/api/companyuser';
+    }
+
     /**
-    * Section of company
-    * @param {object} data - section data
-    * @param {module:models/company} company - company (parent)
+    * Company user service
     * @constructor
     */
-    var exports = function (data, company) {
-        data = data || {};
-
-        /** Get parent (well) */
-        this.getParent = function () {
-            return company;
-        };
-
-        /**
-        * Id of well
-        * @type {number}
-        */
-        this.companyId = data.CompanyId;
-
-        /** Get list of section patterns from root */
-        this.getListOfSectionPattern = function () {
-            return ko.unwrap(this.getParent().getRootViewModel().ListOfSectionPatternDto);
-        };
-
-        /** Add shared props to the section */
-        SectionBase.call(this, data, 'company');
+    var exports = {
+        getCompanyUserList: function () {
+            return ajaxRequest('GET', companyUserUrl());
+        }
     };
 
     return exports;

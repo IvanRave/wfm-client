@@ -388,12 +388,12 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
                 var notAddedCount = 0;
                 var selectInputString = '<select id="well-select" class="form-control"><option value="">select well...</option>';
                 // make well array for select input
-                for (var WellGroupKey = 0; WellGroupKey < wellFieldItem.WellGroups().length; WellGroupKey++) {
-                    selectInputString += '<optgroup label="' + wellFieldItem.WellGroups()[WellGroupKey].Name() + '">';
-                    for (var WellKey = 0; WellKey < wellFieldItem.WellGroups()[WellGroupKey].Wells().length; WellKey++) {
-                        if ($.inArray(wellFieldItem.WellGroups()[WellGroupKey].Wells()[WellKey].Id, drawIdArray) === -1) {
+                for (var WellGroupKey = 0; WellGroupKey < wellFieldItem.wroups().length; WellGroupKey++) {
+                    selectInputString += '<optgroup label="' + wellFieldItem.wroups()[WellGroupKey].Name() + '">';
+                    for (var WellKey = 0; WellKey < wellFieldItem.wroups()[WellGroupKey].Wells().length; WellKey++) {
+                        if ($.inArray(wellFieldItem.wroups()[WellGroupKey].Wells()[WellKey].Id, drawIdArray) === -1) {
                             notAddedCount++;
-                            selectInputString += '<option value="' + wellFieldItem.WellGroups()[WellGroupKey].Wells()[WellKey].Id + '">' + wellFieldItem.WellGroups()[WellGroupKey].Wells()[WellKey].Name() + '</option>';
+                            selectInputString += '<option value="' + wellFieldItem.wroups()[WellGroupKey].Wells()[WellKey].Id + '">' + wellFieldItem.wroups()[WellGroupKey].Wells()[WellKey].Name() + '</option>';
                         }
                     }
 

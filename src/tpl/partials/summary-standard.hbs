@@ -15,8 +15,8 @@
           <span data-bind="if: tpe === 'DateLine'">
             <span data-bind="unix: $parent[clientId]"></span>
           </span>
-          <span data-bind="if: tpe === 'ImgSrc'">
-            <img data-bind="attr: {width: addtData.width, src: $parent[clientId] }"></img>
+          <span data-bind="if: tpe === 'FileLine'">
+            <img data-bind="attr: {width: addtData.width, src: $parent[clientId]().fileUrl }"></img>
           </span>
         </div>
       </div>
@@ -48,11 +48,14 @@
         <span data-bind="if: tpe === 'DateLine'">
           <input class="input-sm" type="text" size="10" data-bind="datepicker: $parent[clientId], datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }" />
         </span>
-        <span data-bind="if: tpe === 'ImgSrc'">
-          <span data-bind="visible: $parent[clientId]">
-            <img data-bind="attr: {width: addtData.width, src: $parent[clientId] }"></img>
+        <span data-bind="if: tpe === 'FileLine'">
+          <span data-bind="if: $parent[clientId]">
+            <img data-bind="attr: {width: addtData.width, src: $parent[clientId]().fileUrl }"></img>
           </span>
-          <button class="btn btn-default btn-sm" data-bind="click: $parent.selectImgSrc">Select image...</button>
+          <button class="btn btn-default btn-sm" data-bind="click: $parent.selectImgFileSpec">Select image...</button>
+          <span data-bind="if: $parent[clientId]">
+            <button class="btn btn-default btn-sm" data-bind="click: $parent.deleteImgFileSpec">Delete image</button>
+          </span>
         </span>
       </div>
     </div>

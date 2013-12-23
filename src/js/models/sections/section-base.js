@@ -167,6 +167,37 @@ define(['knockout', 'models/file-spec', 'services/file-spec'], function (ko, Fil
         };
 
         /**
+        * Delete file spec by id
+        * @param {string} idOfFileSpec
+        * @param {function} callback
+        */
+        this.deleteFileSpecById = function (idOfFileSpec, callback) {
+            // Remove from server
+            fileSpecService.deleteArray(typeOfStage, ths.id, [{ id: idOfFileSpec }]).done(function () {
+                // If success
+                // Remove from client file list if exists
+                var removedFileSpec = ths.getFileSpecById(idOfFileSpec);
+                if (removedFileSpec) {
+                    ths.listOfFileSpec.remove(removedFileSpec);
+                }
+
+                if (callback) {
+                    callback();
+                }
+            });
+        };
+
+        /**
+        * Get file spec by id
+        * @param {string} idOfFileSpec
+        */
+        this.getFileSpecById = function (idOfFileSpec) {
+            return ko.unwrap(ths.listOfFileSpec).filter(function (elem) {
+                return elem.id === idOfFileSpec;
+            })[0];
+        };
+
+        /**
         * Whether any file is selected: to activate delete button or smth else
         * @type {boolean}
         */

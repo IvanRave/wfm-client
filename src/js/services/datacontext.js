@@ -1,15 +1,6 @@
 ﻿define(['jquery', 'helpers/ajax-request'], function ($, ajaxRequest) {
     'use strict';
 
-    function wellRegionUrl(uqp) {
-        return '{{conf.requrl}}/api/wellregion/' + (uqp ? ('?' + $.param(uqp)) : '');
-    }
-    function wellFieldUrl(uqp) {
-        return '{{conf.requrl}}/api/wellfield/' + (uqp ? ('?' + $.param(uqp)) : '');
-    }
-    function wellGroupUrl(uqp) {
-        return '{{conf.requrl}}/api/wellgroup/' + (uqp ? ('?' + $.param(uqp)) : '');
-    }
     function wellUrl(uqp) {
         return '{{conf.requrl}}/api/well/' + (uqp ? ('?' + $.param(uqp)) : '');
     }
@@ -76,50 +67,6 @@
     }
     function companyJobTypeUrl(companyId, jobTypeId) {
         return '{{conf.requrl}}/api/companies/' + companyId + '/job-types' + (jobTypeId ? ('/' + jobTypeId) : '');
-    }
-
-    // DataContext operations
-    // 1. WellRegion
-    function getWellRegionList(uqp) {
-        return ajaxRequest('GET', wellRegionUrl(uqp));
-    }
-
-    function saveNewWellRegion(item) {
-        return ajaxRequest('POST', wellRegionUrl(), item);
-    }
-
-    function deleteWellRegion(item) {
-        return ajaxRequest('DELETE', wellRegionUrl({ id: item.Id }));
-    }
-
-    function saveChangedWellRegion(item) {
-        return ajaxRequest('PUT', wellRegionUrl({ id: item.Id }), item);
-    }
-
-    // 2. WellField
-    function saveNewWellField(item) {
-        return ajaxRequest('POST', wellFieldUrl(), item);
-    }
-
-    function deleteWellField(id) {
-        return ajaxRequest('DELETE', wellFieldUrl({ id: id }));
-    }
-
-    function saveChangedWellField(item) {
-        return ajaxRequest('PUT', wellFieldUrl({ id: item.Id }), item);
-    }
-
-    // 3. WellGroup
-    function saveNewWellGroup(item) {
-        return ajaxRequest('POST', wellGroupUrl(), item);
-    }
-
-    function deleteWellGroup(item) {
-        return ajaxRequest('DELETE', wellGroupUrl({ id: item.Id }));
-    }
-
-    function saveChangedWellGroup(item) {
-        return ajaxRequest('PUT', wellGroupUrl({ id: item.Id }), item);
     }
 
     function postWell(item) {
@@ -395,22 +342,11 @@
     }
 
     var datacontext = {
-        // create objects
-        getWellRegionList: getWellRegionList,
-        // save objects in db 
-        saveNewWellRegion: saveNewWellRegion,
-        saveNewWellField: saveNewWellField,
-        saveNewWellGroup: saveNewWellGroup,
+        // save objects in db
         postWell: postWell,
         // delete objects from db
-        deleteWellRegion: deleteWellRegion,
-        deleteWellField: deleteWellField,
-        deleteWellGroup: deleteWellGroup,
         deleteWell: deleteWell,
         // save changed objects in db
-        saveChangedWellRegion: saveChangedWellRegion,
-        saveChangedWellField: saveChangedWellField,
-        saveChangedWellGroup: saveChangedWellGroup,
         saveChangedWell: saveChangedWell,
         // WellFile
         getWellFiles: getWellFiles,

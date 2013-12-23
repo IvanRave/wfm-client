@@ -46,6 +46,10 @@ contains words (with translation) for all WFM services
 * Well group divides by wells
 * Each stage (company, region, field, group, well) contains sections and widgets (widgets per section and more).
 
+### Stages
+
+Each stage contains properties, like name, description, logo
+
 ### Sections
 
 Section - it is a part of page view (or part of file manager like a folder).

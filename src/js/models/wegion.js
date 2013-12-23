@@ -4,18 +4,27 @@ define(['jquery',
     'services/datacontext',
     'helpers/modal-helper',
     'models/wield', 'models/stage-base',
-    'models/sections/section-of-wegion'], function ($, ko, datacontext, bootstrapModal,
-        WellField, StageBase, SectionOfWegion) {
+    'models/sections/section-of-wegion',
+    'models/prop-spec',
+    'services/wegion',
+    'services/wield'], function ($, ko, datacontext, bootstrapModal,
+        WellField, StageBase, SectionOfWegion, PropSpec, wegionService, wieldService) {
         'use strict';
 
         // 2. WellField (convert data objects into array)
-        function importWellFieldsDto(data, parent) {
+        function importWieldDtoList(data, parent) {
             return data.map(function (item) { return new WellField(item, parent); });
         }
 
         function importListOfSectionOfWegionDto(data, parent) {
             return data.map(function (item) { return new SectionOfWegion(item, parent); });
         }
+
+        /** Main properties for company: headers can be translated here if needed */
+        var wegionPropSpecList = [
+            new PropSpec('name', 'Name', 'Region name', 'SingleLine', { maxLength: 255 }),
+            new PropSpec('description', 'Description', 'Description', 'MultiLine', {})
+        ];
 
         /**
         * Well region
@@ -26,41 +35,41 @@ define(['jquery',
         var exports = function (data, company) {
             data = data || {};
 
-            var self = this;
-
-            // Persisted properties
-            this.Id = data.Id;
-            this.CompanyId = data.CompanyId;
-            this.Name = ko.observable(data.Name);
-            this.Description = ko.observable(data.Description);
-            this.WellFields = ko.observableArray();
+            var ths = this;
 
             this.getCompany = function () {
                 return company;
             };
 
+            // Persisted properties
+            this.id = data.Id;
+            this.companyId = data.CompanyId;
+            this.wields = ko.observableArray();
+            /** Props specifications */
+            this.propSpecList = wegionPropSpecList;
+
             /** Base for all stages */
-            StageBase.call(this);
+            StageBase.call(this, data);
 
             /** 
             * Select section
             * @param {object} sectionToSelect
             */
             this.selectSection = function (sectionToSelect) {
-                self.selectedSection(sectionToSelect);
+                ths.selectedSection(sectionToSelect);
             };
 
             this.isOpenItem = ko.observable(false);
 
             // toggle item - only open menu tree (show inner object without content)
             this.toggleItem = function () {
-                self.isOpenItem(!self.isOpenItem());
+                ths.isOpenItem(!ths.isOpenItem());
             };
 
             /** Is selected item */
             this.isSelectedItem = ko.computed({
                 read: function () {
-                    return (self === ko.unwrap(self.getCompany().selectedWegion));
+                    return (ths === ko.unwrap(ths.getCompany().selectedWegion));
                 },
                 deferEvaluation: true
             });
@@ -71,8 +80,8 @@ define(['jquery',
             */
             this.isShowedItem = ko.computed({
                 read: function () {
-                    if (ko.unwrap(self.isSelectedItem)) {
-                        if (!ko.unwrap(self.selectedWield)) {
+                    if (ko.unwrap(ths.isSelectedItem)) {
+                        if (!ko.unwrap(ths.selectedWield)) {
                             return true;
                         }
                     }
@@ -80,23 +89,23 @@ define(['jquery',
                 deferEvaluation: true
             });
 
-            self.selectedWield = ko.observable();
+            this.selectedWield = ko.observable();
 
-            self.selectWield = function (wieldToSelect) {
+            this.selectWield = function (wieldToSelect) {
                 wieldToSelect.isOpenItem(true);
 
                 // Unselect child
                 wieldToSelect.selectedWroup(null);
 
-                // Select self
-                self.selectedWield(wieldToSelect);
+                // Select ths
+                ths.selectedWield(wieldToSelect);
 
                 // Select parents
-                self.getCompany().selectedWegion(self);
+                ths.getCompany().selectedWegion(ths);
 
                 ////window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
-                ////    region: self.getWellRegion().Id,
-                ////    field: self.Id
+                ////    region: ths.getWellRegion().Id,
+                ////    field: ths.Id
                 ////});
 
                 // Select section by default (or selected section from prevous selected field)
@@ -109,31 +118,19 @@ define(['jquery',
                 }
             };
 
-            self.deleteWellField = function (wellFieldForDelete) {
-                if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(wellFieldForDelete.Name) + '"?')) {
-                    datacontext.deleteWellField(wellFieldForDelete.Id).done(function () {
-                        self.WellFields.remove(wellFieldForDelete);
+            this.removeChild = function (wellFieldForDelete) {
+                if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(wellFieldForDelete.name) + '"?')) {
+                    wieldService.remove(wellFieldForDelete.Id).done(function () {
+                        ths.wields.remove(wellFieldForDelete);
                         // Set parent as selected
-                        self.getCompany().selectWegion(self);
+                        ths.getCompany().selectWegion(ths);
                     });
                 }
             };
 
-            self.editWellRegion = function () {
-                var inputName = document.createElement('input');
-                inputName.type = 'text';
-                $(inputName).val(self.Name()).prop({ 'required': true }).addClass('form-control');
-
-                var innerDiv = document.createElement('div');
-                $(innerDiv).addClass('form-horizontal').append(
-                    bootstrapModal.gnrtDom('Name', inputName)
-                );
-
-                bootstrapModal.openModalWindow("Well region", innerDiv, function () {
-                    self.Name($(inputName).val());
-                    datacontext.saveChangedWellRegion(self).done(function (result) { self.Name(result.Name); });
-                    bootstrapModal.closeModalWindow();
-                });
+            /** Save well region */
+            this.save = function () {
+                wegionService.put(ths.id, ths.toDto());
             };
 
             /// <summary>
@@ -144,26 +141,24 @@ define(['jquery',
             /// "ko.toJS — this clones your view model’s object graph, substituting for each observable the current value of that observable, 
             /// so you get a plain copy that contains only your data and no Knockout-related artifacts"
             /// </remarks>
-            self.toPlainJson = function () {
-                ////var copy = ko.toJS(self);
-                var tmpPropList = ['Id', 'CompanyId', 'Name', 'Description'];
+            this.toDto = function () {
+                var dtoObj = {
+                    'Id': ths.id,
+                    'CompanyId': ths.companyId
+                };
 
-                var objReady = {};
-                $.each(tmpPropList, function (propIndex, propValue) {
-                    // null can be sended to ovveride current value to null
-                    if (typeof ko.unwrap(self[propValue]) !== 'undefined') {
-                        objReady[propValue] = ko.unwrap(self[propValue]);
-                    }
+                ths.propSpecList.forEach(function (prop) {
+                    dtoObj[prop.serverId] = ko.unwrap(ths[prop.clientId]);
                 });
 
-                return objReady;
+                return dtoObj;
             };
 
-            // load well fields
-            this.WellFields(importWellFieldsDto(data.WellFieldsDto, self));
+            /** load well fields */
+            this.wields(importWieldDtoList(data.WellFieldsDto, ths));
 
             /** Load sections */
-            this.listOfSection(importListOfSectionOfWegionDto(data.ListOfSectionOfWegionDto, self));
+            this.listOfSection(importListOfSectionOfWegionDto(data.ListOfSectionOfWegionDto, ths));
         };
 
         exports.prototype.addWellField = function () {
@@ -180,11 +175,12 @@ define(['jquery',
             );
 
             function submitFunction() {
-                datacontext.saveNewWellField({
-                    Name: $(inputName).val(),
-                    WellRegionId: parentItem.Id
+                wieldService.post({
+                    'Name': $(inputName).val(),
+                    'Description': '',
+                    'WellRegionId': parentItem.id
                 }).done(function (result) {
-                    parentItem.WellFields.push(new WellField(result, parentItem));
+                    parentItem.wields.push(new WellField(result, parentItem));
                 });
 
                 bootstrapModal.closeModalWindow();

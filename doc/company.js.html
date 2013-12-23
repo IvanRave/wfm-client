@@ -28,8 +28,8 @@
             <pre class="prettyprint source"><code>﻿/** @module */
 define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/datacontext',
     'helpers/modal-helper', 'helpers/history-helper', 'models/stage-base', 'models/sections/section-of-company',
-    'models/prop-spec', 'services/company',
-    'helpers/knockout-lazy'], function ($, ko, Wegion, JobType, appDatacontext, modalHelper, historyHelper, StageBase, SectionOfCompany, PropSpec, companyService) {
+    'models/prop-spec', 'services/company', 'models/file-spec',
+    'helpers/knockout-lazy'], function ($, ko, Wegion, JobType, appDatacontext, modalHelper, historyHelper, StageBase, SectionOfCompany, PropSpec, companyService, FileSpec) {
         'use strict';
 
         /** Import well regions for company */
@@ -51,8 +51,10 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
 
         /** Main properties for company: headers can be translated here if needed */
         var companyPropSpecList = [
-            new PropSpec('name', 'Name', 'Company name', 'SingleLine', 255),
-            new PropSpec('description', 'Description', 'Company description', 'MultiLine')
+            new PropSpec('name', 'Name', 'Company name', 'SingleLine', { maxLength: 255 }),
+            new PropSpec('description', 'Description', 'Company description', 'MultiLine', {}),
+            new PropSpec('idOfFileSpecOfLogo', 'IdOfFileSpecOfLogo', '', '', {}),
+            new PropSpec('fileSpecOfLogo', 'FileSpecOfLogo', '', 'FileLine', { width: 100, fileSpecPropClientId: 'idOfFileSpecOfLogo' })
         ];
 
         /**
@@ -78,16 +80,29 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
             /** Props specifications */
             this.propSpecList = companyPropSpecList;
 
+            /** Get need property from array */
+            this.getPropSpecByClientId = function (clientId) {
+                var filteredProps = ths.propSpecList.filter(function (elem) {
+                    return elem.clientId === clientId;
+                });
+
+                return filteredProps[0];
+            };
+
             /** Props values: all observables */
             this.propSpecList.forEach(function (prop) {
-                ths[prop.clientId] = ko.observable(data[prop.serverId]);
+                if (prop.tpe === 'FileLine') {
+                    // Create new observable file specification
+                    ths[prop.clientId] = ko.observable();
+                    // If file exists - create object
+                    if (data[prop.serverId]) {
+                        ths[prop.clientId](new FileSpec(data[prop.serverId]));
+                    }
+                }
+                else {
+                    ths[prop.clientId] = ko.observable(data[prop.serverId]);
+                }
             });
-
-            /**
-            * Logo url
-            * @type {string}
-            */
-            this.logoUrl = ko.observable(data.LogoUrl || 'img/question.jpg');
 
             /**
             * List of well regions
@@ -117,6 +132,56 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
                     ths.jobTypeList(importJobTypeList(r));
                 });
             }, this);
+
+            this.deleteImgFileSpec = function (fileSpecProp) {
+                var needSection = ths.getSectionByPatternId('company-summary');
+                // Select file section with logos (load and unselect files)
+                
+            };
+
+            /** Select file for any image */
+            this.selectImgFileSpec = function (fileSpecProp) {
+                ////console.log();
+                var needSection = ths.getSectionByPatternId('company-summary');
+                // Select file section with logos (load and unselect files)
+                ths.selectFileSection(needSection);
+
+                function mgrCallback() {
+                    ths.modalFileMgr.okError('');
+                    // Select file from file manager
+                    var selectedFileSpecs = ko.unwrap(needSection.listOfFileSpec).filter(function (elem) {
+                        return ko.unwrap(elem.isSelected);
+                    });
+
+                    if (selectedFileSpecs.length !== 1) {
+                        ths.modalFileMgr.okError('need to select one file');
+                        return;
+                    }
+
+                    // Get prop id
+                    ths[fileSpecProp.addtData.fileSpecPropClientId](selectedFileSpecs[0].id);
+                    ths.save();
+                    ths.modalFileMgr.hide();
+                    // Change sketch (create if not exists)
+                    ////sketchOfWellService.put(ths.idOfWell, {
+                    ////    idOfWell: ths.idOfWell,
+                    ////    idOfFileSpec: selectedFileSpecs[0].id,
+                    ////    name: ko.unwrap(selectedFileSpecs[0].name) || '',
+                    ////    description: ko.unwrap(ths.description) || ''
+                    ////}).done(function (resSketch) {
+                    ////    ths.name(resSketch.Name);
+                    ////    ths.description(resSketch.Description);
+                    ////    ths.idOfFileSpec(resSketch.IdOfFileSpec);
+                    ////    ths.fileSpec(new FileSpec(resSketch.FileSpecDto));
+                    ////    tmpModalFileMgr.hide();
+                    ////});
+                }
+
+                ths.modalFileMgr.okCallback(mgrCallback);
+                ths.modalFileMgr.okDescription('Please select image for company logo');
+
+                ths.modalFileMgr.show();
+            };
 
             /** Modal window for adding job type */
             this.goToPostingJobType = function () {
@@ -211,8 +276,9 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
 
                 modalHelper.openModalWindow('Well region', innerDiv, function () {
                     appDatacontext.saveNewWellRegion({
-                        Name: $(inputName).val(),
-                        CompanyId: ths.id
+                        'Name': $(inputName).val(),
+                        'Description': '',
+                        'CompanyId': ths.id
                     }).done(function (result) {
                         ths.wegions.push(new Wegion(result, ths));
                     });
@@ -245,7 +311,24 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
 
             /** Save properties */
             this.save = function () {
-                companyService.put({ id: ths.id }, ths.toDto());
+                companyService.put(ths.id, ths.toDto()).done(function (r) {
+                    // Calculated properties on the server
+                    var tmpFileSpecOfLogoProp = ths.propSpecList.filter(function (elem) {
+                        return elem.clientId === 'fileSpecOfLogo';
+                    })[0];
+
+                    if (!tmpFileSpecOfLogoProp) { throw new ReferenceError('No fileSpecOfLogo property for company model'); }
+
+                    // Value of logo file from server
+                    var tmpValueOfFileSpecOfLogo = r[tmpFileSpecOfLogoProp.serverId];
+
+                    if (tmpValueOfFileSpecOfLogo) {
+                        ths[tmpFileSpecOfLogoProp.clientId](new FileSpec(tmpValueOfFileSpecOfLogo));
+                    }
+                    else {
+                        ths[tmpFileSpecOfLogoProp.clientId](null);
+                    }
+                });
             };
 
             /** 
@@ -278,8 +361,7 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
             /** Convert to data transfer object to sent to the server*/
             this.toDto = function () {
                 var dtoObj = {
-                    Id: ths.id,
-                    LogoUrl: ko.unwrap(ths.logoUrl)
+                    Id: ths.id
                 };
 
                 ths.propSpecList.forEach(function (prop) {
@@ -304,13 +386,13 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="ajax-request.html">helpers/ajax-request</a></li><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="prop-spec.html">models/prop-spec</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="stage-base.html">models/stage-base</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-field-map.html">models/well-field-map</a></li><li><a href="well-file.html">models/well-file</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="wield.html">models/wield</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="section-base.html">sections/section-base</a></li><li><a href="section-of-company.html">sections/section-of-company</a></li><li><a href="section-of-wegion.html">sections/section-of-wegion</a></li><li><a href="section-of-well.html">sections/section-of-well</a></li><li><a href="section-of-wield.html">sections/section-of-wield</a></li><li><a href="section-of-wroup.html">sections/section-of-wroup</a></li><li><a href="company_.html">services/company</a></li><li><a href="register.html">services/register</a></li><li><a href="workspace.html">viewmodels/workspace</a></li><li><a href="sketch.html">well/sketch</a></li><li><a href="volume.html">well/volume</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="ajax-request.html">helpers/ajax-request</a></li><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="prop-spec.html">models/prop-spec</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="stage-base.html">models/stage-base</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-field-map.html">models/well-field-map</a></li><li><a href="well-file.html">models/well-file</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="wield.html">models/wield</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="section-base.html">sections/section-base</a></li><li><a href="section-of-company.html">sections/section-of-company</a></li><li><a href="section-of-wegion.html">sections/section-of-wegion</a></li><li><a href="section-of-well.html">sections/section-of-well</a></li><li><a href="section-of-wield.html">sections/section-of-wield</a></li><li><a href="section-of-wroup.html">sections/section-of-wroup</a></li><li><a href="company_.html">services/company</a></li><li><a href="company-user.html">services/company-user</a></li><li><a href="register.html">services/register</a></li><li><a href="workspace.html">viewmodels/workspace</a></li><li><a href="sketch.html">well/sketch</a></li><li><a href="volume.html">well/volume</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0</a> on Fri Dec 20 2013 11:11:06 GMT+0400 (MSK)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0</a> on Sun Dec 22 2013 16:39:01 GMT+0400 (MSK)
 </footer>
 
 <script> prettyPrint(); </script>

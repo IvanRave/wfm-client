@@ -2,14 +2,14 @@
     'use strict';
 
     function ByteImagePart(data) {
-        var self = this;
+        var ths = this;
         data = data || {};
 
-        self.base64String = data.Base64String;
-        self.startY = data.StartY;
+        ths.base64String = data.Base64String;
+        ths.startY = data.StartY;
 
-        self.toPlainJson = function () {
-            return JSON.parse(JSON.stringify(self));
+        ths.toPlainJson = function () {
+            return JSON.parse(JSON.stringify(ths));
         };
     }
 

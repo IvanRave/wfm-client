@@ -1,33 +1,36 @@
 ﻿/** @module */
 define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/datacontext',
     'helpers/modal-helper', 'helpers/history-helper', 'models/stage-base', 'models/sections/section-of-company',
-    'models/prop-spec', 'services/company',
-    'helpers/knockout-lazy'], function ($, ko, Wegion, JobType, appDatacontext, modalHelper, historyHelper, StageBase, SectionOfCompany, PropSpec, companyService) {
+    'models/prop-spec', 'services/company', 'models/file-spec', 'services/wegion',
+    'helpers/knockout-lazy'], function ($, ko, Wegion, JobType, appDatacontext, modalHelper, historyHelper,
+        StageBase, SectionOfCompany, PropSpec, companyService, FileSpec, wegionService) {
         'use strict';
 
         /** Import well regions for company */
         function importWegions(data, companyParent) {
-            return $.map(data, function (item) { return new Wegion(item, companyParent); });
+            return data.map(function (item) { return new Wegion(item, companyParent); });
         }
 
         /** Import job types for this company (joined with global types) */
         function importJobTypeList(data) {
-            return $.map(data || [], function (item) { return new JobType(item); });
+            return data.map(function (item) { return new JobType(item); });
         }
 
         /** Import company sections */
         function importListOfSectionOfCompanyDto(data, parent) {
-            return data.map(function (item) {
-                return new SectionOfCompany(item, parent);
-            });
+            return data.map(function (item) { return new SectionOfCompany(item, parent); });
         }
 
         /** Main properties for company: headers can be translated here if needed */
         var companyPropSpecList = [
             new PropSpec('name', 'Name', 'Company name', 'SingleLine', { maxLength: 255 }),
             new PropSpec('description', 'Description', 'Company description', 'MultiLine', {}),
-            new PropSpec('urlOfLogo', 'UrlOfLogo', 'Logo', 'ImgSrc', { width: 100, clientIdOfFileSpec: 'idOfFileSpecOfLogo' }),
-            new PropSpec('idOfFileSpecOfLogo', 'IdOfFileSpecOfLogo', '', '')
+            new PropSpec('fileSpecOfLogo', 'FileSpecOfLogo', 'Company logo', 'FileLine', {
+                width: 100,
+                // Client id of property of nested id of file spec
+                nestedClientId: 'idOfFileSpecOfLogo'
+            }),
+            new PropSpec('idOfFileSpecOfLogo', 'IdOfFileSpecOfLogo', '', '', {})
         ];
 
         /**
@@ -53,28 +56,14 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
             /** Props specifications */
             this.propSpecList = companyPropSpecList;
 
-            /** Get need property from array */
-            this.getPropSpecByClientId = function (clientId) {
-                var filteredProps = ths.propSpecList.filter(function (elem) {
-                    return elem.clientId === clientId;
-                });
-
-                return filteredProps[0];
-            };
-
-            /** Props values: all observables */
-            this.propSpecList.forEach(function (prop) {
-                ths[prop.clientId] = ko.observable(data[prop.serverId]);
-            });
+            /** Base for all stages */
+            StageBase.call(this, data);
 
             /**
             * List of well regions
             * @type {module:models/wegion}
             */
             this.wegions = ko.observableArray();
-
-            /** Base for all stages */
-            StageBase.call(this);
 
             /** 
             * Select section
@@ -96,9 +85,33 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
                 });
             }, this);
 
+            /**
+            * Delete only link to file - without removing physically and from section
+            * @param {module/prop-spec} fileSpecProp - Property data
+            */
+            this.deleteImgFileSpec = function (fileSpecProp) {
+                ths[fileSpecProp.addtData.nestedClientId](null);
+                ths[fileSpecProp.clientId](null);
+
+                ths.save();
+
+                ////var tmpFileSpecElem = ko.unwrap(ths[fileSpecProp.clientId]);
+                ////if (!tmpFileSpecElem) { return; }
+                ////// Select file section with logos
+
+                ////var idOfFileSpec = tmpFileSpecElem.id;
+                ////console.log(idOfFileSpec);
+                ////var needSection = ths.getSectionByPatternId('company-summary');
+                ////// Remove from file section + clean FileSpec (delete from logo tables)
+                ////needSection.deleteFileSpecById(idOfFileSpec, function () {
+                ////ths[fileSpecProp.addtData.nestedClientId](null);
+                ////ths[fileSpecProp.clientId](null);
+                ////});
+            };
+
             /** Select file for any image */
-            this.selectImgSrc = function (someElem) {
-                console.log(someElem);
+            this.selectImgFileSpec = function (fileSpecProp) {
+                ////console.log();
                 var needSection = ths.getSectionByPatternId('company-summary');
                 // Select file section with logos (load and unselect files)
                 ths.selectFileSection(needSection);
@@ -115,7 +128,8 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
                         return;
                     }
 
-                    ths.idOfFileSpecOfLogo(selectedFileSpecs[0].id);
+                    // Get prop id
+                    ths[fileSpecProp.addtData.nestedClientId](selectedFileSpecs[0].id);
                     ths.save();
                     ths.modalFileMgr.hide();
                     // Change sketch (create if not exists)
@@ -172,7 +186,7 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
                 // Unselect child
                 wegionToSelect.selectedWield(null);
 
-                // Select self
+                // Select ths
                 ths.selectedWegion(wegionToSelect);
 
                 // Select parents (not need)
@@ -181,7 +195,7 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
                 wegionToSelect.selectedSection(wegionToSelect.getSectionByPatternId('wegion-summary'));
 
                 if (!initialData.isHistory) {
-                    historyHelper.pushState('/companies/' + ths.id + '/well-regions/' + wegionToSelect.Id);
+                    historyHelper.pushState('/companies/' + ths.id + '/well-regions/' + wegionToSelect.id);
                 }
 
                 ////if (initialData.wieldId) {
@@ -199,7 +213,7 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
                     var tmpWegions = ko.unwrap(ths.wegions);
 
                     tmpWegions.forEach(function (tmpWegion) {
-                        if (tmpWegion.Id === wegionId) {
+                        if (tmpWegion.id === wegionId) {
                             ths.selectWegion(tmpWegion, initialData);
                         }
                     });
@@ -207,9 +221,9 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
             };
 
             /** Delete well region */
-            this.deleteWegion = function (wellRegionForDelete) {
-                if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(wellRegionForDelete.Name) + '"?')) {
-                    appDatacontext.deleteWellRegion(wellRegionForDelete).done(function () {
+            this.removeChild = function (wellRegionForDelete) {
+                if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(wellRegionForDelete.name) + '"?')) {
+                    wegionService.remove(wellRegionForDelete.id).done(function () {
                         ths.wegions.remove(wellRegionForDelete);
 
                         ths.selectedWegion(null);
@@ -231,7 +245,7 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
                 );
 
                 modalHelper.openModalWindow('Well region', innerDiv, function () {
-                    appDatacontext.saveNewWellRegion({
+                    wegionService.post({
                         'Name': $(inputName).val(),
                         'Description': '',
                         'CompanyId': ths.id
@@ -269,7 +283,21 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
             this.save = function () {
                 companyService.put(ths.id, ths.toDto()).done(function (r) {
                     // Calculated properties on the server
-                    ths.urlOfLogo(r.UrlOfLogo);
+                    var tmpFileSpecOfLogoProp = ths.propSpecList.filter(function (elem) {
+                        return elem.clientId === 'fileSpecOfLogo';
+                    })[0];
+
+                    if (!tmpFileSpecOfLogoProp) { throw new ReferenceError('No fileSpecOfLogo property for company model'); }
+
+                    // Value of logo file from server
+                    var tmpValueOfFileSpecOfLogo = r[tmpFileSpecOfLogoProp.serverId];
+
+                    if (tmpValueOfFileSpecOfLogo) {
+                        ths[tmpFileSpecOfLogoProp.clientId](new FileSpec(tmpValueOfFileSpecOfLogo));
+                    }
+                    else {
+                        ths[tmpFileSpecOfLogoProp.clientId](null);
+                    }
                 });
             };
 
@@ -281,10 +309,7 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
                 initialData = initialData || {};
 
                 if (!ko.unwrap(ths.isLoadedWegions)) {
-                    appDatacontext.getWellRegionList({
-                        company_id: ths.id,
-                        is_inclusive: true
-                    }).done(function (response) {
+                    wegionService.getInclusive(ths.id).done(function (response) {
                         ths.wegions(importWegions(response, ths));
                         ths.isLoadedWegions(true);
 

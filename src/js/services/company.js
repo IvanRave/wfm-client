@@ -11,11 +11,11 @@ define(['jquery', 'helpers/ajax-request'], function ($, ajaxRequest) {
     * @constructor
     */
     var exports = {
-        post: function (data) {
-            return ajaxRequest('POST', companyUrl(), data);
-        },
         get: function () {
             return ajaxRequest('GET', companyUrl());
+        },
+        post: function (data) {
+            return ajaxRequest('POST', companyUrl(), data);
         },
         put: function (companyId, data) {
             return ajaxRequest('PUT', companyUrl(companyId), data);

@@ -13,28 +13,29 @@ define([
     'models/sections/section-of-well',
     'models/well-file',
     'models/well/sketch',
+    'models/prop-spec',
     'models/column-attribute',
     'models/well-history',
     'models/test-scope'
 ], function ($, ko, datacontext, fileHelper, bootstrapModal,
-    appHelper, appMoment, StageBase, wellPerfomancePartial, HistoryView, SectionOfWell, WellFile, SketchOfWell) {
+    appHelper, appMoment, StageBase, wellPerfomancePartial, HistoryView, SectionOfWell, WellFile, SketchOfWell, PropSpec) {
     'use strict';
 
     /** WellFiles (convert data objects into array) */
-    function importWellFilesDto(data, parent) { return $.map(data || [], function (item) { return new WellFile(item, parent); }); }
+    function importWellFilesDto(data, parent) { return data.map(function (item) { return new WellFile(item, parent); }); }
 
     /** ColumnAttributes (convert data objects into array) */
-    function importColumnAttributesDto(data) { return $.map(data || [], function (item) { return datacontext.createColumnAttribute(item); }); }
+    function importColumnAttributesDto(data) { return data.map(function (item) { return datacontext.createColumnAttribute(item); }); }
 
     /** WellHistory (convert data objects into array) */
-    function importWellHistoryDto(data, parent) { return $.map(data || [], function (item) { return datacontext.createWellHistory(item, parent); }); }
+    function importWellHistoryDto(data, parent) { return data.map(function (item) { return datacontext.createWellHistory(item, parent); }); }
 
     /** Test scope */
-    function importTestScopeDtoList(data, wellItem) { return $.map(data || [], function (item) { return datacontext.createTestScope(item, wellItem); }); }
+    function importTestScopeDtoList(data, wellItem) { return data.map(function (item) { return datacontext.createTestScope(item, wellItem); }); }
 
     /** Import all sections of well */
     function importSectionList(data, wellItem) {
-        return $.map(data || [], function (item) { return new SectionOfWell(item, wellItem); });
+        return data.map(function (item) { return new SectionOfWell(item, wellItem); });
     }
 
     /** Get well map list from well field maps with need well id */
@@ -50,6 +51,25 @@ define([
         });
     }
 
+    var wellPropSpecList = [
+        new PropSpec('Name', 'Name', 'Well name', 'SingleLine', { maxLength: 255 }),
+        new PropSpec('Description', 'Description', 'Description', 'Multiline', {})
+
+    ////{ id: 'Name', ttl: 'Name', tpe: 'SingleLine' },
+    ////        { id: 'Description', ttl: 'Description', tpe: 'MultiLine' },
+    ////        { id: 'DrillingDate', ttl: 'Drilling date', tpe: 'DateLine' },
+    ////        { id: 'ProductionHistory', ttl: 'Production history', tpe: 'MultiLine' },
+    ////        { id: 'CompletionType', ttl: 'Completion type', tpe: 'MultiLine' },
+    ////        { id: 'FormationCompleteState', ttl: 'Formation complete state', tpe: 'MultiLine' },
+    ////        { id: 'IntegrityStatus', ttl: 'Integrity status', tpe: 'MultiLine' },
+    ////        { id: 'LastInterventionType', ttl: 'Last intervention type', tpe: 'MultiLine' },
+    ////        { id: 'LastInterventionDate', ttl: 'Last intervention date', tpe: 'DateLine' },
+    ////        { id: 'PerforationDepth', ttl: 'Perforation depth', tpe: 'MultiLine' },
+    ////        { id: 'PressureData', ttl: 'Pressure data', tpe: 'MultiLine' },
+    ////        { id: 'Pvt', ttl: 'PVT', tpe: 'MultiLine' },
+    ////        { id: 'ReservoirData', ttl: 'Reservoir data', tpe: 'MultiLine' }
+    ];
+
     /**
      * Well model
      * @param {object} data - Well data
@@ -59,7 +79,7 @@ define([
     var exports = function (data, wellGroup) {
         data = data || {};
 
-        var self = this;
+        var ths = this;
 
         /** Get well group */
         this.getWellGroup = function () {
@@ -89,35 +109,28 @@ define([
         */
         this.FlowType = ko.observable(data.FlowType);
 
+        this.propSpecList = wellPropSpecList;
+
+        /** Add props to constructor */
+        StageBase.call(this, data);
+
         // TODO: convert each well property to the wellProperty class
         /**
         * Well property list
         * @type {Object.<string, string, string>}
         */
-        this.wellPropertyList = [
-            { id: 'Name', ttl: 'Name', tpe: 'SingleLine' },
-            { id: 'Description', ttl: 'Description', tpe: 'MultiLine' },
-            { id: 'DrillingDate', ttl: 'Drilling date', tpe: 'DateLine' },
-            { id: 'ProductionHistory', ttl: 'Production history', tpe: 'MultiLine' },
-            { id: 'CompletionType', ttl: 'Completion type', tpe: 'MultiLine' },
-            { id: 'FormationCompleteState', ttl: 'Formation complete state', tpe: 'MultiLine' },
-            { id: 'IntegrityStatus', ttl: 'Integrity status', tpe: 'MultiLine' },
-            { id: 'LastInterventionType', ttl: 'Last intervention type', tpe: 'MultiLine' },
-            { id: 'LastInterventionDate', ttl: 'Last intervention date', tpe: 'DateLine' },
-            { id: 'PerforationDepth', ttl: 'Perforation depth', tpe: 'MultiLine' },
-            { id: 'PressureData', ttl: 'Pressure data', tpe: 'MultiLine' },
-            { id: 'Pvt', ttl: 'PVT', tpe: 'MultiLine' },
-            { id: 'ReservoirData', ttl: 'Reservoir data', tpe: 'MultiLine' }
-        ];
+        ////this.wellPropertyList = [
+
+        ////];
 
         /** Load other properties */
-        this.wellPropertyList.forEach(function (arrElem) {
-            /** some member */
-            this[arrElem.id] = ko.observable(data[arrElem.id]);
+        ////this.wellPropertyList.forEach(function (arrElem) {
+        ////    /** some member */
+        ////    this[arrElem.id] = ko.observable(data[arrElem.id]);
 
-            /** some member title */
-            this['ttl' + arrElem.id] = arrElem.ttl;
-        }, this);
+        ////    /** some member title */
+        ////    this['ttl' + arrElem.id] = arrElem.ttl;
+        ////}, this);
 
         /** 
         * Well comment
@@ -149,83 +162,81 @@ define([
             owner: this
         });
 
-        StageBase.call(this);
-
         /** Select section */
-        self.selectSection = function (sectionToSelect) {
+        this.selectSection = function (sectionToSelect) {
             ////window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
-            ////    region: self.getWellGroup().getWellField().getWellRegion().Id,
-            ////    field: self.getWellGroup().getWellField().Id,
-            ////    group: self.getWellGroup().Id,
-            ////    well: self.Id,
+            ////    region: ths.getWellGroup().getWellField().getWellRegion().Id,
+            ////    field: ths.getWellGroup().getWellField().Id,
+            ////    group: ths.getWellGroup().Id,
+            ////    well: ths.Id,
             ////    section: sectionToSelect
             ////});
 
-            self.selectedSection(sectionToSelect);
+            ths.selectedSection(sectionToSelect);
 
             switch (sectionToSelect.sectionPatternId) {
                 // Dashboard: from undefined to null
                 case 'well-history': {
-                    self.getWellHistoryList();
+                    ths.getWellHistoryList();
                     break;
                 }
                 case 'well-sketch': {
-                    self.sketchOfWell.load();
+                    ths.sketchOfWell.load();
                     break;
                 }
                 case 'well-perfomance': {
-                    self.getWellGroup().getWellGroupWfmParameterList();
-                    self.perfomancePartial.forecastEvolution.getDict();
-                    self.perfomancePartial.getHstProductionDataSet();
+                    ths.getWellGroup().getWellGroupWfmParameterList();
+                    ths.perfomancePartial.forecastEvolution.getDict();
+                    ths.perfomancePartial.getHstProductionDataSet();
                     break;
                 }
                 case 'well-nodalanalysis': {
-                    self.isLoadedNodal(false);
+                    ths.isLoadedNodal(false);
 
-                    self.getWellFileList(function () {
+                    ths.getWellFileList(function () {
                         var mainWellFile = null;
-                        if (self.WellFiles().length > 0) {
-                            mainWellFile = self.WellFiles()[0];
+                        if (ths.WellFiles().length > 0) {
+                            mainWellFile = ths.WellFiles()[0];
                         }
 
-                        self.selectedWellFileNodal(mainWellFile);
-                        self.isLoadedNodal(true);
+                        ths.selectedWellFileNodal(mainWellFile);
+                        ths.isLoadedNodal(true);
                     }, 'nodalanalysis', 'work');
 
                     break;
                 }
                 case 'well-integrity': {
-                    self.isLoadedIntegrity(false);
+                    ths.isLoadedIntegrity(false);
 
-                    self.getWellFileList(function () {
+                    ths.getWellFileList(function () {
                         var mainWellFile = null;
-                        if (self.WellFiles().length > 0) {
-                            mainWellFile = self.WellFiles()[0];
+                        if (ths.WellFiles().length > 0) {
+                            mainWellFile = ths.WellFiles()[0];
                         }
 
-                        self.selectedWellFileIntegrity(mainWellFile);
-                        self.isLoadedIntegrity(true);
+                        ths.selectedWellFileIntegrity(mainWellFile);
+                        ths.isLoadedIntegrity(true);
                     }, 'integrity', 'work');
 
                     break;
                 }
                 case 'well-log': {
-                    self.wellLogSelectedFile(null);
+                    ths.wellLogSelectedFile(null);
 
-                    self.getWellFileList(function () {
-                        if (self.logImageList().length > 0) { self.logImageList()[0].showLogImage(); }
+                    ths.getWellFileList(function () {
+                        if (ths.logImageList().length > 0) { ths.logImageList()[0].showLogImage(); }
                     }, 'log', 'work');
 
                     break;
                 }
                 case 'well-test': {
-                    self.getTestScopeList();
-                    self.getWellGroup().getWellGroupWfmParameterList();
+                    ths.getTestScopeList();
+                    ths.getWellGroup().getWellGroupWfmParameterList();
                     break;
                 }
                 case 'well-map': {
                     // find wellfield_id 
-                    var wellFieldItem = self.getWellGroup().getWellField();
+                    var wellFieldItem = ths.getWellGroup().getWellField();
 
                     wellFieldItem.getWellFieldMaps(function () {
                         var arr = ko.unwrap(wellFieldItem.WellFieldMaps);
@@ -233,7 +244,7 @@ define([
                         ////arr = $.grep(arr, function (arrElem, arrIndex) {
                         ////    var cnt = 0;
                         ////    $.each(arrElem.WellInWellFieldMaps(), function(wwfIndex, wwfElem){
-                        ////        if (wwfElem.Id === self.Id) {
+                        ////        if (wwfElem.Id === ths.Id) {
                         ////            cnt++;
                         ////        }
                         ////    });
@@ -250,9 +261,9 @@ define([
                     // no well in new map
                     ////wellFieldParent.initMapFileUpload();
                     // find wellfieldmap from wellfield where id = 
-                    // get all WellInWellFieldMap where wellid = self.wellId
+                    // get all WellInWellFieldMap where wellid = ths.wellId
                     // get all maps
-                    // get only maps where well_id == self.Id
+                    // get only maps where well_id == ths.Id
                     // get all maps
                     // in WellInWellFieldMaps
                 }
@@ -260,58 +271,61 @@ define([
         };
 
         /** Unselect section: show dashboard with widgets */
-        self.unselectSection = function () {
+        this.unselectSection = function () {
             ////window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
-            ////    region: self.getWellGroup().getWellField().getWellRegion().Id,
-            ////    field: self.getWellGroup().getWellField().Id,
-            ////    group: self.getWellGroup().Id,
-            ////    well: self.Id
+            ////    region: ths.getWellGroup().getWellField().getWellRegion().Id,
+            ////    field: ths.getWellGroup().getWellField().Id,
+            ////    group: ths.getWellGroup().Id,
+            ////    well: ths.Id
             ////});
 
-            self.selectedSection(null);
-            self.sketchOfWell.load();
-            self.getWellWidgoutList();
+            ths.selectedSection(null);
+            ths.sketchOfWell.load();
+            ths.getWellWidgoutList();
             // TODO: load data only if there is one or more perfomance widgets (only once) for entire well
-            self.getWellGroup().getWellGroupWfmParameterList();
-            self.perfomancePartial.forecastEvolution.getDict();
-            self.perfomancePartial.getHstProductionDataSet();
-            self.getWellHistoryList();
+            ths.getWellGroup().getWellGroupWfmParameterList();
+            ths.perfomancePartial.forecastEvolution.getDict();
+            ths.perfomancePartial.getHstProductionDataSet();
+            ths.getWellHistoryList();
         };
+
+        /** Save this well main properties */
+        this.save = function () { };
 
         /** Every section has files: filter files only for current section */
         // TODO: Change to new realization
-        self.sectionWellFiles = ko.computed({
+        this.sectionWellFiles = ko.computed({
             read: function () {
-                ////if (ko.unwrap(self.selectedSection)) {
-                ////    return $.grep(ko.unwrap(self.WellFiles), function (wellFile) {
-                ////        return ko.unwrap(wellFile.Purpose) === ko.unwrap(self.selectedSectionId);
+                ////if (ko.unwrap(ths.selectedSection)) {
+                ////    return $.grep(ko.unwrap(ths.WellFiles), function (wellFile) {
+                ////        return ko.unwrap(wellFile.Purpose) === ko.unwrap(ths.selectedSectionId);
                 ////    });
                 ////}
             },
             deferEvaluation: true
         });
 
-        self.isExistsSectionWellFiles = ko.computed({
+        ths.isExistsSectionWellFiles = ko.computed({
             read: function () {
-                if (ko.unwrap(self.sectionWellFiles)) {
-                    return ko.unwrap(self.sectionWellFiles).length > 0;
+                if (ko.unwrap(ths.sectionWellFiles)) {
+                    return ko.unwrap(ths.sectionWellFiles).length > 0;
                 }
             },
             deferEvaluation: true
         });
 
-        self.isOpenItem = ko.observable(false);
+        this.isOpenItem = ko.observable(false);
 
-        self.toggleItem = function () {
-            self.isOpenItem(!self.isOpenItem());
+        this.toggleItem = function () {
+            ths.isOpenItem(!ths.isOpenItem());
         };
 
         /** Whether item and parent are selected */
-        self.isSelectedItem = ko.computed({
+        this.isSelectedItem = ko.computed({
             read: function () {
-                var tmpGroup = self.getWellGroup();
+                var tmpGroup = ths.getWellGroup();
                 if (ko.unwrap(tmpGroup.isSelectedItem)) {
-                    if (self === ko.unwrap(tmpGroup.selectedWell)) {
+                    if (ths === ko.unwrap(tmpGroup.selectedWell)) {
                         return true;
                     }
                 }
@@ -321,30 +335,30 @@ define([
 
         // ======================= file manager section ======================
         // file manager section: like above section but in file manager view
-        self.selectedFmgSectionId = ko.observable(null);
+        this.selectedFmgSectionId = ko.observable(null);
 
-        self.selectFmgSection = function (item) {
-            self.selectedFmgSectionId(item.id);
+        this.selectFmgSection = function (item) {
+            ths.selectedFmgSectionId(item.id);
         };
 
-        self.filteredWellFileList = ko.computed(function () {
-            if (!self.selectedFmgSectionId()) {
-                return self.WellFiles();
+        this.filteredWellFileList = ko.computed(function () {
+            if (!ths.selectedFmgSectionId()) {
+                return ths.WellFiles();
             }
 
-            return $.grep(self.WellFiles(), function (elemValue) {
-                return elemValue.Purpose === self.selectedFmgSectionId();
+            return $.grep(ths.WellFiles(), function (elemValue) {
+                return elemValue.Purpose === ths.selectedFmgSectionId();
             });
         });
 
-        self.logImageList = ko.computed(function () {
-            return $.grep(self.WellFiles(), function (elemValue) {
+        this.logImageList = ko.computed(function () {
+            return $.grep(ths.WellFiles(), function (elemValue) {
                 return ((elemValue.Purpose === 'log') && (elemValue.getExt() === 'png'));
             });
         });
 
-        self.getWellFileList = function (callback, purpose, status) {
-            var uqp = { well_id: self.Id };
+        this.getWellFileList = function (callback, purpose, status) {
+            var uqp = { well_id: ths.Id };
 
             if (purpose) {
                 uqp.purpose = purpose;
@@ -355,7 +369,7 @@ define([
             }
 
             datacontext.getWellFiles(uqp).done(function (response) {
-                self.WellFiles(importWellFilesDto(response, self));
+                ths.WellFiles(importWellFilesDto(response, ths));
                 if ($.isFunction(callback) === true) {
                     callback();
                 }
@@ -364,34 +378,34 @@ define([
 
         // ==================================================================Well test begin================================================================
 
-        self.testScopeList = ko.observableArray();
+        this.testScopeList = ko.observableArray();
 
-        self.sortedTestScopeList = ko.computed(function () {
-            return self.testScopeList().sort(function (left, right) {
+        this.sortedTestScopeList = ko.computed(function () {
+            return ths.testScopeList().sort(function (left, right) {
                 return left.startUnixTime() === right.startUnixTime() ? 0 : (left.startUnixTime() < right.startUnixTime() ? 1 : -1);
             });
         });
 
-        self.lastTestScope = ko.observable();
+        this.lastTestScope = ko.observable();
 
-        self.getTestScopeList = function () {
-            datacontext.getTestScope({ well_id: self.Id }).done(function (response) {
-                self.testScopeList(importTestScopeDtoList(response, self));
+        this.getTestScopeList = function () {
+            datacontext.getTestScope({ well_id: ths.Id }).done(function (response) {
+                ths.testScopeList(importTestScopeDtoList(response, ths));
             });
         };
 
         /** Unix time data for creating new test scope */
-        self.testScopeNewStartUnixTime = {
+        this.testScopeNewStartUnixTime = {
             unixDate: ko.observable(),
             hour: ko.observable(0),
             minute: ko.observable(0)
         };
 
-        self.isEnabledPostTestScope = ko.computed({
+        this.isEnabledPostTestScope = ko.computed({
             read: function () {
-                if (ko.unwrap(self.testScopeNewStartUnixTime.unixDate)) {
-                    if (ko.unwrap(self.testScopeNewStartUnixTime.hour) >= 0) {
-                        if (ko.unwrap(self.testScopeNewStartUnixTime.minute) >= 0) {
+                if (ko.unwrap(ths.testScopeNewStartUnixTime.unixDate)) {
+                    if (ko.unwrap(ths.testScopeNewStartUnixTime.hour) >= 0) {
+                        if (ko.unwrap(ths.testScopeNewStartUnixTime.minute) >= 0) {
                             return true;
                         }
                     }
@@ -403,72 +417,72 @@ define([
         });
 
         /** Post test scope to server */
-        self.postTestScope = function () {
-            if (self.isEnabledPostTestScope) {
+        this.postTestScope = function () {
+            if (ths.isEnabledPostTestScope) {
                 // Date in UTC second
-                var unixTime = ko.unwrap(self.testScopeNewStartUnixTime.unixDate);
+                var unixTime = ko.unwrap(ths.testScopeNewStartUnixTime.unixDate);
 
                 // Remove UTC offset
                 // in seconds
                 unixTime += new Date(unixTime * 1000).getTimezoneOffset() * 60;
 
                 // Add hours
-                unixTime += ko.unwrap(self.testScopeNewStartUnixTime.hour) * 3600;
+                unixTime += ko.unwrap(ths.testScopeNewStartUnixTime.hour) * 3600;
                 // Add minutes
-                unixTime += ko.unwrap(self.testScopeNewStartUnixTime.minute) * 60;
+                unixTime += ko.unwrap(ths.testScopeNewStartUnixTime.minute) * 60;
 
                 datacontext.saveNewTestScope({
-                    WellId: self.Id,
+                    WellId: ths.Id,
                     StartUnixTime: unixTime,
                     IsApproved: null,
                     ConductedBy: '',
                     CertifiedBy: ''
                 }).done(function (response) {
-                    self.testScopeList.unshift(datacontext.createTestScope(response, self));
+                    ths.testScopeList.unshift(datacontext.createTestScope(response, ths));
                 });
             }
         };
 
-        self.selectedTestScope = ko.observable();
+        this.selectedTestScope = ko.observable();
 
-        self.chooseTestScope = function (testScopeItem) {
-            if (testScopeItem === self.selectedTestScope()) {
-                self.selectedTestScope(null);
+        this.chooseTestScope = function (testScopeItem) {
+            if (testScopeItem === ths.selectedTestScope()) {
+                ths.selectedTestScope(null);
             }
             else {
-                self.selectedTestScope(testScopeItem);
+                ths.selectedTestScope(testScopeItem);
             }
         };
 
         // ==================================================================Well test end================================================================
 
-        self.WellInWellFieldMaps = ko.observableArray();
+        this.WellInWellFieldMaps = ko.observableArray();
 
         // ================================================= Well history section start =======================================
 
-        self.historyList = ko.observableArray();
+        this.historyList = ko.observableArray();
 
-        self.isLoadedHistoryList = ko.observable(false);
+        this.isLoadedHistoryList = ko.observable(false);
 
-        self.getWellHistoryList = function () {
-            if (ko.unwrap(self.isLoadedHistoryList) === false) {
-                datacontext.getWellHistoryList({ well_id: self.Id }).done(function (response) {
-                    self.historyList(importWellHistoryDto(response, self));
-                    self.isLoadedHistoryList(true);
+        this.getWellHistoryList = function () {
+            if (ko.unwrap(ths.isLoadedHistoryList) === false) {
+                datacontext.getWellHistoryList({ well_id: ths.Id }).done(function (response) {
+                    ths.historyList(importWellHistoryDto(response, ths));
+                    ths.isLoadedHistoryList(true);
                 });
             }
         };
 
-        self.wellHistoryNew = {
+        this.wellHistoryNew = {
             startUnixTime: ko.observable(),
             endUnixTime: ko.observable(),
-            wellId: self.Id,
+            wellId: ths.Id,
             historyText: ''
         };
 
-        self.isEnabledPostWellHistory = ko.computed({
+        this.isEnabledPostWellHistory = ko.computed({
             read: function () {
-                if (ko.unwrap(self.wellHistoryNew.startUnixTime)) {
+                if (ko.unwrap(ths.wellHistoryNew.startUnixTime)) {
                     return true;
                 }
                 else {
@@ -478,9 +492,9 @@ define([
             deferEvaluation: true
         });
 
-        self.postWellHistory = function () {
-            if (ko.unwrap(self.isEnabledPostWellHistory)) {
-                var wellHistoryNewData = ko.toJS(self.wellHistoryNew);
+        this.postWellHistory = function () {
+            if (ko.unwrap(ths.isEnabledPostWellHistory)) {
+                var wellHistoryNewData = ko.toJS(ths.wellHistoryNew);
 
                 if (wellHistoryNewData.startUnixTime) {
                     if (!wellHistoryNewData.endUnixTime) {
@@ -488,83 +502,83 @@ define([
                     }
 
                     datacontext.postWellHistory(wellHistoryNewData).done(function (result) {
-                        self.historyList.push(datacontext.createWellHistory(result, self));
+                        ths.historyList.push(datacontext.createWellHistory(result, ths));
                         // Set to null for psblty creating new well history
-                        self.wellHistoryNew.startUnixTime(null);
-                        self.wellHistoryNew.endUnixTime(null);
+                        ths.wellHistoryNew.startUnixTime(null);
+                        ths.wellHistoryNew.endUnixTime(null);
                     });
                 }
             }
         };
 
-        self.deleteWellHistory = function (itemForDelete) {
+        this.deleteWellHistory = function (itemForDelete) {
             var tmpStartUnixTime = ko.unwrap(itemForDelete.startUnixTime);
             if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + appMoment(tmpStartUnixTime * 1000).format('YYYY-MM-DD') + '" record?')) {
                 datacontext.deleteWellHistory(itemForDelete.id).done(function () {
-                    self.historyList.remove(itemForDelete);
+                    ths.historyList.remove(itemForDelete);
                 });
             }
         };
 
-        self.historyView = new HistoryView({}, self.historyList);
+        this.historyView = new HistoryView({}, ths.historyList);
 
         // ============================================================= Well history end ===============================================
 
-        self.sectionList = datacontext.getSectionList();
+        this.sectionList = datacontext.getSectionList();
 
         // =============================================================Well report begin=========================================================
 
         // by default - checked summary tab
-        self.reportSectionIdList = ko.observableArray(['summary']);
+        this.reportSectionIdList = ko.observableArray(['summary']);
 
-        self.checkReportSection = function (checkedReportSection) {
+        this.checkReportSection = function (checkedReportSection) {
             switch (checkedReportSection.id) {
-                case 'map': self.getWellGroup().getWellField().getWellFieldMaps(); break;
-                case 'history': self.getWellHistoryList(); break;
-                case 'log': self.getWellFileList('log', 'work'); break;
-                case 'pd': self.perfomancePartial.getHstProductionDataSet(); break;
+                case 'map': ths.getWellGroup().getWellField().getWellFieldMaps(); break;
+                case 'history': ths.getWellHistoryList(); break;
+                case 'log': ths.getWellFileList('log', 'work'); break;
+                case 'pd': ths.perfomancePartial.getHstProductionDataSet(); break;
             }
         };
 
-        self.selectedReportMap = ko.observable();
-        self.selectedReportLog = ko.observable();
+        this.selectedReportMap = ko.observable();
+        this.selectedReportLog = ko.observable();
 
-        self.isCompanyLogoInReport = ko.observable(false);
+        this.isCompanyLogoInReport = ko.observable(false);
 
         // TODO: make create report
-        ////self.createReport = function () {
+        ////ths.createReport = function () {
         ////    // checking checkboxes
-        ////    if (self.reportSectionIdList().length === 0) {
+        ////    if (ths.reportSectionIdList().length === 0) {
         ////        alert('No selected sections for the report');
         ////        return;
         ////    }
 
         ////    // existing selected map when map section is checked
-        ////    if ($.inArray('map', self.reportSectionIdList()) >= 0) {
-        ////        if (typeof self.selectedReportMap() === 'undefined') {
+        ////    if ($.inArray('map', ths.reportSectionIdList()) >= 0) {
+        ////        if (typeof ths.selectedReportMap() === 'undefined') {
         ////            alert('No selected map in the map section');
         ////            return;
         ////        }
         ////    }
 
-        ////    if ($.inArray('log', self.reportSectionIdList()) >= 0) {
-        ////        if (typeof self.selectedReportLog() === 'undefined') {
+        ////    if ($.inArray('log', ths.reportSectionIdList()) >= 0) {
+        ////        if (typeof ths.selectedReportLog() === 'undefined') {
         ////            alert('No selected log in the log section');
         ////            return;
         ////        }
         ////    }
 
-        ////    if (self.isCompanyLogoInReport() === true) {
+        ////    if (ths.isCompanyLogoInReport() === true) {
         ////        // get user profile
-        ////        if (!self.getAppViewModel().curUserProfile().companyLogo()) {
+        ////        if (!ths.getAppViewModel().curUserProfile().companyLogo()) {
         ////            alert('No company logo. Please upload company logo in Cabinet');
         ////            return;
         ////        }
         ////    }
 
         ////    // todo: make check for begin date existence (or end date or together)
-        ////    ////if ($.inArray('history', self.reportSectionIdList()) >= 0) {
-        ////    ////    if (typeof self.reportHistoryBeginDate === 'undefined') {
+        ////    ////if ($.inArray('history', ths.reportSectionIdList()) >= 0) {
+        ////    ////    if (typeof ths.reportHistoryBeginDate === 'undefined') {
         ////    ////        alert('No selected maps in the map section');
         ////    ////        return;
         ////    ////    }
@@ -572,8 +586,8 @@ define([
         ////    // get all unknown data for pdf report and creating
 
         ////    var logoUrl = null;
-        ////    if (self.isCompanyLogoInReport() === true) {
-        ////        var companyLogoByte64String = self.getAppViewModel().curUserProfile().companyLogo();
+        ////    if (ths.isCompanyLogoInReport() === true) {
+        ////        var companyLogoByte64String = ths.getAppViewModel().curUserProfile().companyLogo();
         ////        if (companyLogoByte64String) {
         ////            logoUrl = companyLogoByte64String;
         ////        }
@@ -582,12 +596,12 @@ define([
         ////    require(['helpers/pdf-helper'], function (pdfHelper) {
 
         ////        pdfHelper.getImageFromUrl(logoUrl, function (logoBase64) {
-        ////            var sketchUrl = $.inArray('sketch', self.reportSectionIdList()) >= 0 ? self.MainSketchUrl() : null;
+        ////            var sketchUrl = $.inArray('sketch', ths.reportSectionIdList()) >= 0 ? ths.MainSketchUrl() : null;
         ////            pdfHelper.getImageFromUrl(sketchUrl, function (sketchBase64) {
         ////                // coord to nill - load full image (without crop)
-        ////                var mapUrl = ($.inArray('map', self.reportSectionIdList()) >= 0) ? (self.selectedReportMap().fullImgUrl + '&x1=0&y1=0&x2=0&y2=0') : null;
+        ////                var mapUrl = ($.inArray('map', ths.reportSectionIdList()) >= 0) ? (ths.selectedReportMap().fullImgUrl + '&x1=0&y1=0&x2=0&y2=0') : null;
         ////                pdfHelper.getImageFromUrl(mapUrl, function (mapBase64) {
-        ////                    var logUrl = ($.inArray('log', self.reportSectionIdList()) >= 0) ? (self.selectedReportLog().Url()) : null;
+        ////                    var logUrl = ($.inArray('log', ths.reportSectionIdList()) >= 0) ? (ths.selectedReportLog().Url()) : null;
         ////                    pdfHelper.getImageFromUrl(logUrl, function (logBase64) {
         ////                        var doc = pdfHelper.createPdf();
         ////                        // start string position
@@ -600,26 +614,26 @@ define([
         ////                            strPos = pdfHelper.writeLogoImage(doc, strPos, logoBase64[0]);
         ////                        }
 
-        ////                        strPos = pdfHelper.writeWellName(doc, strPos, self.Name());
+        ////                        strPos = pdfHelper.writeWellName(doc, strPos, ths.Name());
 
         ////                        // other summary fields
-        ////                        if ($.inArray('summary', self.reportSectionIdList()) >= 0) {
-        ////                            strPos = pdfHelper.addSummaryFieldToPdf(doc, self.ttlDescription, self.Description(), strPos);
-        ////                            strPos = pdfHelper.addSummaryFieldToPdf(doc, self.ttlProductionHistory, self.ProductionHistory(), strPos);
-        ////                            strPos = pdfHelper.addSummaryFieldToPdf(doc, self.ttlCompletionType, self.CompletionType(), strPos);
-        ////                            strPos = pdfHelper.addSummaryFieldToPdf(doc, self.ttlFormationCompleteState, self.FormationCompleteState(), strPos);
-        ////                            strPos = pdfHelper.addSummaryFieldToPdf(doc, self.ttlDrillingDate, self.DrillingDate() ? appMoment(self.DrillingDate()).format('YYYY-MM-DD') : '', strPos);
-        ////                            strPos = pdfHelper.addSummaryFieldToPdf(doc, self.ttlIntegrityStatus, self.IntegrityStatus(), strPos);
-        ////                            strPos = pdfHelper.addSummaryFieldToPdf(doc, self.ttlLastInterventionType, self.LastInterventionType(), strPos);
-        ////                            strPos = pdfHelper.addSummaryFieldToPdf(doc, self.ttlLastInterventionDate, self.LastInterventionDate() ? appMoment(self.LastInterventionDate()).format('YYYY-MM-DD') : '', strPos);
-        ////                            strPos = pdfHelper.addSummaryFieldToPdf(doc, self.ttlPerforationDepth, self.PerforationDepth(), strPos);
-        ////                            strPos = pdfHelper.addSummaryFieldToPdf(doc, self.ttlPressureData, self.PressureData(), strPos);
-        ////                            strPos = pdfHelper.addSummaryFieldToPdf(doc, self.ttlPvt, self.Pvt(), strPos);
-        ////                            strPos = pdfHelper.addSummaryFieldToPdf(doc, self.ttlReservoirData, self.ReservoirData(), strPos);
+        ////                        if ($.inArray('summary', ths.reportSectionIdList()) >= 0) {
+        ////                            strPos = pdfHelper.addSummaryFieldToPdf(doc, ths.ttlDescription, ths.Description(), strPos);
+        ////                            strPos = pdfHelper.addSummaryFieldToPdf(doc, ths.ttlProductionHistory, ths.ProductionHistory(), strPos);
+        ////                            strPos = pdfHelper.addSummaryFieldToPdf(doc, ths.ttlCompletionType, ths.CompletionType(), strPos);
+        ////                            strPos = pdfHelper.addSummaryFieldToPdf(doc, ths.ttlFormationCompleteState, ths.FormationCompleteState(), strPos);
+        ////                            strPos = pdfHelper.addSummaryFieldToPdf(doc, ths.ttlDrillingDate, ths.DrillingDate() ? appMoment(ths.DrillingDate()).format('YYYY-MM-DD') : '', strPos);
+        ////                            strPos = pdfHelper.addSummaryFieldToPdf(doc, ths.ttlIntegrityStatus, ths.IntegrityStatus(), strPos);
+        ////                            strPos = pdfHelper.addSummaryFieldToPdf(doc, ths.ttlLastInterventionType, ths.LastInterventionType(), strPos);
+        ////                            strPos = pdfHelper.addSummaryFieldToPdf(doc, ths.ttlLastInterventionDate, ths.LastInterventionDate() ? appMoment(ths.LastInterventionDate()).format('YYYY-MM-DD') : '', strPos);
+        ////                            strPos = pdfHelper.addSummaryFieldToPdf(doc, ths.ttlPerforationDepth, ths.PerforationDepth(), strPos);
+        ////                            strPos = pdfHelper.addSummaryFieldToPdf(doc, ths.ttlPressureData, ths.PressureData(), strPos);
+        ////                            strPos = pdfHelper.addSummaryFieldToPdf(doc, ths.ttlPvt, ths.Pvt(), strPos);
+        ////                            strPos = pdfHelper.addSummaryFieldToPdf(doc, ths.ttlReservoirData, ths.ReservoirData(), strPos);
         ////                        }
 
         ////                        // sketch
-        ////                        if ($.inArray('sketch', self.reportSectionIdList()) >= 0) {
+        ////                        if ($.inArray('sketch', ths.reportSectionIdList()) >= 0) {
         ////                            // no string position (new page)
         ////                            pdfHelper.writeSketchImg(doc, sketchBase64, 'Sketch'); // sketch description
 
@@ -627,21 +641,21 @@ define([
         ////                        }
 
         ////                        if (mapBase64.length > 0) {
-        ////                            pdfHelper.writeMap(doc, mapBase64, 'Map', self.selectedReportMap().WellInWellFieldMaps(), self.selectedReportMap().WellFieldMapAreas());
+        ////                            pdfHelper.writeMap(doc, mapBase64, 'Map', ths.selectedReportMap().WellInWellFieldMaps(), ths.selectedReportMap().WellFieldMapAreas());
         ////                        }
 
-        ////                        if ($.inArray('history', self.reportSectionIdList()) >= 0) {
-        ////                            pdfHelper.writeHistory(doc, 'History', self.sortedHistoryList());
+        ////                        if ($.inArray('history', ths.reportSectionIdList()) >= 0) {
+        ////                            pdfHelper.writeHistory(doc, 'History', ths.sortedHistoryList());
         ////                        }
 
         ////                        if (logBase64.length > 0) {
         ////                            pdfHelper.writeLog(doc, logBase64, 'Log');
         ////                        }
 
-        ////                        if ($.inArray('pd', self.reportSectionIdList()) >= 0) {
-        ////                            var arrPd = ko.unwrap(self.perfomancePartial.filteredByDateProductionDataSet);
-        ////                            $.each(ko.unwrap(self.selectedWfmParamSquadList), function (elemIndex, elemValue) {
-        ////                                var headerList = $.grep(ko.unwrap(self.perfomancePartial.prdColumnAttributeList), function (pdElem) {
+        ////                        if ($.inArray('pd', ths.reportSectionIdList()) >= 0) {
+        ////                            var arrPd = ko.unwrap(ths.perfomancePartial.filteredByDateProductionDataSet);
+        ////                            $.each(ko.unwrap(ths.selectedWfmParamSquadList), function (elemIndex, elemValue) {
+        ////                                var headerList = $.grep(ko.unwrap(ths.perfomancePartial.prdColumnAttributeList), function (pdElem) {
         ////                                    return pdElem.Group === elemValue;
         ////                                });
 
@@ -656,7 +670,7 @@ define([
         ////                            });
         ////                        }
 
-        ////                        pdfHelper.savePdf(doc, 'Report ' + self.Name() + ' ' + nowDateString);
+        ////                        pdfHelper.savePdf(doc, 'Report ' + ths.Name() + ' ' + nowDateString);
         ////                    });
         ////                });
         ////            });
@@ -667,43 +681,43 @@ define([
         // =============================================================Well report end=================================================
 
         // nodal files ======================================
-        self.selectedWellFileNodal = ko.observable();
+        this.selectedWellFileNodal = ko.observable();
 
-        self.selectWellFileNodal = function (wellFile) {
-            self.selectedWellFileNodal(wellFile);
+        this.selectWellFileNodal = function (wellFile) {
+            ths.selectedWellFileNodal(wellFile);
         };
 
-        self.isLoadedNodal = ko.observable(false);
+        this.isLoadedNodal = ko.observable(false);
 
         // integrity files =======================================
-        self.selectedWellFileIntegrity = ko.observable();
+        this.selectedWellFileIntegrity = ko.observable();
 
-        self.selectWellFileIntegrity = function (wellFile) {
-            self.selectedWellFileIntegrity(wellFile);
+        this.selectWellFileIntegrity = function (wellFile) {
+            ths.selectedWellFileIntegrity(wellFile);
         };
 
-        self.isLoadedIntegrity = ko.observable(false);
+        this.isLoadedIntegrity = ko.observable(false);
 
         // file manager
         // function(selectedItemFromKnockout, ...)
-        self.showFmg = function (callbackFunction) {
+        this.showFmg = function (callbackFunction) {
             var jqrModalFileManager = $('#modal-file-manager');
 
-            $.each(self.sectionList, function (elemIndex, elemValue) {
+            $.each(ths.sectionList, function (elemIndex, elemValue) {
                 if (elemValue.formatList.length > 0) {
                     var elemFileUpload = jqrModalFileManager.find('#' + elemValue.id + '_file_upload').get(0);
 
                     fileHelper.initFileUpload(elemFileUpload, datacontext.getWellFileUrl({
-                        well_id: self.Id,
+                        well_id: ths.Id,
                         purpose: elemValue.id,
                         status: 'work'
                     }), elemValue.formatList, function () {
-                        self.getWellFileList();
+                        ths.getWellFileList();
                     });
                 }
             });
 
-            self.getWellFileList();
+            ths.getWellFileList();
 
             function hideModal() {
                 jqrModalFileManager.modal('hide');
@@ -711,7 +725,7 @@ define([
 
             function submitFunction() {
                 // get checked (selected) files
-                var checkedWellFiles = $.map(ko.unwrap(self.WellFiles), function (elemValue) {
+                var checkedWellFiles = $.map(ko.unwrap(ths.WellFiles), function (elemValue) {
                     if (ko.unwrap(elemValue.isChecked) === true) {
                         return elemValue;
                     }
@@ -733,26 +747,26 @@ define([
             ////var innerDiv = document.createElement('div');
 
             ////$(innerDiv).load(datacontext.getFileManagerUrl(), function () {
-            ////    ko.applyBindings(self, $(innerDiv).get(0));
+            ////    ko.applyBindings(ths, $(innerDiv).get(0));
 
-            ////    $.each(self.sectionList, function (elemIndex, elemValue) {
+            ////    $.each(ths.sectionList, function (elemIndex, elemValue) {
             ////        if (elemValue.formatList.length > 0) {
             ////            var elemFileUpload = $(innerDiv).find('#' + elemValue.id + '_file_upload').get(0);
 
             ////            fileHelper.initFileUpload(elemFileUpload, datacontext.getWellFileUrl({
-            ////                well_id: self.Id,
+            ////                well_id: ths.Id,
             ////                purpose: elemValue.id,
             ////                status: 'work'
             ////            }), elemValue.formatList, function () {
-            ////                self.getWellFileList();
+            ////                ths.getWellFileList();
             ////            });
             ////        }
             ////    });
 
-            ////    self.getWellFileList();
+            ////    ths.getWellFileList();
             ////    var submitFunction = function () {
             ////        // get checked (selected) files
-            ////        var checkedWellFiles = $.map(self.WellFiles(), function (elemValue) {
+            ////        var checkedWellFiles = $.map(ths.WellFiles(), function (elemValue) {
             ////            if (elemValue.isChecked() === true) {
             ////                return elemValue;
             ////            }
@@ -771,18 +785,18 @@ define([
         };
 
         /** Sketch of well: by default - empty */
-        this.sketchOfWell = new SketchOfWell(self);
+        this.sketchOfWell = new SketchOfWell(ths);
 
-        self.sketchHashString = ko.observable(new Date().getTime());
+        this.sketchHashString = ko.observable(new Date().getTime());
 
-        self.volumeHashString = ko.observable(new Date().getTime());
+        this.volumeHashString = ko.observable(new Date().getTime());
 
-        self.putWell = function () {
-            datacontext.saveChangedWell(self);
+        this.putWell = function () {
+            datacontext.saveChangedWell(ths);
         };
 
-        self.chooseMainFile = function (purpose) {
-            self.selectedFmgSectionId(purpose);
+        this.chooseMainFile = function (purpose) {
+            ths.selectedFmgSectionId(purpose);
             var callbackFunction = function (checkedWellFileList) {
                 if (checkedWellFileList.length !== 1) {
                     alert('Need to select one image');
@@ -798,25 +812,25 @@ define([
                 bootstrapModal.closeModalFileManager();
 
                 var urlQueryParams = {
-                    well_id: self.Id,
+                    well_id: ths.Id,
                     purpose: checkedFile.Purpose,
                     status: checkedFile.Status(),
                     file_name: checkedFile.Name(),
-                    dest_well_id: self.Id,
+                    dest_well_id: ths.Id,
                     dest_purpose: checkedFile.Purpose,
                     dest_status: checkedFile.Status(),
                     dest_file_name: 'main.' + purpose
                 };
 
                 datacontext.getWellFiles(urlQueryParams).done(function () {
-                    self[purpose + 'HashString'](new Date().getTime());
+                    ths[purpose + 'HashString'](new Date().getTime());
                 });
             };
 
-            self.showFmg(callbackFunction);
+            ths.showFmg(callbackFunction);
         };
 
-        self.editField = function (wellProp) {
+        this.editField = function (wellProp) {
             ////console.log(wellProp);
             var fieldName = wellProp.id,
                 fieldTitle = wellProp.ttl,
@@ -826,7 +840,7 @@ define([
             // draw window with this field
             var inputField;
 
-            var tmpFieldValue = ko.unwrap(self[fieldName]);
+            var tmpFieldValue = ko.unwrap(ths[fieldName]);
 
             if (inputType === 'SingleLine') {
                 inputField = document.createElement('input');
@@ -846,49 +860,49 @@ define([
             );
 
             function submitFunction() {
-                self[fieldName]($(inputField).val());
-                self.putWell();
+                ths[fieldName]($(inputField).val());
+                ths.putWell();
                 bootstrapModal.closeModalWindow();
             }
 
             bootstrapModal.openModalWindow('{{capitalizeFirst lang.toEdit}}', innerDiv, submitFunction);
         };
 
-        self.MainSketchUrl = ko.computed({
+        this.MainSketchUrl = ko.computed({
             read: function () {
                 return datacontext.getWellFileUrl({
-                    well_id: self.Id,
+                    well_id: ths.Id,
                     purpose: 'sketch',
                     status: 'work',
                     file_name: 'main.sketch'
-                }) + '&hashstring=' + self.sketchHashString();
+                }) + '&hashstring=' + ths.sketchHashString();
             },
             deferEvaluation: true
         });
 
-        self.MainVolumeUrl = ko.computed({
+        this.MainVolumeUrl = ko.computed({
             read: function () {
                 return datacontext.getWellFileUrl({
-                    well_id: self.Id,
+                    well_id: ths.Id,
                     purpose: 'volume',
                     status: 'work',
                     file_name: 'main.volume'
-                }) + '&hashstring=' + self.volumeHashString();
+                }) + '&hashstring=' + ths.volumeHashString();
             },
             deferEvaluation: true
         });
 
-        self.editWell = function () {
+        this.editWell = function () {
             var inputName = document.createElement('input');
             inputName.type = 'text';
-            $(inputName).val(self.Name()).prop({ 'required': true });
+            $(inputName).val(ths.Name()).prop({ 'required': true });
 
             var inputDescription = document.createElement('input');
             inputDescription.type = 'text';
-            $(inputDescription).val(self.Description());
+            $(inputDescription).val(ths.Description());
 
             var inputProductionHistory = document.createElement('textarea');
-            $(inputProductionHistory).val(self.ProductionHistory()).prop("rows", 5);
+            $(inputProductionHistory).val(ths.ProductionHistory()).prop("rows", 5);
 
             var innerDiv = document.createElement('div');
             $(innerDiv).addClass('form-horizontal').append(
@@ -898,13 +912,13 @@ define([
             );
 
             function submitFunction() {
-                self.Name($(inputName).val());
-                self.Description($(inputDescription).val());
-                self.ProductionHistory($(inputProductionHistory).val());
-                datacontext.saveChangedWell(self).done(function (result) {
-                    self.Name(result.Name);
-                    self.Description(result.Description);
-                    self.ProductionHistory(result.ProductionHistory);
+                ths.Name($(inputName).val());
+                ths.Description($(inputDescription).val());
+                ths.ProductionHistory($(inputProductionHistory).val());
+                datacontext.saveChangedWell(ths).done(function (result) {
+                    ths.Name(result.Name);
+                    ths.Description(result.Description);
+                    ths.ProductionHistory(result.ProductionHistory);
                 });
                 bootstrapModal.closeModalWindow();
             }
@@ -912,20 +926,20 @@ define([
             bootstrapModal.openModalWindow("Well", innerDiv, submitFunction);
         };
 
-        self.deleteWellFile = function () {
+        this.deleteWellFile = function () {
             var wellFileForDelete = this;
             if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + wellFileForDelete.Name() + '"?')) {
                 datacontext.deleteWellFile(wellFileForDelete).done(function () {
-                    self.WellFiles.remove(wellFileForDelete);
+                    ths.WellFiles.remove(wellFileForDelete);
                 });
             }
         };
 
         // without archive
-        ////self.invertWellFileStatus = function () {
+        ////ths.invertWellFileStatus = function () {
         ////    var invertWellFile = this;
         ////    var urlQueryParams = {
-        ////        well_id: self.Id,
+        ////        well_id: ths.Id,
         ////        purpose: invertWellFile.Purpose,
         ////        status: invertWellFile.Status(),
         ////        file_name: invertWellFile.Name(),
@@ -941,23 +955,23 @@ define([
         ////            // delete old file
         ////            datacontext.deleteWellFile(invertWellFile).done(function () {
         ////                // update list
-        ////                self.getWellFileList();
+        ////                ths.getWellFileList();
         ////            });
         ////        }
         ////    });
         ////};
 
         // ================================================================= Well log section begin ==============================================
-        self.wellLogSelectedFile = ko.observable();
+        this.wellLogSelectedFile = ko.observable();
 
         // TODO: change to computed from wellLogSelectedFile
-        self.WellLogImageUrl = ko.observable();
+        this.WellLogImageUrl = ko.observable();
 
-        self.IsLogImageEditable = ko.observable(false);
+        this.IsLogImageEditable = ko.observable(false);
 
-        self.checkedLogTool = ko.observable('tool-hand');
+        this.checkedLogTool = ko.observable('tool-hand');
 
-        self.checkedLogTool.subscribe(function (newValue) {
+        this.checkedLogTool.subscribe(function (newValue) {
 
             var $drawCnvsLog = $('#draw_cnvs_log');
             $drawCnvsLog.hide();
@@ -986,7 +1000,7 @@ define([
             }
         });
 
-        self.drawLogText = function (currentWellItem, event) {
+        this.drawLogText = function (currentWellItem, event) {
             var drawTextBlock = event.currentTarget;
             ////drawTextBlock.style.filter = 'alpha(opacity=50)';
             // coord accordingly drawTextBlock
@@ -997,12 +1011,12 @@ define([
             });
         };
 
-        self.startLogImageEdit = function () {
-            self.IsLogImageEditable(!self.IsLogImageEditable());
+        this.startLogImageEdit = function () {
+            ths.IsLogImageEditable(!ths.IsLogImageEditable());
             var cnvs = document.getElementById('log_cnvs');
             var cntx = cnvs.getContext('2d');
             cntx.clearRect(0, 0, cnvs.width, cnvs.height);
-            self.checkedLogTool('tool-hand');
+            ths.checkedLogTool('tool-hand');
 
             var maxCanvasHeight = 480;
 
@@ -1033,13 +1047,13 @@ define([
             ////$(textCnvsLog).css({ 'width': logImg.clientWidth });
         };
 
-        self.cancelLogImageEdit = function () {
-            self.IsLogImageEditable(false);
+        this.cancelLogImageEdit = function () {
+            ths.IsLogImageEditable(false);
         };
 
-        self.saveWellLogSelectedFileImagePart = function () {
+        this.saveWellLogSelectedFileImagePart = function () {
             //public HttpResponseMessage Post([FromUri] int well_id, [FromUri] string purpose, [FromUri] string status, [FromUri] string file_name, [FromBody] ByteImagePart byteImagePart)
-            var selectedFile = self.wellLogSelectedFile();
+            var selectedFile = ths.wellLogSelectedFile();
 
             // need select before save
             if (!selectedFile) { return; }
@@ -1061,8 +1075,8 @@ define([
                 });
 
                 datacontext.postWellFile(urlQueryParams, createdByteImagePart).done(function (response, statusText, request) {
-                    self.IsLogImageEditable(false);
-                    self.WellLogImageUrl(request.getResponseHeader('Location') + '#' + appMoment().format('mmss'));
+                    ths.IsLogImageEditable(false);
+                    ths.WellLogImageUrl(request.getResponseHeader('Location') + '#' + appMoment().format('mmss'));
                 });
             });
         };
@@ -1070,75 +1084,75 @@ define([
         // ==================================================================== Well log section end ========================================
         // ==================================================================== Well perfomance begin ========================================
 
-        self.perfomancePartial = wellPerfomancePartial.init(self);
+        this.perfomancePartial = wellPerfomancePartial.init(ths);
 
         // Load column attributes - all loading logic in this file (not separated - not in perfomance-partial file)
-        self.perfomancePartial.prdColumnAttributeList(importColumnAttributesDto(datacontext.getColumnAttributesLocal()));
+        this.perfomancePartial.prdColumnAttributeList(importColumnAttributesDto(datacontext.getColumnAttributesLocal()));
 
-        self.mainPerfomanceView = self.perfomancePartial.createPerfomanceView({
+        this.mainPerfomanceView = ths.perfomancePartial.createPerfomanceView({
             isVisibleForecastData: false
         });
 
         // Well widget layouts
         // Well widget layout -> widget block -> widget
-        self.wellWidgoutList = ko.observableArray();
+        this.wellWidgoutList = ko.observableArray();
 
-        self.possibleWidgoutList = datacontext.getPossibleWidgoutList();
+        this.possibleWidgoutList = datacontext.getPossibleWidgoutList();
 
         // Selected possible widget layout for adding to widget layout list
-        self.slcPossibleWidgout = ko.observable();
+        this.slcPossibleWidgout = ko.observable();
 
-        self.postWellWidgout = function () {
-            var wellWidgoutData = ko.unwrap(self.slcPossibleWidgout);
+        this.postWellWidgout = function () {
+            var wellWidgoutData = ko.unwrap(ths.slcPossibleWidgout);
             if (wellWidgoutData) {
-                datacontext.postWellWidgout(self.Id, wellWidgoutData).done(function (createdWellWidgoutData) {
+                datacontext.postWellWidgout(ths.Id, wellWidgoutData).done(function (createdWellWidgoutData) {
                     require(['models/widgout'], function (Widgout) {
-                        var widgoutNew = new Widgout(createdWellWidgoutData, self);
-                        self.wellWidgoutList.push(widgoutNew);
-                        self.selectedWellWidgout(widgoutNew);
-                        self.slcPossibleWidgout(null);
+                        var widgoutNew = new Widgout(createdWellWidgoutData, ths);
+                        ths.wellWidgoutList.push(widgoutNew);
+                        ths.selectedWellWidgout(widgoutNew);
+                        ths.slcPossibleWidgout(null);
                     });
                 });
             }
         };
 
-        self.deleteWellWidgout = function () {
-            var wellWidgoutToDelete = ko.unwrap(self.selectedWellWidgout);
+        this.deleteWellWidgout = function () {
+            var wellWidgoutToDelete = ko.unwrap(ths.selectedWellWidgout);
             if (wellWidgoutToDelete) {
                 if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(wellWidgoutToDelete.name) + '"?')) {
-                    datacontext.deleteWellWidgout(self.Id, wellWidgoutToDelete.id).done(function () {
-                        self.wellWidgoutList.remove(wellWidgoutToDelete);
+                    datacontext.deleteWellWidgout(ths.Id, wellWidgoutToDelete.id).done(function () {
+                        ths.wellWidgoutList.remove(wellWidgoutToDelete);
                     });
                 }
             }
         };
 
-        self.selectedWellWidgout = ko.observable();
+        this.selectedWellWidgout = ko.observable();
 
-        self.isLoadedWellWidgoutList = ko.observable(false);
+        this.isLoadedWellWidgoutList = ko.observable(false);
 
-        self.getWellWidgoutList = function () {
-            if (!ko.unwrap(self.isLoadedWellWidgoutList)) {
-                datacontext.getWellWidgoutList(self.Id).done(function (response) {
+        this.getWellWidgoutList = function () {
+            if (!ko.unwrap(ths.isLoadedWellWidgoutList)) {
+                datacontext.getWellWidgoutList(ths.Id).done(function (response) {
                     require(['models/widgout'], function (Widgout) {
                         // Well widget layout list
                         function importWidgoutList(data, parentItem) {
                             return $.map(data || [], function (item) { return new Widgout(item, parentItem); });
                         }
 
-                        self.wellWidgoutList(importWidgoutList(response, self));
-                        self.isLoadedWellWidgoutList(true);
+                        ths.wellWidgoutList(importWidgoutList(response, ths));
+                        ths.isLoadedWellWidgoutList(true);
                     });
                 });
             }
         };
 
         /** Load well sections */
-        self.listOfSection(importSectionList(data.ListOfSectionOfWellDto, self));
+        this.listOfSection(importSectionList(data.ListOfSectionOfWellDto, ths));
 
         // ==================================================================== Well perfomance section end ========================================
 
-        self.toPlainJson = function () {
+        this.toPlainJson = function () {
             // add other props
             ////public int Id { get; set; }
             ////public int WellGroupId { get; set; }
@@ -1147,15 +1161,15 @@ define([
             ////public string Comment { get; set; }
             // Join two property arrays
             var tmpPropList = ['Id', 'WellGroupId', 'WellType', 'FlowType', 'Comment'];
-            $.each(self.wellPropertyList, function (propIndex, propValue) {
+            $.each(ths.wellPropertyList, function (propIndex, propValue) {
                 tmpPropList.push(propValue.id);
             });
 
             var objReady = {};
             $.each(tmpPropList, function (propIndex, propValue) {
                 // null can be sended to ovveride current value to null
-                if (typeof ko.unwrap(self[propValue]) !== 'undefined') {
-                    objReady[propValue] = ko.unwrap(self[propValue]);
+                if (typeof ko.unwrap(ths[propValue]) !== 'undefined') {
+                    objReady[propValue] = ko.unwrap(ths[propValue]);
                 }
             });
 

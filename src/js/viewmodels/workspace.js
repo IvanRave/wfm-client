@@ -114,11 +114,11 @@ define([
             ////        if (tmpRegion) {
             ////            ths.selectedWellRegion(tmpRegion);
             ////            tmpRegion.isOpenItem(true);
-            ////            var tmpField = appHelper.getElementByPropertyValue(ths.selectedWellRegion().WellFields(), 'Id', choosedObj.fieldId);
+            ////            var tmpField = appHelper.getElementByPropertyValue(ths.selectedWellRegion().wields(), 'Id', choosedObj.fieldId);
             ////            if (tmpField) {
             ////                ths.selectedWellRegion().selectedWield(tmpField);
             ////                tmpField.isOpenItem(true);
-            ////                var tmpGroup = appHelper.getElementByPropertyValue(ths.selectedWellRegion().selectedWield().WellGroups(), 'Id', choosedObj.groupId);
+            ////                var tmpGroup = appHelper.getElementByPropertyValue(ths.selectedWellRegion().selectedWield().wroups(), 'Id', choosedObj.groupId);
             ////                if (tmpGroup) {
             ////                    ths.selectedWellRegion().selectedWield().selectedWroup(tmpGroup);
             ////                    tmpGroup.isOpenItem(true);
@@ -146,11 +146,6 @@ define([
             ////            }
             ////        }
             ////    }
-
-            ////    datacontext.getWellRegionList({
-            ////        company_id: companyId,
-            ////        is_inclusive: true
-            ////    }).done(getSucceeded);
             ////}
 
             //     loadStructure();

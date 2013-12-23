@@ -5,10 +5,10 @@
         <div class="pull-left">
           <span class="pointer" data-bind="click: $parent.selectEmployee">
             <span data-bind="with: company">
-              <span data-bind="if: urlOfLogo">
-                <img class="company-logo" src="#" data-bind="attr: {src: urlOfLogo, width: getPropSpecByClientId('urlOfLogo').addtData.width }" title="{{capitalizeFirst lang.toView}} {{lang.wfm}}" />
+              <span data-bind="with: fileSpecOfLogo">
+                <img class="company-logo" src="#" data-bind="attr: {src: fileUrl, width: $parent.getPropSpecByClientId('fileSpecOfLogo').addtData.width }" title="{{capitalizeFirst lang.toView}} {{lang.wfm}}" />
               </span>
-              <span data-bind="ifnot: urlOfLogo">
+              <span data-bind="ifnot: fileSpecOfLogo">
                 <img class="company-logo" src="img/question.jpg"></img>
               </span>
             </span>

@@ -20,7 +20,7 @@
         <div class="clearfix">
           <div class="pull-left">
             <i class="glyphicon glyphicon-circle-arrow-down" data-bind="visible: $data === $parent.selectedWieldMap()"></i>
-            <i class="glyphicon glyphicon-circle-arrow-right" data-bind="visible: $data != $parent.selectedWieldMap()"></i>
+            <i class="glyphicon glyphicon-circle-arrow-right" data-bind="visible: $data !== $parent.selectedWieldMap()"></i>
             <a href="#" data-bind="click: showWellFieldMap, attr: { title: Description }">
               <span data-bind="text: name"></span>
             </a>

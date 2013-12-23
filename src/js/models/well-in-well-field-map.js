@@ -35,10 +35,10 @@
 
         self.getWell = function () {
             var wellFieldItem = self.getWellFieldMap().getWellField();
-            for (var WellGroupKey = 0; WellGroupKey < wellFieldItem.WellGroups().length; WellGroupKey++) {
-                for (var WellKey = 0; WellKey < wellFieldItem.WellGroups()[WellGroupKey].Wells().length; WellKey++) {
-                    if (wellFieldItem.WellGroups()[WellGroupKey].Wells()[WellKey].Id === self.WellId) {
-                        return wellFieldItem.WellGroups()[WellGroupKey].Wells()[WellKey];
+            for (var WellGroupKey = 0; WellGroupKey < wellFieldItem.wroups().length; WellGroupKey++) {
+                for (var WellKey = 0; WellKey < wellFieldItem.wroups()[WellGroupKey].Wells().length; WellKey++) {
+                    if (wellFieldItem.wroups()[WellGroupKey].Wells()[WellKey].Id === self.WellId) {
+                        return wellFieldItem.wroups()[WellGroupKey].Wells()[WellKey];
                     }
                 }
             }
