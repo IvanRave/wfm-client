@@ -5,13 +5,15 @@ define(['jquery',
     'helpers/file-helper',
     'helpers/modal-helper',
     'models/stage-base',
-    'models/well-field-map',
+    'models/map-of-wield',
     'models/sections/section-of-wield',
     'models/wroup',
     'models/prop-spec',
     'services/wield',
-    'services/wroup'], function ($, ko, datacontext,
-        fileHelper, bootstrapModal, StageBase, WellFieldMap, SectionOfWield, WellGroup, PropSpec, wieldService, wroupService) {
+    'services/wroup',
+    'models/stage-constants'], function ($, ko, datacontext,
+        fileHelper, bootstrapModal, StageBase, WellFieldMap, SectionOfWield, WellGroup,
+        PropSpec, wieldService, wroupService, stageConstants) {
         'use strict';
 
         // 10. WellFieldMaps (convert data objects into array)
@@ -65,7 +67,7 @@ define(['jquery',
             this.idOfWegion = data.WellRegionId;
 
             // Add identical properties for all stages (well, field, group, regions, company)
-            StageBase.call(this, data);
+            StageBase.call(this, data, stageConstants.wield.id);
 
             /**
             * List of groups
@@ -123,7 +125,7 @@ define(['jquery',
 
             /**
             * List of maps
-            * @type {Array.<module:models/well-field-map>}
+            * @type {Array.<module:models/map-of-wield>}
             */
             this.WellFieldMaps = ko.observableArray();
 
@@ -152,7 +154,7 @@ define(['jquery',
             };
 
             this.deleteWellFieldMap = function (itemToDelete) {
-                if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(itemToDelete.fileSpec.name) + '"?')) {
+                if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(itemToDelete.name) + '"?')) {
                     datacontext.deleteWellFieldMap(ths.Id, itemToDelete.Id).done(function () {
                         ths.WellFieldMaps.remove(itemToDelete);
                     });
@@ -225,12 +227,6 @@ define(['jquery',
 
                 // Open file manager
                 tmpModalFileMgr.show();
-            };
-
-            this.isOpenItem = ko.observable(false);
-
-            this.toggleItem = function () {
-                ths.isOpenItem(!ths.isOpenItem());
             };
 
             /** Whether item and parent are selected */

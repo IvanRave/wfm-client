@@ -68,35 +68,38 @@
                                                 </div>
                                             </div>
                                             <div class="workspace-container" data-bind="with: company, css: $root.workAreaCss">
-                                                <div class="wfm-top-tab-panel clearfix">
-                                                    <div class="pull-left" style="margin-top:1px">
-                                                        <button class="btn btn-inverse btn-sm" type="button" data-bind="click: modalFileMgr.show">
-                                                            <i class="glyphicon glyphicon-folder-open"></i>&nbsp;&nbsp;<span>{{capitalizeFirst lang.fileManager}}</span>
-                                                        </button>
-                                                    </div>
+                                                <div class="wfm-top-tab-panel file-mgr-block">
+                                                    <button class="btn btn-inverse btn-sm" type="button" data-bind="click: modalFileMgr.show">
+                                                        <i class="glyphicon glyphicon-folder-open"></i>&nbsp;&nbsp;<span>{{capitalizeFirst lang.fileManager}}</span>
+                                                    </button>
                                                 </div>
                                                 {{> modal-file-mgr }}
                                                 <div data-bind="ifnot: selectedWegion">
-													{{> section-panel-standard }}
-													{{> company }}
+                                                    {{> section-panel-standard }}
+													{{> dashboard-block }}
+                                                    {{> company }}
                                                 </div>
                                                 <div data-bind="with: selectedWegion">
                                                     <div data-bind="ifnot: selectedWield">
-														{{> section-panel-standard }}
+                                                        {{> section-panel-standard }}
+														{{> dashboard-block }}
                                                         {{> wegion }}
                                                     </div>
                                                     <div data-bind="with: selectedWield">
                                                         <div data-bind="ifnot: selectedWroup">
-															{{> section-panel-standard }}
+                                                            {{> section-panel-standard }}
+															{{> dashboard-block }}
                                                             {{> wield }}
                                                         </div>
                                                         <div data-bind="with: selectedWroup">
                                                             <div data-bind="ifnot: selectedWell">
-																{{> section-panel-standard }}
+                                                                {{> section-panel-standard }}
+																{{> dashboard-block }}
                                                                 {{> wroup }}
                                                             </div>
                                                             <div data-bind="with: selectedWell">
-																{{> section-panel-well }}
+                                                                {{> section-panel-well }}
+																{{> dashboard-block }}
                                                                 {{> well }}
                                                             </div>
                                                         </div>

@@ -1,5 +1,8 @@
 ﻿<div>
   <div class="tab-content-pad">
+    <div data-bind="if: selectedSection() === null">
+      {{> widget-scope}}
+    </div>
     <div data-bind="if: selectedSection">
       <div data-bind="if: selectedSection().sectionPatternId === 'wield-map'">
         {{> wield-map}}

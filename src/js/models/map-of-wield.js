@@ -1,22 +1,20 @@
 ﻿/** @module */
 define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
     'helpers/app-helper', 'models/file-spec',
-    'models/well-field-map-area', 'models/well-in-well-field-map'],
+    'models/area-of-map-of-wield', 'models/well-of-map-of-wield'],
     function ($, ko, datacontext, bootstrapModal, appHelper, FileSpec) {
         'use strict';
 
-        function importWellFieldMapAreasDto(items, parent) {
-            return $.map(items || [],
-                function (itemData) {
-                    return datacontext.createWellFieldMapArea(itemData, parent);
-                });
+        function importWellFieldMapAreasDto(data, parent) {
+            return (data || []).map(function (item) {
+                return datacontext.createWellFieldMapArea(item, parent);
+            });
         }
 
-        function importWellInWellFieldMapsDto(items, parent) {
-            return $.map(items || [],
-                function (itemData) {
-                    return datacontext.createWellInWellFieldMap(itemData, parent);
-                });
+        function importWellInWellFieldMapsDto(data, parent) {
+            return (data || []).map(function (item) {
+                return datacontext.createWellInWellFieldMap(item, parent);
+            });
         }
 
         /**

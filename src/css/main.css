@@ -437,6 +437,28 @@ footer {
             color: #fefefe;
         }
 
+@media screen and (min-width: 768px) {
+    .wfm-top-tab-panel {
+        position: fixed;
+        top: 0;
+        z-index: 1031;
+        padding-top: 1px;
+    }
+
+        .wfm-top-tab-panel.edit-mode-block {
+            top: 5px;
+            right: 100px;
+        }
+
+        .wfm-top-tab-panel.dashboard-block {
+            left: 220px;
+        }
+
+        .wfm-top-tab-panel.file-mgr-block {
+            left: 330px;
+        }
+}
+
 @media screen and (min-width: 992px) {
     /*workspace menu*/
     .sidebar-toggle {
@@ -465,12 +487,6 @@ footer {
     .wfm-bottom-fix {
         position: fixed;
         bottom: 0;
-        z-index: 1031;
-    }
-
-    .wfm-top-tab-panel {
-        position: fixed;
-        top: 0;
         z-index: 1031;
     }
 

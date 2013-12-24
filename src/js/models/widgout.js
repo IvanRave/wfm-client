@@ -1,40 +1,44 @@
-﻿define(['jquery', 'knockout', 'services/datacontext'], function ($, ko, appDatacontext) {
+﻿/** @module */
+define(['knockout', 'models/widgock', 'services/widgout'], function (ko, Widgock, widgoutService) {
     'use strict';
 
-    // Widget layout
-    function Widgout(data, parent) {
-        var self = this;
+    /** Import widget block list to layout */
+    function importWidgockList(data, widgoutItem) {
+        return (data || []).map(function (item) { return new Widgock(item, widgoutItem); });
+    }
+
+    /**
+    * Widget layout
+    * @constructor
+    */
+    var exports = function (data, parent) {
+        var ths = this;
         data = data || {};
 
-        self.getParent = function () {
+        this.getParent = function () {
             return parent;
         };
 
-        self.id = data.Id;
-        self.name = ko.observable(data.Name);
+        this.id = data.Id;
+        this.name = ko.observable(data.Name);
 
-        self.putWellWidgout = function () {
+        this.save = function () {
             // Get well id as parent
-            appDatacontext.putWellWidgout(self.getParent().Id, self.id, {
-                id: self.id,
-                name: ko.unwrap(self.name)
+            var tmpStageId = ths.getParent().Id || ths.getParent().id;
+
+            widgoutService.put('well', tmpStageId, ths.id, {
+                id: ths.id,
+                name: ko.unwrap(ths.name)
             });
         };
 
-        self.name.subscribe(self.putWellWidgout);
+        this.name.subscribe(ths.save);
 
         // Well widget block list
-        self.widgockList = ko.observableArray();
+        this.widgockList = ko.observableArray();
 
-        // Load widget block list
-        require(['models/widgock'], function (Widgock) {
-            function importWidgockList(data, widgoutItem) {
-                return $.map(data || [], function (item) { return new Widgock(item, widgoutItem); });
-            }
+        this.widgockList(importWidgockList(data.WidgockDtoList, ths));
+    };
 
-            self.widgockList(importWidgockList(data.WidgockDtoList, self));
-        });
-    }
-
-    return Widgout;
+    return exports;
 });

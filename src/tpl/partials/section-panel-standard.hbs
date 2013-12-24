@@ -1,15 +1,15 @@
 ﻿<div class="wfm-section-panel wfm-bottom-fix clearfix">
-    <div class="pull-left">
-        <ul class="nav nav-pills" data-bind="foreach: listOfSection">
-            <li data-bind="css: {'active': isSelectedSection }">
-                <div data-bind="click: $parent.selectSection">
-                    <span data-bind="with: sectionPattern">
-                        <span data-bind="text: name"></span>
-                    </span>
-                    <br />
-                    <i class="wfmicon" data-bind="css: 'wfmicon-summary'"></i>
-                </div>
-            </li>
-        </ul>
-    </div>
+  <div class="pull-left">
+    <ul class="nav nav-pills" data-bind="foreach: listOfSection">
+      <li data-bind="css: {'active': isSelectedSection }">
+        <div data-bind="click: $parent.selectSection">
+          <span data-bind="with: sectionPattern">
+            <span data-bind="text: name"></span>
+          </span>
+          <br />
+          <i class="wfmicon" data-bind="css: 'wfmicon-summary'"></i>
+        </div>
+      </li>
+    </ul>
+  </div>
 </div>

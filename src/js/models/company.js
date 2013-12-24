@@ -1,9 +1,9 @@
 ﻿/** @module */
 define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/datacontext',
     'helpers/modal-helper', 'helpers/history-helper', 'models/stage-base', 'models/sections/section-of-company',
-    'models/prop-spec', 'services/company', 'models/file-spec', 'services/wegion',
+    'models/prop-spec', 'services/company', 'models/file-spec', 'services/wegion', 'models/stage-constants',
     'helpers/knockout-lazy'], function ($, ko, Wegion, JobType, appDatacontext, modalHelper, historyHelper,
-        StageBase, SectionOfCompany, PropSpec, companyService, FileSpec, wegionService) {
+        StageBase, SectionOfCompany, PropSpec, companyService, FileSpec, wegionService, stageConstants) {
         'use strict';
 
         /** Import well regions for company */
@@ -57,7 +57,7 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
             this.propSpecList = companyPropSpecList;
 
             /** Base for all stages */
-            StageBase.call(this, data);
+            StageBase.call(this, data, stageConstants.company.id);
 
             /**
             * List of well regions

@@ -8,7 +8,9 @@ define(['jquery',
     'models/sections/section-of-wroup',
     'models/stage-base',
     'models/prop-spec',
-    'services/wroup'], function ($, ko, datacontext, bootstrapModal, Well, WellGroupWfmParameter, SectionOfWroup, StageBase, PropSpec, wroupService) {
+    'services/wroup',
+    'models/stage-constants'], function ($, ko, datacontext, bootstrapModal, Well, WellGroupWfmParameter,
+        SectionOfWroup, StageBase, PropSpec, wroupService, stageConstants) {
         'use strict';
 
         // 18. WellGroupWfmParameter
@@ -68,7 +70,7 @@ define(['jquery',
             this.propSpecList = wroupPropSpecList;
 
             /** Base for all stages */
-            StageBase.call(this, data);
+            StageBase.call(this, data, stageConstants.wroup.id);
 
             /**
             * List of well for this group
@@ -312,12 +314,6 @@ define(['jquery',
 
             this.save = function () {
                 wroupService.put(ths.Id, ths.toDto());
-            };
-
-            this.isOpenItem = ko.observable(false);
-
-            this.toggleItem = function () {
-                ths.isOpenItem(!ths.isOpenItem());
             };
 
             /** Whether item and parent are selected */

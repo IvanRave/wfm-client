@@ -1,7 +1,10 @@
 ﻿<div class="tab-content-pad">
-    <div data-bind="if: selectedSection">
-        <div data-bind="if: selectedSection().sectionPatternId === 'wegion-summary'">
-            {{> summary-standard }}
-        </div>
+  <div data-bind="if: selectedSection() === null">
+    {{> widget-scope}}
+  </div>
+  <div data-bind="if: selectedSection">
+    <div data-bind="if: selectedSection().sectionPatternId === 'wegion-summary'">
+      {{> summary-standard }}
     </div>
+  </div>
 </div>

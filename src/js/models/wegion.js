@@ -7,8 +7,9 @@ define(['jquery',
     'models/sections/section-of-wegion',
     'models/prop-spec',
     'services/wegion',
-    'services/wield'], function ($, ko, datacontext, bootstrapModal,
-        WellField, StageBase, SectionOfWegion, PropSpec, wegionService, wieldService) {
+    'services/wield',
+    'models/stage-constants'], function ($, ko, datacontext, bootstrapModal,
+        WellField, StageBase, SectionOfWegion, PropSpec, wegionService, wieldService, stageConstants) {
         'use strict';
 
         // 2. WellField (convert data objects into array)
@@ -49,7 +50,7 @@ define(['jquery',
             this.propSpecList = wegionPropSpecList;
 
             /** Base for all stages */
-            StageBase.call(this, data);
+            StageBase.call(this, data, stageConstants.wegion.id);
 
             /** 
             * Select section
@@ -57,13 +58,6 @@ define(['jquery',
             */
             this.selectSection = function (sectionToSelect) {
                 ths.selectedSection(sectionToSelect);
-            };
-
-            this.isOpenItem = ko.observable(false);
-
-            // toggle item - only open menu tree (show inner object without content)
-            this.toggleItem = function () {
-                ths.isOpenItem(!ths.isOpenItem());
             };
 
             /** Is selected item */

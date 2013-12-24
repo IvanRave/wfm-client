@@ -1,11 +1,6 @@
 ﻿<div>
   <div class="wfm-top-tab-panel clearfix" style="left: 500px">
     <div class="pull-left" style="margin-top:1px">
-      <button class="btn btn-inverse btn-sm" type="button" data-bind="click: unselectSection">
-        <i class="glyphicon glyphicon-th"></i>&nbsp;&nbsp;<span>{{capitalizeFirst lang.well}} {{lang.dashboard}}</span>
-      </button>
-    </div>
-    <div class="pull-left" style="margin-top:1px">
       <button class="btn btn-inverse btn-sm" type="button" data-bind="click: showFmg">
         <i class="glyphicon glyphicon-folder-open"></i>&nbsp;&nbsp;<span>{{capitalizeFirst lang.fileManager}}</span>
       </button>
@@ -13,6 +8,14 @@
   </div>
 
   <div class="tab-content-pad">
+    <div data-bind="if: selectedSection() === null">
+      {{> widget-perfomance}}
+      {{> widget-sketch}}
+      {{> widget-summary}}
+      {{> widget-history}}
+
+      {{> widget-scope}}
+    </div>
     <div data-bind="if: selectedSection">
       <div data-bind="if: selectedSection().sectionPatternId === 'well-history'">
         {{> well-history}}
@@ -46,11 +49,6 @@
       </div>
       <div data-bind="if: selectedSection().sectionPatternId === 'well-volume'">
         {{> well-volume}}
-      </div>
-    </div>
-    <div data-bind="ifnot: selectedSection">
-      <div data-bind="if: selectedSection() === null">
-        {{> well-widget-scope}}
       </div>
     </div>
   </div>

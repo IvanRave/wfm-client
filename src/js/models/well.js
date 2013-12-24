@@ -15,11 +15,12 @@ define([
     'models/well/sketch',
     'models/prop-spec',
     'services/well',
+    'models/stage-constants',
     'models/column-attribute',
     'models/well-history',
     'models/test-scope'
 ], function ($, ko, datacontext, fileHelper, bootstrapModal,
-    appHelper, appMoment, StageBase, wellPerfomancePartial, HistoryView, SectionOfWell, WellFile, SketchOfWell, PropSpec, wellService) {
+    appHelper, appMoment, StageBase, wellPerfomancePartial, HistoryView, SectionOfWell, WellFile, SketchOfWell, PropSpec, wellService, stageConstants) {
     'use strict';
 
     /** WellFiles (convert data objects into array) */
@@ -112,7 +113,7 @@ define([
         this.propSpecList = wellPropSpecList;
 
         /** Add props to constructor */
-        StageBase.call(this, data);
+        StageBase.call(this, data, stageConstants.well.id);
 
         /** 
         * Well comment
@@ -252,18 +253,8 @@ define([
             }
         };
 
-        /** Unselect section: show dashboard with widgets */
-        this.unselectSection = function () {
-            ////window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
-            ////    region: ths.getWellGroup().getWellField().getWellRegion().Id,
-            ////    field: ths.getWellGroup().getWellField().Id,
-            ////    group: ths.getWellGroup().Id,
-            ////    well: ths.Id
-            ////});
-
-            ths.selectedSection(null);
+        this.loadDashboard = function () {
             ths.sketchOfWell.load();
-            ths.getWellWidgoutList();
             // TODO: load data only if there is one or more perfomance widgets (only once) for entire well
             ths.getWellGroup().getWellGroupWfmParameterList();
             ths.perfomancePartial.forecastEvolution.getDict();
@@ -297,12 +288,6 @@ define([
             },
             deferEvaluation: true
         });
-
-        this.isOpenItem = ko.observable(false);
-
-        this.toggleItem = function () {
-            ths.isOpenItem(!ths.isOpenItem());
-        };
 
         /** Whether item and parent are selected */
         this.isSelectedItem = ko.computed({
@@ -1072,60 +1057,6 @@ define([
         this.mainPerfomanceView = ths.perfomancePartial.createPerfomanceView({
             isVisibleForecastData: false
         });
-
-        // Well widget layouts
-        // Well widget layout -> widget block -> widget
-        this.wellWidgoutList = ko.observableArray();
-
-        this.possibleWidgoutList = datacontext.getPossibleWidgoutList();
-
-        // Selected possible widget layout for adding to widget layout list
-        this.slcPossibleWidgout = ko.observable();
-
-        this.postWellWidgout = function () {
-            var wellWidgoutData = ko.unwrap(ths.slcPossibleWidgout);
-            if (wellWidgoutData) {
-                datacontext.postWellWidgout(ths.Id, wellWidgoutData).done(function (createdWellWidgoutData) {
-                    require(['models/widgout'], function (Widgout) {
-                        var widgoutNew = new Widgout(createdWellWidgoutData, ths);
-                        ths.wellWidgoutList.push(widgoutNew);
-                        ths.selectedWellWidgout(widgoutNew);
-                        ths.slcPossibleWidgout(null);
-                    });
-                });
-            }
-        };
-
-        this.deleteWellWidgout = function () {
-            var wellWidgoutToDelete = ko.unwrap(ths.selectedWellWidgout);
-            if (wellWidgoutToDelete) {
-                if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(wellWidgoutToDelete.name) + '"?')) {
-                    datacontext.deleteWellWidgout(ths.Id, wellWidgoutToDelete.id).done(function () {
-                        ths.wellWidgoutList.remove(wellWidgoutToDelete);
-                    });
-                }
-            }
-        };
-
-        this.selectedWellWidgout = ko.observable();
-
-        this.isLoadedWellWidgoutList = ko.observable(false);
-
-        this.getWellWidgoutList = function () {
-            if (!ko.unwrap(ths.isLoadedWellWidgoutList)) {
-                datacontext.getWellWidgoutList(ths.Id).done(function (response) {
-                    require(['models/widgout'], function (Widgout) {
-                        // Well widget layout list
-                        function importWidgoutList(data, parentItem) {
-                            return $.map(data || [], function (item) { return new Widgout(item, parentItem); });
-                        }
-
-                        ths.wellWidgoutList(importWidgoutList(response, ths));
-                        ths.isLoadedWellWidgoutList(true);
-                    });
-                });
-            }
-        };
 
         /** Load well sections */
         this.listOfSection(importSectionList(data.ListOfSectionOfWellDto, ths));
