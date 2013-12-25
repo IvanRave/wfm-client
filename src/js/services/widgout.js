@@ -1,5 +1,5 @@
 ﻿/** @module */
-define(['helpers/ajax-request', 'models/stage-constants'], function (ajaxRequest, stageConstants) {
+define(['helpers/ajax-request', 'constants/stage-constants'], function (ajaxRequest, stageConstants) {
     'use strict';
 
     var widgoutTemplates = [{

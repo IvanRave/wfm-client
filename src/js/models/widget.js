@@ -1,11 +1,11 @@
 ﻿/** @module */
-define(['jquery', 'knockout',
+define(['knockout',
     'services/datacontext',
     'models/widgets/widget-perfomance',
     'models/widgets/widget-summary',
     'models/widgets/widget-sketch',
     'models/widgets/widget-history'
-], function ($, ko, appDatacontext, WidgetPerfomance, WidgetSummary, WidgetSketch, WidgetHistory) {
+], function (ko, appDatacontext, WidgetPerfomance, WidgetSummary, WidgetSketch, WidgetHistory) {
     'use strict';
 
     /**

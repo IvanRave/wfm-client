@@ -5,11 +5,15 @@
     </div>
     <div class="pull-left">
       <div class="btn-group" data-bind="foreach: listOfSection">
+        <!-- ko if: sectionPattern -->
+        <!-- ko if: sectionPattern().isFolder -->
         <button class="btn btn-sm btn-default" data-bind="css: {'active': isSelectedFileSection }, click: $parent.selectFileSection">
           <span data-bind="with: sectionPattern">
             <span data-bind="text: name"></span>
           </span>
         </button>
+        <!-- /ko -->
+        <!-- /ko -->
       </div>
     </div>
   </div>

@@ -1,5 +1,8 @@
 ﻿/** @module */
-define(['jquery', 'knockout', 'services/datacontext', 'models/widget', 'helpers/app-helper'], function ($, ko, appDatacontext, Widget, appHelper) {
+define(['jquery',
+    'knockout',
+    'services/datacontext',
+    'models/widget'], function ($, ko, appDatacontext, Widget) {
     'use strict';
 
     // Well widget layout list
@@ -35,13 +38,15 @@ define(['jquery', 'knockout', 'services/datacontext', 'models/widget', 'helpers/
 
         this.widgetList = ko.observableArray();
 
-        this.sectionIdList = ['well-summary', 'well-perfomance', 'well-sketch', 'well-history'];
-
-        this.selectedSectionId = ko.observable();
+        /**
+        * Selected section pattern for widget (of this stage)
+        * @type {module:models/section-pattern}
+        */
+        this.slcStagePatternForWidget = ko.observable();
 
         this.addWidget = function () {
-            var sectionId = ko.unwrap(ths.selectedSectionId);
-            if (sectionId) {
+            var tmpStagePattern = ko.unwrap(ths.slcStagePatternForWidget);
+            if (tmpStagePattern) {
                 var tmpWidgetList = ko.unwrap(ths.widgetList);
                 // Get order number of last widget
                 var lastOrderNumber;
@@ -54,8 +59,8 @@ define(['jquery', 'knockout', 'services/datacontext', 'models/widget', 'helpers/
                 }
 
                 appDatacontext.postWidget(ths.id, {
-                    Name: appHelper.capitalizeFirst(sectionId),
-                    IdOfSectionPattern: sectionId,
+                    Name: ko.unwrap(tmpStagePattern.name),
+                    IdOfSectionPattern: tmpStagePattern.id,
                     OrderNumber: lastOrderNumber + 1,
                     Opts: '{}',
                     WidgockId: ths.id

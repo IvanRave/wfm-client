@@ -22,13 +22,8 @@ define(['knockout', 'models/sections/section-base'], function (ko, SectionBase) 
         */
         this.wroupId = data.WroupId;
 
-        /** Get list of section patterns from root */
-        this.getListOfSectionPattern = function () {
-            return ko.unwrap(this.getParent().getWellField().getWellRegion().getCompany().getRootViewModel().ListOfSectionPatternDto);
-        };
-
         /** Add shared props to the section */
-        SectionBase.call(this, data, 'wroup');
+        SectionBase.call(this, data);
     };
 
     return exports;

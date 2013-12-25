@@ -14,11 +14,16 @@ define(['knockout', 'models/file-spec', 'services/file-spec'], function (ko, Fil
     * Section base: sharep props for other types of sections - insert using call method
     * @constructor
     * @param {object} data - Section data
-    * @param {string} typeOfStage - Stage, like 'well', 'wield', 'wroup', 'wegion', 'company'
     */
-    var exports = function (data, typeOfStage) {
+    var exports = function (data) {
         /** Alternative */
         var ths = this;
+
+        /**
+        * Stage, like 'well', 'wield', 'wroup', 'wegion', 'company'
+        * @type {string}
+        */
+        var stageKey = ths.getParent().stageKey;
 
         /**
         * Section guid
@@ -27,7 +32,7 @@ define(['knockout', 'models/file-spec', 'services/file-spec'], function (ko, Fil
         this.id = data.Id;
 
         /**
-        * Whether the section is visible
+        * Whether the section is visible as a view: can ovveride default checkbox from section pattern (isView)
         * @type {boolean}
         */
         this.isVisible = ko.observable(data.IsVisible);
@@ -44,8 +49,8 @@ define(['knockout', 'models/file-spec', 'services/file-spec'], function (ko, Fil
         */
         this.sectionPattern = ko.computed({
             read: function () {
-                var tmpListOfSectionPattern = this.getListOfSectionPattern();
-                var tmpSectionPatternId = this.sectionPatternId;
+                var tmpListOfSectionPattern = ko.unwrap(ths.getParent().stagePatterns);
+                var tmpSectionPatternId = ths.sectionPatternId;
                 var byId = tmpListOfSectionPattern.filter(function (arrElem) {
                     return arrElem.id === tmpSectionPatternId;
                 });
@@ -54,8 +59,25 @@ define(['knockout', 'models/file-spec', 'services/file-spec'], function (ko, Fil
                     return byId[0];
                 }
             },
-            deferEvaluation: true,
-            owner: this
+            deferEvaluation: true
+        });
+
+        /**
+        * Whether section is visible as view: calculated using section checkbox and pattern checkbox
+        * @type {boolean}
+        */
+        this.isVisibleAsView = ko.computed({
+            read: function () {
+                var tmpSectionPattern = ko.unwrap(ths.sectionPattern);
+                var tmpIsVisible = ko.unwrap(ths.isVisible);
+                if (tmpSectionPattern) {
+                    return tmpSectionPattern.isView && tmpIsVisible;
+                }
+                else {
+                    return false;
+                }
+            },
+            deferEvaluation: true
         });
 
         /**
@@ -123,7 +145,7 @@ define(['knockout', 'models/file-spec', 'services/file-spec'], function (ko, Fil
             }
 
             // Loaded files are unselected by default
-            fileSpecService.get(typeOfStage, this.id).done(function (r) {
+            fileSpecService.get(stageKey, this.id).done(function (r) {
                 // Import data to objects
                 ths.listOfFileSpec(importFileSpecs(r));
                 // Set flag (do not load again)
@@ -137,7 +159,7 @@ define(['knockout', 'models/file-spec', 'services/file-spec'], function (ko, Fil
                 callback: function (result) {
                     ths.listOfFileSpec.push(new FileSpec(result[0]));
                 },
-                url: fileSpecService.getUrl(typeOfStage, this.id),
+                url: fileSpecService.getUrl(stageKey, this.id),
                 fileTypeRegExp: ko.unwrap(ths.sectionPattern).fileTypeRegExp
             };
         };
@@ -157,7 +179,7 @@ define(['knockout', 'models/file-spec', 'services/file-spec'], function (ko, Fil
             });
 
             // Remove from server
-            fileSpecService.deleteArray(typeOfStage, ths.id, tmpIdList).done(function () {
+            fileSpecService.deleteArray(stageKey, ths.id, tmpIdList).done(function () {
                 // If success
                 // Remove from client file list (all selected files)
                 tmpSelectedList.forEach(function (elem) {
@@ -173,7 +195,7 @@ define(['knockout', 'models/file-spec', 'services/file-spec'], function (ko, Fil
         */
         this.deleteFileSpecById = function (idOfFileSpec, callback) {
             // Remove from server
-            fileSpecService.deleteArray(typeOfStage, ths.id, [{ id: idOfFileSpec }]).done(function () {
+            fileSpecService.deleteArray(stageKey, ths.id, [{ id: idOfFileSpec }]).done(function () {
                 // If success
                 // Remove from client file list if exists
                 var removedFileSpec = ths.getFileSpecById(idOfFileSpec);

@@ -15,7 +15,7 @@ define([
     'models/well/sketch',
     'models/prop-spec',
     'services/well',
-    'models/stage-constants',
+    'constants/stage-constants',
     'models/column-attribute',
     'models/well-history',
     'models/test-scope'
@@ -87,8 +87,8 @@ define([
         };
 
         /** Get workspace view model */
-        this.getAppViewModel = function () {
-            return this.getWellGroup().getWellField().getWellRegion().getCompany().getRootViewModel();
+        this.getRootViewModel = function () {
+            return this.getWellGroup().getRootViewModel();
         };
 
         /**
@@ -112,8 +112,14 @@ define([
         /** Well property specifications */
         this.propSpecList = wellPropSpecList;
 
+        /**
+        * Stage key: equals file name
+        * @type {string}
+        */
+        this.stageKey = stageConstants.well.id;
+
         /** Add props to constructor */
-        StageBase.call(this, data, stageConstants.well.id);
+        StageBase.call(this, data);
 
         /** 
         * Well comment

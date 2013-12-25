@@ -9,7 +9,7 @@ define(['jquery',
     'models/stage-base',
     'models/prop-spec',
     'services/wroup',
-    'models/stage-constants'], function ($, ko, datacontext, bootstrapModal, Well, WellGroupWfmParameter,
+    'constants/stage-constants'], function ($, ko, datacontext, bootstrapModal, Well, WellGroupWfmParameter,
         SectionOfWroup, StageBase, PropSpec, wroupService, stageConstants) {
         'use strict';
 
@@ -54,6 +54,11 @@ define(['jquery',
                 return wellField;
             };
 
+            /** Get root view model */
+            this.getRootViewModel = function () {
+                return this.getWellField().getRootViewModel();
+            };
+
             /**
             * Group id
             * @type {number}
@@ -69,8 +74,14 @@ define(['jquery',
             /** Property specifications */
             this.propSpecList = wroupPropSpecList;
 
+            /**
+            * Stage key: equals file name
+            * @type {string}
+            */
+            this.stageKey = stageConstants.wroup.id;
+
             /** Base for all stages */
-            StageBase.call(this, data, stageConstants.wroup.id);
+            StageBase.call(this, data);
 
             /**
             * List of well for this group
@@ -181,13 +192,11 @@ define(['jquery',
                 }
             };
 
-            var appViewModel = ths.getWellField().getWellRegion().getCompany().getRootViewModel();
-
             // wfm parameter from main source which is not in this group
             this.unselectedWfmParameterList = ko.computed({
                 read: function () {
                     // two arrays
-                    return $.grep(ko.unwrap(appViewModel.wfmParameterList), function (prmElem) {
+                    return $.grep(ko.unwrap(ths.getRootViewModel().wfmParameterList), function (prmElem) {
                         var isParamExist = false;
                         $.each(ko.unwrap(ths.wellGroupWfmParameterList), function (wlgIndex, wlgElem) {
                             if (wlgElem.wfmParameterId === prmElem.id) {

@@ -8,7 +8,7 @@ define(['jquery',
     'models/prop-spec',
     'services/wegion',
     'services/wield',
-    'models/stage-constants'], function ($, ko, datacontext, bootstrapModal,
+    'constants/stage-constants'], function ($, ko, datacontext, bootstrapModal,
         WellField, StageBase, SectionOfWegion, PropSpec, wegionService, wieldService, stageConstants) {
         'use strict';
 
@@ -42,6 +42,11 @@ define(['jquery',
                 return company;
             };
 
+            /** Get root view model */
+            this.getRootViewModel = function () {
+                return this.getCompany().getRootViewModel();
+            };
+
             // Persisted properties
             this.id = data.Id;
             this.companyId = data.CompanyId;
@@ -49,8 +54,14 @@ define(['jquery',
             /** Props specifications */
             this.propSpecList = wegionPropSpecList;
 
+            /**
+            * Stage key: equals file name
+            * @type {string}
+            */
+            this.stageKey = stageConstants.wegion.id;
+
             /** Base for all stages */
-            StageBase.call(this, data, stageConstants.wegion.id);
+            StageBase.call(this, data);
 
             /** 
             * Select section

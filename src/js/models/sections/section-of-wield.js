@@ -22,13 +22,8 @@ define(['knockout', 'models/sections/section-base'], function (ko, SectionBase) 
         */
         this.wieldId = data.WieldId;
 
-        /** Get list from root */
-        this.getListOfSectionPattern = function () {
-            return ko.unwrap(this.getParent().getWellRegion().getCompany().getRootViewModel().ListOfSectionPatternDto);
-        };
-
         // Add shared props
-        SectionBase.call(this, data, 'wield');
+        SectionBase.call(this, data);
     };
 
     return exports;

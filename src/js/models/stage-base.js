@@ -13,7 +13,7 @@ define(['knockout',
         /**
         * Base for all stages: well, group, region etc.
         */
-        var exports = function (data, stageType) {
+        var exports = function (data) {
             var ths = this;
 
             /** Props values: all observables */
@@ -96,9 +96,8 @@ define(['knockout',
 
             /** Load widget layouts for stage */
             this.loadWidgouts = function () {
-                console.log(stageType);
                 if (!ko.unwrap(ths.isLoadedWidgouts)) {
-                    widgoutService.get(stageType, ths.id || ths.Id).done(function (res) {
+                    widgoutService.get(ths.stageKey, ths.id || ths.Id).done(function (res) {
                         ths.widgouts(importWidgouts(res, ths));
                         ths.isLoadedWidgouts(true);
                     });
@@ -115,7 +114,7 @@ define(['knockout',
             this.postWidgout = function () {
                 var tmpWidgoutTemlate = ko.unwrap(ths.slcWidgoutTemplate);
                 if (tmpWidgoutTemlate) {
-                    widgoutService.post(stageType, ths.id || ths.Id, tmpWidgoutTemlate).done(function (createdWellWidgoutData) {
+                    widgoutService.post(ths.stageKey, ths.id || ths.Id, tmpWidgoutTemlate).done(function (createdWellWidgoutData) {
                         var widgoutNew = new Widgout(createdWellWidgoutData, ths);
                         ths.widgouts.push(widgoutNew);
                         ths.slcWidgout(widgoutNew);
@@ -129,16 +128,45 @@ define(['knockout',
                 var widgoutToDelete = ko.unwrap(ths.slcWidgout);
                 if (widgoutToDelete) {
                     if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(widgoutToDelete.name) + '"?')) {
-                        widgoutService.remove(stageType, ths.id || ths.Id, widgoutToDelete.id).done(function () {
+                        widgoutService.remove(ths.stageKey, ths.id || ths.Id, widgoutToDelete.id).done(function () {
                             ths.widgouts.remove(widgoutToDelete);
                         });
                     }
                 }
             };
 
+            /**
+            * List of section patterns for current stage (names, ids, etc.)
+            *    Section patterns where idOfStage === stageKey
+            * @type {Array.<module:models/section-pattern>}
+            */
+            this.stagePatterns = ko.computed({
+                read: function () {
+                    // List of all section patterns
+                    var tmpAllPatterns = ko.unwrap(ths.getRootViewModel().ListOfSectionPatternDto);
+                    return tmpAllPatterns.filter(function (elem) {
+                        return elem.idOfStage === ths.stageKey;
+                    });
+                },
+                deferEvaluation: true
+            });
+
+            /**
+            * List of patterns for widgets
+            * @type {Array.<module:models/section-pattern}
+            */
+            this.stagePatternsForWidget = ko.computed({
+                read: function () {
+                    var tmpStagePatterns = ko.unwrap(ths.stagePatterns);
+                    return tmpStagePatterns.filter(function (elem) {
+                        return elem.isWidget;
+                    });
+                },
+                deferEvaluation: true
+            });
+
             /** Choose dashboard (no section */
             this.unselectSection = function () {
-                console.log('asdfasdf');
                 ths.selectedSection(null);
                 ths.loadWidgouts();
                 ////window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
@@ -148,9 +176,9 @@ define(['knockout',
                 ////    well: ths.Id
                 ////});
 
-                ////if (ths.loadDashboard) {
-                ////    ths.loadDashboard();
-                ////}
+                if (ths.loadDashboard) {
+                    ths.loadDashboard();
+                }
             };
         };
 

@@ -1,6 +1,7 @@
 ﻿<div class="wfm-section-panel wfm-bottom-fix clearfix">
   <div class="pull-left">
     <ul class="nav nav-pills" data-bind="foreach: listOfSection">
+      <!-- ko if: isVisibleAsView -->
       <li data-bind="css: {'active': isSelectedSection }">
         <div data-bind="click: $parent.selectSection">
           <span data-bind="with: sectionPattern">
@@ -10,6 +11,7 @@
           <i class="wfmicon" data-bind="css: 'wfmicon-summary'"></i>
         </div>
       </li>
+      <!-- /ko -->
     </ul>
   </div>
 </div>

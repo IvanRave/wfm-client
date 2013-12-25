@@ -62,8 +62,9 @@
           <div class="widget-tile">
             <div class="widget-empty">
               <div class="text-right">
-                <select class="input-sm" data-bind="options: sectionIdList, value: selectedSectionId, optionsCaption: 'widget type...'"></select>
-                <button class="btn btn-default btn-sm" type="button" data-bind="click: addWidget, enable: selectedSectionId">
+                <!--sectionIdList-->
+                <select class="input-sm" data-bind="options: $parents[1].stagePatternsForWidget, optionsText: 'name', value: slcStagePatternForWidget, optionsCaption: 'choose widget...'"></select>
+                <button class="btn btn-default btn-sm" type="button" data-bind="click: addWidget, enable: slcStagePatternForWidget">
                   {{capitalizeFirst lang.toAdd}}
                 </button>
               </div>

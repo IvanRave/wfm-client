@@ -22,13 +22,8 @@ define(['knockout', 'models/sections/section-base'], function (ko, SectionBase) 
         */
         this.companyId = data.CompanyId;
 
-        /** Get list of section patterns from root */
-        this.getListOfSectionPattern = function () {
-            return ko.unwrap(this.getParent().getRootViewModel().ListOfSectionPatternDto);
-        };
-
         /** Add shared props to the section */
-        SectionBase.call(this, data, 'company');
+        SectionBase.call(this, data);
     };
 
     return exports;

@@ -11,7 +11,7 @@ define(['jquery',
     'models/prop-spec',
     'services/wield',
     'services/wroup',
-    'models/stage-constants'], function ($, ko, datacontext,
+    'constants/stage-constants'], function ($, ko, datacontext,
         fileHelper, bootstrapModal, StageBase, WellFieldMap, SectionOfWield, WellGroup,
         PropSpec, wieldService, wroupService, stageConstants) {
         'use strict';
@@ -52,6 +52,11 @@ define(['jquery',
                 return wellRegion;
             };
 
+            /** Get root view model */
+            this.getRootViewModel = function () {
+                return this.getWellRegion().getRootViewModel();
+            };
+
             this.propSpecList = wieldPropSpecList;
 
             /**
@@ -66,8 +71,14 @@ define(['jquery',
             */
             this.idOfWegion = data.WellRegionId;
 
+            /**
+            * Stage key: equals file name
+            * @type {string}
+            */
+            this.stageKey = stageConstants.wield.id;
+
             // Add identical properties for all stages (well, field, group, regions, company)
-            StageBase.call(this, data, stageConstants.wield.id);
+            StageBase.call(this, data);
 
             /**
             * List of groups
