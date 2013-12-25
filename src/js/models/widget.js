@@ -1,4 +1,5 @@
-﻿define(['jquery', 'knockout',
+﻿/** @module */
+define(['jquery', 'knockout',
     'services/datacontext',
     'models/widgets/widget-perfomance',
     'models/widgets/widget-summary',
@@ -7,64 +8,67 @@
 ], function ($, ko, appDatacontext, WidgetPerfomance, WidgetSummary, WidgetSketch, WidgetHistory) {
     'use strict';
 
-    // Supertype
-    function Widget(data, widgockItem) {
-        var self = this;
+    /**
+    * Widget
+    * @constructor
+    */
+    var exports = function (data, widgockItem) {
+        var ths = this;
         data = data || {};
 
-        self.getWidgock = function () {
+        this.getWidgock = function () {
             return widgockItem;
         };
 
         // Properties
-        self.id = data.Id;
-        self.name = ko.observable(data.Name);
-        self.sectionId = data.SectionId;
-        self.widgockId = data.WidgockId;
-        self.orderNumber = ko.observable(data.OrderNumber);
+        this.id = data.Id;
+        this.name = ko.observable(data.Name);
+        this.idOfSectionPattern = data.IdOfSectionPattern;
+        this.widgockId = data.WidgockId;
+        this.orderNumber = ko.observable(data.OrderNumber);
 
-        self.widgetTpl = self.sectionId + '-widget-tpl';
+        this.widgetTpl = ths.idOfSectionPattern + '-widget-tpl';
 
-        self.isVisSettingPanel = ko.observable(false);
+        this.isVisSettingPanel = ko.observable(false);
 
-        self.showVisSettingPanel = function () {
-            self.isVisSettingPanel(true);
+        this.showVisSettingPanel = function () {
+            ths.isVisSettingPanel(true);
         };
 
-        self.putWidget = function () {
-            appDatacontext.putWidget(self.widgockId, self.id, self.toPlainJson()).done(function () {
-                self.isVisSettingPanel(false);
+        this.putWidget = function () {
+            appDatacontext.putWidget(ths.widgockId, ths.id, ths.toPlainJson()).done(function () {
+                ths.isVisSettingPanel(false);
             });
         };
 
         var optsObj = JSON.parse(data.Opts);
-        
-        switch (self.sectionId) {
-            case 'perfomance':
-                WidgetPerfomance.call(self, optsObj, self.getWidgock());
+
+        switch (this.idOfSectionPattern) {
+            case 'well-perfomance':
+                WidgetPerfomance.call(ths, optsObj, ths.getWidgock());
                 break;
-            case 'summary':
-                WidgetSummary.call(self, optsObj, ko.unwrap(self.getWidgock().getWidgout().getParent().propSpecList));
+            case 'well-summary':
+                WidgetSummary.call(ths, optsObj, ko.unwrap(ths.getWidgock().getWidgout().getParent().propSpecList));
                 break;
-            case 'sketch':
-                WidgetSketch.call(self, optsObj);
+            case 'well-sketch':
+                WidgetSketch.call(ths, optsObj);
                 break;
-            case 'history':
-                WidgetHistory.call(self, optsObj, self.getWidgock().getWidgout().getParent().historyList);
+            case 'well-history':
+                WidgetHistory.call(ths, optsObj, ths.getWidgock().getWidgout().getParent().historyList);
                 break;
         }
 
-        self.toPlainJson = function () {           
+        this.toPlainJson = function () {
             return {
-                id: ko.unwrap(self.id),
-                name: ko.unwrap(self.name),
-                sectionId: ko.unwrap(self.sectionId),
-                widgockId: ko.unwrap(self.widgockId),
-                orderNumber: ko.unwrap(self.orderNumber),
-                opts: JSON.stringify(self.toPlainOpts())
+                id: ko.unwrap(ths.id),
+                name: ko.unwrap(ths.name),
+                idOfSectionPattern: ko.unwrap(ths.idOfSectionPattern),
+                widgockId: ko.unwrap(ths.widgockId),
+                orderNumber: ko.unwrap(ths.orderNumber),
+                opts: JSON.stringify(ths.toPlainOpts())
             };
         };
-    }
+    };
 
-    return Widget;
+    return exports;
 });

@@ -497,22 +497,22 @@ define([
 
         // =============================================================Well report begin=========================================================
 
-        // by default - checked summary tab
-        this.reportSectionIdList = ko.observableArray(['summary']);
+        //// // by default - checked summary tab
+        ////this.reportSectionIdList = ko.observableArray(['summary']);
 
-        this.checkReportSection = function (checkedReportSection) {
-            switch (checkedReportSection.id) {
-                case 'map': ths.getWellGroup().getWellField().getWellFieldMaps(); break;
-                case 'history': ths.getWellHistoryList(); break;
-                case 'log': ths.getWellFileList('log', 'work'); break;
-                case 'pd': ths.perfomancePartial.getHstProductionDataSet(); break;
-            }
-        };
+        ////this.checkReportSection = function (checkedReportSection) {
+        ////    switch (checkedReportSection.id) {
+        ////        case 'map': ths.getWellGroup().getWellField().getWellFieldMaps(); break;
+        ////        case 'history': ths.getWellHistoryList(); break;
+        ////        case 'log': ths.getWellFileList('log', 'work'); break;
+        ////        case 'pd': ths.perfomancePartial.getHstProductionDataSet(); break;
+        ////    }
+        ////};
 
-        this.selectedReportMap = ko.observable();
-        this.selectedReportLog = ko.observable();
+        ////this.selectedReportMap = ko.observable();
+        ////this.selectedReportLog = ko.observable();
 
-        this.isCompanyLogoInReport = ko.observable(false);
+        ////this.isCompanyLogoInReport = ko.observable(false);
 
         // TODO: make create report
         ////ths.createReport = function () {

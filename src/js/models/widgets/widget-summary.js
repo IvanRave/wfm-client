@@ -3,7 +3,7 @@ define(['knockout'], function (ko) {
     'use strict';
 
     /*
-    * Widget for summary well info
+    * Widget for summary info: for all stages
     * @constructor
     */
     var exports = function (opts, propSpecList) {
