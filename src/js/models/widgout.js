@@ -26,7 +26,7 @@ define(['knockout', 'models/widgock', 'services/widgout'], function (ko, Widgock
             // Get well id as parent
             var tmpStageId = ths.getParent().Id || ths.getParent().id;
 
-            widgoutService.put('well', tmpStageId, ths.id, {
+            widgoutService.put(ths.getParent().stageKey, tmpStageId, ths.id, {
                 id: ths.id,
                 name: ko.unwrap(ths.name)
             });

@@ -1,8 +1,8 @@
 ﻿/** @module */
 define(['jquery',
     'knockout',
-    'services/datacontext',
-    'models/widget'], function ($, ko, appDatacontext, Widget) {
+    'services/widget',
+    'models/widget'], function ($, ko, widgetService, Widget) {
     'use strict';
 
     // Well widget layout list
@@ -58,7 +58,7 @@ define(['jquery',
                     lastOrderNumber = 0;
                 }
 
-                appDatacontext.postWidget(ths.id, {
+                widgetService.post(ths.getWidgout().getParent().stageKey, ths.id, {
                     Name: ko.unwrap(tmpStagePattern.name),
                     IdOfSectionPattern: tmpStagePattern.id,
                     OrderNumber: lastOrderNumber + 1,
@@ -72,9 +72,10 @@ define(['jquery',
             }
         };
 
-        this.deleteWidget = function (widgetToDelete) {
+        /** Remove widget from widget block */
+        this.removeWidget = function (widgetToDelete) {
             if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(widgetToDelete.name) + '"?')) {
-                appDatacontext.deleteWidget(widgetToDelete.widgockId, widgetToDelete.id).done(function () {
+                widgetService.remove(ths.getWidgout().getParent().stageKey, ths.id, widgetToDelete.id).done(function () {
                     ths.widgetList.remove(widgetToDelete);
                 });
             }

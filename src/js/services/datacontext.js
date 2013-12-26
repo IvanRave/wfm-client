@@ -59,9 +59,6 @@
     function forecastEvolutionUrl(uqp) {
         return '{{conf.requrl}}/api/forecastevolution/' + (uqp ? ('?' + $.param(uqp)) : '');
     }
-    function widgetUrl(widgockId, widgetId) {
-        return '{{conf.requrl}}/api/widgocks/' + widgockId + '/widgets' + (widgetId ? ('/' + widgetId) : '');
-    }
     function companyJobTypeUrl(companyId, jobTypeId) {
         return '{{conf.requrl}}/api/companies/' + companyId + '/job-types' + (jobTypeId ? ('/' + jobTypeId) : '');
     }
@@ -396,20 +393,6 @@
         getWfmParamSquadList: getWfmParamSquadList,
         getForecastEvolution: getForecastEvolution,
         postForecastEvolution: postForecastEvolution
-    };
-
-    // Widget (well widget or well group widget etc.)==========================================
-    datacontext.postWidget = function (widgockId, widgetData) {
-        return ajaxRequest('POST', widgetUrl(widgockId), widgetData);
-    };
-
-    // Save changed widget
-    datacontext.putWidget = function (widgockId, widgetId, widgetData) {
-        return ajaxRequest('PUT', widgetUrl(widgockId, widgetId), widgetData);
-    };
-
-    datacontext.deleteWidget = function (widgockId, widgetId) {
-        return ajaxRequest('DELETE', widgetUrl(widgockId, widgetId));
     };
 
     datacontext.getJobTypeList = function (companyId) {

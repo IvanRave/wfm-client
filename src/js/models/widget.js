@@ -1,11 +1,11 @@
 ﻿/** @module */
 define(['knockout',
-    'services/datacontext',
+    'services/widget',
     'models/widgets/widget-perfomance',
     'models/widgets/widget-summary',
     'models/widgets/widget-sketch',
     'models/widgets/widget-history'
-], function (ko, appDatacontext, WidgetPerfomance, WidgetSummary, WidgetSketch, WidgetHistory) {
+], function (ko, widgetService, WidgetPerfomance, WidgetSummary, WidgetSketch, WidgetHistory) {
     'use strict';
 
     /**
@@ -27,7 +27,11 @@ define(['knockout',
         this.widgockId = data.WidgockId;
         this.orderNumber = ko.observable(data.OrderNumber);
 
-        this.widgetTpl = ths.idOfSectionPattern + '-widget-tpl';
+        /**
+        * Widget template name: for summary - default summary section
+        * @type {string}
+        */
+        this.widgetTpl = (ths.idOfSectionPattern.indexOf('-summary') > 0 ? 'default-summary' : ths.idOfSectionPattern) + '-widget-tpl';
 
         this.isVisSettingPanel = ko.observable(false);
 
@@ -36,7 +40,7 @@ define(['knockout',
         };
 
         this.putWidget = function () {
-            appDatacontext.putWidget(ths.widgockId, ths.id, ths.toPlainJson()).done(function () {
+            widgetService.put(ths.getWidgock().getWidgout().getParent().stageKey, ths.widgockId, ths.id, ths.toPlainJson()).done(function () {
                 ths.isVisSettingPanel(false);
             });
         };
@@ -48,6 +52,7 @@ define(['knockout',
                 WidgetPerfomance.call(ths, optsObj, ths.getWidgock());
                 break;
             case 'well-summary':
+            case 'company-summary':
                 WidgetSummary.call(ths, optsObj, ko.unwrap(ths.getWidgock().getWidgout().getParent().propSpecList));
                 break;
             case 'well-sketch':
