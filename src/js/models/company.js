@@ -182,12 +182,10 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
             /**
             * Select well region
             * @param {module:models/wegion} wegionToSelect - Well region to select
-            * @param {object} [initialData] - Initial data
             */
-            this.selectWegion = function (wegionToSelect, initialData) {
-                initialData = initialData || {};
-
-                wegionToSelect.isOpenItem(true);
+            this.selectWegion = function (wegionToSelect) {
+                /** Initial function for all select stage functions */
+                ths.selectChildStage(wegionToSelect);
 
                 // Unselect child
                 wegionToSelect.selectedWield(null);
@@ -199,31 +197,22 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
 
                 // Select summary section
                 wegionToSelect.selectedSection(wegionToSelect.getSectionByPatternId('wegion-summary'));
-
-                if (!initialData.isHistory) {
-                    historyHelper.pushState('/companies/' + ths.id + '/well-regions/' + wegionToSelect.id);
-                }
-
-                ////if (initialData.wieldId) {
-                ////    wegionToSelect.selectWieldById(initialData.wieldId);
-                ////}
             };
 
             /**
             * Select region by id: wrap for select wegion function
             * @param {number} wegionId - Id of well region
-            * @param {object} initialData - Initial data
             */
-            this.selectWegionById = function (wegionId, initialData) {
-                if ($.isNumeric(wegionId)) {
-                    var tmpWegions = ko.unwrap(ths.wegions);
+            this.getWegionById = function (wegionId) {
+                var needWegion;
+                var tmpWegions = ko.unwrap(ths.wegions);
 
-                    tmpWegions.forEach(function (tmpWegion) {
-                        if (tmpWegion.id === wegionId) {
-                            ths.selectWegion(tmpWegion, initialData);
-                        }
-                    });
-                }
+                tmpWegions.forEach(function (tmpWegion) {
+                    if (tmpWegion.id === wegionId) {
+                        needWegion = tmpWegion;
+                    }
+                });
+                return needWegion;
             };
 
             /** Delete well region */
@@ -309,25 +298,28 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
 
             /** 
             * Load wegions of this company
-            * @param {object} [initialData] - Initial data
             */
-            this.loadWegions = function (initialData) {
-                initialData = initialData || {};
+            this.loadWegions = function () {
+                var tmpInitialUrlData = ko.unwrap(ths.getRootViewModel().initialUrlData);
+
+                function selectWegionIfNeed() {
+                    if (tmpInitialUrlData.wegionId) {
+                        var wegionToSelect = ths.getWegionById(tmpInitialUrlData.wegionId);
+                        if (wegionToSelect) {
+                            ths.selectWegion(wegionToSelect);
+                        }
+                    }
+                }
 
                 if (!ko.unwrap(ths.isLoadedWegions)) {
                     wegionService.getInclusive(ths.id).done(function (response) {
                         ths.wegions(importWegions(response, ths));
                         ths.isLoadedWegions(true);
-
-                        if ($.isNumeric(initialData.wegionId)) {
-                            ths.selectWegionById(initialData.wegionId, initialData);
-                        }
+                        selectWegionIfNeed();
                     });
                 }
                 else {
-                    if ($.isNumeric(initialData.wegionId)) {
-                        ths.selectWegionById(initialData.wegionId, initialData);
-                    }
+                    selectWegionIfNeed();
                 }
             };
 

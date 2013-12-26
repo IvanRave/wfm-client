@@ -97,7 +97,7 @@ define(['jquery',
             this.selectedWield = ko.observable();
 
             this.selectWield = function (wieldToSelect) {
-                wieldToSelect.isOpenItem(true);
+                ths.selectChildStage(wieldToSelect);
 
                 // Unselect child
                 wieldToSelect.selectedWroup(null);

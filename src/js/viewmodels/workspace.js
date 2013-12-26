@@ -156,10 +156,10 @@ define([
             */
             this.userProfile = new UserProfile(ths);
 
-            //var initialData = getInitialData(document.location.hash);
+            this.initialUrlData = ko.observable(historyHelper.getInitialData(document.location.hash.substring(1)));
 
             /** Auth user profile and load data if successful */
-            this.userProfile.loadAccountInfo(historyHelper.getInitialData(document.location.hash.substring(1)));
+            this.userProfile.loadAccountInfo();
 
             /** Back, forward, refresh browser navigation */
             window.onpopstate = function () {
@@ -167,8 +167,10 @@ define([
                 // When load any info - do not push info to history again
                 stateData.isHistory = true;
                 // Reload all data
-                ths.userProfile.loadAccountInfo(stateData);
+                ths.initialUrlData(stateData);
                 console.log('location: ' + document.location.hash + ', state: ' + JSON.stringify(stateData));
+
+                ths.userProfile.loadAccountInfo();
             };
         };
 

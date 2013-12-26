@@ -65,6 +65,9 @@ define(['jquery',
             */
             this.Id = data.Id;
 
+            /** Alternatie for caps Id */
+            this.id = data.Id;
+
             /**
             * Field (parent) id
             * @type {number}
@@ -108,6 +111,8 @@ define(['jquery',
             * @param {module:models/well} wellToSelect - Well to select
             */
             this.selectWell = function (wellToSelect) {
+                /** Initial function for all select stage functions */
+                ths.selectChildStage(wellToSelect);
                 ////window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
                 ////    region: ths.getWellGroup().getWellField().getWellRegion().Id,
                 ////    field: ths.getWellGroup().getWellField().Id,

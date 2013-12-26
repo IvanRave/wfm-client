@@ -97,6 +97,9 @@ define([
          */
         this.Id = data.Id;
 
+        /** Alternative for caps Id */
+        this.id = data.Id;
+
         /**
         * Well type
         * @type {string}

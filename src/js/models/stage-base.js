@@ -2,7 +2,9 @@
 define(['knockout',
     'models/file-spec',
     'models/widgout',
-    'services/widgout'], function (ko, FileSpec, Widgout, widgoutService) {
+    'services/widgout',
+    'helpers/history-helper',
+    'constants/stage-constants'], function (ko, FileSpec, Widgout, widgoutService, historyHelper, stageConstants) {
         'use strict';
 
         /** Import widget layouts to the stage */
@@ -178,6 +180,51 @@ define(['knockout',
 
                 if (ths.loadDashboard) {
                     ths.loadDashboard();
+                }
+            };
+
+            /**
+            * Select child stage: initial function for all 'select child' on every stage
+            * @param {object} childStage - Child stage: like wroup for wield
+            */
+            this.selectChildStage = function (childStage) {
+                childStage.isOpenItem(true);
+
+                var tmpInitialUrlData = ko.unwrap(ths.getRootViewModel().initialUrlData);
+                console.log('initialUrlData', tmpInitialUrlData);
+                if (!tmpInitialUrlData.isHistory) {
+                    var navigationArr;
+                    switch (childStage.stageKey) {
+                        case stageConstants.wegion.id:
+                            navigationArr = [stageConstants.company.plural, childStage.getCompany().id,
+                                stageConstants.wegion.plural, childStage.id];
+                            break;
+                        case stageConstants.wield.id:
+                            navigationArr = [stageConstants.company.plural, childStage.getWellRegion().getCompany().id,
+                                stageConstants.wegion.plural, childStage.getWellRegion().id,
+                                stageConstants.wield.plural, childStage.id];
+                            break;
+                        case stageConstants.wroup.id:
+                            navigationArr = [stageConstants.company.plural, childStage.getWellField().getWellRegion().getCompany().id,
+                                stageConstants.wegion.plural, childStage.getWellField().getWellRegion().id,
+                                stageConstants.wield.plural, childStage.getWellField().id,
+                                stageConstants.wroup.plural, childStage.id];
+                            break;
+                        case stageConstants.well.id:
+                            navigationArr = [stageConstants.company.plural, childStage.getWellGroup().getWellField().getWellRegion().getCompany().id,
+                                stageConstants.wegion.plural, childStage.getWellGroup().getWellField().getWellRegion().id,
+                                stageConstants.wield.plural, childStage.getWellGroup().getWellField().id,
+                                stageConstants.wroup.plural, childStage.getWellGroup().id,
+                                stageConstants.well.plural, childStage.id];
+                            break;
+                    }
+
+                    if (navigationArr) {
+                        historyHelper.pushState('/' + navigationArr.join('/'));
+                    }
+                    else {
+                        throw new Error('No stage for navigation url in stage-base');
+                    }
                 }
             };
         };

@@ -59,11 +59,15 @@ define(['jquery',
 
             this.propSpecList = wieldPropSpecList;
 
+            // TODO: change to small id
             /**
             * Field id
             * @type {number}
             */
             this.Id = data.Id;
+
+            /** Alternative for Id */
+            this.id = data.Id;
 
             /**
             * Id of region (parent): foreign key
@@ -90,13 +94,14 @@ define(['jquery',
             this.selectedWroup = ko.observable();
 
             this.selectWroup = function (wroupToSelect) {
+                /** Initial function for all select stage functions */
+                ths.selectChildStage(wroupToSelect);
                 ////window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
                 ////    region: ths.getWellField().getWellRegion().Id,
                 ////    field: ths.getWellField().Id,
                 ////    group: ths.Id
                 ////});
 
-                wroupToSelect.isOpenItem(true);
                 // Unselect all wells
                 wroupToSelect.selectedWell(null);
                 // Set group as selected

@@ -172,17 +172,14 @@ define(['knockout', 'models/employee', 'services/register', 'helpers/lang-helper
 
             /**
             * Get account info: Email, Roles, IsLogged
-            * @param {object} [initialData] - WFM default values from url, like companyId, wellId etc.
             */
-            this.loadAccountInfo = function (initialData) {
-                initialData = initialData || {};
-
+            this.loadAccountInfo = function () {
                 ths.isLoadedAccountInfo(false);
                 ths.isLogged(false);
                 appDatacontext.getAccountInfo().done(function (r) {
                     ths.email(r.Email);
                     ths.isLogged(true);
-                    ths.loadEmployees(initialData);
+                    ths.loadEmployees();
                 }).always(function () {
                     ths.isLoadedAccountInfo(true);
                 });
@@ -203,10 +200,9 @@ define(['knockout', 'models/employee', 'services/register', 'helpers/lang-helper
             /**
             * Select employee
             * @param {module:models/employee} employeeToSelect - Employee to select
-            * @param {object} [initialData] - Initial data
             */
-            this.selectEmployee = function (employeeToSelect, initialData) {
-                initialData = initialData || {};
+            this.selectEmployee = function (employeeToSelect) {
+                var tmpInitialUrlData = ko.unwrap(vm.initialUrlData);
 
                 // Unselect child
                 employeeToSelect.company.selectedWegion(null);
@@ -219,12 +215,21 @@ define(['knockout', 'models/employee', 'services/register', 'helpers/lang-helper
                 var tmpCompany = ko.unwrap(ths.selectedEmployee).company;
 
                 // Load all regions for company of selected employee
-                tmpCompany.loadWegions(initialData);
+                tmpCompany.loadWegions();
 
-                // Select summary section
-                tmpCompany.selectSection(tmpCompany.getSectionByPatternId('company-summary'));
+                // If not selected children, then select first section
+                if (!tmpInitialUrlData.wegionId) {
+                    if (tmpInitialUrlData.companySectionId) {
+                        // Select section
+                        tmpCompany.selectSection(tmpCompany.getSectionByPatternId('company-' + tmpInitialUrlData.companySectionId));
+                    }
+                    else {
+                        // Show dashboard
+                        tmpCompany.unselectSection();
+                    }
+                }
 
-                if (!initialData.isHistory) {
+                if (!tmpInitialUrlData.isHistory) {
                     historyHelper.pushState('/companies/' + employeeToSelect.companyId);
                 }
             };
@@ -237,25 +242,27 @@ define(['knockout', 'models/employee', 'services/register', 'helpers/lang-helper
 
             /**
             * Load employee list for this user
-            * @param {string} [initialData] - Default values to select, like company id, well id etc.
             */
-            this.loadEmployees = function (initialData) {
-                initialData = initialData || {};
+            this.loadEmployees = function () {
+                var tmpInitialUrlData = ko.unwrap(vm.initialUrlData);
 
                 ths.isLoadedEmployees(false);
                 ths.selectedEmployee(null);
                 companyUserService.getCompanyUserList().done(function (response) {
-                    if (!initialData.isHistory) {
+                    if (tmpInitialUrlData.isHistory) {
+                        // Set hash, add to history
                         historyHelper.pushState('/companies');
                     }
+
                     var emplArray = importEmployees(response, vm);
                     ths.employees(emplArray);
                     ths.isLoadedEmployees(true);
 
-                    if (initialData.companyId) {
+                    if (tmpInitialUrlData.companyId) {
                         emplArray.forEach(function (arrElem) {
-                            if (arrElem.companyId === initialData.companyId) {
-                                ths.selectEmployee(arrElem, initialData);
+                            if (arrElem.companyId === tmpInitialUrlData.companyId) {
+                                // Select employee = select company
+                                ths.selectEmployee(arrElem);
                             }
                         });
                     }
