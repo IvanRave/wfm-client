@@ -93,17 +93,44 @@ define(['jquery',
             /** Selected group */
             this.selectedWroup = ko.observable();
 
+            /** Select well group */
             this.selectWroup = function (wroupToSelect) {
                 /** Initial function for all select stage functions */
                 ths.selectChildStage(wroupToSelect);
-                ////window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
-                ////    region: ths.getWellField().getWellRegion().Id,
-                ////    field: ths.getWellField().Id,
-                ////    group: ths.Id
-                ////});
 
-                // Unselect all wells
-                wroupToSelect.selectedWell(null);
+                var tmpInitialUrlData = ko.unwrap(ths.getRootViewModel().initialUrlData);
+
+                if (tmpInitialUrlData.wellId) {
+                    var needWell = wroupToSelect.getWellById(tmpInitialUrlData.wellId);
+                    if (needWell) {
+                        wroupToSelect.selectWell(needWell);
+                    }
+                    else
+                    {
+                        alert('Well from url is not found');
+                    }
+
+                    // Clean unnecessary ids
+                    delete tmpInitialUrlData.wellId;
+                    ths.getRootViewModel().initialUrlData(tmpInitialUrlData);
+                }
+                else if (tmpInitialUrlData.wroupSectionId) {
+                    // Select section
+
+                    var tmpSection = wroupToSelect.getSectionByPatternId('wroup-' + tmpInitialUrlData.wroupSectionId);
+                    wroupToSelect.selectSection(tmpSection);
+
+                    // Remove section id from
+                    delete tmpInitialUrlData.wroupSectionId;
+                    ths.getRootViewModel().initialUrlData(tmpInitialUrlData);
+                }
+                else {
+                    // Show dashboard
+                    wroupToSelect.unselectSection();
+                    // Unselect child to show parent content
+                    wroupToSelect.selectedWell(null);
+                }
+
                 // Set group as selected
                 ths.selectedWroup(wroupToSelect);
 
@@ -140,6 +167,17 @@ define(['jquery',
             };
 
             /**
+            * Get well group by id
+            * @param {number} idOfWroup - Id of well group
+            */
+            this.getWroupById = function (idOfWroup) {
+                var tmpWroups = ko.unwrap(ths.wroups);
+                return tmpWroups.filter(function (elem) {
+                    return elem.id === idOfWroup;
+                })[0];
+            };
+
+            /**
             * List of maps
             * @type {Array.<module:models/map-of-wield>}
             */
@@ -149,23 +187,19 @@ define(['jquery',
             this.selectedWieldMap = ko.observable();
 
             /** Set this section as selected */
-            this.selectSection = function (sectionToSelect) {
-                if (sectionToSelect) {
-                    switch (sectionToSelect.sectionPatternId) {
-                        case 'wield-map':
-                            // Get all maps from this field
-                            ths.getWellFieldMaps(function () {
-                                var arr = ko.unwrap(ths.WellFieldMaps);
-                                if (arr.length > 0) {
-                                    arr[0].showWellFieldMap();
-                                }
-                            });
+            this.loadSectionContent = function (idOfSectionPattern) {
+                switch (idOfSectionPattern) {
+                    case 'wield-map':
+                        // Get all maps from this field
+                        ths.getWellFieldMaps(function () {
+                            var arr = ko.unwrap(ths.WellFieldMaps);
+                            if (arr.length > 0) {
+                                arr[0].showWellFieldMap();
+                            }
+                        });
 
-                            //ths.initMapFileUpload();
-                            break;
-                    }
-
-                    ths.selectedSection(sectionToSelect);
+                        //ths.initMapFileUpload();
+                        break;
                 }
             };
 

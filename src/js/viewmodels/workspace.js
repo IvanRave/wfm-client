@@ -11,6 +11,11 @@ define([
     'models/wfm-param-squad'], function ($, ko, datacontext, bootstrapModal, appHelper, UserProfile, historyHelper) {
         'use strict';
 
+        // WfmParamSquadList (convert data objects into array)
+        function importWfmParamSquadList(data) {
+            return (data || []).map(function (item) { return datacontext.createWfmParamSquad(item); });
+        }
+
         /**
         * Root view model
         * @constructor
@@ -54,11 +59,6 @@ define([
             // =====================================Wfm parameters begin==========================================================
             this.wfmParamSquadList = ko.lazyObservableArray(function () {
                 datacontext.getWfmParamSquadList({ is_inclusive: true }).done(function (r) {
-                    // WfmParamSquadList (convert data objects into array)
-                    function importWfmParamSquadList(data) {
-                        return $.map(data || [], function (item) { return datacontext.createWfmParamSquad(item); });
-                    }
-
                     ths.wfmParamSquadList(importWfmParamSquadList(r));
                 });
             }, this);
@@ -162,16 +162,18 @@ define([
             this.userProfile.loadAccountInfo();
 
             /** Back, forward, refresh browser navigation */
-            window.onpopstate = function () {
-                var stateData = historyHelper.getInitialData(document.location.hash.substring(1));
-                // When load any info - do not push info to history again
-                stateData.isHistory = true;
-                // Reload all data
-                ths.initialUrlData(stateData);
-                console.log('location: ' + document.location.hash + ', state: ' + JSON.stringify(stateData));
+            // TODO: back
+            ////window.onpopstate = function () {
+            ////    var stateData = historyHelper.getInitialData(document.location.hash.substring(1));
+            ////    // When load any info - do not push info to history again
+            ////    stateData.isHistory = true;
+            ////    // Reload all data
+            ////    ths.initialUrlData(stateData);
 
-                ths.userProfile.loadAccountInfo();
-            };
+            ////    console.log('location: ' + document.location.hash + ', state: ' + JSON.stringify(stateData));
+
+            ////    ths.userProfile.loadAccountInfo();
+            ////};
         };
 
         return exports;

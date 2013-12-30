@@ -11,8 +11,11 @@ define(['helpers/app-helper'], function (appHelper) {
             { url: '/companies/{companyId:guid}/well-regions/{wegionId:int}' },
             { url: '/companies/{companyId:guid}/well-regions/{wegionId:int}/sections/{wegionSectionId}' },
             { url: '/companies/{companyId:guid}/well-regions/{wegionId:int}/well-fields/{wieldId:int}' },
+            { url: '/companies/{companyId:guid}/well-regions/{wegionId:int}/well-fields/{wieldId:int}/sections/{wieldSectionId}' },
             { url: '/companies/{companyId:guid}/well-regions/{wegionId:int}/well-fields/{wieldId:int}/well-groups/{wroupId:int}' },
+            { url: '/companies/{companyId:guid}/well-regions/{wegionId:int}/well-fields/{wieldId:int}/well-groups/{wroupId:int}/sections/{wroupSectionId}' },
             { url: '/companies/{companyId:guid}/well-regions/{wegionId:int}/well-fields/{wieldId:int}/well-groups/{wroupId:int}/wells/{wellId:int}' },
+            { url: '/companies/{companyId:guid}/well-regions/{wegionId:int}/well-fields/{wieldId:int}/well-groups/{wroupId:int}/wells/{wellId:int}/sections/{wellSectionId}' },
             { url: '/account/logon' }, // may be with some query params, like redirectUrl
             { url: '/account/register' }
     ];
@@ -97,7 +100,6 @@ define(['helpers/app-helper'], function (appHelper) {
                     switch (paramType) {
                         case 'guid':
                             isTypeSuccess = appHelper.isGuidValid(currentUrlArr[elemIndex]);
-
                             break;
                         case 'int':
                             isTypeSuccess = currentUrlArr[elemIndex] % 1 === 0;

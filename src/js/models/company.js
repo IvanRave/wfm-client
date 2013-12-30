@@ -71,14 +71,6 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
             */
             this.wegions = ko.observableArray();
 
-            /** 
-            * Select section
-            * @param {object} sectionToSelect
-            */
-            this.selectSection = function (sectionToSelect) {
-                ths.selectedSection(sectionToSelect);
-            };
-
             /**
             * Whether well regions are loaded
             * @type {boolean}
@@ -187,16 +179,42 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
                 /** Initial function for all select stage functions */
                 ths.selectChildStage(wegionToSelect);
 
-                // Unselect child
-                wegionToSelect.selectedWield(null);
+                var tmpInitialUrlData = ko.unwrap(ths.getRootViewModel().initialUrlData);
 
-                // Select ths
+                // 1. Check url to child stage
+                if (tmpInitialUrlData.wieldId) {
+                    var needWield = wegionToSelect.getWieldById(tmpInitialUrlData.wieldId);
+                    if (needWield) {
+                        wegionToSelect.selectWield(needWield);
+                    }
+                    else {
+                        alert('Well field is not found');
+                    }
+
+                    delete tmpInitialUrlData.wieldId;
+                    ths.getRootViewModel().initialUrlData(tmpInitialUrlData);
+                }
+                else if (tmpInitialUrlData.wegionSectionId) {
+                    // Select section
+
+                    var tmpSection = wegionToSelect.getSectionByPatternId('wegion-' + tmpInitialUrlData.wegionSectionId);
+                    wegionToSelect.selectSection(tmpSection);
+
+                    // Remove section id from
+                    delete tmpInitialUrlData.wegionSectionId;
+                    ths.getRootViewModel().initialUrlData(tmpInitialUrlData);
+                }
+                else {
+                    // Show dashboard
+                    wegionToSelect.unselectSection();
+                    // Unselect child to show parent content
+                    wegionToSelect.selectedWield(null);
+                }
+                
+                // Set as selected: only after select all children
                 ths.selectedWegion(wegionToSelect);
 
                 // Select parents (not need)
-
-                // Select summary section
-                wegionToSelect.selectedSection(wegionToSelect.getSectionByPatternId('wegion-summary'));
             };
 
             /**
@@ -308,6 +326,10 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
                         if (wegionToSelect) {
                             ths.selectWegion(wegionToSelect);
                         }
+
+                        // Remove to not load again
+                        delete tmpInitialUrlData.wegionId;
+                        ths.getRootViewModel().initialUrlData(tmpInitialUrlData);
                     }
                 }
 

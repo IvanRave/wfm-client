@@ -204,34 +204,38 @@ define(['knockout', 'models/employee', 'services/register', 'helpers/lang-helper
             this.selectEmployee = function (employeeToSelect) {
                 var tmpInitialUrlData = ko.unwrap(vm.initialUrlData);
 
-                // Unselect child
-                employeeToSelect.company.selectedWegion(null);
-
-                // Select ths
-                ths.selectedEmployee(employeeToSelect);
-
-                // Select parents (no need)
-
-                var tmpCompany = ko.unwrap(ths.selectedEmployee).company;
+                var tmpCompany = employeeToSelect.company;
 
                 // Load all regions for company of selected employee
                 tmpCompany.loadWegions();
 
                 // If not selected children, then select first section
-                if (!tmpInitialUrlData.wegionId) {
-                    if (tmpInitialUrlData.companySectionId) {
-                        // Select section
-                        tmpCompany.selectSection(tmpCompany.getSectionByPatternId('company-' + tmpInitialUrlData.companySectionId));
-                    }
-                    else {
-                        // Show dashboard
-                        tmpCompany.unselectSection();
-                    }
+                if (tmpInitialUrlData.wegionId) {
+                    // Select child after loading well regions
+                    // If no well-regions then redirect to the main page
+                }
+                else if (tmpInitialUrlData.companySectionId) {
+                    // Select section
+
+                    var tmpSection = tmpCompany.getSectionByPatternId('company-' + tmpInitialUrlData.companySectionId);
+                    tmpCompany.selectSection(tmpSection);
+
+                    // Remove section id from
+                    delete tmpInitialUrlData.companySectionId;
+                    vm.initialUrlData(tmpInitialUrlData);
+                }
+                else {
+                    // Unselect child
+                    employeeToSelect.company.selectedWegion(null);
+                    // Show dashboard
+                    tmpCompany.unselectSection();
+
                 }
 
-                if (!tmpInitialUrlData.isHistory) {
-                    historyHelper.pushState('/companies/' + employeeToSelect.companyId);
-                }
+                // Select ths
+                ths.selectedEmployee(employeeToSelect);
+
+                // Select parents (no need)
             };
 
             /**
@@ -249,10 +253,9 @@ define(['knockout', 'models/employee', 'services/register', 'helpers/lang-helper
                 ths.isLoadedEmployees(false);
                 ths.selectedEmployee(null);
                 companyUserService.getCompanyUserList().done(function (response) {
-                    if (tmpInitialUrlData.isHistory) {
-                        // Set hash, add to history
-                        historyHelper.pushState('/companies');
-                    }
+
+                    // Set hash, add to history
+                    historyHelper.pushState('/companies');
 
                     var emplArray = importEmployees(response, vm);
                     ths.employees(emplArray);
@@ -263,6 +266,9 @@ define(['knockout', 'models/employee', 'services/register', 'helpers/lang-helper
                             if (arrElem.companyId === tmpInitialUrlData.companyId) {
                                 // Select employee = select company
                                 ths.selectEmployee(arrElem);
+                                // Clean from initial url data to don't select again
+                                delete tmpInitialUrlData.companyId;
+                                vm.initialUrlData(tmpInitialUrlData);
                             }
                         });
                     }

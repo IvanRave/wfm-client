@@ -13,6 +13,43 @@ define(['knockout',
         }
 
         /**
+        * Get array for navigation url: builded from childstage and sections
+        * @param {object} childStage - Child stage: well, wroup...
+        */
+        function getNavigationArr(childStage) {
+            var navigationArr;
+            switch (childStage.stageKey) {
+                case stageConstants.company.id:
+                    navigationArr = [stageConstants.company.plural, childStage.id];
+                    break;
+                case stageConstants.wegion.id:
+                    navigationArr = [stageConstants.company.plural, childStage.getCompany().id,
+                        stageConstants.wegion.plural, childStage.id];
+                    break;
+                case stageConstants.wield.id:
+                    navigationArr = [stageConstants.company.plural, childStage.getWellRegion().getCompany().id,
+                        stageConstants.wegion.plural, childStage.getWellRegion().id,
+                        stageConstants.wield.plural, childStage.id];
+                    break;
+                case stageConstants.wroup.id:
+                    navigationArr = [stageConstants.company.plural, childStage.getWellField().getWellRegion().getCompany().id,
+                        stageConstants.wegion.plural, childStage.getWellField().getWellRegion().id,
+                        stageConstants.wield.plural, childStage.getWellField().id,
+                        stageConstants.wroup.plural, childStage.id];
+                    break;
+                case stageConstants.well.id:
+                    navigationArr = [stageConstants.company.plural, childStage.getWellGroup().getWellField().getWellRegion().getCompany().id,
+                        stageConstants.wegion.plural, childStage.getWellGroup().getWellField().getWellRegion().id,
+                        stageConstants.wield.plural, childStage.getWellGroup().getWellField().id,
+                        stageConstants.wroup.plural, childStage.getWellGroup().id,
+                        stageConstants.well.plural, childStage.id];
+                    break;
+            }
+
+            return navigationArr;
+        }
+
+        /**
         * Base for all stages: well, group, region etc.
         */
         var exports = function (data) {
@@ -167,65 +204,74 @@ define(['knockout',
                 deferEvaluation: true
             });
 
+            /** Select section */
+            this.selectSection = function (sectionToSelect) {
+                if (!sectionToSelect) { return; }
+                ths.selectedSection(sectionToSelect);
+                if (ths.loadSectionContent) {
+                    ths.loadSectionContent(sectionToSelect.sectionPatternId);
+                }
+
+                // Add data to the url
+                var navigationArr = getNavigationArr(ths);
+
+                navigationArr.push('sections');
+                navigationArr.push(sectionToSelect.sectionPatternId.split('-')[1]);
+
+                if (navigationArr) {
+                    historyHelper.pushState('/' + navigationArr.join('/'));
+                }
+                else {
+                    throw new Error('No stage for navigation url in stage-base');
+                }
+            };
+
             /** Choose dashboard (no section */
             this.unselectSection = function () {
                 ths.selectedSection(null);
                 ths.loadWidgouts();
-                ////window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
-                ////    region: ths.getWellGroup().getWellField().getWellRegion().Id,
-                ////    field: ths.getWellGroup().getWellField().Id,
-                ////    group: ths.getWellGroup().Id,
-                ////    well: ths.Id
-                ////});
 
                 if (ths.loadDashboard) {
                     ths.loadDashboard();
+                }
+
+                var navigationArr = getNavigationArr(ths);
+                if (navigationArr) {
+                    historyHelper.pushState('/' + navigationArr.join('/'));
+                }
+                else {
+                    throw new Error('Unselect section: no stage for navigation url in stage-base');
                 }
             };
 
             /**
             * Select child stage: initial function for all 'select child' on every stage
-            * @param {object} childStage - Child stage: like wroup for wield
+            * @param {object} childStage - Child stage: like well, wroup, wield, wegion, company
             */
             this.selectChildStage = function (childStage) {
                 childStage.isOpenItem(true);
 
-                var tmpInitialUrlData = ko.unwrap(ths.getRootViewModel().initialUrlData);
-                console.log('initialUrlData', tmpInitialUrlData);
-                if (!tmpInitialUrlData.isHistory) {
-                    var navigationArr;
-                    switch (childStage.stageKey) {
-                        case stageConstants.wegion.id:
-                            navigationArr = [stageConstants.company.plural, childStage.getCompany().id,
-                                stageConstants.wegion.plural, childStage.id];
-                            break;
-                        case stageConstants.wield.id:
-                            navigationArr = [stageConstants.company.plural, childStage.getWellRegion().getCompany().id,
-                                stageConstants.wegion.plural, childStage.getWellRegion().id,
-                                stageConstants.wield.plural, childStage.id];
-                            break;
-                        case stageConstants.wroup.id:
-                            navigationArr = [stageConstants.company.plural, childStage.getWellField().getWellRegion().getCompany().id,
-                                stageConstants.wegion.plural, childStage.getWellField().getWellRegion().id,
-                                stageConstants.wield.plural, childStage.getWellField().id,
-                                stageConstants.wroup.plural, childStage.id];
-                            break;
-                        case stageConstants.well.id:
-                            navigationArr = [stageConstants.company.plural, childStage.getWellGroup().getWellField().getWellRegion().getCompany().id,
-                                stageConstants.wegion.plural, childStage.getWellGroup().getWellField().getWellRegion().id,
-                                stageConstants.wield.plural, childStage.getWellGroup().getWellField().id,
-                                stageConstants.wroup.plural, childStage.getWellGroup().id,
-                                stageConstants.well.plural, childStage.id];
-                            break;
-                    }
 
-                    if (navigationArr) {
-                        historyHelper.pushState('/' + navigationArr.join('/'));
-                    }
-                    else {
-                        throw new Error('No stage for navigation url in stage-base');
-                    }
-                }
+
+                // Push to the navigation url: no need 
+                // When you select stage, then selected any of the sections (or unselect section)
+                // On this moment url will be changed
+                // By default: 
+                // 1. Load section from url
+                // 2. Load section from previous selected stage from the same level
+                // If not: unselect sections (show dashboard) //childStage.unselectSection();
+
+                ////var tmpInitialUrlData = ko.unwrap(ths.getRootViewModel().initialUrlData);
+                ////console.log('initialUrlData', tmpInitialUrlData);
+                ////var navigationArr = getNavigationArr(childStage);
+
+                ////if (navigationArr) {
+                ////    historyHelper.pushState('/' + navigationArr.join('/'));
+                ////}
+                ////else {
+                ////    throw new Error('SelectChildStage: no stage for navigation url in stage-base');
+                ////}
+
             };
         };
 

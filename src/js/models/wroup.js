@@ -92,19 +92,22 @@ define(['jquery',
             */
             this.Wells = ko.observableArray();
 
-            /** 
-            * Select section
-            * @param {object} sectionToSelect
-            */
-            this.selectSection = function (sectionToSelect) {
-                ths.selectedSection(sectionToSelect);
-            };
-
             /**
             * Selected well
             * @type {module:models/well}
             */
             this.selectedWell = ko.observable();
+
+            /**
+            * Get well by id
+            * @param {number} idOfWell - Id of well
+            */
+            this.getWellById = function (idOfWell) {
+                var tmpWells = ko.unwrap(ths.Wells);
+                return tmpWells.filter(function (elem) {
+                    return elem.id === idOfWell;
+                })[0];
+            };
 
             /**
             * Select well (child)
@@ -113,53 +116,67 @@ define(['jquery',
             this.selectWell = function (wellToSelect) {
                 /** Initial function for all select stage functions */
                 ths.selectChildStage(wellToSelect);
-                ////window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
-                ////    region: ths.getWellGroup().getWellField().getWellRegion().Id,
-                ////    field: ths.getWellGroup().getWellField().Id,
-                ////    group: ths.getWellGroup().Id,
-                ////    well: ths.Id
-                ////});
 
-                // By default - no template - show widget page
-                // Previous - by default - summary ths.sectionList[0].id;
-                var previousSelectedSection;
 
-                var prevSlcWellRegion = ko.unwrap(ths.getWellField().getWellRegion().getCompany().selectedWegion);
+                var tmpInitialUrlData = ko.unwrap(ths.getRootViewModel().initialUrlData);
 
-                // get previous selected section (if exists)
-                if (prevSlcWellRegion) {
-                    var prevSlcWellField = ko.unwrap(prevSlcWellRegion.selectedWield);
-                    if (prevSlcWellField) {
-                        var prevSlcWellGroup = ko.unwrap(prevSlcWellField.selectedWroup);
-                        if (prevSlcWellGroup) {
-                            // previous selected well
-                            var prevSlcWell = ko.unwrap(prevSlcWellGroup.selectedWell);
-                            if (prevSlcWell) {
-                                previousSelectedSection = ko.unwrap(prevSlcWell.selectedSection);
+                if (tmpInitialUrlData.wellSectionId) {
+                    // Select section
 
-                                // If selected perfomance section
-                                var tmpSelectedAttrGroupId = ko.unwrap(prevSlcWell.mainPerfomanceView.selectedAttrGroupId);
-                                if (tmpSelectedAttrGroupId) {
-                                    wellToSelect.mainPerfomanceView.selectedAttrGroupId(tmpSelectedAttrGroupId);
+                    var tmpSection = wellToSelect.getSectionByPatternId('well-' + tmpInitialUrlData.wellSectionId);
+                    wellToSelect.selectSection(tmpSection);
+
+                    // Remove section id from
+                    delete tmpInitialUrlData.wellSectionId;
+                    ths.getRootViewModel().initialUrlData(tmpInitialUrlData);
+                }
+                else
+                {
+                    // Check previous section
+
+
+                    // By default - no template - show widget page
+                    // Previous - by default - summary ths.sectionList[0].id;
+                    var previousSelectedSection;
+
+                    var prevSlcWellRegion = ko.unwrap(ths.getWellField().getWellRegion().getCompany().selectedWegion);
+
+                    // get previous selected section (if exists)
+                    if (prevSlcWellRegion) {
+                        var prevSlcWellField = ko.unwrap(prevSlcWellRegion.selectedWield);
+                        if (prevSlcWellField) {
+                            var prevSlcWellGroup = ko.unwrap(prevSlcWellField.selectedWroup);
+                            if (prevSlcWellGroup) {
+                                // previous selected well
+                                var prevSlcWell = ko.unwrap(prevSlcWellGroup.selectedWell);
+                                if (prevSlcWell) {
+                                    previousSelectedSection = ko.unwrap(prevSlcWell.selectedSection);
+
+                                    // If selected perfomance section
+                                    var tmpSelectedAttrGroupId = ko.unwrap(prevSlcWell.mainPerfomanceView.selectedAttrGroupId);
+                                    if (tmpSelectedAttrGroupId) {
+                                        wellToSelect.mainPerfomanceView.selectedAttrGroupId(tmpSelectedAttrGroupId);
+                                    }
                                 }
                             }
                         }
                     }
+
+                    if (previousSelectedSection) {
+                        wellToSelect.selectSection(wellToSelect.getSectionByPatternId(previousSelectedSection.sectionPatternId));
+                    }
+                    else {
+                        wellToSelect.unselectSection();
+                    }
                 }
+                    
+
 
                 // set new selected data (plus region in the end)
                 var slcWellGroup = ths;
                 var slcWellField = ths.getWellField();
                 var slcWellRegion = slcWellField.getWellRegion();
                 var slcCompany = slcWellRegion.getCompany();
-
-                // 1. Section
-                if (previousSelectedSection) {
-                    wellToSelect.selectSection(wellToSelect.getSectionByPatternId(previousSelectedSection.sectionPatternId));
-                }
-                else {
-                    wellToSelect.unselectSection();
-                }
 
                 // 2. Well
                 // set selected items in DESC order (can be redraw each time if ASC order)

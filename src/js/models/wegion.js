@@ -63,14 +63,6 @@ define(['jquery',
             /** Base for all stages */
             StageBase.call(this, data);
 
-            /** 
-            * Select section
-            * @param {object} sectionToSelect
-            */
-            this.selectSection = function (sectionToSelect) {
-                ths.selectedSection(sectionToSelect);
-            };
-
             /** Is selected item */
             this.isSelectedItem = ko.computed({
                 read: function () {
@@ -96,11 +88,52 @@ define(['jquery',
 
             this.selectedWield = ko.observable();
 
+            /**
+            * Get well field by id
+            * @type {number} idOfWield - Well field id
+            */
+            this.getWieldById = function (idOfWield) {
+                var tmpWields = ko.unwrap(ths.wields);
+                return tmpWields.filter(function (elem) {
+                    return elem.id === idOfWield;
+                })[0];
+            };
+
+            /** Select well field */
             this.selectWield = function (wieldToSelect) {
                 ths.selectChildStage(wieldToSelect);
 
-                // Unselect child
-                wieldToSelect.selectedWroup(null);
+                var tmpInitialUrlData = ko.unwrap(ths.getRootViewModel().initialUrlData);
+
+                if (tmpInitialUrlData.wroupId) {
+                    var needWroup = wieldToSelect.getWroupById(tmpInitialUrlData.wroupId);
+                    if (needWroup) {
+                        wieldToSelect.selectWroup(needWroup);
+                    }
+                    else
+                    {
+                        alert('Well group from url is not found');
+                    }
+
+                    delete tmpInitialUrlData.wroupId;
+                    ths.getRootViewModel().initialUrlData(tmpInitialUrlData);
+                }
+                else if (tmpInitialUrlData.wieldSectionId) {
+                    // Select section
+
+                    var tmpSection = wieldToSelect.getSectionByPatternId('wield-' + tmpInitialUrlData.wieldSectionId);
+                    wieldToSelect.selectSection(tmpSection);
+
+                    // Remove section id from
+                    delete tmpInitialUrlData.wieldSectionId;
+                    ths.getRootViewModel().initialUrlData(tmpInitialUrlData);
+                }
+                else {
+                    // Show dashboard
+                    wieldToSelect.unselectSection();
+                    // Unselect child to show parent content
+                    wieldToSelect.selectedWroup(null);
+                }
 
                 // Select ths
                 ths.selectedWield(wieldToSelect);
@@ -108,19 +141,14 @@ define(['jquery',
                 // Select parents
                 ths.getCompany().selectedWegion(ths);
 
-                ////window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
-                ////    region: ths.getWellRegion().Id,
-                ////    field: ths.Id
-                ////});
-
                 // Select section by default (or selected section from prevous selected field)
-                var needSection = $.grep(ko.unwrap(wieldToSelect.listOfSection), function (arrElem) {
-                    return (arrElem.sectionPatternId === 'wield-map');
-                })[0];
+                ////var needSection = $.grep(ko.unwrap(wieldToSelect.listOfSection), function (arrElem) {
+                ////    return (arrElem.sectionPatternId === 'wield-map');
+                ////})[0];
 
-                if (needSection) {
-                    wieldToSelect.selectSection(needSection);
-                }
+                ////if (needSection) {
+                ////    wieldToSelect.selectSection(needSection);
+                ////}
             };
 
             this.removeChild = function (wellFieldForDelete) {
