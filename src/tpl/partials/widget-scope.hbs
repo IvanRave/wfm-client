@@ -1,4 +1,7 @@
 ﻿<div data-bind="if: isLoadedWidgouts">
+  <div data-bind="if: widgouts().length === 0">
+    {{ capitalizeFirst lang.dashboard }} is empty
+  </div>
   <div class="clearfix">
     <div class="pull-left">
       <span data-bind="with: slcWidgout">

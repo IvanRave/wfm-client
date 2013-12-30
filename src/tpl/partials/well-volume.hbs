@@ -1,12 +1,24 @@
-﻿<div>
-  <div class="row">
-    <div class="col-sm-4 text-center">
-      <div>
-        <button class="btn btn-default btn-sm btn-block" data-bind="click: function(){ chooseMainFile('volume'); }">Choose volume...</button>
-      </div>
-      <span class="pointer" data-bind="panzoomImg: {src: MainVolumeUrl}">
-        <img class="img-responsive" src="#" data-bind="attr: { src: MainVolumeUrl }" alt="Volume image" />
+﻿<div class="row">
+  <div class="col-md-8">
+    <div data-bind="with: slcVolume">
+      <span data-bind="with: fileSpec">
+        <span class="pointer" data-bind="panzoomImg: {src: fileUrl}">
+          <img src="#" data-bind="attr: {src: fileUrl}"></img>
+        </span>
       </span>
+      <h4 data-bind="text: name"></h4>
+      <h5 data-bind="text: description"></h5>
+    </div>
+    <div data-bind="ifnot: slcVolume">
+      No selected volume
+    </div>
+  </div>
+  <div class="col-md-4">
+    <button class="btn btn-xs btn-default" type="button" data-bind="click: createVolumeFromFile">Add volume...</button>
+    <div class="min-top-margin" data-bind="foreach: volumes">
+      <div>
+        <span class="pointer link-view" data-bind="text: name, click: $parent.selectVolume"></span>
+      </div>
     </div>
   </div>
 </div>
