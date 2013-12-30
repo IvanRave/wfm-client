@@ -1,4 +1,5 @@
-﻿define(['jquery', 'knockout', 'services/datacontext', 'helpers/app-helper'], function ($, ko, datacontext, appHelper) {
+﻿/** @module */
+define(['jquery', 'knockout', 'services/datacontext', 'helpers/app-helper'], function ($, ko, datacontext, appHelper) {
     'use strict';
 
     function WellFieldMapArea(data, wellFieldMap) {

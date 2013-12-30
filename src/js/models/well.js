@@ -928,20 +928,15 @@ define([
                     // Add to the current array
                     ths.volumes.push(new VolumeOfWell(res, ths.slcVolume));
                     tmpModalFileMgr.hide();
+                }).fail(function (jqXHR) {
+                    if (jqXHR.status === 422) {
+                        var resJson = jqXHR.responseJSON;
+                        require(['helpers/lang-helper'], function (langHelper) {
+                            var tmpProcessError = (langHelper.translate(resJson.errId) || '{{lang.unknownError}}');
+                            tmpModalFileMgr.okError(tmpProcessError);
+                        });
+                    }
                 });
-                // Change sketch (create if not exists)
-                ////sketchOfWellService.put(ths.idOfWell, {
-                ////    idOfWell: ths.idOfWell,
-                ////    idOfFileSpec: selectedFileSpecs[0].id,
-                ////    name: ko.unwrap(selectedFileSpecs[0].name) || '',
-                ////    description: ko.unwrap(ths.description) || ''
-                ////}).done(function (resSketch) {
-                ////    ths.name(resSketch.Name);
-                ////    ths.description(resSketch.Description);
-                ////    ths.idOfFileSpec(resSketch.IdOfFileSpec);
-                ////    ths.fileSpec(new FileSpec(resSketch.FileSpecDto));
-                ////    tmpModalFileMgr.hide();
-                ////});
             }
 
             // Add to observable
