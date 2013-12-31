@@ -50,20 +50,28 @@ define(['knockout', 'models/file-spec', 'services/well/sketch'], function (ko, F
         /** Load well sketches: get only first elem of array: one sketch per well */
         this.load = function () {
             // Load only if not loaded already
-            if (!ko.unwrap(ths.isLoaded)) {
-                // return array of sketch: get only first
-                sketchOfWellService.get(ths.idOfWell).done(function (r) {
-                    if (r.length > 0) {
-                        var resSketch = r[0];
+            if (ko.unwrap(ths.isLoaded)) { return; }
 
-                        ths.name(resSketch.Name);
-                        ths.description(resSketch.Description);
-                        ths.idOfFileSpec(resSketch.IdOfFileSpec);
-                        ths.fileSpec(new FileSpec(resSketch.FileSpecDto));
-                    }
-                    ths.isLoaded(true);
-                });
-            }
+            // return array of sketch: get only first
+            sketchOfWellService.get(ths.idOfWell).done(function (r) {
+                if (r.length > 0) {
+                    var resSketch = r[0];
+
+                    ths.name(resSketch.Name);
+                    ths.description(resSketch.Description);
+                    ths.idOfFileSpec(resSketch.IdOfFileSpec);
+                    ths.fileSpec(new FileSpec(resSketch.FileSpecDto));
+                }
+                else {
+                    ths.name(null);
+                    ths.description(null);
+                    ths.idOfFileSpec(null);
+                    ths.fileSpec(null);
+                }
+
+                ths.isLoaded(true);
+            });
+
         };
 
         this.save = function () {

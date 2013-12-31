@@ -13,18 +13,6 @@ define(['knockout',
         }
 
         /**
-        * Update section after removing files
-        */
-        function updateSectionAfterRemovingFiles(idOfSectionPattern) {
-            switch (idOfSectionPattern) {
-                case 'well-volume':
-                    ths.getParent().isLoadedVolumes(false);
-                    ths.getParent().loadVolumes();
-                    break;
-            }
-        }
-
-        /**
         * Section base: sharep props for other types of sections - insert using call method
         * @constructor
         * @param {object} data - Section data
@@ -203,6 +191,26 @@ define(['knockout',
                     });
                 });
             };
+
+            /**
+            * Update section after removing files
+            */
+            function updateSectionAfterRemovingFiles(idOfSectionPattern) {
+                switch (idOfSectionPattern) {
+                    case 'well-volume':
+                        ths.getParent().isLoadedVolumes(false);
+                        ths.getParent().loadVolumes();
+                        break;
+                    case 'well-sketch':
+                        ths.getParent().sketchOfWell.isLoaded(false);
+                        ths.getParent().sketchOfWell.load();
+                        break;
+                    case 'well-history':
+                        ths.getParent().isLoadedHistoryList(false);
+                        ths.getParent().getWellHistoryList();
+                        break;
+                }
+            }
 
             /**
             * Delete file spec by id

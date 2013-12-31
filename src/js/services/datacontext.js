@@ -35,9 +35,7 @@
     function wellInWellFieldMapUrl(uqp) {
         return '{{conf.requrl}}/api/wellinwellfieldmap/' + (uqp ? ('?' + $.param(uqp)) : '');
     }
-    function wellHistoryFileUrl(uqp) {
-        return '{{conf.requrl}}/api/wellhistoryfile/' + (uqp ? ('?' + $.param(uqp)) : '');
-    }
+    
     function userProfileUrl(uqp) {
         return '{{conf.requrl}}/api/userprofile/' + (uqp ? ('?' + $.param(uqp)) : '');
     }
@@ -233,17 +231,6 @@
         return ajaxRequest('DELETE', wellInWellFieldMapUrl(urlQueryParams));
     }
 
-    function postWellHistoryFile(item) {
-        return ajaxRequest('POST', wellHistoryFileUrl(), item);
-    }
-
-    function deleteWellHistoryFile(item) {
-        return ajaxRequest('DELETE', wellHistoryFileUrl({
-            'cloudfile_id': item.CloudFileId,
-            'wellhistory_id': item.WellHistoryId
-        }));
-    }
-
     // user profile
     function createUserProfile(data) {
         return new datacontext.userProfile(data); // from cabinet.model.js
@@ -366,9 +353,6 @@
         saveNewWellInWellFieldMap: saveNewWellInWellFieldMap,
         saveChangedWellInWellFieldMap: saveChangedWellInWellFieldMap,
         deleteWellInWellFieldMap: deleteWellInWellFieldMap,
-        // WellHistoryFile
-        postWellHistoryFile: postWellHistoryFile,
-        deleteWellHistoryFile: deleteWellHistoryFile,
         // section list
         getSectionList: getSectionList,
         imageMimeTypes: imageMimeTypes,

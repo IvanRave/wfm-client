@@ -44,8 +44,9 @@
                   </span>
                 </div>
                 <div class="clearfix" data-bind="foreach: WellHistoryFiles">
-                  <div class="img-thumbnail pull-left">
-                    <a href="#" data-bind="text: FileNameWODate, click: downloadWellHistoryFile"></a>
+                  <div class="img-thumbnail pull-left" data-bind="with: fileSpec">
+                    <!--click: downloadWellHistoryFile-->
+                    <span class="link-view pointer" data-bind="text: name"></span>
                   </div>
                 </div>
               </div>

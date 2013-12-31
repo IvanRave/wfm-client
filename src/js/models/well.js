@@ -448,12 +448,12 @@ define([
         this.isLoadedHistoryList = ko.observable(false);
 
         this.getWellHistoryList = function () {
-            if (ko.unwrap(ths.isLoadedHistoryList) === false) {
-                datacontext.getWellHistoryList({ well_id: ths.Id }).done(function (response) {
-                    ths.historyList(importWellHistoryDto(response, ths));
-                    ths.isLoadedHistoryList(true);
-                });
-            }
+            if (ko.unwrap(ths.isLoadedHistoryList)) { return; }
+
+            datacontext.getWellHistoryList({ well_id: ths.Id }).done(function (response) {
+                ths.historyList(importWellHistoryDto(response, ths));
+                ths.isLoadedHistoryList(true);
+            });
         };
 
         this.wellHistoryNew = {

@@ -1,117 +1,150 @@
-﻿define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper', 'helpers/app-helper', 'models/well-history-file', 'models/wfm-image'],
-    function ($, ko, datacontext, bootstrapModal, appHelper) {
+﻿define(['jquery', 'knockout',
+    'services/datacontext',
+    'helpers/modal-helper',
+    'helpers/app-helper',
+    'models/file-spec-of-history-of-well',
+    'services/file-spec-of-history-of-well',
+    'models/wfm-image'],
+    function ($, ko, datacontext, bootstrapModal, appHelper, FileSpecOfHistoryOfWell, fileSpecOfHistoryOfWellService) {
         'use strict';
 
         // convert data objects into array
-        function importWellHistoryFiles(data) { return $.map(data || [], function (item) { return datacontext.createWellHistoryFile(item); }); }
+        function importWellHistoryFiles(data) {
+            return (data || []).map(function (item) { return new FileSpecOfHistoryOfWell(item); });
+        }
 
-        function importWfmImagesDto(data) { return $.map(data || [], function (item) { return datacontext.createWfmImage(item); }); }
+        function importWfmImagesDto(data) {
+            return (data || []).map(function (item) { return datacontext.createWfmImage(item); });
+        }
 
         function WellHistory(data, well) {
-            var self = this;
+            var ths = this;
             data = data || {};
 
-            self.getWell = function () {
+            this.getWell = function () {
                 return well;
             };
 
             // Properties
-            self.id = data.Id;
-            self.historyText = ko.observable(data.HistoryText);
-            self.startUnixTime = ko.observable(data.StartUnixTime);
-            self.endUnixTime = ko.observable(data.EndUnixTime);
-            self.jobTypeId = data.JobTypeId ? ko.observable(data.JobTypeId) : ko.observable();
-            self.wellId = data.WellId;
+            this.id = data.Id;
+            this.historyText = ko.observable(data.HistoryText);
+            this.startUnixTime = ko.observable(data.StartUnixTime);
+            this.endUnixTime = ko.observable(data.EndUnixTime);
+            this.jobTypeId = data.JobTypeId ? ko.observable(data.JobTypeId) : ko.observable();
+            this.wellId = data.WellId;
 
-            self.WfmImages = ko.observableArray();
-            self.WellHistoryFiles = ko.observableArray(importWellHistoryFiles(data.WellHistoryFiles));
+            this.WfmImages = ko.observableArray();
+            this.WellHistoryFiles = ko.observableArray(importWellHistoryFiles(data.WellHistoryFiles));
 
             // Load job type id
             // Extract from root.companyJobTypeList by id
             // Computed
-            self.jobType = ko.computed({
+            this.jobType = ko.computed({
                 read: function () {
-                    var tmpJobTypeId = ko.unwrap(self.jobTypeId);
+                    var tmpJobTypeId = ko.unwrap(ths.jobTypeId);
                     if (tmpJobTypeId) {
-                        var companyJobTypeList = ko.unwrap(self.getWell().getWellGroup().getWellField().getWellRegion().getCompany().jobTypeList);
+                        var companyJobTypeList = ko.unwrap(ths.getWell().getWellGroup().getWellField().getWellRegion().getCompany().jobTypeList);
                         return appHelper.getElementByPropertyValue(companyJobTypeList, 'id', tmpJobTypeId);
                     }
                 },
                 deferEvaluation: true
             });
 
-            self.isVisibleEndUnixTime = ko.computed({
+            this.isVisibleEndUnixTime = ko.computed({
                 read: function () {
-                    return ko.unwrap(self.startUnixTime) !== ko.unwrap(self.endUnixTime);
+                    return ko.unwrap(ths.startUnixTime) !== ko.unwrap(ths.endUnixTime);
                 },
                 deferEvaluation: true
             });
 
-            self.putWellHistory = function () {
+            this.putWellHistory = function () {
                 var wellHistoryData = {
-                    id: ko.unwrap(self.id),
-                    startUnixTime: ko.unwrap(self.startUnixTime),
-                    endUnixTime: ko.unwrap(self.endUnixTime),
-                    wellId: ko.unwrap(self.wellId),
-                    historyText: ko.unwrap(self.historyText),
-                    jobTypeId: ko.unwrap(self.jobTypeId)
+                    id: ko.unwrap(ths.id),
+                    startUnixTime: ko.unwrap(ths.startUnixTime),
+                    endUnixTime: ko.unwrap(ths.endUnixTime),
+                    wellId: ko.unwrap(ths.wellId),
+                    historyText: ko.unwrap(ths.historyText),
+                    jobTypeId: ko.unwrap(ths.jobTypeId)
                 };
 
                 datacontext.putWellHistory(wellHistoryData);
             };
 
-            self.startUnixTime.subscribe(self.putWellHistory);
-            self.endUnixTime.subscribe(self.putWellHistory);
-            self.jobTypeId.subscribe(self.putWellHistory);
+            this.startUnixTime.subscribe(ths.putWellHistory);
+            this.endUnixTime.subscribe(ths.putWellHistory);
+            this.jobTypeId.subscribe(ths.putWellHistory);
 
-            self.deleteWfmImage = function (itemForDelete) {
+            this.deleteWfmImage = function (itemForDelete) {
                 if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + itemForDelete.Name + '"?')) {
                     datacontext.deleteWfmImage(itemForDelete).done(function () {
-                        self.WfmImages.remove(itemForDelete);
+                        ths.WfmImages.remove(itemForDelete);
                     });
                 }
             };
 
-            self.deleteWellHistoryFile = function (itemForDelete) {
+            /** Remove file spec of history of well */
+            this.removeFileSpecOfHistoryOfWell = function (fileSpecOfHistoryOfWellToRemove) {
                 if (confirm('{{capitalizeFirst lang.confirmToDelete}} this file?')) {
-                    datacontext.deleteWellHistoryFile(itemForDelete).done(function () {
-                        self.WellHistoryFiles.remove(itemForDelete);
+                    fileSpecOfHistoryOfWellService.remove(ths.id, fileSpecOfHistoryOfWellToRemove.idOfFileSpec).done(function () {
+                        ths.WellHistoryFiles.remove(fileSpecOfHistoryOfWellToRemove);
                     });
                 }
             };
 
-            self.chooseWellHistoryFile = function () {
-                var existingFileNames = $.map(self.WellHistoryFiles(), function (whValue) {
-                    var partUrlArray = whValue.CloudFileUrl.split('/');
-                    return partUrlArray[partUrlArray.length - 1];
-                });
+            /**
+            * Create file spec of history of well from well section
+            */
+            this.createFileSpecOfHistoryOfWell = function () {
+                var needSection = ths.getWell().getSectionByPatternId('well-history');
 
-                self.getWell().selectedFmgSectionId('history');
+                // Select file section with sketches (load and unselect files)
+                ths.getWell().selectFileSection(needSection);
 
-                function callbackFunction(checkedWellFileList) {
-                    $.each(checkedWellFileList, function (elemIndex, elemValue) {
-                        // if the selected file has not been added earlier, then add to well history files
-                        if ($.inArray(elemValue.Name(), existingFileNames) === -1) {
-                            var itemForAdd = datacontext.createWellHistoryFile({
-                                WellHistoryId: self.id,
-                                Comment: '',
-                                CloudFileUrl: self.wellId + '/history/work/' + elemValue.Name()
-                            });
+                var tmpModalFileMgr = ths.getWell().getWellGroup().getWellField().getWellRegion().getCompany().modalFileMgr;
 
-                            datacontext.postWellHistoryFile(itemForAdd).done(function (response) {
-                                self.WellHistoryFiles.push(datacontext.createWellHistoryFile(response));
+                // Calback for selected file
+                function mgrCallback() {
+                    tmpModalFileMgr.okError('');
+                    // Select file from file manager
+                    var selectedFileSpecs = ko.unwrap(needSection.listOfFileSpec).filter(function (elem) {
+                        return ko.unwrap(elem.isSelected);
+                    });
+
+                    if (selectedFileSpecs.length !== 1) {
+                        tmpModalFileMgr.okError('need to select one file');
+                        return;
+                    }
+
+                    fileSpecOfHistoryOfWellService.post(ths.id, {
+                        idOfFileSpec: selectedFileSpecs[0].id,
+                        idOfHistoryOfWell: ths.id,
+                        description: ''
+                    }).done(function (res) {
+                        ths.WellHistoryFiles.push(new FileSpecOfHistoryOfWell(res));
+                        tmpModalFileMgr.hide();
+                    }).fail(function (jqXHR) {
+                        if (jqXHR.status === 422) {
+                            var resJson = jqXHR.responseJSON;
+                            require(['helpers/lang-helper'], function (langHelper) {
+                                var tmpProcessError = (langHelper.translate(resJson.errId) || '{{lang.unknownError}}');
+                                tmpModalFileMgr.okError(tmpProcessError);
                             });
                         }
                     });
-
-                    bootstrapModal.closeModalFileManager();
                 }
 
-                self.getWell().showFmg(callbackFunction);
+                // Add to observable
+                tmpModalFileMgr.okCallback(mgrCallback);
+
+                // Notification
+                tmpModalFileMgr.okDescription('Please select a file to attach to this history record');
+
+                // Open file manager
+                tmpModalFileMgr.show();
             };
 
-            self.chooseWfmImage = function () {
-                self.getWell().selectedFmgSectionId('history');
+            this.chooseWfmImage = function () {
+                ths.getWell().selectedFmgSectionId('history');
                 function callbackFunction(checkedWellFileList) {
                     if (checkedWellFileList.length !== 1) {
                         alert('Need to select one image');
@@ -127,7 +160,7 @@
                     bootstrapModal.closeModalFileManager();
 
                     var urlQueryParams = {
-                        well_id: self.wellId,
+                        well_id: ths.wellId,
                         purpose: 'history',
                         status: 'work',
                         file_name: checkedFile.Name()
@@ -172,9 +205,9 @@
                                 });
 
                                 // send coords to database = save in wfmimage
-                                datacontext.saveNewWfmImage({ wellhistory_id: self.id }, wfmImageReady).done(function (saveResult) {
+                                datacontext.saveNewWfmImage({ wellhistory_id: ths.id }, wfmImageReady).done(function (saveResult) {
                                     // add images to dom with src
-                                    self.WfmImages.push(datacontext.createWfmImage(saveResult));
+                                    ths.WfmImages.push(datacontext.createWfmImage(saveResult));
                                     // push to wellhistory wfmimages
                                 });
 
@@ -188,16 +221,16 @@
                     historyImgElem.src = path;
                 }
 
-                self.getWell().showFmg(callbackFunction);
+                ths.getWell().showFmg(callbackFunction);
             };
 
             if (data.WfmImagesDto) {
-                self.WfmImages(importWfmImagesDto(data.WfmImagesDto));
+                this.WfmImages(importWfmImagesDto(data.WfmImagesDto));
             }
 
             // No needs. Extracted from root.jobTypeList
             ////if (data.JobTypeDto) {
-            ////    self.jobType(new JobType(data.JobTypeDto));
+            ////    ths.jobType(new JobType(data.JobTypeDto));
             ////}
         }
 
