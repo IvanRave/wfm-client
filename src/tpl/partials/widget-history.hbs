@@ -39,14 +39,15 @@
                   </blockquote>
                 </div>
                 <div data-bind="foreach: WfmImages">
-                  <span class="pointer" data-bind="panzoomImg: {src: dataUrl}">
-                    <img class="img-thumbnail elem-shadow" src="" data-bind="attr: { src: dataUrl }" alt="History image" />
+                  <span class="pointer" data-bind="panzoomImg: {src: croppedImageUrl}">
+                    <img class="img-thumbnail elem-shadow" src="" data-bind="attr: { src: croppedImageUrl }" alt="History image" />
                   </span>
                 </div>
                 <div class="clearfix" data-bind="foreach: WellHistoryFiles">
                   <div class="img-thumbnail pull-left" data-bind="with: fileSpec">
-                    <!--click: downloadWellHistoryFile-->
-                    <span class="link-view pointer" data-bind="text: name"></span>
+                    <span class="link-view pointer">
+                      <span data-bind="text: namePlusExtension, click: download"></span>
+                    </span>
                   </div>
                 </div>
               </div>

@@ -1,5 +1,5 @@
 ﻿/** @module */
-define(['knockout', 'moment'], function (ko, appMoment) {
+define(['knockout', 'moment', 'helpers/app-helper'], function (ko, appMoment, appHelper) {
     'use strict';
 
     /**
@@ -9,6 +9,9 @@ define(['knockout', 'moment'], function (ko, appMoment) {
     */
     var exports = function (data) {
         data = data || {};
+
+        /** Alternative */
+        var ths = this;
 
         /**
         * File guid
@@ -66,11 +69,24 @@ define(['knockout', 'moment'], function (ko, appMoment) {
             ' bytes\nExtension: ' + this.extension +
             '\nCreated: ' + appMoment(ko.unwrap(this.createdUnixTime) * 1000).format('YYYY-MM-DD HH:mm:ss');
 
+        /** Name plus extension */
+        this.namePlusExtension = ko.computed({
+            read: function () {
+                return ko.unwrap(ths.name) + ko.unwrap(ths.extension);
+            },
+            deferEvaluation: true
+        });
+
         /**
         * Whether file is selected (in file manager)
         * @type {boolean}
         */
         this.isSelected = ko.observable();
+
+        /** Download file */
+        this.download = function () {
+            appHelper.downloadURL(ths.fileUrl);
+        };
     };
 
     return exports;

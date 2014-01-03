@@ -396,7 +396,7 @@
 ////            var oadateString = appMoment((parseFloat(elemValue.Id) - 25569) * 24 * 3600 * 1000).format('YYYY-MM');
 ////            pdfDoc.text(pdfPage.margin, pdStringPosition, oadateString);
 
-////            // TODO: restore without using self
+////            // TODO: restore without using slf
 ////            ////$.each(headerList, function (headerIndex, headerValue) {
 ////            ////    if (headerValue.IsCalc() === false) {
 ////            ////        if (elemValue[headerValue.Name] !== null) {

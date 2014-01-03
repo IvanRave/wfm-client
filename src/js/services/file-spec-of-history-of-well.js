@@ -4,7 +4,7 @@ define(['helpers/ajax-request'], function (ajaxRequest) {
 
     /** Url */
     var url = function (idOfHistoryOfWell, idOfFileSpec) {
-        return '{{conf.requrl}}/api/well-history/' + idOfHistoryOfWell + '/history-files' + (idOfFileSpec ? ('/' + idOfFileSpec) : '');
+        return '{{conf.requrl}}/api/well-histories/' + idOfHistoryOfWell + '/history-files' + (idOfFileSpec ? ('/' + idOfFileSpec) : '');
     };
 
     /**

@@ -1,11 +1,15 @@
-﻿define(['jquery', 'knockout',
+﻿/** @module */
+define(['jquery', 'knockout',
     'services/datacontext',
     'helpers/modal-helper',
     'helpers/app-helper',
     'models/file-spec-of-history-of-well',
     'services/file-spec-of-history-of-well',
-    'models/wfm-image'],
-    function ($, ko, datacontext, bootstrapModal, appHelper, FileSpecOfHistoryOfWell, fileSpecOfHistoryOfWellService) {
+    'models/wfm-image',
+    'services/image-of-history-of-well'],
+    function ($, ko, datacontext, bootstrapModal, appHelper,
+        FileSpecOfHistoryOfWell, fileSpecOfHistoryOfWellService,
+        WfmImage, imageOfHistoryOfWellService) {
         'use strict';
 
         // convert data objects into array
@@ -14,10 +18,14 @@
         }
 
         function importWfmImagesDto(data) {
-            return (data || []).map(function (item) { return datacontext.createWfmImage(item); });
+            return (data || []).map(function (item) { return new WfmImage(item); });
         }
 
-        function WellHistory(data, well) {
+        /**
+        * History of well
+        * @constructor
+        */
+        var exports = function (data, well) {
             var ths = this;
             data = data || {};
 
@@ -74,9 +82,9 @@
             this.endUnixTime.subscribe(ths.putWellHistory);
             this.jobTypeId.subscribe(ths.putWellHistory);
 
-            this.deleteWfmImage = function (itemForDelete) {
-                if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + itemForDelete.Name + '"?')) {
-                    datacontext.deleteWfmImage(itemForDelete).done(function () {
+            this.removeWfmImage = function (itemForDelete) {
+                if (confirm('{{capitalizeFirst lang.confirmToDelete}}?')) {
+                    imageOfHistoryOfWellService.remove(ths.id, itemForDelete.id).done(function () {
                         ths.WfmImages.remove(itemForDelete);
                     });
                 }
@@ -143,31 +151,37 @@
                 tmpModalFileMgr.show();
             };
 
-            this.chooseWfmImage = function () {
-                ths.getWell().selectedFmgSectionId('history');
-                function callbackFunction(checkedWellFileList) {
-                    if (checkedWellFileList.length !== 1) {
-                        alert('Need to select one image');
+            /**
+            * Create cropped well history image from file spec
+            */
+            this.createImageFromFileSpec = function () {
+                var needSection = ths.getWell().getSectionByPatternId('well-history');
+
+                // Select file section with sketches (load and unselect files)
+                ths.getWell().selectFileSection(needSection);
+
+                var tmpModalFileMgr = ths.getWell().getWellGroup().getWellField().getWellRegion().getCompany().modalFileMgr;
+
+                // Calback for selected file
+                function mgrCallback() {
+                    tmpModalFileMgr.okError('');
+                    // Select file from file manager
+                    var selectedFileSpecs = ko.unwrap(needSection.listOfFileSpec).filter(function (elem) {
+                        return ko.unwrap(elem.isSelected);
+                    });
+
+                    if (selectedFileSpecs.length !== 1) {
+                        tmpModalFileMgr.okError('need to select one file');
                         return;
                     }
 
-                    var checkedFile = checkedWellFileList[0];
-                    if ($.inArray(checkedFile.ContentType, datacontext.imageMimeTypes) === -1) {
-                        alert('Need to select image file: ' + datacontext.imageMimeTypes.join(', '));
-                        return;
-                    }
+                    var imageFileSpec = selectedFileSpecs[0];
 
-                    bootstrapModal.closeModalFileManager();
-
-                    var urlQueryParams = {
-                        well_id: ths.wellId,
-                        purpose: 'history',
-                        status: 'work',
-                        file_name: checkedFile.Name()
-                    };
+                    // Close file manager modal window
+                    // And show modal with crop feature
+                    tmpModalFileMgr.hide();
 
                     // history image src
-                    var path = datacontext.getWellFileUrl(urlQueryParams);
                     var innerDiv = document.createElement('div');
                     var historyImgElem = document.createElement('img');
                     innerDiv.appendChild(historyImgElem);
@@ -191,37 +205,36 @@
 
                             // submitted by OK button
                             bootstrapModal.openModalWideWindow(innerDiv, function () {
-                                ////var url = path + '&crop=(' + coords[0] + ',' + coords[1] + ',' + coords[2] + ',' + coords[3] + ')';
-                                // check not null comments = if user can't choose whole images
-                                // create wfmimage
-                                var wfmImageReady = datacontext.createWfmImage({
+                                // TODO: check not null comments = if user can't choose whole images
+                                imageOfHistoryOfWellService.post(ths.id, {
+                                    IdOfFileSpec: imageFileSpec.id,
                                     X1: coords[0],
                                     X2: coords[2],
                                     Y1: coords[1],
                                     Y2: coords[3],
-                                    // full name (well_id + purpose + status + sdf
-                                    // 71/history/work/fid20130211042811196_WellHistory.png
-                                    Name: [urlQueryParams.well_id, urlQueryParams.purpose, urlQueryParams.status, urlQueryParams.file_name].join('/')
+                                    CropXUnits: 0,
+                                    CropYUnits: 0
+                                }).done(function (res) {
+                                    ths.WfmImages.push(new WfmImage(res));
+                                    bootstrapModal.closeModalWideWindow();
                                 });
-
-                                // send coords to database = save in wfmimage
-                                datacontext.saveNewWfmImage({ wellhistory_id: ths.id }, wfmImageReady).done(function (saveResult) {
-                                    // add images to dom with src
-                                    ths.WfmImages.push(datacontext.createWfmImage(saveResult));
-                                    // push to wellhistory wfmimages
-                                });
-
-                                bootstrapModal.closeModalFileManager();
                             });
                             // end of require
                         });
                     };
 
                     // start load image
-                    historyImgElem.src = path;
+                    historyImgElem.src = imageFileSpec.fileUrl;
                 }
 
-                ths.getWell().showFmg(callbackFunction);
+                // Add to observable
+                tmpModalFileMgr.okCallback(mgrCallback);
+
+                // Notification
+                tmpModalFileMgr.okDescription('Please select a history image to crop');
+
+                // Open file manager
+                tmpModalFileMgr.show();
             };
 
             if (data.WfmImagesDto) {
@@ -232,9 +245,7 @@
             ////if (data.JobTypeDto) {
             ////    ths.jobType(new JobType(data.JobTypeDto));
             ////}
-        }
-
-        datacontext.createWellHistory = function (item, wellParent) {
-            return new WellHistory(item, wellParent);
         };
+
+        return exports;
     });

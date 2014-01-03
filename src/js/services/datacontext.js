@@ -13,9 +13,6 @@
     function wellHistoryUrl(uqp) {
         return '{{conf.requrl}}/api/wellhistory/' + (uqp ? ('?' + $.param(uqp)) : '');
     }
-    function wfmImageUrl(uqp) {
-        return '{{conf.requrl}}/api/wfmimage/' + (uqp ? ('?' + $.param(uqp)) : '');
-    }
     function sectionPatternsUrl() {
         return '{{conf.requrl}}/api/section-patterns';
     }
@@ -157,17 +154,12 @@
 
     function getSectionList() {
         return [
-        { id: 'summary', name: 'Summary', formatList: ['*'] }, // any file type (main well files)
-        { id: 'sketch', name: 'Sketch', formatList: ['image/jpeg', 'image/png'] },
-        { id: 'volume', name: 'Volume', formatList: ['image/jpeg', 'image/png'] },
         { id: 'history', name: 'History', formatList: ['*'] }, // any file type
-        { id: 'map', name: 'Map', formatList: [] }, // file loading forbidden
         { id: 'log', name: 'Log', formatList: [''] }, // las files has empty mime type
         { id: 'pd', name: 'Perfomance', formatList: ['text/plain', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel'] },
         { id: 'test', name: 'Test', formatList: [] }, // file loading forbidden
         { id: 'integrity', name: 'Integrity', formatList: ['image/jpeg', 'image/png', 'application/pdf'] },
-        { id: 'nodalanalysis', name: 'Nodal analysis', formatList: ['image/jpeg', 'image/png'] },
-        { id: 'report', name: 'Report', formatList: ['application/pdf'] }
+        { id: 'nodalanalysis', name: 'Nodal analysis', formatList: ['image/jpeg', 'image/png'] }
         ];
     }
 
@@ -186,15 +178,6 @@
 
     function deleteWellHistory(wellHistoryId) {
         return ajaxRequest('DELETE', wellHistoryUrl({ id: wellHistoryId }));
-    }
-
-    // 9. WfmImage
-    function saveNewWfmImage(urlQueryParams, item) {
-        return ajaxRequest('POST', wfmImageUrl(urlQueryParams), item);
-    }
-
-    function deleteWfmImage(item) {
-        return ajaxRequest('DELETE', wfmImageUrl({ id: item.Id }));
     }
 
     // 11. WellFieldMapArea
@@ -340,9 +323,6 @@
         postWellHistory: postWellHistory,
         putWellHistory: putWellHistory,
         deleteWellHistory: deleteWellHistory,
-        // WfmImage
-        saveNewWfmImage: saveNewWfmImage,
-        deleteWfmImage: deleteWfmImage,
         // WellFieldMapArea
         getWellFieldMapAreas: getWellFieldMapAreas,
         saveNewWellFieldMapArea: saveNewWellFieldMapArea,

@@ -69,7 +69,7 @@
                 <button class="btn btn-default" type="button" data-bind="click: createFileSpecOfHistoryOfWell">
                   <i class="glyphicon glyphicon-paperclip"></i> {{capitalizeFirst lang.attachFile}}
                 </button>
-                <button class="btn btn-default" type="button" data-bind="click: chooseWfmImage">
+                <button class="btn btn-default" type="button" data-bind="click: createImageFromFileSpec">
                   <i class="glyphicon glyphicon-picture"></i> {{capitalizeFirst lang.cropImage}}
                 </button>
                 <button class="btn btn-default" type="button" data-bind="click: $parents[1].deleteWellHistory">
@@ -94,20 +94,19 @@
             </div>
             <div data-bind="foreach: WfmImages">
               <div>
-                <span class="pointer" data-bind="panzoomImg: {src: dataUrl}">
-                  <img class="img-thumbnail elem-shadow" src="" data-bind="attr: { src: dataUrl }" alt="History image" />
+                <span class="pointer" data-bind="panzoomImg: {src: croppedImageUrl}">
+                  <img class="img-thumbnail elem-shadow" src="" data-bind="attr: { src: croppedImageUrl }" alt="History image" />
                 </span>
                 <span data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
-                  <i class="glyphicon glyphicon-remove link-icon" data-bind="click: $parent.deleteWfmImage"></i>
+                  <i class="glyphicon glyphicon-remove link-icon" data-bind="click: $parent.removeWfmImage"></i>
                 </span>
               </div>
             </div>
             <div data-bind="foreach: WellHistoryFiles" class="clearfix">
               <div class="img-thumbnail pull-left">
-                <!--, click: downloadWellHistoryFile-->
                 <span class="link-view pointer">
                   <span data-bind="with: fileSpec">
-                    <span data-bind="text: name"></span><span data-bind="text: extension"></span>
+                    <span data-bind="text: namePlusExtension, click: download"></span>
                   </span>
                 </span>
                 <span data-bind="if: $root.userProfile.selectedEmployee().isEditMode">

@@ -18,13 +18,13 @@ define([
     'constants/stage-constants',
     'models/volume-of-well',
     'services/volume-of-well',
+    'models/history-of-well',
     'models/column-attribute',
-    'models/well-history',
     'models/test-scope'
 ], function ($, ko, datacontext, fileHelper, bootstrapModal,
     appHelper, appMoment, StageBase, wellPerfomancePartial,
     HistoryView, SectionOfWell, WellFile, SketchOfWell,
-    PropSpec, wellService, stageConstants, VolumeOfWell, volumeOfWellService) {
+    PropSpec, wellService, stageConstants, VolumeOfWell, volumeOfWellService, HistoryOfWell) {
     'use strict';
 
     function importVolumes(data, slcVolume) {
@@ -38,7 +38,7 @@ define([
     function importColumnAttributesDto(data) { return data.map(function (item) { return datacontext.createColumnAttribute(item); }); }
 
     /** WellHistory (convert data objects into array) */
-    function importWellHistoryDto(data, parent) { return data.map(function (item) { return datacontext.createWellHistory(item, parent); }); }
+    function importWellHistoryDto(data, parent) { return data.map(function (item) { return new HistoryOfWell(item, parent); }); }
 
     /** Test scope */
     function importTestScopeDtoList(data, wellItem) { return data.map(function (item) { return datacontext.createTestScope(item, wellItem); }); }
@@ -485,7 +485,7 @@ define([
                     }
 
                     datacontext.postWellHistory(wellHistoryNewData).done(function (result) {
-                        ths.historyList.push(datacontext.createWellHistory(result, ths));
+                        ths.historyList.push(new HistoryOfWell(result, ths));
                         // Set to null for psblty creating new well history
                         ths.wellHistoryNew.startUnixTime(null);
                         ths.wellHistoryNew.endUnixTime(null);
