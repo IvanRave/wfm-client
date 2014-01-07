@@ -207,7 +207,7 @@ define(['knockout',
                         break;
                     case 'well-history':
                         ths.getParent().isLoadedHistoryList(false);
-                        ths.getParent().getWellHistoryList();
+                        ths.getParent().loadWellHistoryList();
                         break;
                 }
             }

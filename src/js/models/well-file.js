@@ -1,11 +1,8 @@
 ﻿/** @module */
 define(['jquery', 'knockout', 'services/datacontext',
     'helpers/modal-helper', 'helpers/app-helper',
-    'moment', 'models/column-attribute'], function ($, ko, datacontext, bootstrapModal, appHelper, appMoment) {
+    'moment', 'models/column-attribute'], function ($, ko, datacontext, bootstrapModal, appHelper, appMoment, ColumnAttribute) {
         'use strict';
-
-        // ColumnAttributes (convert data objects into array)
-        function importColumnAttributesDto(data) { return $.map(data || [], function (item) { return datacontext.createColumnAttribute(item); }); }
 
         function fromOAtoJS(oaDate) {
             var jsDate = new Date((parseFloat(oaDate) - 25569) * 24 * 3600 * 1000);
@@ -105,99 +102,7 @@ define(['jquery', 'knockout', 'services/datacontext',
                 appHelper.downloadURL(extUrl);
             };
 
-            self.showLogImage = function () {
-                var urlQueryParams = {
-                    well_id: self.WellId,
-                    purpose: self.Purpose,
-                    status: self.Status,
-                    file_name: self.Name
-                };
-                self.getWell().wellLogSelectedFile(self);
-                self.getWell().IsLogImageEditable(false);
-                self.getWell().WellLogImageUrl(datacontext.getWellFileUrl(urlQueryParams));
-            };
-
-            self.importWellFileToLog = function () {
-                if (self.Purpose !== 'log') { return; }
-
-                var urlQueryParams = {
-                    well_id: self.WellId,
-                    purpose: self.Purpose,
-                    status: self.Status,
-                    file_name: self.Name
-                };
-
-                datacontext.getColumnAttributes(urlQueryParams).done(function (result) {
-                    var columnAttributes = importColumnAttributesDto(result);
-
-                    var selectDepth = document.createElement('select');
-                    $(selectDepth).addClass('pd-parameter');
-
-                    var selectSP = document.createElement('select');
-                    $(selectSP).addClass('pd-parameter');
-
-                    var selectGR = document.createElement('select');
-                    $(selectGR).addClass('pd-parameter');
-
-                    var selectRS = document.createElement('select');
-                    $(selectRS).addClass('pd-parameter');
-
-                    for (var caIndex = 0, caMaxIndex = columnAttributes.length; caIndex < caMaxIndex; caIndex++) {
-                        var optionColumnAttribute = document.createElement('option');
-                        $(optionColumnAttribute)
-                            .val(columnAttributes[caIndex].Id)
-                            .html(columnAttributes[caIndex].Name + (columnAttributes[caIndex].Format() ? (', ' + columnAttributes[caIndex].Format()) : ''));
-
-                        switch (columnAttributes[caIndex].Name) {
-                            case 'DEPTH': case 'DEPT': selectDepth.appendChild(optionColumnAttribute); break;
-                            case 'SP': case 'SPC': selectSP.appendChild(optionColumnAttribute); break;
-                            case 'GR': case 'HGRT': case 'GRDS': case 'SGR': case 'NGRT': selectGR.appendChild(optionColumnAttribute); break;
-                            case 'RS': case 'RES': case 'RESD': selectRS.appendChild(optionColumnAttribute); break;
-                        }
-                    }
-
-                    var innerDiv = document.createElement('div');
-                    $(innerDiv).addClass('form-horizontal').append(
-                        bootstrapModal.gnrtDom('Depth', selectDepth),
-                        bootstrapModal.gnrtDom('GR', selectGR),
-                        bootstrapModal.gnrtDom('SP', selectSP),
-                        bootstrapModal.gnrtDom('Resistivity', selectRS)
-                    );
-
-                    function submitFunction() {
-                        var selectedArray = $(innerDiv).find('.pd-parameter').map(function () {
-                            return $(this).val();
-                        }).get();
-
-                        if (selectedArray.length < 4) {
-                            alert('All fields required');
-                            return;
-                        }
-
-                        var urlQueryParams = {
-                            well_id: self.WellId,
-                            purpose: self.Purpose,
-                            status: self.Status,
-                            file_name: self.Name,
-                            headers_match: selectedArray.join(','),
-                            is_log: true
-                        };
-
-                        // return result, textStatus, request
-                        datacontext.getWellFiles(urlQueryParams).done(function () {
-                            ////self.getWell().WellLogImageUrl(request.getResponseHeader('Location'));
-                            self.getWell().getWellFileList();
-                            alert('Successfully imported to log image. See image in log section.');
-                        });
-
-                        bootstrapModal.closeModalWindow();
-                    }
-
-                    bootstrapModal.closeModalWideWindow();
-
-                    bootstrapModal.openModalWindow('Column match', innerDiv, submitFunction);
-                });
-            };
+            ////self.getWell().IsLogImageEditable(false);
 
             self.importToProductionData = function () {
                 // only for pd files
@@ -398,7 +303,7 @@ define(['jquery', 'knockout', 'services/datacontext',
 
                         var needColumnListSelected = $.map(matchSelectList, function (arrElem, arrIndex) {
                             if ($(arrElem.matchNameElem).val()) {
-                                var pdColumnAttr = datacontext.createColumnAttribute({
+                                var pdColumnAttr = new ColumnAttribute({
                                     Id: arrIndex,
                                     Name: $(arrElem.matchNameElem).val(),
                                     Format: $(arrElem.matchFormatElem).val() + ($(arrElem.matchFormatElemDenominator).val() ? ("/" + $(arrElem.matchFormatElemDenominator).val()) : '')
@@ -515,7 +420,7 @@ define(['jquery', 'knockout', 'services/datacontext',
             ////        };
 
             ////        datacontext.getColumnAttributes(urlQueryParams).done(function (result) {
-            ////            var columnAttributes = importColumnAttributesDto(result);
+            ////            var columnAttributes = importColumnAttributes(result);
 
             ////            var needColumns = [
             ////                { Name: 'Date', IsRequired: true },

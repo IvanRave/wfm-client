@@ -1,56 +1,64 @@
 ﻿<div>
   <div class="clearfix">
-    <div class="pull-left" data-bind="visible: wellLogSelectedFile">
-      <div class="clearfix">
-        <div class="pull-left">
-          <div data-bind="visible: IsLogImageEditable">
-            <label class="radio-inline">
-              <input type="radio" name="log-tools" value="tool-hand" data-bind="checked: checkedLogTool" />Default
-            </label>
-            <label class="radio-inline">
-              <input type="radio" name="log-tools" value="tool-text" data-bind="checked: checkedLogTool" />Text
-            </label>
-            <label class="radio-inline">
-              <input type="radio" name="log-tools" value="tool-line" data-bind="checked: checkedLogTool" />Line
-            </label>
-            <label class="radio-inline">
-              <input type="radio" name="log-tools" value="tool-arrow" data-bind="checked: checkedLogTool" />Arrow
-            </label>
+    <div class="pull-left">
+      <div data-bind="with: slcLogOfWell">
+        <div class="clearfix" data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
+          <div class="pull-left">
+            <div>
+              <label class="radio-inline">
+                <input type="radio" name="log-tools" value="tool-hand" data-bind="checked: checkedLogTool" />Default
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="log-tools" value="tool-text" data-bind="checked: checkedLogTool" />Text
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="log-tools" value="tool-line" data-bind="checked: checkedLogTool" />Line
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="log-tools" value="tool-arrow" data-bind="checked: checkedLogTool" />Arrow
+              </label>
+            </div>
+          </div>
+          <div class="pull-right" style="margin-right: 22px">
+            <button type="button" class="btn btn-xs btn-default" data-bind="click: saveWellLogSelectedFileImagePart">Save</button>
           </div>
         </div>
-        <div class="pull-right" style="margin-right: 22px">
-          <div data-bind="visible: !IsLogImageEditable()">
-            <button type="button" class="btn btn-sm btn-primary" style="width: 60px" data-bind="click: startLogImageEdit">Edit</button>
+        <!-- ko if: $root.userProfile.selectedEmployee().isEditMode -->
+        <div style="position: relative; z-index: 1;" data-bind="logLas: { imgSrc: representationUrl, checkedLogTool: checkedLogTool }">
+          <div class="log-las-img-wrap">
+            <img class="log-las-img" id="log_img" src="#" alt="Log representation" />
           </div>
-          <!-- TODO: add icons to button -->
-          <div class="btn-group" data-bind="visible: IsLogImageEditable">
-            <button type="button" class="btn btn-sm btn-primary" style="width: 60px" data-bind="click: saveWellLogSelectedFileImagePart">Save</button>
-            <button type="button" class="btn btn-sm btn-default" style="width: 60px" data-bind="click: cancelLogImageEdit">Cancel</button>
+          <canvas class="log-las-base" id="log_cnvs" width="624" height="480"></canvas>
+          <div>
+            <canvas class="log-las-draw" id="draw_cnvs_log" width="624" height="480"></canvas>
+            <div class="log-las-text" id="text_cnvs_log" data-bind="click: drawLogText"></div>
           </div>
         </div>
-      </div>
-      <div style="position: relative; z-index: 1;">
-        <div style="height:480px; width:650px; overflow: auto; overflow-x: hidden;">
-          <img id="log_img" style="z-index: 1; width: 624px; border: 2px solid #ccc;" src="#" alt="no data" data-bind="attr: { src: WellLogImageUrl } " />
+        <!-- /ko -->
+        <!-- ko ifnot: $root.userProfile.selectedEmployee().isEditMode -->
+        <div class="log-las-img-wrap">
+          <img class="log-las-img" src="#" alt="Log representation" data-bind="attr: {src: representationUrl}" />
         </div>
-        <canvas id="log_cnvs" width="624" height="480" style="position: absolute; top: 0; left: 0; border: 2px dotted #f00; z-index: 2;" data-bind="visible: IsLogImageEditable"></canvas>
-        <div data-bind="visible: IsLogImageEditable">
-          <canvas id="draw_cnvs_log" width="624" height="480" data-bind="drawCnvsLog: {}" style="position: absolute; top: 0; left: 0; display: none; z-index: 3; border: 2px dotted #f00;"></canvas>
-          <div id="text_cnvs_log" data-bind="click: drawLogText" style="background-color: #fff; opacity: 0.5; filter: alpha(opacity = 50); width: 624px; height: 480px; position: absolute; top: 0; left: 0; z-index: 11; display: none; border: 2px dotted #f00;"></div>
-        </div>
+        <!-- /ko -->
       </div>
     </div>
     <div class="pull-right" style="width: 280px">
-      <h5>Log images:</h5>
-      <div data-bind="foreach: logImageList">
-        <div>
-          <i class="glyphicon glyphicon-picture"></i>&nbsp;
-          <a href="#" data-bind="text: displayedName, click: showLogImage, style: { 'font-weight': $data === $parent.wellLogSelectedFile() ? 'bold' : 'normal' }"></a>
+      <div class="clearfix">
+        <h5 class="pull-left">Logs:</h5>
+        <!-- ko if: $root.userProfile.selectedEmployee().isEditMode -->
+        <div class="pull-right">
+          <button class="btn btn-default btn-xs" data-bind="click: createLogOfWellFromFileSpec">Create log...</button>
         </div>
+        <!-- /ko -->
       </div>
-      <div>
-        <small>*import file from "File manager" to add image</small>
-      </div>
+      <ul class="list-unstyled wfm-light-list" data-bind="foreach: logsOfWell">
+        <li data-bind="css: {'active' : isSelected}">
+          <i class="glyphicon glyphicon-picture margin-min-right"></i>
+          <span class="pointer link-view" data-bind="click: $parent.selectLogOfWell">
+            <span data-bind="text: name"></span>
+          </span>
+        </li>
+      </ul>
     </div>
   </div>
 </div>

@@ -1,7 +1,13 @@
-﻿define(['jquery', 'knockout', 'services/datacontext'], function ($, ko, datacontext) {
+﻿/** @module */
+define(['jquery', 'knockout'], function ($, ko) {
     'use strict';
 
-    function ColumnAttribute(data) {
+    /**
+    * Model: column attribute
+    * @constructor
+    * @param {object} data - Attribute data
+    */
+    var exports = function (data) {
         var self = this;
         data = data || {};
 
@@ -48,9 +54,7 @@
         self.toPlainJson = function () {
             return ko.toJS(self);
         };
-    }
-
-    datacontext.createColumnAttribute = function (data) {
-        return new ColumnAttribute(data);
     };
+
+    return exports;
 });

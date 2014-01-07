@@ -19,23 +19,33 @@ define([
     'models/volume-of-well',
     'services/volume-of-well',
     'models/history-of-well',
+    'models/log-of-well',
+    'services/log-of-well',
+    'services/file-spec',
     'models/column-attribute',
-    'models/test-scope'
+    'models/test-scope',
 ], function ($, ko, datacontext, fileHelper, bootstrapModal,
     appHelper, appMoment, StageBase, wellPerfomancePartial,
     HistoryView, SectionOfWell, WellFile, SketchOfWell,
-    PropSpec, wellService, stageConstants, VolumeOfWell, volumeOfWellService, HistoryOfWell) {
+    PropSpec, wellService, stageConstants, VolumeOfWell,
+    volumeOfWellService, HistoryOfWell,
+    LogOfWell, logOfWellService,
+    fileSpecService, ColumnAttribute) {
     'use strict';
 
     function importVolumes(data, slcVolume) {
         return (data || []).map(function (item) { return new VolumeOfWell(item, slcVolume); });
     }
 
+    function importLogsOfWell(data, slcLogOfWell) {
+        return (data || []).map(function (item) { return new LogOfWell(item, slcLogOfWell); });
+    }
+
     /** WellFiles (convert data objects into array) */
     function importWellFilesDto(data, parent) { return data.map(function (item) { return new WellFile(item, parent); }); }
 
     /** ColumnAttributes (convert data objects into array) */
-    function importColumnAttributesDto(data) { return data.map(function (item) { return datacontext.createColumnAttribute(item); }); }
+    function importColumnAttributes(data) { return data.map(function (item) { return new ColumnAttribute(item); }); }
 
     /** WellHistory (convert data objects into array) */
     function importWellHistoryDto(data, parent) { return data.map(function (item) { return new HistoryOfWell(item, parent); }); }
@@ -170,7 +180,7 @@ define([
             switch (idOfSectionPattern) {
                 // Dashboard: from undefined to null
                 case 'well-history': {
-                    ths.getWellHistoryList();
+                    ths.loadWellHistoryList();
                     break;
                 }
                 case 'well-sketch': {
@@ -218,12 +228,8 @@ define([
                     break;
                 }
                 case 'well-log': {
-                    ths.wellLogSelectedFile(null);
-
-                    ths.getWellFileList(function () {
-                        if (ths.logImageList().length > 0) { ths.logImageList()[0].showLogImage(); }
-                    }, 'log', 'work');
-
+                    ths.loadLogsOfWell();
+                    // TODO: Select first log image
                     break;
                 }
                 case 'well-test': {
@@ -273,7 +279,7 @@ define([
             ths.getWellGroup().getWellGroupWfmParameterList();
             ths.perfomancePartial.forecastEvolution.getDict();
             ths.perfomancePartial.getHstProductionDataSet();
-            ths.getWellHistoryList();
+            ths.loadWellHistoryList();
         };
 
         /** Save this well main properties */
@@ -294,7 +300,7 @@ define([
             deferEvaluation: true
         });
 
-        ths.isExistsSectionWellFiles = ko.computed({
+        this.isExistsSectionWellFiles = ko.computed({
             read: function () {
                 if (ko.unwrap(ths.sectionWellFiles)) {
                     return ko.unwrap(ths.sectionWellFiles).length > 0;
@@ -331,12 +337,6 @@ define([
 
             return $.grep(ths.WellFiles(), function (elemValue) {
                 return elemValue.Purpose === ths.selectedFmgSectionId();
-            });
-        });
-
-        this.logImageList = ko.computed(function () {
-            return $.grep(ths.WellFiles(), function (elemValue) {
-                return ((elemValue.Purpose === 'log') && (elemValue.getExt() === 'png'));
             });
         });
 
@@ -441,13 +441,160 @@ define([
 
         this.WellInWellFieldMaps = ko.observableArray();
 
+        // ================================================= Well log start =================================================
+
+        /**
+        * Well logs
+        * @type {Array.<module:models/log-of-well>}
+        */
+        this.logsOfWell = ko.observableArray();
+
+        /**
+        * Whether well logs are loaded
+        * @type {boolean}
+        */
+        this.isLoadedLogsOfWell = ko.observable(false);
+
+        /** Load well logs */
+        this.loadLogsOfWell = function () {
+            if (ko.unwrap(ths.isLoadedLogsOfWell)) { return; }
+
+            logOfWellService.get(ths.id).done(function (res) {
+                ths.logsOfWell(importLogsOfWell(res, ths.slcLogOfWell));
+                ths.isLoadedLogsOfWell(true);
+            });
+        };
+
+        /**
+        * Selected log of well
+        * @type {module:models/log-of-well}
+        */
+        this.slcLogOfWell = ko.observable();
+
+        /**
+        * Select log of well: do not set (slcLogOfWell) directly
+        */
+        this.selectLogOfWell = function (itemToSelect) {
+            ths.slcLogOfWell(itemToSelect);
+
+            ////logOfWellService.get(ths.idOfWell, itemToSelect.id).done(function () { });
+        };
+
+        /** Select file and create log */
+        this.createLogOfWellFromFileSpec = function () {
+            var needSection = ths.getSectionByPatternId('well-log');
+
+            // Select file section with volumes (load and unselect files)
+            ths.selectFileSection(needSection);
+
+            var tmpModalFileMgr = ths.getWellGroup().getWellField().getWellRegion().getCompany().modalFileMgr;
+
+            // Calback for selected file
+            function mgrCallback() {
+                tmpModalFileMgr.okError('');
+                // Select file from file manager
+                var selectedFileSpecs = ko.unwrap(needSection.listOfFileSpec).filter(function (elem) {
+                    return ko.unwrap(elem.isSelected);
+                });
+
+                if (selectedFileSpecs.length !== 1) {
+                    tmpModalFileMgr.okError('need to select one file');
+                    return;
+                }
+
+                var tmpFileSpec = selectedFileSpecs[0];
+
+                // 1. Select file
+                // 2. Show column attributes modal window
+
+                fileSpecService.getColumnAttributes(ths.stageKey, needSection.id, tmpFileSpec.id).done(function (res) {
+                    // ColumnAttributes (convert data objects into array)
+                    var columnAttributes = importColumnAttributes(res);
+
+                    // TODO: Style decor for attribute selection
+                    var selectDepth = document.createElement('select');
+                    $(selectDepth).addClass('pd-parameter');
+
+                    var selectSP = document.createElement('select');
+                    $(selectSP).addClass('pd-parameter');
+
+                    var selectGR = document.createElement('select');
+                    $(selectGR).addClass('pd-parameter');
+
+                    var selectRS = document.createElement('select');
+                    $(selectRS).addClass('pd-parameter');
+
+                    for (var caIndex = 0, caMaxIndex = columnAttributes.length; caIndex < caMaxIndex; caIndex++) {
+                        var optionColumnAttribute = document.createElement('option');
+                        $(optionColumnAttribute)
+                            .val(columnAttributes[caIndex].Id)
+                            .html(columnAttributes[caIndex].Name + (columnAttributes[caIndex].Format() ? (', ' + columnAttributes[caIndex].Format()) : ''));
+
+                        switch (columnAttributes[caIndex].Name) {
+                            case 'DEPTH': case 'DEPT': selectDepth.appendChild(optionColumnAttribute); break;
+                            case 'SP': case 'SPC': selectSP.appendChild(optionColumnAttribute); break;
+                            case 'GR': case 'HGRT': case 'GRDS': case 'SGR': case 'NGRT': selectGR.appendChild(optionColumnAttribute); break;
+                            case 'RS': case 'RES': case 'RESD': selectRS.appendChild(optionColumnAttribute); break;
+                        }
+                    }
+
+                    var innerDiv = document.createElement('div');
+                    $(innerDiv).addClass('form-horizontal').append(
+                        bootstrapModal.gnrtDom('Depth', selectDepth),
+                        bootstrapModal.gnrtDom('GR', selectGR),
+                        bootstrapModal.gnrtDom('SP', selectSP),
+                        bootstrapModal.gnrtDom('Resistivity', selectRS)
+                    );
+
+                    function submitFunction() {
+                        var selectedArray = $(innerDiv).find('.pd-parameter').map(function () {
+                            return $(this).val();
+                        }).get();
+
+                        if (selectedArray.length < 4) {
+                            alert('All fields required');
+                            return;
+                        }
+
+                        // 3. Select column attributes
+                        // 4. Add new log
+
+                        logOfWellService.post(ths.id, {
+                            IdOfWell: ths.id,
+                            IdOfFileSpec: tmpFileSpec.id,
+                            Name: ko.unwrap(tmpFileSpec.name),
+                            Description: selectedArray.join(',')
+                        }).done(function (createdDataOfLogOfWell) {
+                            // Add to the list
+                            ths.logsOfWell.push(new LogOfWell(createdDataOfLogOfWell));
+                        });
+
+                        bootstrapModal.closeModalWindow();
+                    }
+
+                    tmpModalFileMgr.hide();
+
+                    bootstrapModal.openModalWindow('Column match', innerDiv, submitFunction);
+                });
+            }
+
+            // Add to observable
+            tmpModalFileMgr.okCallback(mgrCallback);
+
+            // Notification
+            tmpModalFileMgr.okDescription('Please select a file for a log');
+
+            // Open file manager
+            tmpModalFileMgr.show();
+        };
+
         // ================================================= Well history section start =======================================
 
         this.historyList = ko.observableArray();
 
         this.isLoadedHistoryList = ko.observable(false);
 
-        this.getWellHistoryList = function () {
+        this.loadWellHistoryList = function () {
             if (ko.unwrap(ths.isLoadedHistoryList)) { return; }
 
             datacontext.getWellHistoryList({ well_id: ths.Id }).done(function (response) {
@@ -517,7 +664,7 @@ define([
         ////this.checkReportSection = function (checkedReportSection) {
         ////    switch (checkedReportSection.id) {
         ////        case 'map': ths.getWellGroup().getWellField().getWellFieldMaps(); break;
-        ////        case 'history': ths.getWellHistoryList(); break;
+        ////        case 'history': ths.loadWellHistoryList(); break;
         ////        case 'log': ths.getWellFileList('log', 'work'); break;
         ////        case 'pd': ths.perfomancePartial.getHstProductionDataSet(); break;
         ////    }
@@ -1016,133 +1163,12 @@ define([
         ////    });
         ////};
 
-        // ================================================================= Well log section begin ==============================================
-        this.wellLogSelectedFile = ko.observable();
-
-        // TODO: change to computed from wellLogSelectedFile
-        this.WellLogImageUrl = ko.observable();
-
-        this.IsLogImageEditable = ko.observable(false);
-
-        this.checkedLogTool = ko.observable('tool-hand');
-
-        this.checkedLogTool.subscribe(function (newValue) {
-
-            var $drawCnvsLog = $('#draw_cnvs_log');
-            $drawCnvsLog.hide();
-            $('#text_cnvs_log').hide();
-
-            // get coords from main canvas layer
-            var cnvsTop = $('#log_cnvs').css('top');
-
-            switch (newValue) {
-                case 'tool-line':
-                    require(['helpers/log-helper'], function (logHelper) {
-                        logHelper.isArrowXorLine = false;
-                    });
-                    $drawCnvsLog.css({ 'top': cnvsTop }).show();
-                    break;
-                case 'tool-arrow':
-                    require(['helpers/log-helper'], function (logHelper) {
-                        logHelper.isArrowXorLine = true;
-                    });
-
-                    $drawCnvsLog.css({ 'top': cnvsTop }).show();
-                    break;
-                case 'tool-text':
-                    $('#text_cnvs_log').css({ 'top': cnvsTop }).show();
-                    break;
-            }
-        });
-
-        this.drawLogText = function (currentWellItem, event) {
-            var drawTextBlock = event.currentTarget;
-            ////drawTextBlock.style.filter = 'alpha(opacity=50)';
-            // coord accordingly drawTextBlock
-            var posX = parseFloat(event.pageX - $(drawTextBlock).offset().left);
-            var posY = parseFloat(event.pageY - $(drawTextBlock).offset().top);
-            require(['helpers/log-helper'], function (logHelper) {
-                logHelper.drawText(posX, posY, drawTextBlock);
-            });
-        };
-
-        this.startLogImageEdit = function () {
-            ths.IsLogImageEditable(!ths.IsLogImageEditable());
-            var cnvs = document.getElementById('log_cnvs');
-            var cntx = cnvs.getContext('2d');
-            cntx.clearRect(0, 0, cnvs.width, cnvs.height);
-            ths.checkedLogTool('tool-hand');
-
-            var maxCanvasHeight = 480;
-
-            var logImg = document.getElementById('log_img');
-            var drawCnvsLog = document.getElementById('draw_cnvs_log');
-            var textCnvsLog = document.getElementById('text_cnvs_log');
-
-            $(logImg).parent().off('scroll').on('scroll', function () { });
-
-            // height
-            if (logImg.clientHeight < maxCanvasHeight) {
-                cnvs.height = logImg.clientHeight;
-                drawCnvsLog.height = logImg.clientHeight;
-                $(textCnvsLog).css({ 'height': logImg.clientHeight });
-                //$(cnvs).css({ 'top': 0 });
-            }
-            else {
-                cnvs.height = maxCanvasHeight;
-                drawCnvsLog.height = maxCanvasHeight;
-                $(textCnvsLog).css({ 'height': maxCanvasHeight });
-                // coords of button "Edit"
-                //$(cnvs).css({ 'top': $(event.currentTarget).offset().top });
-            }
-
-            ////// width - const = 624
-            ////cnvs.width = logImg.clientWidth;
-            ////drawCnvsLog.width = logImg.clientWidth;
-            ////$(textCnvsLog).css({ 'width': logImg.clientWidth });
-        };
-
-        this.cancelLogImageEdit = function () {
-            ths.IsLogImageEditable(false);
-        };
-
-        this.saveWellLogSelectedFileImagePart = function () {
-            //public HttpResponseMessage Post([FromUri] int well_id, [FromUri] string purpose, [FromUri] string status, [FromUri] string file_name, [FromBody] ByteImagePart byteImagePart)
-            var selectedFile = ths.wellLogSelectedFile();
-
-            // need select before save
-            if (!selectedFile) { return; }
-
-            var urlQueryParams = {
-                well_id: selectedFile.WellId,
-                purpose: selectedFile.Purpose,
-                status: selectedFile.Status,
-                file_name: selectedFile.Name
-            };
-
-            var cnvs = document.getElementById('log_cnvs');
-
-            require(['models/byte-image-part'], function () {
-                var createdByteImagePart = datacontext.createByteImagePart({
-                    Base64String: cnvs.toDataURL('image/png').replace('data:image/png;base64,', ''),
-                    StartY: Math.abs($('#log_img').position().top)
-                    ////StartY: $(cnvs).position().top
-                });
-
-                datacontext.postWellFile(urlQueryParams, createdByteImagePart).done(function (response, statusText, request) {
-                    ths.IsLogImageEditable(false);
-                    ths.WellLogImageUrl(request.getResponseHeader('Location') + '#' + appMoment().format('mmss'));
-                });
-            });
-        };
-
-        // ==================================================================== Well log section end ========================================
         // ==================================================================== Well perfomance begin ========================================
 
         this.perfomancePartial = wellPerfomancePartial.init(ths);
 
         // Load column attributes - all loading logic in this file (not separated - not in perfomance-partial file)
-        this.perfomancePartial.prdColumnAttributeList(importColumnAttributesDto(datacontext.getColumnAttributesLocal()));
+        this.perfomancePartial.prdColumnAttributeList(importColumnAttributes(datacontext.getColumnAttributesLocal()));
 
         this.mainPerfomanceView = ths.perfomancePartial.createPerfomanceView({
             isVisibleForecastData: false

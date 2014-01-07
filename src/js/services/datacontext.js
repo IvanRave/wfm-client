@@ -7,9 +7,6 @@
     function wellFileUrl(uqp) {
         return '{{conf.requrl}}/api/wellfile/' + (uqp ? ('?' + $.param(uqp)) : '');
     }
-    function columnAttributeUrl(uqp) {
-        return '{{conf.requrl}}/api/columnattribute/' + (uqp ? ('?' + $.param(uqp)) : '');
-    }
     function wellHistoryUrl(uqp) {
         return '{{conf.requrl}}/api/wellhistory/' + (uqp ? ('?' + $.param(uqp)) : '');
     }
@@ -104,11 +101,6 @@
         return ajaxRequest('DELETE', productionDataUrl({ 'well_id': wellId }));
     }
 
-    // 7. Column attribute
-    function getColumnAttributes(urlQueryParams) {
-        return ajaxRequest('GET', columnAttributeUrl(urlQueryParams));
-    }
-
     function getWfmParamSquadList(uqp) {
         return ajaxRequest('GET', wfmParamSquadUrl(uqp));
 
@@ -154,10 +146,7 @@
 
     function getSectionList() {
         return [
-        { id: 'history', name: 'History', formatList: ['*'] }, // any file type
-        { id: 'log', name: 'Log', formatList: [''] }, // las files has empty mime type
         { id: 'pd', name: 'Perfomance', formatList: ['text/plain', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel'] },
-        { id: 'test', name: 'Test', formatList: [] }, // file loading forbidden
         { id: 'integrity', name: 'Integrity', formatList: ['image/jpeg', 'image/png', 'application/pdf'] },
         { id: 'nodalanalysis', name: 'Nodal analysis', formatList: ['image/jpeg', 'image/png'] }
         ];
@@ -316,7 +305,6 @@
         getProductionData: getProductionData,
         deleteWellProductionData: deleteWellProductionData,
         // ColumnAttribute
-        getColumnAttributes: getColumnAttributes,
         getColumnAttributesLocal: getColumnAttributesLocal,
         // WellHistory
         getWellHistoryList: getWellHistoryList,
