@@ -255,7 +255,7 @@ define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-he
             }
         };
 
-        function initLogLasDraw(drawCnvs) {
+        function initLogLasDraw(drawCnvs, imgFigures) {
             var startX = 0,
             startY = 0,
             lastX = 0,
@@ -271,16 +271,38 @@ define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-he
                 startY = e.pageY - $(this).offset().top;
                 isPainting = true;
             }).on('mouseup', function (e) {
-                // when mouseleave than 
                 if (isPainting === true) {
                     lastX = e.pageX - $(this).offset().left;
                     lastY = e.pageY - $(this).offset().top;
+
                     drawCntx.clearRect(0, 0, drawCnvs.width, drawCnvs.height);
                     isPainting = false;
                     ////drawLineCntx(startX + $(this).offset().left, startY + $(this).offset().top, lastX + $(this).offset().left, lastY + $(this).offset().top);
 
+                    console.log(startX, startY, lastX, lastY);
+
                     require(['helpers/log-helper'], function (logHelper) {
                         logHelper.drawLineCntx(startX, startY, lastX, lastY);
+
+                        require(['models/img-figure', 'constants/img-figure-type-constants'], function (ImgFigure, imgFigureTypeConstants) {
+
+                            var tmpTpe = logHelper.isArrowXorLine ? imgFigureTypeConstants.arrowFigure.id : imgFigureTypeConstants.lineFigure.id;
+
+                            // Create line or arrow object
+                            var createdImgFigure = new ImgFigure({
+                                Color: '#000',
+                                Tpe: tmpTpe,
+                                StartX: startX,
+                                StartY: startY,
+                                LastX: lastX,
+                                LastY: lastY
+                            });
+
+                            // Add to the log element img figures
+                            imgFigures.push(createdImgFigure);
+
+                            console.log(imgFigures);
+                        });
                     });
                 }
             }).on('mouseleave', function () {
@@ -301,10 +323,15 @@ define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-he
             });
         }
 
-
-        // All log blocks
+        /** All log blocks */
         ko.bindingHandlers.logLas = {
             init: function (element, valueAccessor) {
+                // Draw a line - create Line (Array) Object
+                // Get coords of this line
+                // Add to the log
+                // Send coords to the server
+                // - build image on the server side for downloading
+
                 var logLasDraw = element.getElementsByClassName('log-las-draw')[0];
                 if (!logLasDraw) { throw new Error('no element'); }
 
@@ -328,8 +355,6 @@ define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-he
 
                     var tmpImgClientHeight = logLasImg.clientHeight;
 
-                    console.log(tmpImgClientHeight);
-
                     if (tmpImgClientHeight > maxCanvasHeight) {
                         tmpImgClientHeight = maxCanvasHeight;
                     }
@@ -344,7 +369,10 @@ define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-he
                     ////drawCnvsLog.width = logImg.clientWidth;
                     ////$(textCnvsLog).css({ 'width': logImg.clientWidth });
 
-                    initLogLasDraw(logLasDraw);
+                    // Draw all image figures
+                    console.log(opts.imgFigures);
+
+                    initLogLasDraw(logLasDraw, opts.imgFigures);
                 };
 
                 // Load img and all handlers

@@ -1,6 +1,5 @@
 module.exports = function (grunt) {
     
-    // By default = devSite
     var isProd = grunt.option('prod') ? true : false,
         isIpad = grunt.option('ipad') ? true : false,
 		isMetro = grunt.option('metro') ? true : false,
@@ -9,46 +8,14 @@ module.exports = function (grunt) {
         
     // API url (prod and dev)
     var requrl = isProd ? 'http://wfm-client.azurewebsites.net' : 'http://localhost:17171';
-        
-    // Commit message for bump feature
-    // var cmtheader = grunt.option('cmtheader') || 'fix(project): change',
-        // cmtbody = grunt.option('cmtbody') || 'some changes',
-        // cmtfooter = grunt.option('cmtfooter') || 'some footer';
     
-    // var cmtmsg = cmtheader + '\n\n' + cmtbody + '\n\n' + cmtfooter;
-    // var cmtType = grunt.option('cmtType') || 'fix',
-        // // Scope could be anything specifying place of the commit change
-        // cmtScope = grunt.option('cmtScope') || 'project',
-        // use imperative, present tense: “change” not “changed” nor “changes”
-        // don't capitalize first letter
-        // no dot (.) at the end
-    
-    // Allowed <type>
-    // feat (feature)
-    // fix (bug fix)
-    // docs (documentation)
-    // style (formatting, missing semi colons, …)
-    // refactor
-    // test (when adding missing tests)
-    // chore (maintain)
-    // var allowedCmtTypes = ['feat', 'fix', 'docs', 'style', 'refactor', 'test', 'chore'];
-    
-    // if (allowedCmtTypes.indexOf(cmtType) === -1){
-        // cmtType = 'fix';
-    // }
-
     // Target - destination folder plus config, for example: 
     // dev (development)
     // dst (main distribution)
     // devipad (dev for IPad)
     // dstipad (distrib for IPad)
     var trgt = isProd ? 'dst' : 'dev';
-    if (isIpad) {
-        trgt += 'ipad';
-    }
-    else if (isMetro) {
-        trgt += 'metro';
-    }
+    if (isIpad) { trgt += 'ipad'; } else if (isMetro) { trgt += 'metro'; }
 
     // Project configuration
     grunt.config.init({
@@ -205,7 +172,7 @@ module.exports = function (grunt) {
                     dest: '<%= trgt %>'
                 }]
             },
-            // Assemble js files after copy in dest directory
+            // Assemble js files: replace {{}} to assemble data
             js: {
                 options: {
                     ext: '.js'
@@ -248,6 +215,16 @@ module.exports = function (grunt) {
                 // // }
             // // }
         },
+        // // less: {
+            // // main: {
+                // // options: {
+                    // // yuicompress: true
+                // // },
+                // // files: {
+                    // // '<%= trgt %>/css/site.min.css': '<%= trgt %>/css/site.less'
+                // // }
+            // // }
+        // // },
         bump: {
           options: {
             files: ['package.json', 'bower.json'],
@@ -332,7 +309,6 @@ module.exports = function (grunt) {
     if (isProd) {
         // Bundle with r.js
         tasks.push('requirejs:main');
-        ////tasks.push('requirejs:workspace');
     }
 
     grunt.registerTask('default', tasks);

@@ -20,11 +20,11 @@
             </div>
           </div>
           <div class="pull-right" style="margin-right: 22px">
-            <button type="button" class="btn btn-xs btn-default" data-bind="click: saveWellLogSelectedFileImagePart">Save</button>
+            <button type="button" class="btn btn-xs btn-default" data-bind="click: saveImgFigures">Save</button>
           </div>
         </div>
         <!-- ko if: $root.userProfile.selectedEmployee().isEditMode -->
-        <div style="position: relative; z-index: 1;" data-bind="logLas: { imgSrc: representationUrl, checkedLogTool: checkedLogTool }">
+        <div style="position: relative; z-index: 1;" data-bind="logLas: { imgSrc: representationUrl, checkedLogTool: checkedLogTool, imgFigures: imgFigures }">
           <div class="log-las-img-wrap">
             <img class="log-las-img" id="log_img" src="#" alt="Log representation" />
           </div>

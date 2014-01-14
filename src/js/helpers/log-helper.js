@@ -1,4 +1,5 @@
-﻿define(['jquery'], function ($) {
+﻿/** @module */
+define(['jquery'], function ($) {
 
     // ============================log canvas
     var logHelper = {
