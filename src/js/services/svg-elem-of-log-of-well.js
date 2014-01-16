@@ -8,7 +8,7 @@ define(['helpers/ajax-request'], function (ajaxRequest) {
     * @param {string} id - Id of this figure: guid
     */
     var url = function (idOfLogOfWell, id) {
-        return '{{conf.requrl}}/api/well-logs/' + idOfLogOfWell + '/img-figures' + (id ? ('/' + id) : '');
+        return '{{conf.requrl}}/api/well-logs/' + idOfLogOfWell + '/svg-elements' + (id ? ('/' + id) : '');
     };
 
     /**

@@ -255,12 +255,15 @@ define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-he
             }
         };
 
-        function initLogLasDraw(drawCnvs, imgFigures) {
+        /** Figures in draw block */
+        function initLogLasDraw(drawCnvs, logCntx, imgFigures, koCheckedLogTool) {
             var startX = 0,
             startY = 0,
             lastX = 0,
             lastY = 0,
-            isPainting = false;
+            isPainting = false,
+            // Defines on MouseDown event
+            isArrowXorLine;
 
             var drawCntx = drawCnvs.getContext('2d');
             drawCntx.strokeStyle = '#000';
@@ -269,6 +272,9 @@ define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-he
             $(drawCnvs).on('mousedown', function (e) {
                 startX = e.pageX - $(this).offset().left;
                 startY = e.pageY - $(this).offset().top;
+                // Defines only one time: when user click on the field and start draw (line or arrow)
+                // When user draw - user can't change Arrow to Line
+                isArrowXorLine = ko.unwrap(koCheckedLogTool) === 'tool-arrow';
                 isPainting = true;
             }).on('mouseup', function (e) {
                 if (isPainting === true) {
@@ -277,25 +283,22 @@ define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-he
 
                     drawCntx.clearRect(0, 0, drawCnvs.width, drawCnvs.height);
                     isPainting = false;
-                    ////drawLineCntx(startX + $(this).offset().left, startY + $(this).offset().top, lastX + $(this).offset().left, lastY + $(this).offset().top);
-
-                    console.log(startX, startY, lastX, lastY);
 
                     require(['helpers/log-helper'], function (logHelper) {
-                        logHelper.drawLineCntx(startX, startY, lastX, lastY);
+                        logHelper.drawLineCntx(logCntx, startX, startY, lastX, lastY, isArrowXorLine);
 
-                        require(['models/img-figure', 'constants/img-figure-type-constants'], function (ImgFigure, imgFigureTypeConstants) {
-
-                            var tmpTpe = logHelper.isArrowXorLine ? imgFigureTypeConstants.arrowFigure.id : imgFigureTypeConstants.lineFigure.id;
-
+                        require(['models/svg-elem', 'constants/svg-elem-type-constants'], function (SvgElem, svgElemTypeConstants) {
                             // Create line or arrow object
-                            var createdImgFigure = new ImgFigure({
+                            var createdImgFigure = new SvgElem({
                                 Color: '#000',
-                                Tpe: tmpTpe,
-                                StartX: startX,
-                                StartY: startY,
-                                LastX: lastX,
-                                LastY: lastY
+                                Tpe: svgElemTypeConstants.line.id,
+                                Opts: JSON.stringify({
+                                    StartX: startX,
+                                    StartY: startY,
+                                    LastX: lastX,
+                                    LastY: lastY,
+                                    IsArrow: isArrowXorLine
+                                })
                             });
 
                             // Add to the log element img figures
@@ -317,7 +320,7 @@ define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-he
                     lastY = e.pageY - $(this).offset().top;
                     drawCntx.clearRect(0, 0, drawCnvs.width, drawCnvs.height);
                     require(['helpers/log-helper'], function (logHelper) {
-                        logHelper.drawLineCntxPart(drawCntx, startX, startY, lastX, lastY);
+                        logHelper.drawLineCntx(drawCntx, startX, startY, lastX, lastY, isArrowXorLine);
                     });
                 }
             });
@@ -344,10 +347,10 @@ define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-he
                 var logLasImg = element.getElementsByClassName('log-las-img')[0];
                 if (!logLasImg) { throw new Error('no element'); }
 
-                var opts = valueAccessor();
+                var accessor = valueAccessor();
                 logLasImg.onload = function () {
-                    var cntx = logLasBase.getContext('2d');
-                    cntx.clearRect(0, 0, logLasBase.width, logLasBase.height);
+                    var logCntx = logLasBase.getContext('2d');
+                    logCntx.clearRect(0, 0, logLasBase.width, logLasBase.height);
 
                     var maxCanvasHeight = 480;
 
@@ -370,13 +373,13 @@ define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-he
                     ////$(textCnvsLog).css({ 'width': logImg.clientWidth });
 
                     // Draw all image figures
-                    console.log(opts.imgFigures);
+                    console.log(accessor.imgFigures);
 
-                    initLogLasDraw(logLasDraw, opts.imgFigures);
+                    initLogLasDraw(logLasDraw, logCntx, accessor.imgFigures, accessor.checkedLogTool);
                 };
 
                 // Load img and all handlers
-                logLasImg.src = opts.imgSrc;
+                logLasImg.src = accessor.imgSrc;
             },
             update: function (element, valueAccessor) {
                 var logLasDraw = element.getElementsByClassName('log-las-draw')[0];
@@ -403,17 +406,9 @@ define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-he
 
                 switch (checkedLogTool) {
                     case 'tool-line':
-                        require(['helpers/log-helper'], function (logHelper) {
-                            logHelper.isArrowXorLine = false;
-                        });
-
                         $(logLasDraw).css({ 'top': cnvsTop }).show();
                         break;
                     case 'tool-arrow':
-                        require(['helpers/log-helper'], function (logHelper) {
-                            logHelper.isArrowXorLine = true;
-                        });
-
                         $(logLasDraw).css({ 'top': cnvsTop }).show();
                         break;
                     case 'tool-text':

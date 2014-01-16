@@ -1,7 +1,7 @@
 ﻿/** @module */
 define(['jquery', 'knockout',
     'services/log-of-well',
-    'models/img-figure', 'services/img-figure-of-log-of-well'], function ($, ko, logOfWellService, ImgFigure, imgFigureOfLogOfWellService) {
+    'models/svg-elem', 'services/svg-elem-of-log-of-well'], function ($, ko, logOfWellService, ImgFigure, svgElemOfLogOfWellService) {
         'use strict';
 
         /** Import image figures to the log image */
@@ -85,9 +85,7 @@ define(['jquery', 'knockout',
             /**
             * Figures in this log image: loaded with log-of-well
             */
-            this.imgFigures = ko.observableArray();
-
-            this.imgFigures(importImgFigures(data.ListOfDtoOfImgFigure));
+            this.imgFigures = ko.observableArray(importImgFigures(data.ListOfSvgElemDto));
 
             /**
             * Add new figures and remove deleted figures (saveWellLogSelectedFileImagePart)
@@ -103,7 +101,7 @@ define(['jquery', 'knockout',
                 // Add every element
                 // TODO: try to make one request
                 createdImgFigures.forEach(function (elem) {
-                    imgFigureOfLogOfWellService.post(ths.id, elem.toDto()).done(function (res) {
+                    svgElemOfLogOfWellService.post(ths.id, elem.toDto()).done(function (res) {
                         console.log(res);
                     });
                 });

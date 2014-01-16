@@ -2,16 +2,17 @@
 define(['jquery'], function ($) {
 
     // ============================log canvas
-    var logHelper = {
-        isArrowXorLine: true
-    };
+    var logHelper = {};
 
-    logHelper.drawLineCntxPart = function (cntx, startX, startY, lastX, lastY) {
+    /** Draw line on any context */
+    logHelper.drawLineCntx = function (cntx, startX, startY, lastX, lastY, isArrow) {
         var arrowHeadLength = 10;
+        cntx.strokeStyle = '#000';
+        cntx.lineWidth = 0.5;
         cntx.beginPath();
         cntx.moveTo(startX, startY);
         cntx.lineTo(lastX, lastY);
-        if (logHelper.isArrowXorLine === true) {
+        if (isArrow) {
             var angle = Math.atan2(lastY - startY, lastX - startX);
             cntx.lineTo(lastX - arrowHeadLength * Math.cos(angle - Math.PI / 6), lastY - arrowHeadLength * Math.sin(angle - Math.PI / 6));
             cntx.moveTo(lastX, lastY);
@@ -26,14 +27,6 @@ define(['jquery'], function ($) {
         cntx.textBaseline = 'middle';
         cntx.font = 'normal 12px sans-serif';
         cntx.fillText(textString, startX, startY);
-    };
-
-    logHelper.drawLineCntx = function (startX, startY, lastX, lastY) {
-        var cnvs = document.getElementById('log_cnvs');
-        var cntx = cnvs.getContext('2d');
-        cntx.strokeStyle = '#000';
-        cntx.lineWidth = 0.5;
-        logHelper.drawLineCntxPart(cntx, startX, startY, lastX, lastY);
     };
 
     logHelper.drawTextCntx = function (textString, startX, startY) {
