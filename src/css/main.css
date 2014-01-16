@@ -593,6 +593,10 @@ footer {
     margin-right: 8px;
 }
 
+.min-bottom-margin {
+    margin-bottom: 8px;
+}
+
 .min-margin {
     margin: 8px;
 }

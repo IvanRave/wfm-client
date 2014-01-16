@@ -2,17 +2,7 @@
   <div class="clearfix">
     <div class="pull-left">
       <div data-bind="with: slcLogOfWell">
-        <div style="position: relative; z-index: 1;" data-bind="logLas: { imgSrc: representationUrl, checkedLogTool: checkedLogTool, imgFigures: imgFigures }">
-          <div class="log-las-img-wrap">
-            <img class="log-las-img" src="#" alt="Log representation" />
-          </div>
-          <canvas class="log-las-base" width="624" height="480"></canvas>
-          <div>
-            <canvas class="log-las-draw" width="624" height="480"></canvas>
-            <div class="log-las-text"></div>
-          </div>
-        </div>
-        <div class="clearfix min-top-margin" data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
+        <div class="clearfix min-bottom-margin" data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
           <div class="pull-left">
             <div>
               <label class="radio-inline">
@@ -30,9 +20,19 @@
             </div>
           </div>
           <div class="pull-right" style="margin-right: 22px">
-            <button type="button" class="btn btn-sm btn-default" data-bind="click: saveSvgElems, enable: isEnabledSavingSvgElems">
+            <button type="button" class="btn btn-xs btn-default" data-bind="click: saveSvgElems, enable: isEnabledSavingSvgElems">
               <i class="glyphicon glyphicon-floppy-saved"></i> Save
             </button>
+          </div>
+        </div>
+        <div style="position: relative; z-index: 1;" data-bind="logLas: { imgSrc: representationUrl, checkedLogTool: checkedLogTool, imgFigures: imgFigures }">
+          <div class="log-las-img-wrap">
+            <img class="log-las-img" src="#" alt="Log representation" />
+          </div>
+          <canvas class="log-las-base" width="624" height="480"></canvas>
+          <div>
+            <canvas class="log-las-draw" width="624" height="480"></canvas>
+            <div class="log-las-text"></div>
           </div>
         </div>
       </div>
