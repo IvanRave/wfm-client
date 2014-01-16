@@ -192,7 +192,7 @@ define(['knockout',
 
             /**
             * List of patterns for widgets
-            * @type {Array.<module:models/section-pattern}
+            * @type {Array.<module:models/section-pattern>}
             */
             this.stagePatternsForWidget = ko.computed({
                 read: function () {

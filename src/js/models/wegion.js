@@ -90,7 +90,7 @@ define(['jquery',
 
             /**
             * Get well field by id
-            * @type {number} idOfWield - Well field id
+            * @param {number} idOfWield - Well field id
             */
             this.getWieldById = function (idOfWield) {
                 var tmpWields = ko.unwrap(ths.wields);

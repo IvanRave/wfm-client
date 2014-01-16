@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: filters/bindings.js</title>
+    
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+    
+    <h1 class="page-title">Source: filters/bindings.js</h1>
+    
+    
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source"><code>﻿/** @module */
+define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-helper',
+    'jquery.slimscroll', 'jquery.bootstrap', 'picker.date'], function ($, ko, appMoment, bootstrapModal, fileHelper) {
+        'use strict';
+
+        // Controls whether or not the text in a textbox is selected based on a model property
+        ko.bindingHandlers.selected = {
+            init: function (elem, valueAccessor) {
+                $(elem).blur(function () {
+                    var boundProperty = valueAccessor();
+                    if (ko.isWriteableObservable(boundProperty)) {
+                        boundProperty(false);
+                    }
+                });
+            },
+            update: function (elem, valueAccessor) {
+                var shouldBeSelected = ko.utils.unwrapObservable(valueAccessor());
+                if (shouldBeSelected) {
+                    $(elem).select();
+                }
+            }
+        };
+
+        ko.bindingHandlers.placeholder = {
+            init: function (elem, valueAccessor) {
+                var placeholderText = ko.utils.unwrapObservable(valueAccessor()),
+                    input = $(elem);
+
+                input.attr('placeholder', placeholderText);
+            }
+        };
+
+        ko.bindingHandlers.date = {
+            update: function (element, valueAccessor) {
+                if (ko.unwrap(valueAccessor())) {
+                    element.innerHTML = appMoment(new Date(ko.unwrap(valueAccessor()))).format('YYYY-MM-DD');
+                }
+            }
+        };
+
+        ko.bindingHandlers.unix = {
+            update: function (element, valueAccessor) {
+                if (ko.unwrap(valueAccessor())) {
+                    element.innerHTML = appMoment(ko.unwrap(valueAccessor()) * 1000).format('YYYY-MM-DD');
+                }
+            }
+        };
+
+        ko.bindingHandlers.unixTime = {
+            update: function (element, valueAccessor) {
+                if (ko.unwrap(valueAccessor())) {
+                    element.innerHTML = appMoment(ko.unwrap(valueAccessor()) * 1000).format('YYYY-MM-DD HH:mm:ss');
+                }
+            }
+        };
+
+        ko.bindingHandlers.prec = {
+            update: function (element, valueAccessor) {
+                var p = ko.unwrap(valueAccessor().value);
+
+                if ($.isNumeric(p) === false) {
+                    element.innerHTML = "";
+                    return;
+                }
+
+                p = p * valueAccessor().coef();
+
+                if (p === 0) {
+                    element.innerHTML = 0;
+                }
+                else if (p &lt; 1) {
+                    var i = 0;
+                    while (p &lt; 1) {
+                        i -= 1;
+                        p *= 10;
+                    }
+
+                    element.innerHTML = String(Math.round(p * 100) / 100) + 'x10&lt;sup>' + i + '&lt;/sup>';
+                }
+                else {
+                    element.innerHTML = String(Math.round(p * 100) / 100);
+                }
+            }
+        };
+
+        ko.bindingHandlers.hidden = {
+            update: function (element, valueAccessor) {
+                ko.bindingHandlers.visible.update(element, function () {
+                    return !ko.utils.unwrapObservable(valueAccessor());
+                });
+            }
+        };
+
+        ko.bindingHandlers.scroller = {
+            init: function (element) {
+                $(element).slimScroll({
+                    railVisible: true,
+                    alwaysVisible: true,
+                    color: '#fcfcfc',
+                    //distance: '0',
+                    position: 'right',
+                    ////width: 210,
+                    // move page scroll with this scroll
+                    allowPageScroll: true
+                });
+
+                var jqrWindow = $(window);
+
+                function redrawBlock() {
+                    var curHeight = jqrWindow.height(),
+                        curWidth = jqrWindow.width();
+
+                    if ($.isNumeric(curHeight)) {
+                        // Convert to numbers (if not)
+                        curHeight = +curHeight;
+                        curWidth = +curWidth;
+
+                        // 992px - small size in bootstrap - min width for div with scroll
+                        var minWidth = 992,
+                            topMargin = 32,
+                            bottomMargin = 50,
+                            defaultMenuWidth = 210;
+
+                        var needHeight,
+                            needWidth;
+                        if (curWidth >= minWidth) {
+                            needHeight = curHeight - topMargin - bottomMargin;
+                            needWidth = defaultMenuWidth;
+                        }
+                        else {
+                            needHeight = 'auto'; // by content
+                            needWidth = curWidth; // full width
+                        }
+
+                        $(element).parent().height(needHeight);
+                        $(element).height(needHeight);
+
+                        $(element).parent().width(needWidth);
+                        $(element).width(needWidth);
+                    }
+
+                    ////$(element).slimScroll({
+                    ////    railVisible: true,
+                    ////    alwaysVisible: true
+                    ////});
+                }
+
+                jqrWindow.resize(redrawBlock);
+
+                redrawBlock();
+            }
+        };
+
+        ko.bindingHandlers.datepicker = {
+            init: function (element, valueAccessor, allBindings) {
+                // Initialize datepicker with some optional options
+                var curValue = valueAccessor();
+
+                if (ko.isObservable(curValue)) {
+                    var options = allBindings.get('datepickerOptions') || {};
+
+                    var $input = $(element).pickadate(options);
+                    var picker = $input.pickadate('picker');
+
+                    var initialValue = ko.unwrap(curValue);
+
+                    if (initialValue) {
+                        // convert to ms
+                        initialValue = initialValue * 1000;
+                        // convert to local time to show in input
+                        var startUtcOffset = new Date(initialValue).getTimezoneOffset() * 60 * 1000;
+                        initialValue -= startUtcOffset;
+                        ////console.log('set as a start value in input: with utc', new Date(initialValue).toISOString());
+                        picker.set('select', initialValue);
+                    }
+
+                    picker.on({
+                        set: function (event) {
+                            ////console.log('on Set call with event: ', event);
+
+                            ////var selectedObj = picker.get('select');
+                            ////console.log('slcObj', selectedObj);
+                            // select - UTC unix time
+                            ////console.log(event);
+                            if (event.hasOwnProperty('select')) {
+                                var unixTimeMs = event.select;
+                                if (unixTimeMs) {
+                                    // offset in seconds
+                                    var utcOffset = new Date(unixTimeMs).getTimezoneOffset() * 60;
+                                    ////console.log('withoututc', unixTimeMs / 1000 - utcOffset);
+                                    // Save as UTC unix time (seconds)
+                                    curValue(unixTimeMs / 1000 - utcOffset);
+                                }
+                            }
+                            else if (event.hasOwnProperty('clear')) {
+                                ////console.log('clear setting');
+                                // Set to null by clear event
+                                // Do not set to null because of pickadate set undefined when choose year or month from select
+                                curValue(null);
+                            }
+                        }
+                    });
+
+                    ////options.onSet = function (event) {
+
+                    ////};
+
+                    ////options.max = new Date();
+
+                    ////$(element).pickadate(options);
+                }
+            },
+            update: function (element, valueAccessor) {
+                var curValue = valueAccessor();
+
+                if (ko.isObservable(curValue)) {
+                    var initialValue = ko.unwrap(curValue);
+                    //var setArchFunction = picker.on();
+                    ////console.log('pickerOn', picker);
+
+                    if (!initialValue) {
+                        var picker = $(element).pickadate('picker');
+                        // TODO: turn off onSet 
+                        // then set any value
+                        // then turn on previous onSet
+                        picker.set('clear');
+                    }
+                }
+                ////    var picker = $(element).pickadate('picker');
+
+                ////    var curVal = ko.unwrap(valueAccessor());
+
+                ////    console.log('picker', picker);
+                ////    console.log(curVal);
+
+                ////    ////if (curVal) {
+                ////    ////    // Convert to unit time miliseconds
+                ////    ////    curVal = curVal * 1000;
+                ////    ////    console.log('curval', new Date(curVal).toISOString());
+                ////    ////    // Get utc offset
+
+                ////    ////    //var utcOffset = new Date(curVal).getTimezoneOffset() * 60;
+                ////    ////    // Diff UTC
+                ////    ////    //curVal = curVal - utcOffset;
+
+                ////    ////    picker.set('select', curVal);
+                ////    ////}
+            }
+        };
+
+        // for bootstrap dropdown (wich not loaded correctly by data-toggle in external page)
+        ko.bindingHandlers.drpdwn = {
+            init: function (element) {
+                $(element).dropdown();
+            }
+        };
+
+        /** Figures in draw block */
+        function initLogLasDraw(drawCnvs, logCntx, imgFigures, koCheckedLogTool, logLasImg) {
+            var startX = 0,
+            startY = 0,
+            lastX = 0,
+            lastY = 0,
+            isPainting = false,
+            // Defines on MouseDown event
+            isArrowXorLine;
+
+            var drawCntx = drawCnvs.getContext('2d');
+            drawCntx.strokeStyle = '#000';
+            drawCntx.lineWidth = 0.5;
+
+            $(drawCnvs).on('mousedown', function (e) {
+                startX = e.pageX - $(this).offset().left;
+                startY = e.pageY - $(this).offset().top;
+                // Defines only one time: when user click on the field and start draw (line or arrow)
+                // When user draw - user can't change Arrow to Line
+                isArrowXorLine = ko.unwrap(koCheckedLogTool) === 'tool-arrow';
+                isPainting = true;
+            }).on('mouseup', function (e) {
+                if (isPainting === true) {
+                    lastX = e.pageX - $(this).offset().left;
+                    lastY = e.pageY - $(this).offset().top;
+
+                    drawCntx.clearRect(0, 0, drawCnvs.width, drawCnvs.height);
+                    isPainting = false;
+
+                    require(['models/svg-elem', 'constants/svg-elem-type-constants'], function (SvgElem, svgElemTypeConstants) {
+                        // Create line or arrow object
+                        var logLasImgTopPos = Math.abs($(logLasImg).position().top);
+                        console.log(logLasImgTopPos);
+                        var createdImgFigure = new SvgElem({
+                            Color: '#000',
+                            Tpe: svgElemTypeConstants.line.id,
+                            Opts: JSON.stringify({
+                                StartX: startX,
+                                StartY: startY + logLasImgTopPos,
+                                LastX: lastX,
+                                LastY: lastY + logLasImgTopPos,
+                                IsArrow: isArrowXorLine
+                            })
+                        });
+
+                        // Add to the log element img figures
+                        imgFigures.push(createdImgFigure);
+
+                        console.log(imgFigures);
+
+                        // Draw
+                        require(['helpers/log-helper'], function (logHelper) {
+                            logHelper.drawLineCntx(logCntx, startX, startY, lastX, lastY, isArrowXorLine);
+                        });
+                    });
+                }
+            }).on('mouseleave', function () {
+                // cancel painting
+                if (isPainting === true) {
+                    drawCntx.clearRect(0, 0, drawCnvs.width, drawCnvs.height);
+                    isPainting = false;
+                }
+            }).on('mousemove', function (e) {
+                if (isPainting === true) {
+                    lastX = e.pageX - $(this).offset().left;
+                    lastY = e.pageY - $(this).offset().top;
+                    drawCntx.clearRect(0, 0, drawCnvs.width, drawCnvs.height);
+                    require(['helpers/log-helper'], function (logHelper) {
+                        logHelper.drawLineCntx(drawCntx, startX, startY, lastX, lastY, isArrowXorLine);
+                    });
+                }
+            });
+        }
+
+        function initLogLasText(logLasText, logCntx, koSvgElems, logLasImg) {
+            $(logLasText).off('click').on('click', function (event) {
+                ////drawTextBlock.style.filter = 'alpha(opacity=50)';
+                // coord accordingly drawTextBlock
+                var posX = parseFloat(event.pageX - $(logLasText).offset().left);
+                var posY = parseFloat(event.pageY - $(logLasText).offset().top);
+
+                // Create new imgFigure: text
+                // Add to the history list: set isNew = true
+                // When save - add only where isNew = true (change isNew to false)
+                // When click 'return' - remove last element from list where isNew = true (old elements can't be removed)
+
+                require(['helpers/log-helper'], function (logHelper) {
+                    var podl = document.createElement('span');
+                    $(podl).css({
+                        'position': 'absolute',
+                        'top': (posY - 9),
+                        'left': posX,
+                        'white-space': 'nowrap',
+                        'color': '#888',
+                        'font-size': '12px',
+                        'font-family': 'sans-serif',
+                        'z-index': '15'
+                    }).html('enter text...');
+
+                    var pTag = document.createElement('span');
+                    $(pTag).prop({ 'contenteditable': true }).css({
+                        'position': 'absolute',
+                        'top': (posY - 9),
+                        'left': posX,
+                        'white-space': 'nowrap',
+                        'font-size': '12px',
+                        'font-family': 'sans-serif',
+                        'z-index': '15'
+                    }).on('keypress', function (e) {
+                        var code = (e.keyCode ? e.keyCode : e.which);
+                        // Enter keycode
+                        if (code === 13) {
+                            e.preventDefault();
+                            var s = $(pTag).html();
+                            $(podl).remove();
+                            $(pTag).remove();
+
+                            require(['models/svg-elem', 'constants/svg-elem-type-constants'], function (SvgElem, svgElemTypeConstants) {
+
+                                var logLasImgTopPos = Math.abs($(logLasImg).position().top);
+
+                                ////    ////        StartY: 
+                                // Create line or arrow object
+                                var createdImgFigure = new SvgElem({
+                                    Color: '#000',
+                                    Tpe: svgElemTypeConstants.text.id,
+                                    Opts: JSON.stringify({
+                                        StartX: posX,
+                                        StartY: posY + logLasImgTopPos,
+                                        TextContent: s
+                                    })
+                                });
+
+                                console.log(createdImgFigure);
+
+                                // Add to the log element img figures
+                                koSvgElems.push(createdImgFigure);
+
+                                // Draw
+                                logHelper.drawTextCntx(logCntx, s, posX, posY);
+                            });
+                        }
+                    }).on('keyup', function (e) {
+                        var s = $(pTag).html();
+
+                        if (s.length === 0) {
+                            $(podl).show();
+                        }
+                        else {
+                            $(podl).hide();
+                        }
+
+                        var code = (e.keyCode ? e.keyCode : e.which);
+                        if (code === 27) {
+                            $(podl).remove();
+                            $(pTag).remove();
+                        }
+                    }).on('focusout', function () {
+                        $(podl).remove();
+                        $(pTag).remove();
+                    });
+
+                    $(logLasText).append(podl, pTag);
+                    $(pTag).focus();
+                });
+            });
+        }
+
+        /* Redraw elements */
+        function drawLogElements(logCntx, svgElements, jqrLogLasImg) {
+            var logLasImgTopPos = Math.abs(jqrLogLasImg.position().top);
+            require(['helpers/log-helper'], function (logHelper) {
+                svgElements.forEach(function (elem) {
+                    var opts = ko.unwrap(elem.opts);
+
+                    switch (elem.tpe) {
+                        case 'line':
+                            logHelper.drawLineCntx(logCntx, opts.StartX, opts.StartY - logLasImgTopPos, opts.LastX, opts.LastY - logLasImgTopPos, opts.IsArrow);
+                            break;
+                        case 'text':
+                            logHelper.drawTextCntx(logCntx, opts.TextContent, opts.StartX, opts.StartY - logLasImgTopPos);
+                            break;
+                        default: throw new Error('NoSuchTypeForLogFigure');
+                    }
+                });
+            });
+        }
+
+        /** All log blocks */
+        ko.bindingHandlers.logLas = {
+            init: function (element, valueAccessor) {
+                // Draw a line - create Line (Array) Object
+                // Get coords of this line
+                // Add to the log
+                // Send coords to the server
+                // - build image on the server side for downloading
+
+                var logLasDraw = element.getElementsByClassName('log-las-draw')[0];
+                if (!logLasDraw) { throw new Error('no element'); }
+
+                var logLasBase = element.getElementsByClassName('log-las-base')[0];
+                if (!logLasBase) { throw new Error('no element'); }
+
+                var logLasText = element.getElementsByClassName('log-las-text')[0];
+                if (!logLasText) { throw new Error('no element'); }
+
+                var logLasImg = element.getElementsByClassName('log-las-img')[0];
+                if (!logLasImg) { throw new Error('no element'); }
+
+                var accessor = valueAccessor();
+                logLasImg.onload = function () {
+                    var logCntx = logLasBase.getContext('2d');
+                    logCntx.clearRect(0, 0, logLasBase.width, logLasBase.height);
+
+                    var maxCanvasHeight = 480;
+
+                    var jqrLogLasImg = $(logLasImg);
+                    // Add scroll event for image
+                    jqrLogLasImg.parent().off('scroll').on('scroll', function () {
+                        logCntx.clearRect(0, 0, logLasBase.width, logLasBase.height);
+                        drawLogElements(logCntx, ko.unwrap(accessor.imgFigures), jqrLogLasImg);
+                    });
+
+                    var tmpImgClientHeight = logLasImg.clientHeight;
+
+                    if (tmpImgClientHeight > maxCanvasHeight) {
+                        tmpImgClientHeight = maxCanvasHeight;
+                    }
+
+                    // Set height to all elements
+                    logLasBase.height = tmpImgClientHeight;
+                    logLasDraw.height = tmpImgClientHeight;
+                    $(logLasText).css({
+                        'height': tmpImgClientHeight
+                    });
+
+                    // Width - const = 624
+                    ////cnvs.width = logImg.clientWidth;
+                    ////drawCnvsLog.width = logImg.clientWidth;
+                    ////$(textCnvsLog).css({ 'width': logImg.clientWidth });
+
+                    // Draw all image figures on logCntx
+                    drawLogElements(logCntx, ko.unwrap(accessor.imgFigures), jqrLogLasImg);
+
+                    initLogLasDraw(logLasDraw, logCntx, accessor.imgFigures, accessor.checkedLogTool, logLasImg);
+
+                    initLogLasText(logLasText, logCntx, accessor.imgFigures, logLasImg);
+                };
+
+                // Load img and all handlers
+                logLasImg.src = accessor.imgSrc;
+            },
+            update: function (element, valueAccessor) {
+                var logLasDraw = element.getElementsByClassName('log-las-draw')[0];
+                if (!logLasDraw) { throw new Error('no element'); }
+
+                var logLasBase = element.getElementsByClassName('log-las-base')[0];
+                if (!logLasBase) { throw new Error('no element'); }
+
+                var logLasText = element.getElementsByClassName('log-las-text')[0];
+                if (!logLasText) { throw new Error('no element'); }
+
+                var logLasImg = element.getElementsByClassName('log-las-img')[0];
+                if (!logLasImg) { throw new Error('no element'); }
+
+                var accessor = valueAccessor();
+                var checkedLogTool = ko.unwrap(accessor.checkedLogTool);
+
+                // Hide all blocks by default
+                $(logLasDraw).hide();
+                $(logLasText).hide();
+
+                // Get coords from main canvas layer
+                var cnvsTop = $(logLasBase).css('top');
+
+                switch (checkedLogTool) {
+                    case 'tool-line':
+                        $(logLasDraw).css({ 'top': cnvsTop }).show();
+                        break;
+                    case 'tool-arrow':
+                        $(logLasDraw).css({ 'top': cnvsTop }).show();
+                        break;
+                    case 'tool-text':
+                        $(logLasText).css({ 'top': cnvsTop }).show();
+                        break;
+                }
+            }
+        };
+
+        // svg graph (like perfomance)
+        ko.bindingHandlers.svgResponsive = {
+            init: function (element, valueAccessor) {
+                function updateWidth() {
+                    valueAccessor().tmpPrfGraphWidth($(element).parent().width());
+                }
+
+                // When change window size - update graph size
+                $(window).resize(updateWidth);
+
+                // When toggle left menu - update graph size
+                valueAccessor().tmpIsVisibleMenu.subscribe(updateWidth);
+
+                // Update initial
+                updateWidth();
+                // svg viewbox size need to init before creating of this element
+            }
+        };
+
+        ko.bindingHandlers.panzoomImg = {
+            init: function (element, valueAccessor) {
+                var imgSrc = ko.unwrap(valueAccessor().src);
+                $(element).on('click', function (e) {
+                    e.preventDefault();
+                    bootstrapModal.openModalPanzoomWindow(imgSrc);
+                });
+            }
+        };
+
+        ko.bindingHandlers.filoader = {
+            init: function (element, valueAccessor) {
+                var tmpFiloader = valueAccessor();
+                fileHelper.initRegExpFileUpload(element, tmpFiloader.url, tmpFiloader.fileTypeRegExp, tmpFiloader.callback);
+            }
+        };
+
+        ko.bindingHandlers.modalWindow = {
+            init: function (element, valueAccessor) {
+                var tmpValue = valueAccessor();
+
+                $(element).on('hidden.bs.modal', function () {
+                    tmpValue.fileMgrHiddenCallback();
+                });
+            },
+            update: function (element, valueAccessor) {
+                var tmpValue = valueAccessor();
+
+                if (ko.unwrap(tmpValue.isOpenFileMgr)) {
+                    $(element).modal('show');
+                }
+                else {
+                    $(element).modal('hide');
+                }
+            }
+        };
+
+        ko.bindingHandlers.svgZoomGraph = {
+            update: function (element, valueAccessor) {
+                var dataSet = ko.unwrap(valueAccessor().filteredByDateProductionDataSet);
+                if (dataSet.length === 0) { return; }
+
+                var graph = {
+                    axis: ko.unwrap(valueAccessor().prfGraphAxis),
+                    zoom: ko.unwrap(valueAccessor().prfGraphZoom),
+                    viewBox: ko.unwrap(valueAccessor().prfGraphViewBox),
+                    svgPath: ko.unwrap(valueAccessor().productionDataSetSvgPath)
+                };
+
+                // Zoom coefficient for plus/minus buttons
+                var scaleCoef = 1.1;
+                var diffX = (graph.viewBox.width / 2) * (scaleCoef - 1),
+                    diffY = (graph.viewBox.height / 2) * (scaleCoef - 1);
+
+                require(['d3'], function (d3) {
+
+                    var graphWrap = d3.select(element);
+
+                    function redrawGraph() {
+                        // Redraw each curve (JSON obj)
+                        $.each(graph.svgPath, function (elemKey, elemVal) {
+                            graphWrap.select('.svg-prf-graph-g').select('#grp-' + elemKey).attr('d', elemVal(dataSet));
+                        });
+
+                        // Redraw x axis
+                        graphWrap.select('.axis.x').call(graph.axis.x);
+
+                        // Redraw y axis
+                        graphWrap.select('.axis.y').call(graph.axis.y);
+                    }
+
+                    // When zooming redraw graph
+                    graph.zoom.on('zoom', redrawGraph);
+
+                    // Apply zoom to whole graph (axis + lines)
+                    graphWrap.select('.graph-zoom-rect').call(graph.zoom);
+
+                    graphWrap.select('.zoom-in').on('click', function () {
+                        graph.zoom.scale(graph.zoom.scale() * scaleCoef);
+
+                        var tmpTr = graph.zoom.translate();
+                        tmpTr[0] -= diffX;
+                        tmpTr[1] -= diffY;
+                        graph.zoom.translate(tmpTr);
+
+                        redrawGraph();
+
+                        // Previous graph state - before click
+                        ////var prevGraph = {
+                        ////    // by default = 1
+                        ////    scale: graph.zoom.scale(),
+                        ////    // by default = [0,0]
+                        ////    translate: graph.zoom.translate()
+                        ////};
+
+                        ////// Previous width of graph = Initial width * previous zoom
+                        ////prevGraph.width = graph.viewBox.width / prevGraph.scale;
+                        ////prevGraph.height = graph.viewBox.height / prevGraph.scale;
+
+                        ////// 1 -> 2 -> 4 -> 8 -> 16
+                        ////// Current graph state - after click
+                        ////var curGraph = {
+                        ////    scale: prevGraph.scale + scaleCoef,
+                        ////    translate: []
+                        ////};
+
+                        ////graph.zoom.scale(curGraph.scale);
+
+                        ////curGraph.width = prevGraph.width / curGraph.scale;
+                        ////curGraph.height = prevGraph.height / curGraph.scale;
+
+                        ////curGraph.translate[0] = prevGraph.translate[0] - ((prevGraph.width - curGraph.width) / 2);
+                        ////curGraph.translate[1] = prevGraph.translate[1] - ((prevGraph.height - curGraph.height) / 2);
+
+                        ////graph.zoom.translate(curGraph.translate);
+                        //////    // dx = (x * cf - x)/2
+
+                        //////    tmpTranslate[0] -= (prfGraphViewBox.width * tmpZoom - prfGraphViewBox.width) / 2;
+                        //////    tmpTranslate[1] -= (prfGraphViewBox.height * tmpZoom - prfGraphViewBox.height) / 2;
+                        //////    prfGraphZoom.translate(tmpTranslate);
+
+                    });
+
+                    graphWrap.select('.zoom-out').on('click', function () {
+                        ////if (tmpSc > 1) {
+                        graph.zoom.scale(graph.zoom.scale() / scaleCoef);
+
+                        var tmpTr = graph.zoom.translate();
+                        tmpTr[0] += diffX;
+                        tmpTr[1] += diffY;
+                        graph.zoom.translate(tmpTr);
+
+                        redrawGraph();
+                        ////}
+                        ////var tmpZoom = prfGraphZoom.scale();
+                        ////// 1 -> 1/2 -> 1/4 -> 1/8 -> 1/16
+                        ////if ($.isNumeric(tmpZoom)) {
+                        ////    tmpZoom = tmpZoom / zoomCoef;
+                        ////    prfGraphZoom.scale(tmpZoom);
+
+                        ////    var tmpTranslate = prfGraphZoom.translate();
+                        ////    tmpTranslate[0] += (1110 * (zoomCoef - 1)) / 2;
+                        ////    tmpTranslate[1] += (370 * (zoomCoef - 1)) / 2;
+
+                        ////    prfGraphZoom.translate(tmpTranslate);
+
+                        ////    redrawGraph();
+                        ////    console.log(tmpZoom);
+                        ////}
+                    });
+
+                    // Redraw graph once like initial zoom event
+                    redrawGraph();
+                });
+            }
+        };
+    });</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="stage-constants.html">constants/stage-constants</a></li><li><a href="svg-elem-type-constants.html">constants/svg-elem-type-constants</a></li><li><a href="bindings.html">filters/bindings</a></li><li><a href="ajax-request.html">helpers/ajax-request</a></li><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="log-helper.html">helpers/log-helper</a></li><li><a href="area-of-map-of-wield.html">models/area-of-map-of-wield</a></li><li><a href="column-attribute.html">models/column-attribute</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="file-spec-of-history-of-well.html">models/file-spec-of-history-of-well</a></li><li><a href="history-of-well.html">models/history-of-well</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="log-of-well.html">models/log-of-well</a></li><li><a href="map-of-wield.html">models/map-of-wield</a></li><li><a href="prop-spec.html">models/prop-spec</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="stage-base.html">models/stage-base</a></li><li><a href="svg-elem.html">models/svg-elem</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="volume-of-well.html">models/volume-of-well</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-file.html">models/well-file</a></li><li><a href="wfm-image.html">models/wfm-image</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="widget.html">models/widget</a></li><li><a href="widgock.html">models/widgock</a></li><li><a href="widgout.html">models/widgout</a></li><li><a href="wield.html">models/wield</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="section-base.html">sections/section-base</a></li><li><a href="section-of-company.html">sections/section-of-company</a></li><li><a href="section-of-wegion.html">sections/section-of-wegion</a></li><li><a href="section-of-well.html">sections/section-of-well</a></li><li><a href="section-of-wield.html">sections/section-of-wield</a></li><li><a href="section-of-wroup.html">sections/section-of-wroup</a></li><li><a href="company_.html">services/company</a></li><li><a href="company-user.html">services/company-user</a></li><li><a href="file-spec_.html">services/file-spec</a></li><li><a href="file-spec-of-history-of-well_.html">services/file-spec-of-history-of-well</a></li><li><a href="image-of-history-of-well.html">services/image-of-history-of-well</a></li><li><a href="log-of-well_.html">services/log-of-well</a></li><li><a href="register.html">services/register</a></li><li><a href="svg-elem-of-log-of-well.html">services/svg-elem-of-log-of-well</a></li><li><a href="volume-of-well_.html">services/volume-of-well</a></li><li><a href="wegion_.html">services/wegion</a></li><li><a href="well_.html">services/well</a></li><li><a href="widget_.html">services/widget</a></li><li><a href="widgout_.html">services/widgout</a></li><li><a href="wield_.html">services/wield</a></li><li><a href="wroup_.html">services/wroup</a></li><li><a href="workspace.html">viewmodels/workspace</a></li><li><a href="sketch.html">well/sketch</a></li><li><a href="widget-summary.html">widgets/widget-summary</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0</a> on Thu Jan 16 2014 20:35:03 GMT+0200 (EET)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

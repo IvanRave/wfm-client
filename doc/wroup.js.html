@@ -33,23 +33,33 @@ define(['jquery',
     'models/well',
     'models/wfm-parameter-of-wroup',
     'models/sections/section-of-wroup',
-    'models/stage-base'], function ($, ko, datacontext, bootstrapModal, Well, WellGroupWfmParameter, SectionOfWroup, StageBase) {
+    'models/stage-base',
+    'models/prop-spec',
+    'services/wroup',
+    'constants/stage-constants'], function ($, ko, datacontext, bootstrapModal, Well, WellGroupWfmParameter,
+        SectionOfWroup, StageBase, PropSpec, wroupService, stageConstants) {
         'use strict';
 
         // 18. WellGroupWfmParameter
         function importWellGroupWfmParameterDtoList(data, wellGroupItem) {
-            return $.map(data || [], function (item) { return new WellGroupWfmParameter(item, wellGroupItem); });
+            return data.map(function (item) { return new WellGroupWfmParameter(item, wellGroupItem); });
         }
 
         // 4. Wells (convert data objects into array)
         function importWellsDto(data, parent) {
-            return $.map(data || [], function (item) { return new Well(item, parent); });
+            return data.map(function (item) { return new Well(item, parent); });
         }
 
         /** Import sections */
         function importListOfSectionOfWroupDto(data, parent) {
             return data.map(function (item) { return new SectionOfWroup(item, parent); });
         }
+
+        /** Main properties for groups */
+        var wroupPropSpecList = [
+            new PropSpec('Name', 'Name', 'Group name', 'SingleLine', { maxLength: 255 }),
+            new PropSpec('Description', 'Description', 'Description', 'MultiLine', {})
+        ];
 
         /**
         * Well group
@@ -61,7 +71,7 @@ define(['jquery',
             data = data || {};
 
             /** Alternative of this context: for closures etc. */
-            var self = this;
+            var ths = this;
 
             /**
             * Get well field (parent)
@@ -71,23 +81,19 @@ define(['jquery',
                 return wellField;
             };
 
+            /** Get root view model */
+            this.getRootViewModel = function () {
+                return this.getWellField().getRootViewModel();
+            };
+
             /**
             * Group id
             * @type {number}
             */
             this.Id = data.Id;
 
-            /**
-            * Group name
-            * @type {string}
-            */
-            this.Name = ko.observable(data.Name);
-
-            /**
-            * Group description: nvarchar(max)
-            * @type {string}
-            */
-            this.Description = ko.observable(data.Description);
+            /** Alternatie for caps Id */
+            this.id = data.Id;
 
             /**
             * Field (parent) id
@@ -95,22 +101,23 @@ define(['jquery',
             */
             this.WellFieldId = data.WellFieldId;
 
+            /** Property specifications */
+            this.propSpecList = wroupPropSpecList;
+
+            /**
+            * Stage key: equals file name
+            * @type {string}
+            */
+            this.stageKey = stageConstants.wroup.id;
+
+            /** Base for all stages */
+            StageBase.call(this, data);
+
             /**
             * List of well for this group
             * @type {Array.&lt;module:models/well>}
             */
             this.Wells = ko.observableArray();
-
-            /** Base for all stages */
-            StageBase.call(this);
-
-            /** 
-            * Select section
-            * @param {object} sectionToSelect
-            */
-            this.selectSection = function (sectionToSelect) {
-                self.selectedSection(sectionToSelect);
-            };
 
             /**
             * Selected well
@@ -119,57 +126,84 @@ define(['jquery',
             this.selectedWell = ko.observable();
 
             /**
+            * Get well by id
+            * @param {number} idOfWell - Id of well
+            */
+            this.getWellById = function (idOfWell) {
+                var tmpWells = ko.unwrap(ths.Wells);
+                return tmpWells.filter(function (elem) {
+                    return elem.id === idOfWell;
+                })[0];
+            };
+
+            /**
             * Select well (child)
             * @param {module:models/well} wellToSelect - Well to select
             */
             this.selectWell = function (wellToSelect) {
-                ////window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
-                ////    region: self.getWellGroup().getWellField().getWellRegion().Id,
-                ////    field: self.getWellGroup().getWellField().Id,
-                ////    group: self.getWellGroup().Id,
-                ////    well: self.Id
-                ////});
+                /** Initial function for all select stage functions */
+                ths.selectChildStage(wellToSelect);
 
-                // By default - no template - show widget page
-                // Previous - by default - summary self.sectionList[0].id;
-                var previousSelectedSection;
 
-                var prevSlcWellRegion = ko.unwrap(self.getWellField().getWellRegion().getCompany().selectedWegion);
+                var tmpInitialUrlData = ko.unwrap(ths.getRootViewModel().initialUrlData);
 
-                // get previous selected section (if exists)
-                if (prevSlcWellRegion) {
-                    var prevSlcWellField = ko.unwrap(prevSlcWellRegion.selectedWield);
-                    if (prevSlcWellField) {
-                        var prevSlcWellGroup = ko.unwrap(prevSlcWellField.selectedWroup);
-                        if (prevSlcWellGroup) {
-                            // previous selected well
-                            var prevSlcWell = ko.unwrap(prevSlcWellGroup.selectedWell);
-                            if (prevSlcWell) {
-                                previousSelectedSection = ko.unwrap(prevSlcWell.selectedSection);
+                if (tmpInitialUrlData.wellSectionId) {
+                    // Select section
 
-                                // If selected perfomance section
-                                var tmpSelectedAttrGroupId = ko.unwrap(prevSlcWell.mainPerfomanceView.selectedAttrGroupId);
-                                if (tmpSelectedAttrGroupId) {
-                                    wellToSelect.mainPerfomanceView.selectedAttrGroupId(tmpSelectedAttrGroupId);
+                    var tmpSection = wellToSelect.getSectionByPatternId('well-' + tmpInitialUrlData.wellSectionId);
+                    wellToSelect.selectSection(tmpSection);
+
+                    // Remove section id from
+                    delete tmpInitialUrlData.wellSectionId;
+                    ths.getRootViewModel().initialUrlData(tmpInitialUrlData);
+                }
+                else
+                {
+                    // Check previous section
+
+
+                    // By default - no template - show widget page
+                    // Previous - by default - summary ths.sectionList[0].id;
+                    var previousSelectedSection;
+
+                    var prevSlcWellRegion = ko.unwrap(ths.getWellField().getWellRegion().getCompany().selectedWegion);
+
+                    // get previous selected section (if exists)
+                    if (prevSlcWellRegion) {
+                        var prevSlcWellField = ko.unwrap(prevSlcWellRegion.selectedWield);
+                        if (prevSlcWellField) {
+                            var prevSlcWellGroup = ko.unwrap(prevSlcWellField.selectedWroup);
+                            if (prevSlcWellGroup) {
+                                // previous selected well
+                                var prevSlcWell = ko.unwrap(prevSlcWellGroup.selectedWell);
+                                if (prevSlcWell) {
+                                    previousSelectedSection = ko.unwrap(prevSlcWell.selectedSection);
+
+                                    // If selected perfomance section
+                                    var tmpSelectedAttrGroupId = ko.unwrap(prevSlcWell.mainPerfomanceView.selectedAttrGroupId);
+                                    if (tmpSelectedAttrGroupId) {
+                                        wellToSelect.mainPerfomanceView.selectedAttrGroupId(tmpSelectedAttrGroupId);
+                                    }
                                 }
                             }
                         }
                     }
+
+                    if (previousSelectedSection) {
+                        wellToSelect.selectSection(wellToSelect.getSectionByPatternId(previousSelectedSection.sectionPatternId));
+                    }
+                    else {
+                        wellToSelect.unselectSection();
+                    }
                 }
+                    
+
 
                 // set new selected data (plus region in the end)
-                var slcWellGroup = self;
-                var slcWellField = self.getWellField();
+                var slcWellGroup = ths;
+                var slcWellField = ths.getWellField();
                 var slcWellRegion = slcWellField.getWellRegion();
                 var slcCompany = slcWellRegion.getCompany();
-
-                // 1. Section
-                if (previousSelectedSection) {
-                    wellToSelect.selectSection(wellToSelect.getSectionByPatternId(previousSelectedSection.sectionPatternId));
-                }
-                else {
-                    wellToSelect.unselectSection();
-                }
 
                 // 2. Well
                 // set selected items in DESC order (can be redraw each time if ASC order)
@@ -198,24 +232,22 @@ define(['jquery',
             */
             this.isLoadWellGroupWfmParameterList = ko.observable(false);
 
-            self.getWellGroupWfmParameterList = function () {
-                if (ko.unwrap(self.isLoadWellGroupWfmParameterList) === false) {
-                    datacontext.getWellGroupWfmParameterList({ wellgroup_id: self.Id }).done(function (response) {
-                        self.wellGroupWfmParameterList(importWellGroupWfmParameterDtoList(response));
-                        self.isLoadWellGroupWfmParameterList(true);
+            this.getWellGroupWfmParameterList = function () {
+                if (ko.unwrap(ths.isLoadWellGroupWfmParameterList) === false) {
+                    datacontext.getWellGroupWfmParameterList({ wellgroup_id: ths.Id }).done(function (response) {
+                        ths.wellGroupWfmParameterList(importWellGroupWfmParameterDtoList(response));
+                        ths.isLoadWellGroupWfmParameterList(true);
                     });
                 }
             };
 
-            var appViewModel = self.getWellField().getWellRegion().getCompany().getRootViewModel();
-
             // wfm parameter from main source which is not in this group
-            self.unselectedWfmParameterList = ko.computed({
+            this.unselectedWfmParameterList = ko.computed({
                 read: function () {
                     // two arrays
-                    return $.grep(ko.unwrap(appViewModel.wfmParameterList), function (prmElem) {
+                    return $.grep(ko.unwrap(ths.getRootViewModel().wfmParameterList), function (prmElem) {
                         var isParamExist = false;
-                        $.each(ko.unwrap(self.wellGroupWfmParameterList), function (wlgIndex, wlgElem) {
+                        $.each(ko.unwrap(ths.wellGroupWfmParameterList), function (wlgIndex, wlgElem) {
                             if (wlgElem.wfmParameterId === prmElem.id) {
                                 isParamExist = true;
                                 // break from arr
@@ -231,23 +263,23 @@ define(['jquery',
             });
 
             // WFM parameter which user select from unselected wfm parameter list (from root)
-            self.selectedWfmParameterId = ko.observable();
+            this.selectedWfmParameterId = ko.observable();
 
-            self.addWellGroupWfmParameter = function () {
-                var tmpWfmParamId = ko.unwrap(self.selectedWfmParameterId);
+            this.addWellGroupWfmParameter = function () {
+                var tmpWfmParamId = ko.unwrap(ths.selectedWfmParameterId);
                 if (tmpWfmParamId) {
                     datacontext.postWellGroupWfmParameter({
                         Color: '',
                         SerialNumber: 1,
-                        WellGroupId: self.Id,
+                        WellGroupId: ths.Id,
                         WfmParameterId: tmpWfmParamId
                     }).done(function (response) {
-                        self.wellGroupWfmParameterList.push(new WellGroupWfmParameter(response, self));
+                        ths.wellGroupWfmParameterList.push(new WellGroupWfmParameter(response, ths));
                     });
                 }
             };
 
-            ////self.addWellGroupWfmParameter = function () {
+            ////this.addWellGroupWfmParameter = function () {
             ////    var inputId = document.createElement("input");
             ////    inputId.type = "text";
             ////    $(inputId).prop({ pattern: "[a-zA-Z]+", title: "Only letters: a-z(A-Z)", required: true });
@@ -284,17 +316,17 @@ define(['jquery',
             ////            var wellGroupWfmParameterNew = datacontext.createWellGroupWfmParameter({
             ////                Color: "",
             ////                SerialNumber: 1,
-            ////                WellGroupId: self.Id,
+            ////                WellGroupId: ths.Id,
             ////                WfmParameterId: $(inputId).val()
             ////            });
 
             ////            datacontext.postWellGroupWfmParameter(wellGroupWfmParameterNew).done(function (response) {
             ////                var createdWellGroupWfmParameter = datacontext.createWellGroupWfmParameter(response);
             ////                createdWellGroupWfmParameter.wfmParameter = createdWfmParameter;
-            ////                self.wellGroupWfmParameterList.push(createdWellGroupWfmParameter);
+            ////                ths.wellGroupWfmParameterList.push(createdWellGroupWfmParameter);
             ////            });
             ////            // or error - id is denied
-            ////            // if one company get for itself purposes all ids, then will be errors frequently
+            ////            // if one company get for itths purposes all ids, then will be errors frequently
             ////        });
 
             ////        bootstrapModal.closeModalWindow();
@@ -303,7 +335,7 @@ define(['jquery',
             ////    bootstrapModal.openModalWindow("Add parameter", innerDiv, submitFunction);
             ////};
 
-            self.addWell = function () {
+            this.addWell = function () {
                 var inputName = document.createElement('input');
                 inputName.type = 'text';
                 $(inputName).prop({ 'required': true }).addClass('form-control');
@@ -316,9 +348,10 @@ define(['jquery',
                 function submitFunction() {
                     datacontext.postWell({
                         Name: $(inputName).val(),
-                        WellGroupId: self.Id
+                        Description: '',
+                        WellGroupId: ths.Id
                     }).done(function (result) {
-                        self.Wells.push(new Well(result, self));
+                        ths.Wells.push(new Well(result, ths));
                     });
 
                     bootstrapModal.closeModalWindow();
@@ -327,47 +360,26 @@ define(['jquery',
                 bootstrapModal.openModalWindow('Well', innerDiv, submitFunction);
             };
 
-            self.deleteWell = function (wellForDelete) {
+            this.removeChild = function (wellForDelete) {
                 if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(wellForDelete.Name) + '"?')) {
                     datacontext.deleteWell(wellForDelete).done(function () {
-                        self.Wells.remove(wellForDelete);
+                        ths.Wells.remove(wellForDelete);
                         // Select this wroup
-                        self.getWellField().selectWroup(self);
+                        ths.getWellField().selectWroup(ths);
                     });
                 }
             };
 
-            self.editWellGroup = function () {
-                var inputName = document.createElement('input');
-                inputName.type = 'text';
-                $(inputName).val(self.Name()).prop({ 'required': true }).addClass('form-control');
-
-                var innerDiv = document.createElement('div');
-                $(innerDiv).addClass('form-horizontal').append(
-                    bootstrapModal.gnrtDom('Name', inputName)
-                );
-
-                function submitFunction() {
-                    self.Name($(inputName).val());
-                    datacontext.saveChangedWellGroup(self).done(function (result) { self.Name(result.Name); });
-                    bootstrapModal.closeModalWindow();
-                }
-
-                bootstrapModal.openModalWindow("Well group", innerDiv, submitFunction);
-            };
-
-            self.isOpenItem = ko.observable(false);
-
-            self.toggleItem = function () {
-                self.isOpenItem(!self.isOpenItem());
+            this.save = function () {
+                wroupService.put(ths.Id, ths.toDto());
             };
 
             /** Whether item and parent are selected */
-            self.isSelectedItem = ko.computed({
+            this.isSelectedItem = ko.computed({
                 read: function () {
-                    var tmpField = self.getWellField();
+                    var tmpField = ths.getWellField();
                     if (ko.unwrap(tmpField.isSelectedItem)) {
-                        if (self === ko.unwrap(tmpField.selectedWroup)) {
+                        if (ths === ko.unwrap(tmpField.selectedWroup)) {
                             return true;
                         }
                     }
@@ -376,10 +388,10 @@ define(['jquery',
             });
 
             /** Is item selected and showed on the page */
-            self.isShowedItem = ko.computed({
+            this.isShowedItem = ko.computed({
                 read: function () {
-                    if (ko.unwrap(self.isSelectedItem)) {
-                        if (!ko.unwrap(self.selectedWell)) {
+                    if (ko.unwrap(ths.isSelectedItem)) {
+                        if (!ko.unwrap(ths.selectedWell)) {
                             return true;
                         }
                     }
@@ -387,25 +399,24 @@ define(['jquery',
                 deferEvaluation: true
             });
 
-            self.toPlainJson = function () {
-                ////var copy = ko.toJS(self);
-                var tmpPropList = ['Id', 'Name', 'WellFieldId', 'Description'];
-                var objReady = {};
-                $.each(tmpPropList, function (propIndex, propValue) {
-                    // null can be sended to ovveride current value to null
-                    if (typeof ko.unwrap(self[propValue]) !== 'undefined') {
-                        objReady[propValue] = ko.unwrap(self[propValue]);
-                    }
+            this.toDto = function () {
+                var dtoObj = {
+                    'Id': ths.Id,
+                    'WellFieldId': ths.WellFieldId
+                };
+
+                ths.propSpecList.forEach(function (prop) {
+                    dtoObj[prop.serverId] = ko.unwrap(ths[prop.clientId]);
                 });
 
-                return objReady;
+                return dtoObj;
             };
 
             // load wells
-            this.Wells(importWellsDto(data.WellsDto, self));
+            this.Wells(importWellsDto(data.WellsDto, ths));
 
             /** Load sections */
-            this.listOfSection(importListOfSectionOfWroupDto(data.ListOfSectionOfWroupDto, self));
+            this.listOfSection(importListOfSectionOfWroupDto(data.ListOfSectionOfWroupDto, ths));
         };
 
         return exports;
@@ -419,13 +430,13 @@ define(['jquery',
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="ajax-request.html">helpers/ajax-request</a></li><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="prop-spec.html">models/prop-spec</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="stage-base.html">models/stage-base</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-field-map.html">models/well-field-map</a></li><li><a href="well-file.html">models/well-file</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="wield.html">models/wield</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="section-base.html">sections/section-base</a></li><li><a href="section-of-company.html">sections/section-of-company</a></li><li><a href="section-of-wegion.html">sections/section-of-wegion</a></li><li><a href="section-of-well.html">sections/section-of-well</a></li><li><a href="section-of-wield.html">sections/section-of-wield</a></li><li><a href="section-of-wroup.html">sections/section-of-wroup</a></li><li><a href="company_.html">services/company</a></li><li><a href="company-user.html">services/company-user</a></li><li><a href="register.html">services/register</a></li><li><a href="workspace.html">viewmodels/workspace</a></li><li><a href="sketch.html">well/sketch</a></li><li><a href="volume.html">well/volume</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="stage-constants.html">constants/stage-constants</a></li><li><a href="svg-elem-type-constants.html">constants/svg-elem-type-constants</a></li><li><a href="bindings.html">filters/bindings</a></li><li><a href="ajax-request.html">helpers/ajax-request</a></li><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="log-helper.html">helpers/log-helper</a></li><li><a href="area-of-map-of-wield.html">models/area-of-map-of-wield</a></li><li><a href="column-attribute.html">models/column-attribute</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="file-spec-of-history-of-well.html">models/file-spec-of-history-of-well</a></li><li><a href="history-of-well.html">models/history-of-well</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="log-of-well.html">models/log-of-well</a></li><li><a href="map-of-wield.html">models/map-of-wield</a></li><li><a href="prop-spec.html">models/prop-spec</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="stage-base.html">models/stage-base</a></li><li><a href="svg-elem.html">models/svg-elem</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="volume-of-well.html">models/volume-of-well</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-file.html">models/well-file</a></li><li><a href="wfm-image.html">models/wfm-image</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="widget.html">models/widget</a></li><li><a href="widgock.html">models/widgock</a></li><li><a href="widgout.html">models/widgout</a></li><li><a href="wield.html">models/wield</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="section-base.html">sections/section-base</a></li><li><a href="section-of-company.html">sections/section-of-company</a></li><li><a href="section-of-wegion.html">sections/section-of-wegion</a></li><li><a href="section-of-well.html">sections/section-of-well</a></li><li><a href="section-of-wield.html">sections/section-of-wield</a></li><li><a href="section-of-wroup.html">sections/section-of-wroup</a></li><li><a href="company_.html">services/company</a></li><li><a href="company-user.html">services/company-user</a></li><li><a href="file-spec_.html">services/file-spec</a></li><li><a href="file-spec-of-history-of-well_.html">services/file-spec-of-history-of-well</a></li><li><a href="image-of-history-of-well.html">services/image-of-history-of-well</a></li><li><a href="log-of-well_.html">services/log-of-well</a></li><li><a href="register.html">services/register</a></li><li><a href="svg-elem-of-log-of-well.html">services/svg-elem-of-log-of-well</a></li><li><a href="volume-of-well_.html">services/volume-of-well</a></li><li><a href="wegion_.html">services/wegion</a></li><li><a href="well_.html">services/well</a></li><li><a href="widget_.html">services/widget</a></li><li><a href="widgout_.html">services/widgout</a></li><li><a href="wield_.html">services/wield</a></li><li><a href="wroup_.html">services/wroup</a></li><li><a href="workspace.html">viewmodels/workspace</a></li><li><a href="sketch.html">well/sketch</a></li><li><a href="widget-summary.html">widgets/widget-summary</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0</a> on Sun Dec 22 2013 16:39:01 GMT+0400 (MSK)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0</a> on Thu Jan 16 2014 20:35:04 GMT+0200 (EET)
 </footer>
 
 <script> prettyPrint(); </script>

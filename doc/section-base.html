@@ -37,7 +37,7 @@
     
         
 <dt>
-    <h4 class="name" id="module:sections/section-base"><span class="type-signature"></span>new require("sections/section-base")<span class="signature">(data, typeOfStage)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="module:sections/section-base"><span class="type-signature"></span>new require("sections/section-base")<span class="signature">(data)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -99,29 +99,6 @@
         </tr>
 	
 	
-	
-        <tr>
-            
-                <td class="name"><code>typeOfStage</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last">Stage, like 'well', 'wield', 'wroup', 'wegion', 'company'</td>
-        </tr>
-	
-	
 	</tbody>
 </table>
     
@@ -149,7 +126,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line19">line 19</a>
+        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line20">line 20</a>
     </li></ul></dd>
     
     
@@ -287,7 +264,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line27">line 27</a>
+        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line34">line 34</a>
     </li></ul></dd>
     
     
@@ -351,7 +328,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line109">line 109</a>
+        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line133">line 133</a>
     </li></ul></dd>
     
     
@@ -415,7 +392,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line204">line 204</a>
+        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line250">line 250</a>
     </li></ul></dd>
     
     
@@ -479,7 +456,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line77">line 77</a>
+        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line101">line 101</a>
     </li></ul></dd>
     
     
@@ -543,7 +520,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line65">line 65</a>
+        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line89">line 89</a>
     </li></ul></dd>
     
     
@@ -568,7 +545,7 @@
 <dd>
     
     <div class="description">
-        Whether the section is visible
+        Whether the section is visible as a view: can ovveride default checkbox from section pattern (isView)
     </div>
     
     
@@ -607,7 +584,71 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line33">line 33</a>
+        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line40">line 40</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="isVisibleAsView"><span class="type-signature"></span>isVisibleAsView<span class="type-signature"> :boolean</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        Whether section is visible as view: calculated using section checkbox and pattern checkbox
+    </div>
+    
+    
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">boolean</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line71">line 71</a>
     </li></ul></dd>
     
     
@@ -671,7 +712,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line89">line 89</a>
+        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line113">line 113</a>
     </li></ul></dd>
     
     
@@ -735,7 +776,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line95">line 95</a>
+        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line119">line 119</a>
     </li></ul></dd>
     
     
@@ -799,7 +840,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line45">line 45</a>
+        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line52">line 52</a>
     </li></ul></dd>
     
     
@@ -863,7 +904,71 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line39">line 39</a>
+        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line46">line 46</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="stageKey"><span class="type-signature">&lt;inner> </span>stageKey<span class="type-signature"> :string</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        Stage, like 'well', 'wield', 'wroup', 'wegion', 'company'
+    </div>
+    
+    
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">string</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line28">line 28</a>
     </li></ul></dd>
     
     
@@ -917,7 +1022,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line21">line 21</a>
+        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line22">line 22</a>
     </li></ul></dd>
     
     
@@ -1053,7 +1158,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line174">line 174</a>
+        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line220">line 220</a>
     </li></ul></dd>
     
     
@@ -1089,7 +1194,7 @@
     
     
     <div class="description">
-        Delete selected files
+        Delete selected files from this section
     </div>
     
 
@@ -1122,7 +1227,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line146">line 146</a>
+        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line170">line 170</a>
     </li></ul></dd>
     
     
@@ -1239,7 +1344,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line194">line 194</a>
+        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line240">line 240</a>
     </li></ul></dd>
     
     
@@ -1308,7 +1413,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line135">line 135</a>
+        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line159">line 159</a>
     </li></ul></dd>
     
     
@@ -1377,7 +1482,76 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line112">line 112</a>
+        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line136">line 136</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="updateSectionAfterRemovingFiles"><span class="type-signature">&lt;inner> </span>updateSectionAfterRemovingFiles<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Update section after removing files
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="section-base.js.html">models/sections/section-base.js</a>, <a href="section-base.js.html#line198">line 198</a>
     </li></ul></dd>
     
     
@@ -1418,13 +1592,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="ajax-request.html">helpers/ajax-request</a></li><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="prop-spec.html">models/prop-spec</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="stage-base.html">models/stage-base</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-field-map.html">models/well-field-map</a></li><li><a href="well-file.html">models/well-file</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="wield.html">models/wield</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="section-base.html">sections/section-base</a></li><li><a href="section-of-company.html">sections/section-of-company</a></li><li><a href="section-of-wegion.html">sections/section-of-wegion</a></li><li><a href="section-of-well.html">sections/section-of-well</a></li><li><a href="section-of-wield.html">sections/section-of-wield</a></li><li><a href="section-of-wroup.html">sections/section-of-wroup</a></li><li><a href="company_.html">services/company</a></li><li><a href="company-user.html">services/company-user</a></li><li><a href="register.html">services/register</a></li><li><a href="workspace.html">viewmodels/workspace</a></li><li><a href="sketch.html">well/sketch</a></li><li><a href="volume.html">well/volume</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="stage-constants.html">constants/stage-constants</a></li><li><a href="svg-elem-type-constants.html">constants/svg-elem-type-constants</a></li><li><a href="bindings.html">filters/bindings</a></li><li><a href="ajax-request.html">helpers/ajax-request</a></li><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="log-helper.html">helpers/log-helper</a></li><li><a href="area-of-map-of-wield.html">models/area-of-map-of-wield</a></li><li><a href="column-attribute.html">models/column-attribute</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="file-spec-of-history-of-well.html">models/file-spec-of-history-of-well</a></li><li><a href="history-of-well.html">models/history-of-well</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="log-of-well.html">models/log-of-well</a></li><li><a href="map-of-wield.html">models/map-of-wield</a></li><li><a href="prop-spec.html">models/prop-spec</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="stage-base.html">models/stage-base</a></li><li><a href="svg-elem.html">models/svg-elem</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="volume-of-well.html">models/volume-of-well</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-file.html">models/well-file</a></li><li><a href="wfm-image.html">models/wfm-image</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="widget.html">models/widget</a></li><li><a href="widgock.html">models/widgock</a></li><li><a href="widgout.html">models/widgout</a></li><li><a href="wield.html">models/wield</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="section-base.html">sections/section-base</a></li><li><a href="section-of-company.html">sections/section-of-company</a></li><li><a href="section-of-wegion.html">sections/section-of-wegion</a></li><li><a href="section-of-well.html">sections/section-of-well</a></li><li><a href="section-of-wield.html">sections/section-of-wield</a></li><li><a href="section-of-wroup.html">sections/section-of-wroup</a></li><li><a href="company_.html">services/company</a></li><li><a href="company-user.html">services/company-user</a></li><li><a href="file-spec_.html">services/file-spec</a></li><li><a href="file-spec-of-history-of-well_.html">services/file-spec-of-history-of-well</a></li><li><a href="image-of-history-of-well.html">services/image-of-history-of-well</a></li><li><a href="log-of-well_.html">services/log-of-well</a></li><li><a href="register.html">services/register</a></li><li><a href="svg-elem-of-log-of-well.html">services/svg-elem-of-log-of-well</a></li><li><a href="volume-of-well_.html">services/volume-of-well</a></li><li><a href="wegion_.html">services/wegion</a></li><li><a href="well_.html">services/well</a></li><li><a href="widget_.html">services/widget</a></li><li><a href="widgout_.html">services/widgout</a></li><li><a href="wield_.html">services/wield</a></li><li><a href="wroup_.html">services/wroup</a></li><li><a href="workspace.html">viewmodels/workspace</a></li><li><a href="sketch.html">well/sketch</a></li><li><a href="widget-summary.html">widgets/widget-summary</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0</a> on Sun Dec 22 2013 16:39:03 GMT+0400 (MSK)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0</a> on Thu Jan 16 2014 20:35:07 GMT+0200 (EET)
 </footer>
 
 <script> prettyPrint(); </script>

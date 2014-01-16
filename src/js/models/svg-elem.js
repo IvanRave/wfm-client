@@ -5,7 +5,6 @@ define(['knockout'], function (ko) {
     /**
     * Figure on image: arrow, line, text, etc.
     * @constructor
-    * @type {object} data - Figure data from server
     */
     var exports = function (data) {
         data = data || {};

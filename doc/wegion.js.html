@@ -31,18 +31,28 @@ define(['jquery',
     'services/datacontext',
     'helpers/modal-helper',
     'models/wield', 'models/stage-base',
-    'models/sections/section-of-wegion'], function ($, ko, datacontext, bootstrapModal,
-        WellField, StageBase, SectionOfWegion) {
+    'models/sections/section-of-wegion',
+    'models/prop-spec',
+    'services/wegion',
+    'services/wield',
+    'constants/stage-constants'], function ($, ko, datacontext, bootstrapModal,
+        WellField, StageBase, SectionOfWegion, PropSpec, wegionService, wieldService, stageConstants) {
         'use strict';
 
         // 2. WellField (convert data objects into array)
-        function importWellFieldsDto(data, parent) {
+        function importWieldDtoList(data, parent) {
             return data.map(function (item) { return new WellField(item, parent); });
         }
 
         function importListOfSectionOfWegionDto(data, parent) {
             return data.map(function (item) { return new SectionOfWegion(item, parent); });
         }
+
+        /** Main properties for company: headers can be translated here if needed */
+        var wegionPropSpecList = [
+            new PropSpec('name', 'Name', 'Region name', 'SingleLine', { maxLength: 255 }),
+            new PropSpec('description', 'Description', 'Description', 'MultiLine', {})
+        ];
 
         /**
         * Well region
@@ -53,41 +63,37 @@ define(['jquery',
         var exports = function (data, company) {
             data = data || {};
 
-            var self = this;
-
-            // Persisted properties
-            this.Id = data.Id;
-            this.CompanyId = data.CompanyId;
-            this.Name = ko.observable(data.Name);
-            this.Description = ko.observable(data.Description);
-            this.WellFields = ko.observableArray();
+            var ths = this;
 
             this.getCompany = function () {
                 return company;
             };
 
-            /** Base for all stages */
-            StageBase.call(this);
+            /** Get root view model */
+            this.getRootViewModel = function () {
+                return this.getCompany().getRootViewModel();
+            };
 
-            /** 
-            * Select section
-            * @param {object} sectionToSelect
+            // Persisted properties
+            this.id = data.Id;
+            this.companyId = data.CompanyId;
+            this.wields = ko.observableArray();
+            /** Props specifications */
+            this.propSpecList = wegionPropSpecList;
+
+            /**
+            * Stage key: equals file name
+            * @type {string}
             */
-            this.selectSection = function (sectionToSelect) {
-                self.selectedSection(sectionToSelect);
-            };
+            this.stageKey = stageConstants.wegion.id;
 
-            this.isOpenItem = ko.observable(false);
-
-            // toggle item - only open menu tree (show inner object without content)
-            this.toggleItem = function () {
-                self.isOpenItem(!self.isOpenItem());
-            };
+            /** Base for all stages */
+            StageBase.call(this, data);
 
             /** Is selected item */
             this.isSelectedItem = ko.computed({
                 read: function () {
-                    return (self === ko.unwrap(self.getCompany().selectedWegion));
+                    return (ths === ko.unwrap(ths.getCompany().selectedWegion));
                 },
                 deferEvaluation: true
             });
@@ -98,8 +104,8 @@ define(['jquery',
             */
             this.isShowedItem = ko.computed({
                 read: function () {
-                    if (ko.unwrap(self.isSelectedItem)) {
-                        if (!ko.unwrap(self.selectedWield)) {
+                    if (ko.unwrap(ths.isSelectedItem)) {
+                        if (!ko.unwrap(ths.selectedWield)) {
                             return true;
                         }
                     }
@@ -107,60 +113,84 @@ define(['jquery',
                 deferEvaluation: true
             });
 
-            self.selectedWield = ko.observable();
+            this.selectedWield = ko.observable();
 
-            self.selectWield = function (wieldToSelect) {
-                wieldToSelect.isOpenItem(true);
-
-                // Unselect child
-                wieldToSelect.selectedWroup(null);
-
-                // Select self
-                self.selectedWield(wieldToSelect);
-
-                // Select parents
-                self.getCompany().selectedWegion(self);
-
-                ////window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
-                ////    region: self.getWellRegion().Id,
-                ////    field: self.Id
-                ////});
-
-                // Select section by default (or selected section from prevous selected field)
-                var needSection = $.grep(ko.unwrap(wieldToSelect.listOfSection), function (arrElem) {
-                    return (arrElem.sectionPatternId === 'wield-map');
+            /**
+            * Get well field by id
+            * @param {number} idOfWield - Well field id
+            */
+            this.getWieldById = function (idOfWield) {
+                var tmpWields = ko.unwrap(ths.wields);
+                return tmpWields.filter(function (elem) {
+                    return elem.id === idOfWield;
                 })[0];
-
-                if (needSection) {
-                    wieldToSelect.selectSection(needSection);
-                }
             };
 
-            self.deleteWellField = function (wellFieldForDelete) {
-                if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(wellFieldForDelete.Name) + '"?')) {
-                    datacontext.deleteWellField(wellFieldForDelete.Id).done(function () {
-                        self.WellFields.remove(wellFieldForDelete);
+            /** Select well field */
+            this.selectWield = function (wieldToSelect) {
+                ths.selectChildStage(wieldToSelect);
+
+                var tmpInitialUrlData = ko.unwrap(ths.getRootViewModel().initialUrlData);
+
+                if (tmpInitialUrlData.wroupId) {
+                    var needWroup = wieldToSelect.getWroupById(tmpInitialUrlData.wroupId);
+                    if (needWroup) {
+                        wieldToSelect.selectWroup(needWroup);
+                    }
+                    else
+                    {
+                        alert('Well group from url is not found');
+                    }
+
+                    delete tmpInitialUrlData.wroupId;
+                    ths.getRootViewModel().initialUrlData(tmpInitialUrlData);
+                }
+                else if (tmpInitialUrlData.wieldSectionId) {
+                    // Select section
+
+                    var tmpSection = wieldToSelect.getSectionByPatternId('wield-' + tmpInitialUrlData.wieldSectionId);
+                    wieldToSelect.selectSection(tmpSection);
+
+                    // Remove section id from
+                    delete tmpInitialUrlData.wieldSectionId;
+                    ths.getRootViewModel().initialUrlData(tmpInitialUrlData);
+                }
+                else {
+                    // Show dashboard
+                    wieldToSelect.unselectSection();
+                    // Unselect child to show parent content
+                    wieldToSelect.selectedWroup(null);
+                }
+
+                // Select ths
+                ths.selectedWield(wieldToSelect);
+
+                // Select parents
+                ths.getCompany().selectedWegion(ths);
+
+                // Select section by default (or selected section from prevous selected field)
+                ////var needSection = $.grep(ko.unwrap(wieldToSelect.listOfSection), function (arrElem) {
+                ////    return (arrElem.sectionPatternId === 'wield-map');
+                ////})[0];
+
+                ////if (needSection) {
+                ////    wieldToSelect.selectSection(needSection);
+                ////}
+            };
+
+            this.removeChild = function (wellFieldForDelete) {
+                if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(wellFieldForDelete.name) + '"?')) {
+                    wieldService.remove(wellFieldForDelete.Id).done(function () {
+                        ths.wields.remove(wellFieldForDelete);
                         // Set parent as selected
-                        self.getCompany().selectWegion(self);
+                        ths.getCompany().selectWegion(ths);
                     });
                 }
             };
 
-            self.editWellRegion = function () {
-                var inputName = document.createElement('input');
-                inputName.type = 'text';
-                $(inputName).val(self.Name()).prop({ 'required': true }).addClass('form-control');
-
-                var innerDiv = document.createElement('div');
-                $(innerDiv).addClass('form-horizontal').append(
-                    bootstrapModal.gnrtDom('Name', inputName)
-                );
-
-                bootstrapModal.openModalWindow("Well region", innerDiv, function () {
-                    self.Name($(inputName).val());
-                    datacontext.saveChangedWellRegion(self).done(function (result) { self.Name(result.Name); });
-                    bootstrapModal.closeModalWindow();
-                });
+            /** Save well region */
+            this.save = function () {
+                wegionService.put(ths.id, ths.toDto());
             };
 
             /// &lt;summary>
@@ -171,26 +201,24 @@ define(['jquery',
             /// "ko.toJS — this clones your view model’s object graph, substituting for each observable the current value of that observable, 
             /// so you get a plain copy that contains only your data and no Knockout-related artifacts"
             /// &lt;/remarks>
-            self.toPlainJson = function () {
-                ////var copy = ko.toJS(self);
-                var tmpPropList = ['Id', 'CompanyId', 'Name', 'Description'];
+            this.toDto = function () {
+                var dtoObj = {
+                    'Id': ths.id,
+                    'CompanyId': ths.companyId
+                };
 
-                var objReady = {};
-                $.each(tmpPropList, function (propIndex, propValue) {
-                    // null can be sended to ovveride current value to null
-                    if (typeof ko.unwrap(self[propValue]) !== 'undefined') {
-                        objReady[propValue] = ko.unwrap(self[propValue]);
-                    }
+                ths.propSpecList.forEach(function (prop) {
+                    dtoObj[prop.serverId] = ko.unwrap(ths[prop.clientId]);
                 });
 
-                return objReady;
+                return dtoObj;
             };
 
-            // load well fields
-            this.WellFields(importWellFieldsDto(data.WellFieldsDto, self));
+            /** load well fields */
+            this.wields(importWieldDtoList(data.WellFieldsDto, ths));
 
             /** Load sections */
-            this.listOfSection(importListOfSectionOfWegionDto(data.ListOfSectionOfWegionDto, self));
+            this.listOfSection(importListOfSectionOfWegionDto(data.ListOfSectionOfWegionDto, ths));
         };
 
         exports.prototype.addWellField = function () {
@@ -207,11 +235,12 @@ define(['jquery',
             );
 
             function submitFunction() {
-                datacontext.saveNewWellField({
-                    Name: $(inputName).val(),
-                    WellRegionId: parentItem.Id
+                wieldService.post({
+                    'Name': $(inputName).val(),
+                    'Description': '',
+                    'WellRegionId': parentItem.id
                 }).done(function (result) {
-                    parentItem.WellFields.push(new WellField(result, parentItem));
+                    parentItem.wields.push(new WellField(result, parentItem));
                 });
 
                 bootstrapModal.closeModalWindow();
@@ -231,13 +260,13 @@ define(['jquery',
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="ajax-request.html">helpers/ajax-request</a></li><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="prop-spec.html">models/prop-spec</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="stage-base.html">models/stage-base</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-field-map.html">models/well-field-map</a></li><li><a href="well-file.html">models/well-file</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="wield.html">models/wield</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="section-base.html">sections/section-base</a></li><li><a href="section-of-company.html">sections/section-of-company</a></li><li><a href="section-of-wegion.html">sections/section-of-wegion</a></li><li><a href="section-of-well.html">sections/section-of-well</a></li><li><a href="section-of-wield.html">sections/section-of-wield</a></li><li><a href="section-of-wroup.html">sections/section-of-wroup</a></li><li><a href="company_.html">services/company</a></li><li><a href="company-user.html">services/company-user</a></li><li><a href="register.html">services/register</a></li><li><a href="workspace.html">viewmodels/workspace</a></li><li><a href="sketch.html">well/sketch</a></li><li><a href="volume.html">well/volume</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="stage-constants.html">constants/stage-constants</a></li><li><a href="svg-elem-type-constants.html">constants/svg-elem-type-constants</a></li><li><a href="bindings.html">filters/bindings</a></li><li><a href="ajax-request.html">helpers/ajax-request</a></li><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="log-helper.html">helpers/log-helper</a></li><li><a href="area-of-map-of-wield.html">models/area-of-map-of-wield</a></li><li><a href="column-attribute.html">models/column-attribute</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="file-spec-of-history-of-well.html">models/file-spec-of-history-of-well</a></li><li><a href="history-of-well.html">models/history-of-well</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="log-of-well.html">models/log-of-well</a></li><li><a href="map-of-wield.html">models/map-of-wield</a></li><li><a href="prop-spec.html">models/prop-spec</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="stage-base.html">models/stage-base</a></li><li><a href="svg-elem.html">models/svg-elem</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="volume-of-well.html">models/volume-of-well</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-file.html">models/well-file</a></li><li><a href="wfm-image.html">models/wfm-image</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="widget.html">models/widget</a></li><li><a href="widgock.html">models/widgock</a></li><li><a href="widgout.html">models/widgout</a></li><li><a href="wield.html">models/wield</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="section-base.html">sections/section-base</a></li><li><a href="section-of-company.html">sections/section-of-company</a></li><li><a href="section-of-wegion.html">sections/section-of-wegion</a></li><li><a href="section-of-well.html">sections/section-of-well</a></li><li><a href="section-of-wield.html">sections/section-of-wield</a></li><li><a href="section-of-wroup.html">sections/section-of-wroup</a></li><li><a href="company_.html">services/company</a></li><li><a href="company-user.html">services/company-user</a></li><li><a href="file-spec_.html">services/file-spec</a></li><li><a href="file-spec-of-history-of-well_.html">services/file-spec-of-history-of-well</a></li><li><a href="image-of-history-of-well.html">services/image-of-history-of-well</a></li><li><a href="log-of-well_.html">services/log-of-well</a></li><li><a href="register.html">services/register</a></li><li><a href="svg-elem-of-log-of-well.html">services/svg-elem-of-log-of-well</a></li><li><a href="volume-of-well_.html">services/volume-of-well</a></li><li><a href="wegion_.html">services/wegion</a></li><li><a href="well_.html">services/well</a></li><li><a href="widget_.html">services/widget</a></li><li><a href="widgout_.html">services/widgout</a></li><li><a href="wield_.html">services/wield</a></li><li><a href="wroup_.html">services/wroup</a></li><li><a href="workspace.html">viewmodels/workspace</a></li><li><a href="sketch.html">well/sketch</a></li><li><a href="widget-summary.html">widgets/widget-summary</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0</a> on Sun Dec 22 2013 16:39:01 GMT+0400 (MSK)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0</a> on Thu Jan 16 2014 20:35:04 GMT+0200 (EET)
 </footer>
 
 <script> prettyPrint(); </script>

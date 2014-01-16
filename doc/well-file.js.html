@@ -28,11 +28,8 @@
             <pre class="prettyprint source"><code>﻿/** @module */
 define(['jquery', 'knockout', 'services/datacontext',
     'helpers/modal-helper', 'helpers/app-helper',
-    'moment', 'models/column-attribute'], function ($, ko, datacontext, bootstrapModal, appHelper, appMoment) {
+    'moment', 'models/column-attribute'], function ($, ko, datacontext, bootstrapModal, appHelper, appMoment, ColumnAttribute) {
         'use strict';
-
-        // ColumnAttributes (convert data objects into array)
-        function importColumnAttributesDto(data) { return $.map(data || [], function (item) { return datacontext.createColumnAttribute(item); }); }
 
         function fromOAtoJS(oaDate) {
             var jsDate = new Date((parseFloat(oaDate) - 25569) * 24 * 3600 * 1000);
@@ -132,99 +129,7 @@ define(['jquery', 'knockout', 'services/datacontext',
                 appHelper.downloadURL(extUrl);
             };
 
-            self.showLogImage = function () {
-                var urlQueryParams = {
-                    well_id: self.WellId,
-                    purpose: self.Purpose,
-                    status: self.Status,
-                    file_name: self.Name
-                };
-                self.getWell().wellLogSelectedFile(self);
-                self.getWell().IsLogImageEditable(false);
-                self.getWell().WellLogImageUrl(datacontext.getWellFileUrl(urlQueryParams));
-            };
-
-            self.importWellFileToLog = function () {
-                if (self.Purpose !== 'log') { return; }
-
-                var urlQueryParams = {
-                    well_id: self.WellId,
-                    purpose: self.Purpose,
-                    status: self.Status,
-                    file_name: self.Name
-                };
-
-                datacontext.getColumnAttributes(urlQueryParams).done(function (result) {
-                    var columnAttributes = importColumnAttributesDto(result);
-
-                    var selectDepth = document.createElement('select');
-                    $(selectDepth).addClass('pd-parameter');
-
-                    var selectSP = document.createElement('select');
-                    $(selectSP).addClass('pd-parameter');
-
-                    var selectGR = document.createElement('select');
-                    $(selectGR).addClass('pd-parameter');
-
-                    var selectRS = document.createElement('select');
-                    $(selectRS).addClass('pd-parameter');
-
-                    for (var caIndex = 0, caMaxIndex = columnAttributes.length; caIndex &lt; caMaxIndex; caIndex++) {
-                        var optionColumnAttribute = document.createElement('option');
-                        $(optionColumnAttribute)
-                            .val(columnAttributes[caIndex].Id)
-                            .html(columnAttributes[caIndex].Name + (columnAttributes[caIndex].Format() ? (', ' + columnAttributes[caIndex].Format()) : ''));
-
-                        switch (columnAttributes[caIndex].Name) {
-                            case 'DEPTH': case 'DEPT': selectDepth.appendChild(optionColumnAttribute); break;
-                            case 'SP': case 'SPC': selectSP.appendChild(optionColumnAttribute); break;
-                            case 'GR': case 'HGRT': case 'GRDS': case 'SGR': case 'NGRT': selectGR.appendChild(optionColumnAttribute); break;
-                            case 'RS': case 'RES': case 'RESD': selectRS.appendChild(optionColumnAttribute); break;
-                        }
-                    }
-
-                    var innerDiv = document.createElement('div');
-                    $(innerDiv).addClass('form-horizontal').append(
-                        bootstrapModal.gnrtDom('Depth', selectDepth),
-                        bootstrapModal.gnrtDom('GR', selectGR),
-                        bootstrapModal.gnrtDom('SP', selectSP),
-                        bootstrapModal.gnrtDom('Resistivity', selectRS)
-                    );
-
-                    function submitFunction() {
-                        var selectedArray = $(innerDiv).find('.pd-parameter').map(function () {
-                            return $(this).val();
-                        }).get();
-
-                        if (selectedArray.length &lt; 4) {
-                            alert('All fields required');
-                            return;
-                        }
-
-                        var urlQueryParams = {
-                            well_id: self.WellId,
-                            purpose: self.Purpose,
-                            status: self.Status,
-                            file_name: self.Name,
-                            headers_match: selectedArray.join(','),
-                            is_log: true
-                        };
-
-                        // return result, textStatus, request
-                        datacontext.getWellFiles(urlQueryParams).done(function () {
-                            ////self.getWell().WellLogImageUrl(request.getResponseHeader('Location'));
-                            self.getWell().getWellFileList();
-                            alert('Successfully imported to log image. See image in log section.');
-                        });
-
-                        bootstrapModal.closeModalWindow();
-                    }
-
-                    bootstrapModal.closeModalWideWindow();
-
-                    bootstrapModal.openModalWindow('Column match', innerDiv, submitFunction);
-                });
-            };
+            ////self.getWell().IsLogImageEditable(false);
 
             self.importToProductionData = function () {
                 // only for pd files
@@ -425,7 +330,7 @@ define(['jquery', 'knockout', 'services/datacontext',
 
                         var needColumnListSelected = $.map(matchSelectList, function (arrElem, arrIndex) {
                             if ($(arrElem.matchNameElem).val()) {
-                                var pdColumnAttr = datacontext.createColumnAttribute({
+                                var pdColumnAttr = new ColumnAttribute({
                                     Id: arrIndex,
                                     Name: $(arrElem.matchNameElem).val(),
                                     Format: $(arrElem.matchFormatElem).val() + ($(arrElem.matchFormatElemDenominator).val() ? ("/" + $(arrElem.matchFormatElemDenominator).val()) : '')
@@ -542,7 +447,7 @@ define(['jquery', 'knockout', 'services/datacontext',
             ////        };
 
             ////        datacontext.getColumnAttributes(urlQueryParams).done(function (result) {
-            ////            var columnAttributes = importColumnAttributesDto(result);
+            ////            var columnAttributes = importColumnAttributes(result);
 
             ////            var needColumns = [
             ////                { Name: 'Date', IsRequired: true },
@@ -640,13 +545,13 @@ define(['jquery', 'knockout', 'services/datacontext',
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="ajax-request.html">helpers/ajax-request</a></li><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="prop-spec.html">models/prop-spec</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="stage-base.html">models/stage-base</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-field-map.html">models/well-field-map</a></li><li><a href="well-file.html">models/well-file</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="wield.html">models/wield</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="section-base.html">sections/section-base</a></li><li><a href="section-of-company.html">sections/section-of-company</a></li><li><a href="section-of-wegion.html">sections/section-of-wegion</a></li><li><a href="section-of-well.html">sections/section-of-well</a></li><li><a href="section-of-wield.html">sections/section-of-wield</a></li><li><a href="section-of-wroup.html">sections/section-of-wroup</a></li><li><a href="company_.html">services/company</a></li><li><a href="company-user.html">services/company-user</a></li><li><a href="register.html">services/register</a></li><li><a href="workspace.html">viewmodels/workspace</a></li><li><a href="sketch.html">well/sketch</a></li><li><a href="volume.html">well/volume</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="stage-constants.html">constants/stage-constants</a></li><li><a href="svg-elem-type-constants.html">constants/svg-elem-type-constants</a></li><li><a href="bindings.html">filters/bindings</a></li><li><a href="ajax-request.html">helpers/ajax-request</a></li><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="log-helper.html">helpers/log-helper</a></li><li><a href="area-of-map-of-wield.html">models/area-of-map-of-wield</a></li><li><a href="column-attribute.html">models/column-attribute</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="file-spec-of-history-of-well.html">models/file-spec-of-history-of-well</a></li><li><a href="history-of-well.html">models/history-of-well</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="log-of-well.html">models/log-of-well</a></li><li><a href="map-of-wield.html">models/map-of-wield</a></li><li><a href="prop-spec.html">models/prop-spec</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="stage-base.html">models/stage-base</a></li><li><a href="svg-elem.html">models/svg-elem</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="volume-of-well.html">models/volume-of-well</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-file.html">models/well-file</a></li><li><a href="wfm-image.html">models/wfm-image</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="widget.html">models/widget</a></li><li><a href="widgock.html">models/widgock</a></li><li><a href="widgout.html">models/widgout</a></li><li><a href="wield.html">models/wield</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="section-base.html">sections/section-base</a></li><li><a href="section-of-company.html">sections/section-of-company</a></li><li><a href="section-of-wegion.html">sections/section-of-wegion</a></li><li><a href="section-of-well.html">sections/section-of-well</a></li><li><a href="section-of-wield.html">sections/section-of-wield</a></li><li><a href="section-of-wroup.html">sections/section-of-wroup</a></li><li><a href="company_.html">services/company</a></li><li><a href="company-user.html">services/company-user</a></li><li><a href="file-spec_.html">services/file-spec</a></li><li><a href="file-spec-of-history-of-well_.html">services/file-spec-of-history-of-well</a></li><li><a href="image-of-history-of-well.html">services/image-of-history-of-well</a></li><li><a href="log-of-well_.html">services/log-of-well</a></li><li><a href="register.html">services/register</a></li><li><a href="svg-elem-of-log-of-well.html">services/svg-elem-of-log-of-well</a></li><li><a href="volume-of-well_.html">services/volume-of-well</a></li><li><a href="wegion_.html">services/wegion</a></li><li><a href="well_.html">services/well</a></li><li><a href="widget_.html">services/widget</a></li><li><a href="widgout_.html">services/widgout</a></li><li><a href="wield_.html">services/wield</a></li><li><a href="wroup_.html">services/wroup</a></li><li><a href="workspace.html">viewmodels/workspace</a></li><li><a href="sketch.html">well/sketch</a></li><li><a href="widget-summary.html">widgets/widget-summary</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0</a> on Sun Dec 22 2013 16:39:01 GMT+0400 (MSK)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0</a> on Thu Jan 16 2014 20:35:04 GMT+0200 (EET)
 </footer>
 
 <script> prettyPrint(); </script>

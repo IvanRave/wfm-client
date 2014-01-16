@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: models/file-spec.js</title>
+    <title>JSDoc: Source: services/file-spec.js</title>
     
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Source: models/file-spec.js</h1>
+    <h1 class="page-title">Source: services/file-spec.js</h1>
     
     
 
@@ -26,78 +26,34 @@
     <section>
         <article>
             <pre class="prettyprint source"><code>﻿/** @module */
-define(['knockout', 'moment'], function (ko, appMoment) {
+define(['constants/stage-constants', 'helpers/ajax-request'], function (stageConstants, ajaxRequest) {
     'use strict';
 
+    /** Generate url */
+    var url = function (stageKey, idOfSection, idOfFileSpec) {
+        var stagePlural = stageConstants[stageKey].plural;
+        return '{{conf.requrl}}/api/' + stagePlural + '/sections/' + idOfSection + '/file-specs' + (idOfFileSpec ? ('/' + idOfFileSpec) : '');
+    };
+
     /**
-    * File specification
-    * @param {object} data - File specification data
+    * File spec service
     * @constructor
     */
-    var exports = function (data) {
-        data = data || {};
-
-        /**
-        * File guid
-        * @type {string}
-        */
-        this.id = data.Id;
-
-        /**
-        * File url: generating on the server
-        * @type {string}
-        */
-        this.fileUrl = data.FileUrl;
-
-        /**
-        * File name (255)
-        * @type {string}
-        */
-        this.name = ko.observable(data.Name);
-
-        /**
-        * File extension
-        * @type {string}
-        */
-        this.extension = data.Extension;
-
-        /**
-        * Content type
-        * @type {string}
-        */
-        this.contentType = data.ContentType;
-
-        /**
-        * File creation datetime, unix timestamp, in seconds
-        * @type {number}
-        */
-        this.createdUnixTime = data.CreatedUnixTime;
-
-        /**
-        * File size, bytes,
-        * @type {number}
-        */
-        this.length = data.Length;
-
-        /**
-        * File size, kilobytes
-        * @type {number}
-        */
-        this.lengthInKb = parseInt(this.length / 1024, 10);
-
-        /**
-        * Full file decription for files on small screen
-        * @type {string}
-        */
-        this.fullTitle = 'Size: ' + this.length +
-            ' bytes\nExtension: ' + this.extension +
-            '\nCreated: ' + appMoment(ko.unwrap(this.createdUnixTime) * 1000).format('YYYY-MM-DD HH:mm:ss');
-
-        /**
-        * Whether file is selected (in file manager)
-        * @type {boolean}
-        */
-        this.isSelected = ko.observable();
+    var exports = {
+        // Get url for posting new file
+        getUrl: function (stageKey, idOfSection, idOfFileSpec) {
+            return url(stageKey, idOfSection, idOfFileSpec);
+        },
+        get: function (stageKey, idOfSection) {
+            return ajaxRequest('GET', url(stageKey, idOfSection));
+        },
+        getColumnAttributes: function(stageKey, idOfSection, idOfFileSpec){
+            return ajaxRequest('GET', url(stageKey, idOfSection, idOfFileSpec) + '/column-attributes');
+        },
+        // Delete few files in one request
+        deleteArray: function (stageKey, idOfSection, listOfFileSpec) {
+            return ajaxRequest('DELETE', url(stageKey, idOfSection), listOfFileSpec);
+        }
     };
 
     return exports;
@@ -111,13 +67,13 @@ define(['knockout', 'moment'], function (ko, appMoment) {
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="ajax-request.html">helpers/ajax-request</a></li><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="prop-spec.html">models/prop-spec</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="stage-base.html">models/stage-base</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-field-map.html">models/well-field-map</a></li><li><a href="well-file.html">models/well-file</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="wield.html">models/wield</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="section-base.html">sections/section-base</a></li><li><a href="section-of-company.html">sections/section-of-company</a></li><li><a href="section-of-wegion.html">sections/section-of-wegion</a></li><li><a href="section-of-well.html">sections/section-of-well</a></li><li><a href="section-of-wield.html">sections/section-of-wield</a></li><li><a href="section-of-wroup.html">sections/section-of-wroup</a></li><li><a href="company_.html">services/company</a></li><li><a href="company-user.html">services/company-user</a></li><li><a href="register.html">services/register</a></li><li><a href="workspace.html">viewmodels/workspace</a></li><li><a href="sketch.html">well/sketch</a></li><li><a href="volume.html">well/volume</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="stage-constants.html">constants/stage-constants</a></li><li><a href="svg-elem-type-constants.html">constants/svg-elem-type-constants</a></li><li><a href="bindings.html">filters/bindings</a></li><li><a href="ajax-request.html">helpers/ajax-request</a></li><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="log-helper.html">helpers/log-helper</a></li><li><a href="area-of-map-of-wield.html">models/area-of-map-of-wield</a></li><li><a href="column-attribute.html">models/column-attribute</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="file-spec-of-history-of-well.html">models/file-spec-of-history-of-well</a></li><li><a href="history-of-well.html">models/history-of-well</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="log-of-well.html">models/log-of-well</a></li><li><a href="map-of-wield.html">models/map-of-wield</a></li><li><a href="prop-spec.html">models/prop-spec</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="stage-base.html">models/stage-base</a></li><li><a href="svg-elem.html">models/svg-elem</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="volume-of-well.html">models/volume-of-well</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-file.html">models/well-file</a></li><li><a href="wfm-image.html">models/wfm-image</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="widget.html">models/widget</a></li><li><a href="widgock.html">models/widgock</a></li><li><a href="widgout.html">models/widgout</a></li><li><a href="wield.html">models/wield</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="section-base.html">sections/section-base</a></li><li><a href="section-of-company.html">sections/section-of-company</a></li><li><a href="section-of-wegion.html">sections/section-of-wegion</a></li><li><a href="section-of-well.html">sections/section-of-well</a></li><li><a href="section-of-wield.html">sections/section-of-wield</a></li><li><a href="section-of-wroup.html">sections/section-of-wroup</a></li><li><a href="company_.html">services/company</a></li><li><a href="company-user.html">services/company-user</a></li><li><a href="file-spec_.html">services/file-spec</a></li><li><a href="file-spec-of-history-of-well_.html">services/file-spec-of-history-of-well</a></li><li><a href="image-of-history-of-well.html">services/image-of-history-of-well</a></li><li><a href="log-of-well_.html">services/log-of-well</a></li><li><a href="register.html">services/register</a></li><li><a href="svg-elem-of-log-of-well.html">services/svg-elem-of-log-of-well</a></li><li><a href="volume-of-well_.html">services/volume-of-well</a></li><li><a href="wegion_.html">services/wegion</a></li><li><a href="well_.html">services/well</a></li><li><a href="widget_.html">services/widget</a></li><li><a href="widgout_.html">services/widgout</a></li><li><a href="wield_.html">services/wield</a></li><li><a href="wroup_.html">services/wroup</a></li><li><a href="workspace.html">viewmodels/workspace</a></li><li><a href="sketch.html">well/sketch</a></li><li><a href="widget-summary.html">widgets/widget-summary</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0</a> on Sun Dec 22 2013 16:39:01 GMT+0400 (MSK)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0</a> on Thu Jan 16 2014 20:35:04 GMT+0200 (EET)
 </footer>
 
 <script> prettyPrint(); </script>

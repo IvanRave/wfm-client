@@ -38,6 +38,11 @@ define([
     'models/wfm-param-squad'], function ($, ko, datacontext, bootstrapModal, appHelper, UserProfile, historyHelper) {
         'use strict';
 
+        // WfmParamSquadList (convert data objects into array)
+        function importWfmParamSquadList(data) {
+            return (data || []).map(function (item) { return datacontext.createWfmParamSquad(item); });
+        }
+
         /**
         * Root view model
         * @constructor
@@ -81,11 +86,6 @@ define([
             // =====================================Wfm parameters begin==========================================================
             this.wfmParamSquadList = ko.lazyObservableArray(function () {
                 datacontext.getWfmParamSquadList({ is_inclusive: true }).done(function (r) {
-                    // WfmParamSquadList (convert data objects into array)
-                    function importWfmParamSquadList(data) {
-                        return $.map(data || [], function (item) { return datacontext.createWfmParamSquad(item); });
-                    }
-
                     ths.wfmParamSquadList(importWfmParamSquadList(r));
                 });
             }, this);
@@ -141,11 +141,11 @@ define([
             ////        if (tmpRegion) {
             ////            ths.selectedWellRegion(tmpRegion);
             ////            tmpRegion.isOpenItem(true);
-            ////            var tmpField = appHelper.getElementByPropertyValue(ths.selectedWellRegion().WellFields(), 'Id', choosedObj.fieldId);
+            ////            var tmpField = appHelper.getElementByPropertyValue(ths.selectedWellRegion().wields(), 'Id', choosedObj.fieldId);
             ////            if (tmpField) {
             ////                ths.selectedWellRegion().selectedWield(tmpField);
             ////                tmpField.isOpenItem(true);
-            ////                var tmpGroup = appHelper.getElementByPropertyValue(ths.selectedWellRegion().selectedWield().WellGroups(), 'Id', choosedObj.groupId);
+            ////                var tmpGroup = appHelper.getElementByPropertyValue(ths.selectedWellRegion().selectedWield().wroups(), 'Id', choosedObj.groupId);
             ////                if (tmpGroup) {
             ////                    ths.selectedWellRegion().selectedWield().selectedWroup(tmpGroup);
             ////                    tmpGroup.isOpenItem(true);
@@ -173,11 +173,6 @@ define([
             ////            }
             ////        }
             ////    }
-
-            ////    datacontext.getWellRegionList({
-            ////        company_id: companyId,
-            ////        is_inclusive: true
-            ////    }).done(getSucceeded);
             ////}
 
             //     loadStructure();
@@ -188,20 +183,24 @@ define([
             */
             this.userProfile = new UserProfile(ths);
 
-            //var initialData = getInitialData(document.location.hash);
+            this.initialUrlData = ko.observable(historyHelper.getInitialData(document.location.hash.substring(1)));
 
             /** Auth user profile and load data if successful */
-            this.userProfile.loadAccountInfo(historyHelper.getInitialData(document.location.hash.substring(1)));
+            this.userProfile.loadAccountInfo();
 
             /** Back, forward, refresh browser navigation */
-            window.onpopstate = function () {
-                var stateData = historyHelper.getInitialData(document.location.hash.substring(1));
-                // When load any info - do not push info to history again
-                stateData.isHistory = true;
-                // Reload all data
-                ths.userProfile.loadAccountInfo(stateData);
-                console.log('location: ' + document.location.hash + ', state: ' + JSON.stringify(stateData));
-            };
+            // TODO: back
+            ////window.onpopstate = function () {
+            ////    var stateData = historyHelper.getInitialData(document.location.hash.substring(1));
+            ////    // When load any info - do not push info to history again
+            ////    stateData.isHistory = true;
+            ////    // Reload all data
+            ////    ths.initialUrlData(stateData);
+
+            ////    console.log('location: ' + document.location.hash + ', state: ' + JSON.stringify(stateData));
+
+            ////    ths.userProfile.loadAccountInfo();
+            ////};
         };
 
         return exports;
@@ -215,13 +214,13 @@ define([
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="ajax-request.html">helpers/ajax-request</a></li><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="prop-spec.html">models/prop-spec</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="stage-base.html">models/stage-base</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-field-map.html">models/well-field-map</a></li><li><a href="well-file.html">models/well-file</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="wield.html">models/wield</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="section-base.html">sections/section-base</a></li><li><a href="section-of-company.html">sections/section-of-company</a></li><li><a href="section-of-wegion.html">sections/section-of-wegion</a></li><li><a href="section-of-well.html">sections/section-of-well</a></li><li><a href="section-of-wield.html">sections/section-of-wield</a></li><li><a href="section-of-wroup.html">sections/section-of-wroup</a></li><li><a href="company_.html">services/company</a></li><li><a href="company-user.html">services/company-user</a></li><li><a href="register.html">services/register</a></li><li><a href="workspace.html">viewmodels/workspace</a></li><li><a href="sketch.html">well/sketch</a></li><li><a href="volume.html">well/volume</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="stage-constants.html">constants/stage-constants</a></li><li><a href="svg-elem-type-constants.html">constants/svg-elem-type-constants</a></li><li><a href="bindings.html">filters/bindings</a></li><li><a href="ajax-request.html">helpers/ajax-request</a></li><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="log-helper.html">helpers/log-helper</a></li><li><a href="area-of-map-of-wield.html">models/area-of-map-of-wield</a></li><li><a href="column-attribute.html">models/column-attribute</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="file-spec-of-history-of-well.html">models/file-spec-of-history-of-well</a></li><li><a href="history-of-well.html">models/history-of-well</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="log-of-well.html">models/log-of-well</a></li><li><a href="map-of-wield.html">models/map-of-wield</a></li><li><a href="prop-spec.html">models/prop-spec</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="stage-base.html">models/stage-base</a></li><li><a href="svg-elem.html">models/svg-elem</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="volume-of-well.html">models/volume-of-well</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-file.html">models/well-file</a></li><li><a href="wfm-image.html">models/wfm-image</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="widget.html">models/widget</a></li><li><a href="widgock.html">models/widgock</a></li><li><a href="widgout.html">models/widgout</a></li><li><a href="wield.html">models/wield</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="section-base.html">sections/section-base</a></li><li><a href="section-of-company.html">sections/section-of-company</a></li><li><a href="section-of-wegion.html">sections/section-of-wegion</a></li><li><a href="section-of-well.html">sections/section-of-well</a></li><li><a href="section-of-wield.html">sections/section-of-wield</a></li><li><a href="section-of-wroup.html">sections/section-of-wroup</a></li><li><a href="company_.html">services/company</a></li><li><a href="company-user.html">services/company-user</a></li><li><a href="file-spec_.html">services/file-spec</a></li><li><a href="file-spec-of-history-of-well_.html">services/file-spec-of-history-of-well</a></li><li><a href="image-of-history-of-well.html">services/image-of-history-of-well</a></li><li><a href="log-of-well_.html">services/log-of-well</a></li><li><a href="register.html">services/register</a></li><li><a href="svg-elem-of-log-of-well.html">services/svg-elem-of-log-of-well</a></li><li><a href="volume-of-well_.html">services/volume-of-well</a></li><li><a href="wegion_.html">services/wegion</a></li><li><a href="well_.html">services/well</a></li><li><a href="widget_.html">services/widget</a></li><li><a href="widgout_.html">services/widgout</a></li><li><a href="wield_.html">services/wield</a></li><li><a href="wroup_.html">services/wroup</a></li><li><a href="workspace.html">viewmodels/workspace</a></li><li><a href="sketch.html">well/sketch</a></li><li><a href="widget-summary.html">widgets/widget-summary</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0</a> on Sun Dec 22 2013 16:39:01 GMT+0400 (MSK)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0</a> on Thu Jan 16 2014 20:35:04 GMT+0200 (EET)
 </footer>
 
 <script> prettyPrint(); </script>

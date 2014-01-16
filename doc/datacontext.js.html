@@ -28,29 +28,14 @@
             <pre class="prettyprint source"><code>﻿define(['jquery', 'helpers/ajax-request'], function ($, ajaxRequest) {
     'use strict';
 
-    function wellRegionUrl(uqp) {
-        return '{{conf.requrl}}/api/wellregion/' + (uqp ? ('?' + $.param(uqp)) : '');
-    }
-    function wellFieldUrl(uqp) {
-        return '{{conf.requrl}}/api/wellfield/' + (uqp ? ('?' + $.param(uqp)) : '');
-    }
-    function wellGroupUrl(uqp) {
-        return '{{conf.requrl}}/api/wellgroup/' + (uqp ? ('?' + $.param(uqp)) : '');
-    }
     function wellUrl(uqp) {
         return '{{conf.requrl}}/api/well/' + (uqp ? ('?' + $.param(uqp)) : '');
     }
     function wellFileUrl(uqp) {
         return '{{conf.requrl}}/api/wellfile/' + (uqp ? ('?' + $.param(uqp)) : '');
     }
-    function columnAttributeUrl(uqp) {
-        return '{{conf.requrl}}/api/columnattribute/' + (uqp ? ('?' + $.param(uqp)) : '');
-    }
     function wellHistoryUrl(uqp) {
         return '{{conf.requrl}}/api/wellhistory/' + (uqp ? ('?' + $.param(uqp)) : '');
-    }
-    function wfmImageUrl(uqp) {
-        return '{{conf.requrl}}/api/wfmimage/' + (uqp ? ('?' + $.param(uqp)) : '');
     }
     function sectionPatternsUrl() {
         return '{{conf.requrl}}/api/section-patterns';
@@ -71,9 +56,7 @@
     function wellInWellFieldMapUrl(uqp) {
         return '{{conf.requrl}}/api/wellinwellfieldmap/' + (uqp ? ('?' + $.param(uqp)) : '');
     }
-    function wellHistoryFileUrl(uqp) {
-        return '{{conf.requrl}}/api/wellhistoryfile/' + (uqp ? ('?' + $.param(uqp)) : '');
-    }
+    
     function userProfileUrl(uqp) {
         return '{{conf.requrl}}/api/userprofile/' + (uqp ? ('?' + $.param(uqp)) : '');
     }
@@ -95,58 +78,8 @@
     function forecastEvolutionUrl(uqp) {
         return '{{conf.requrl}}/api/forecastevolution/' + (uqp ? ('?' + $.param(uqp)) : '');
     }
-    function wellWidgoutUrl(wellId, widgoutId) {
-        return '{{conf.requrl}}/api/wells/' + wellId + '/widgouts' + (widgoutId ? ('/' + widgoutId) : '');
-    }
-    function widgetUrl(widgockId, widgetId) {
-        return '{{conf.requrl}}/api/widgocks/' + widgockId + '/widgets' + (widgetId ? ('/' + widgetId) : '');
-    }
     function companyJobTypeUrl(companyId, jobTypeId) {
         return '{{conf.requrl}}/api/companies/' + companyId + '/job-types' + (jobTypeId ? ('/' + jobTypeId) : '');
-    }
-
-    // DataContext operations
-    // 1. WellRegion
-    function getWellRegionList(uqp) {
-        return ajaxRequest('GET', wellRegionUrl(uqp));
-    }
-
-    function saveNewWellRegion(item) {
-        return ajaxRequest('POST', wellRegionUrl(), item);
-    }
-
-    function deleteWellRegion(item) {
-        return ajaxRequest('DELETE', wellRegionUrl({ id: item.Id }));
-    }
-
-    function saveChangedWellRegion(item) {
-        return ajaxRequest('PUT', wellRegionUrl({ id: item.Id }), item);
-    }
-
-    // 2. WellField
-    function saveNewWellField(item) {
-        return ajaxRequest('POST', wellFieldUrl(), item);
-    }
-
-    function deleteWellField(id) {
-        return ajaxRequest('DELETE', wellFieldUrl({ id: id }));
-    }
-
-    function saveChangedWellField(item) {
-        return ajaxRequest('PUT', wellFieldUrl({ id: item.Id }), item);
-    }
-
-    // 3. WellGroup
-    function saveNewWellGroup(item) {
-        return ajaxRequest('POST', wellGroupUrl(), item);
-    }
-
-    function deleteWellGroup(item) {
-        return ajaxRequest('DELETE', wellGroupUrl({ id: item.Id }));
-    }
-
-    function saveChangedWellGroup(item) {
-        return ajaxRequest('PUT', wellGroupUrl({ id: item.Id }), item);
     }
 
     function postWell(item) {
@@ -155,10 +88,6 @@
 
     function deleteWell(item) {
         return ajaxRequest('DELETE', wellUrl({ id: item.Id }));
-    }
-
-    function saveChangedWell(item) {
-        return ajaxRequest('PUT', wellUrl({ id: item.Id }), item);
     }
 
     // get list
@@ -197,11 +126,6 @@
 
     function deleteWellProductionData(wellId) {
         return ajaxRequest('DELETE', productionDataUrl({ 'well_id': wellId }));
-    }
-
-    // 7. Column attribute
-    function getColumnAttributes(urlQueryParams) {
-        return ajaxRequest('GET', columnAttributeUrl(urlQueryParams));
     }
 
     function getWfmParamSquadList(uqp) {
@@ -249,17 +173,9 @@
 
     function getSectionList() {
         return [
-        { id: 'summary', name: 'Summary', formatList: ['*'] }, // any file type (main well files)
-        { id: 'sketch', name: 'Sketch', formatList: ['image/jpeg', 'image/png'] },
-        { id: 'volume', name: 'Volume', formatList: ['image/jpeg', 'image/png'] },
-        { id: 'history', name: 'History', formatList: ['*'] }, // any file type
-        { id: 'map', name: 'Map', formatList: [] }, // file loading forbidden
-        { id: 'log', name: 'Log', formatList: [''] }, // las files has empty mime type
         { id: 'pd', name: 'Perfomance', formatList: ['text/plain', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel'] },
-        { id: 'test', name: 'Test', formatList: [] }, // file loading forbidden
         { id: 'integrity', name: 'Integrity', formatList: ['image/jpeg', 'image/png', 'application/pdf'] },
-        { id: 'nodalanalysis', name: 'Nodal analysis', formatList: ['image/jpeg', 'image/png'] },
-        { id: 'report', name: 'Report', formatList: ['application/pdf'] }
+        { id: 'nodalanalysis', name: 'Nodal analysis', formatList: ['image/jpeg', 'image/png'] }
         ];
     }
 
@@ -278,15 +194,6 @@
 
     function deleteWellHistory(wellHistoryId) {
         return ajaxRequest('DELETE', wellHistoryUrl({ id: wellHistoryId }));
-    }
-
-    // 9. WfmImage
-    function saveNewWfmImage(urlQueryParams, item) {
-        return ajaxRequest('POST', wfmImageUrl(urlQueryParams), item);
-    }
-
-    function deleteWfmImage(item) {
-        return ajaxRequest('DELETE', wfmImageUrl({ id: item.Id }));
     }
 
     // 11. WellFieldMapArea
@@ -321,17 +228,6 @@
 
     function deleteWellInWellFieldMap(urlQueryParams) {
         return ajaxRequest('DELETE', wellInWellFieldMapUrl(urlQueryParams));
-    }
-
-    function postWellHistoryFile(item) {
-        return ajaxRequest('POST', wellHistoryFileUrl(), item);
-    }
-
-    function deleteWellHistoryFile(item) {
-        return ajaxRequest('DELETE', wellHistoryFileUrl({
-            'cloudfile_id': item.CloudFileId,
-            'wellhistory_id': item.WellHistoryId
-        }));
     }
 
     // user profile
@@ -422,23 +318,10 @@
     }
 
     var datacontext = {
-        // create objects
-        getWellRegionList: getWellRegionList,
-        // save objects in db 
-        saveNewWellRegion: saveNewWellRegion,
-        saveNewWellField: saveNewWellField,
-        saveNewWellGroup: saveNewWellGroup,
+        // save objects in db
         postWell: postWell,
         // delete objects from db
-        deleteWellRegion: deleteWellRegion,
-        deleteWellField: deleteWellField,
-        deleteWellGroup: deleteWellGroup,
         deleteWell: deleteWell,
-        // save changed objects in db
-        saveChangedWellRegion: saveChangedWellRegion,
-        saveChangedWellField: saveChangedWellField,
-        saveChangedWellGroup: saveChangedWellGroup,
-        saveChangedWell: saveChangedWell,
         // WellFile
         getWellFiles: getWellFiles,
         getWellFileUrl: getWellFileUrl,
@@ -449,16 +332,12 @@
         getProductionData: getProductionData,
         deleteWellProductionData: deleteWellProductionData,
         // ColumnAttribute
-        getColumnAttributes: getColumnAttributes,
         getColumnAttributesLocal: getColumnAttributesLocal,
         // WellHistory
         getWellHistoryList: getWellHistoryList,
         postWellHistory: postWellHistory,
         putWellHistory: putWellHistory,
         deleteWellHistory: deleteWellHistory,
-        // WfmImage
-        saveNewWfmImage: saveNewWfmImage,
-        deleteWfmImage: deleteWfmImage,
         // WellFieldMapArea
         getWellFieldMapAreas: getWellFieldMapAreas,
         saveNewWellFieldMapArea: saveNewWellFieldMapArea,
@@ -469,9 +348,6 @@
         saveNewWellInWellFieldMap: saveNewWellInWellFieldMap,
         saveChangedWellInWellFieldMap: saveChangedWellInWellFieldMap,
         deleteWellInWellFieldMap: deleteWellInWellFieldMap,
-        // WellHistoryFile
-        postWellHistoryFile: postWellHistoryFile,
-        deleteWellHistoryFile: deleteWellHistoryFile,
         // section list
         getSectionList: getSectionList,
         imageMimeTypes: imageMimeTypes,
@@ -496,42 +372,6 @@
         getWfmParamSquadList: getWfmParamSquadList,
         getForecastEvolution: getForecastEvolution,
         postForecastEvolution: postForecastEvolution
-    };
-
-    // Widget layouts for well=================================================================
-    datacontext.getWellWidgoutList = function (wellId) {
-        return ajaxRequest('GET', wellWidgoutUrl(wellId));
-    };
-
-    // Widget layout for well
-    datacontext.getWellWidgout = function (wellId, widgoutId) {
-        return ajaxRequest('GET', wellWidgoutUrl(wellId, widgoutId));
-    };
-
-    datacontext.postWellWidgout = function (wellId, widgoutData) {
-        return ajaxRequest('POST', wellWidgoutUrl(wellId), widgoutData);
-    };
-
-    datacontext.putWellWidgout = function (wellId, id, widgoutData) {
-        return ajaxRequest('PUT', wellWidgoutUrl(wellId, id), widgoutData);
-    };
-
-    datacontext.deleteWellWidgout = function (wellId, widgoutId) {
-        return ajaxRequest('DELETE', wellWidgoutUrl(wellId, widgoutId));
-    };
-
-    // Widget (well widget or well group widget etc.)==========================================
-    datacontext.postWidget = function (widgockId, widgetData) {
-        return ajaxRequest('POST', widgetUrl(widgockId), widgetData);
-    };
-
-    // Save changed widget
-    datacontext.putWidget = function (widgockId, widgetId, widgetData) {
-        return ajaxRequest('PUT', widgetUrl(widgockId, widgetId), widgetData);
-    };
-
-    datacontext.deleteWidget = function (widgockId, widgetId) {
-        return ajaxRequest('DELETE', widgetUrl(widgockId, widgetId));
     };
 
     datacontext.getJobTypeList = function (companyId) {
@@ -585,150 +425,6 @@
         return ajaxRequest('GET', sectionPatternsUrl());
     };
 
-    datacontext.getPossibleWidgoutList = function () {
-        return [{
-            name: '1 (one column)',
-            widgockDtoList: [{
-                orderNumber: 1,
-                columnCount: 12
-            }]
-        },
-       {
-           name: '1-1 (two columns)',
-           widgockDtoList: [{
-               orderNumber: 1,
-               columnCount: 6
-           },
-           {
-               orderNumber: 1,
-               columnCount: 6
-           }]
-       },
-       {
-           name: '1-1-1 (three columns)',
-           widgockDtoList: [{
-               orderNumber: 1,
-               columnCount: 4
-           },
-           {
-               orderNumber: 2,
-               columnCount: 4
-           },
-           {
-               orderNumber: 3,
-               columnCount: 4
-           }]
-       },
-       {
-           name: '1-2 (two columns)',
-           widgockDtoList: [{
-               orderNumber: 1,
-               columnCount: 4
-           },
-           {
-               orderNumber: 2,
-               columnCount: 8
-           }]
-       },
-       {
-           name: '2-1 (two columns)',
-           widgockDtoList: [{
-               orderNumber: 1,
-               columnCount: 8
-           },
-           {
-               orderNumber: 2,
-               columnCount: 4
-           }]
-       },
-       {
-           name: '1-1-1-1 (four columns)',
-           widgockDtoList: [{
-               orderNumber: 1,
-               columnCount: 3
-           },
-           {
-               orderNumber: 2,
-               columnCount: 3
-           },
-           {
-               orderNumber: 3,
-               columnCount: 3
-           },
-           {
-               orderNumber: 4,
-               columnCount: 3
-           }]
-       },
-       {
-           name: '1-1-2 (three columns)',
-           widgockDtoList: [{
-               orderNumber: 1,
-               columnCount: 3
-           },
-           {
-               orderNumber: 2,
-               columnCount: 3
-           },
-           {
-               orderNumber: 3,
-               columnCount: 6
-           }]
-       },
-       {
-           name: '1-2-1 (three columns)',
-           widgockDtoList: [{
-               orderNumber: 1,
-               columnCount: 3
-           },
-           {
-               orderNumber: 2,
-               columnCount: 6
-           },
-           {
-               orderNumber: 3,
-               columnCount: 3
-           }]
-       },
-       {
-           name: '2-1-1 (three columns)',
-           widgockDtoList: [{
-               orderNumber: 1,
-               columnCount: 6
-           },
-           {
-               orderNumber: 2,
-               columnCount: 3
-           },
-           {
-               orderNumber: 3,
-               columnCount: 3
-           }]
-       },
-       {
-           name: '3-1 (two columns)',
-           widgockDtoList: [{
-               orderNumber: 1,
-               columnCount: 9
-           },
-           {
-               orderNumber: 2,
-               columnCount: 3
-           }]
-       },
-       {
-           name: '1-3 (two columns)',
-           widgockDtoList: [{
-               orderNumber: 1,
-               columnCount: 3
-           },
-           {
-               orderNumber: 2,
-               columnCount: 9
-           }]
-       }];
-    };
-
     return datacontext;
 });</code></pre>
         </article>
@@ -740,13 +436,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="ajax-request.html">helpers/ajax-request</a></li><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="prop-spec.html">models/prop-spec</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="stage-base.html">models/stage-base</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-field-map.html">models/well-field-map</a></li><li><a href="well-file.html">models/well-file</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="wield.html">models/wield</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="section-base.html">sections/section-base</a></li><li><a href="section-of-company.html">sections/section-of-company</a></li><li><a href="section-of-wegion.html">sections/section-of-wegion</a></li><li><a href="section-of-well.html">sections/section-of-well</a></li><li><a href="section-of-wield.html">sections/section-of-wield</a></li><li><a href="section-of-wroup.html">sections/section-of-wroup</a></li><li><a href="company_.html">services/company</a></li><li><a href="company-user.html">services/company-user</a></li><li><a href="register.html">services/register</a></li><li><a href="workspace.html">viewmodels/workspace</a></li><li><a href="sketch.html">well/sketch</a></li><li><a href="volume.html">well/volume</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="stage-constants.html">constants/stage-constants</a></li><li><a href="svg-elem-type-constants.html">constants/svg-elem-type-constants</a></li><li><a href="bindings.html">filters/bindings</a></li><li><a href="ajax-request.html">helpers/ajax-request</a></li><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="log-helper.html">helpers/log-helper</a></li><li><a href="area-of-map-of-wield.html">models/area-of-map-of-wield</a></li><li><a href="column-attribute.html">models/column-attribute</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="file-spec-of-history-of-well.html">models/file-spec-of-history-of-well</a></li><li><a href="history-of-well.html">models/history-of-well</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="log-of-well.html">models/log-of-well</a></li><li><a href="map-of-wield.html">models/map-of-wield</a></li><li><a href="prop-spec.html">models/prop-spec</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="stage-base.html">models/stage-base</a></li><li><a href="svg-elem.html">models/svg-elem</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="volume-of-well.html">models/volume-of-well</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-file.html">models/well-file</a></li><li><a href="wfm-image.html">models/wfm-image</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="widget.html">models/widget</a></li><li><a href="widgock.html">models/widgock</a></li><li><a href="widgout.html">models/widgout</a></li><li><a href="wield.html">models/wield</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="section-base.html">sections/section-base</a></li><li><a href="section-of-company.html">sections/section-of-company</a></li><li><a href="section-of-wegion.html">sections/section-of-wegion</a></li><li><a href="section-of-well.html">sections/section-of-well</a></li><li><a href="section-of-wield.html">sections/section-of-wield</a></li><li><a href="section-of-wroup.html">sections/section-of-wroup</a></li><li><a href="company_.html">services/company</a></li><li><a href="company-user.html">services/company-user</a></li><li><a href="file-spec_.html">services/file-spec</a></li><li><a href="file-spec-of-history-of-well_.html">services/file-spec-of-history-of-well</a></li><li><a href="image-of-history-of-well.html">services/image-of-history-of-well</a></li><li><a href="log-of-well_.html">services/log-of-well</a></li><li><a href="register.html">services/register</a></li><li><a href="svg-elem-of-log-of-well.html">services/svg-elem-of-log-of-well</a></li><li><a href="volume-of-well_.html">services/volume-of-well</a></li><li><a href="wegion_.html">services/wegion</a></li><li><a href="well_.html">services/well</a></li><li><a href="widget_.html">services/widget</a></li><li><a href="widgout_.html">services/widgout</a></li><li><a href="wield_.html">services/wield</a></li><li><a href="wroup_.html">services/wroup</a></li><li><a href="workspace.html">viewmodels/workspace</a></li><li><a href="sketch.html">well/sketch</a></li><li><a href="widget-summary.html">widgets/widget-summary</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0</a> on Sun Dec 22 2013 16:39:01 GMT+0400 (MSK)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0</a> on Thu Jan 16 2014 20:35:03 GMT+0200 (EET)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -28,33 +28,36 @@
             <pre class="prettyprint source"><code>﻿/** @module */
 define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/datacontext',
     'helpers/modal-helper', 'helpers/history-helper', 'models/stage-base', 'models/sections/section-of-company',
-    'models/prop-spec', 'services/company', 'models/file-spec',
-    'helpers/knockout-lazy'], function ($, ko, Wegion, JobType, appDatacontext, modalHelper, historyHelper, StageBase, SectionOfCompany, PropSpec, companyService, FileSpec) {
+    'models/prop-spec', 'services/company', 'models/file-spec', 'services/wegion', 'constants/stage-constants',
+    'helpers/knockout-lazy'], function ($, ko, Wegion, JobType, appDatacontext, modalHelper, historyHelper,
+        StageBase, SectionOfCompany, PropSpec, companyService, FileSpec, wegionService, stageConstants) {
         'use strict';
 
         /** Import well regions for company */
         function importWegions(data, companyParent) {
-            return $.map(data, function (item) { return new Wegion(item, companyParent); });
+            return data.map(function (item) { return new Wegion(item, companyParent); });
         }
 
         /** Import job types for this company (joined with global types) */
         function importJobTypeList(data) {
-            return $.map(data || [], function (item) { return new JobType(item); });
+            return data.map(function (item) { return new JobType(item); });
         }
 
         /** Import company sections */
         function importListOfSectionOfCompanyDto(data, parent) {
-            return data.map(function (item) {
-                return new SectionOfCompany(item, parent);
-            });
+            return data.map(function (item) { return new SectionOfCompany(item, parent); });
         }
 
         /** Main properties for company: headers can be translated here if needed */
         var companyPropSpecList = [
             new PropSpec('name', 'Name', 'Company name', 'SingleLine', { maxLength: 255 }),
             new PropSpec('description', 'Description', 'Company description', 'MultiLine', {}),
-            new PropSpec('idOfFileSpecOfLogo', 'IdOfFileSpecOfLogo', '', '', {}),
-            new PropSpec('fileSpecOfLogo', 'FileSpecOfLogo', '', 'FileLine', { width: 100, fileSpecPropClientId: 'idOfFileSpecOfLogo' })
+            new PropSpec('fileSpecOfLogo', 'FileSpecOfLogo', 'Company logo', 'FileLine', {
+                width: 100,
+                // Client id of property of nested id of file spec
+                nestedClientId: 'idOfFileSpecOfLogo'
+            }),
+            new PropSpec('idOfFileSpecOfLogo', 'IdOfFileSpecOfLogo', '', '', {})
         ];
 
         /**
@@ -80,46 +83,20 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
             /** Props specifications */
             this.propSpecList = companyPropSpecList;
 
-            /** Get need property from array */
-            this.getPropSpecByClientId = function (clientId) {
-                var filteredProps = ths.propSpecList.filter(function (elem) {
-                    return elem.clientId === clientId;
-                });
+            /**
+            * Stage key: equals file name
+            * @type {string}
+            */
+            this.stageKey = stageConstants.company.id;
 
-                return filteredProps[0];
-            };
-
-            /** Props values: all observables */
-            this.propSpecList.forEach(function (prop) {
-                if (prop.tpe === 'FileLine') {
-                    // Create new observable file specification
-                    ths[prop.clientId] = ko.observable();
-                    // If file exists - create object
-                    if (data[prop.serverId]) {
-                        ths[prop.clientId](new FileSpec(data[prop.serverId]));
-                    }
-                }
-                else {
-                    ths[prop.clientId] = ko.observable(data[prop.serverId]);
-                }
-            });
+            /** Base for all stages */
+            StageBase.call(this, data);
 
             /**
             * List of well regions
             * @type {module:models/wegion}
             */
             this.wegions = ko.observableArray();
-
-            /** Base for all stages */
-            StageBase.call(this);
-
-            /** 
-            * Select section
-            * @param {object} sectionToSelect
-            */
-            this.selectSection = function (sectionToSelect) {
-                ths.selectedSection(sectionToSelect);
-            };
 
             /**
             * Whether well regions are loaded
@@ -133,10 +110,28 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
                 });
             }, this);
 
+            /**
+            * Delete only link to file - without removing physically and from section
+            * @param {module/prop-spec} fileSpecProp - Property data
+            */
             this.deleteImgFileSpec = function (fileSpecProp) {
-                var needSection = ths.getSectionByPatternId('company-summary');
-                // Select file section with logos (load and unselect files)
-                
+                ths[fileSpecProp.addtData.nestedClientId](null);
+                ths[fileSpecProp.clientId](null);
+
+                ths.save();
+
+                ////var tmpFileSpecElem = ko.unwrap(ths[fileSpecProp.clientId]);
+                ////if (!tmpFileSpecElem) { return; }
+                ////// Select file section with logos
+
+                ////var idOfFileSpec = tmpFileSpecElem.id;
+                ////console.log(idOfFileSpec);
+                ////var needSection = ths.getSectionByPatternId('company-summary');
+                ////// Remove from file section + clean FileSpec (delete from logo tables)
+                ////needSection.deleteFileSpecById(idOfFileSpec, function () {
+                ////ths[fileSpecProp.addtData.nestedClientId](null);
+                ////ths[fileSpecProp.clientId](null);
+                ////});
             };
 
             /** Select file for any image */
@@ -159,7 +154,7 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
                     }
 
                     // Get prop id
-                    ths[fileSpecProp.addtData.fileSpecPropClientId](selectedFileSpecs[0].id);
+                    ths[fileSpecProp.addtData.nestedClientId](selectedFileSpecs[0].id);
                     ths.save();
                     ths.modalFileMgr.hide();
                     // Change sketch (create if not exists)
@@ -206,54 +201,69 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
             /**
             * Select well region
             * @param {module:models/wegion} wegionToSelect - Well region to select
-            * @param {object} [initialData] - Initial data
             */
-            this.selectWegion = function (wegionToSelect, initialData) {
-                initialData = initialData || {};
+            this.selectWegion = function (wegionToSelect) {
+                /** Initial function for all select stage functions */
+                ths.selectChildStage(wegionToSelect);
 
-                wegionToSelect.isOpenItem(true);
+                var tmpInitialUrlData = ko.unwrap(ths.getRootViewModel().initialUrlData);
 
-                // Unselect child
-                wegionToSelect.selectedWield(null);
+                // 1. Check url to child stage
+                if (tmpInitialUrlData.wieldId) {
+                    var needWield = wegionToSelect.getWieldById(tmpInitialUrlData.wieldId);
+                    if (needWield) {
+                        wegionToSelect.selectWield(needWield);
+                    }
+                    else {
+                        alert('Well field is not found');
+                    }
 
-                // Select self
+                    delete tmpInitialUrlData.wieldId;
+                    ths.getRootViewModel().initialUrlData(tmpInitialUrlData);
+                }
+                else if (tmpInitialUrlData.wegionSectionId) {
+                    // Select section
+
+                    var tmpSection = wegionToSelect.getSectionByPatternId('wegion-' + tmpInitialUrlData.wegionSectionId);
+                    wegionToSelect.selectSection(tmpSection);
+
+                    // Remove section id from
+                    delete tmpInitialUrlData.wegionSectionId;
+                    ths.getRootViewModel().initialUrlData(tmpInitialUrlData);
+                }
+                else {
+                    // Show dashboard
+                    wegionToSelect.unselectSection();
+                    // Unselect child to show parent content
+                    wegionToSelect.selectedWield(null);
+                }
+                
+                // Set as selected: only after select all children
                 ths.selectedWegion(wegionToSelect);
 
                 // Select parents (not need)
-
-                // Select summary section
-                wegionToSelect.selectedSection(wegionToSelect.getSectionByPatternId('wegion-summary'));
-
-                if (!initialData.isHistory) {
-                    historyHelper.pushState('/companies/' + ths.id + '/well-regions/' + wegionToSelect.Id);
-                }
-
-                ////if (initialData.wieldId) {
-                ////    wegionToSelect.selectWieldById(initialData.wieldId);
-                ////}
             };
 
             /**
             * Select region by id: wrap for select wegion function
             * @param {number} wegionId - Id of well region
-            * @param {object} initialData - Initial data
             */
-            this.selectWegionById = function (wegionId, initialData) {
-                if ($.isNumeric(wegionId)) {
-                    var tmpWegions = ko.unwrap(ths.wegions);
+            this.getWegionById = function (wegionId) {
+                var needWegion;
+                var tmpWegions = ko.unwrap(ths.wegions);
 
-                    tmpWegions.forEach(function (tmpWegion) {
-                        if (tmpWegion.Id === wegionId) {
-                            ths.selectWegion(tmpWegion, initialData);
-                        }
-                    });
-                }
+                tmpWegions.forEach(function (tmpWegion) {
+                    if (tmpWegion.id === wegionId) {
+                        needWegion = tmpWegion;
+                    }
+                });
+                return needWegion;
             };
 
             /** Delete well region */
-            this.deleteWegion = function (wellRegionForDelete) {
-                if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(wellRegionForDelete.Name) + '"?')) {
-                    appDatacontext.deleteWellRegion(wellRegionForDelete).done(function () {
+            this.removeChild = function (wellRegionForDelete) {
+                if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(wellRegionForDelete.name) + '"?')) {
+                    wegionService.remove(wellRegionForDelete.id).done(function () {
                         ths.wegions.remove(wellRegionForDelete);
 
                         ths.selectedWegion(null);
@@ -275,7 +285,7 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
                 );
 
                 modalHelper.openModalWindow('Well region', innerDiv, function () {
-                    appDatacontext.saveNewWellRegion({
+                    wegionService.post({
                         'Name': $(inputName).val(),
                         'Description': '',
                         'CompanyId': ths.id
@@ -333,28 +343,32 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
 
             /** 
             * Load wegions of this company
-            * @param {object} [initialData] - Initial data
             */
-            this.loadWegions = function (initialData) {
-                initialData = initialData || {};
+            this.loadWegions = function () {
+                var tmpInitialUrlData = ko.unwrap(ths.getRootViewModel().initialUrlData);
+
+                function selectWegionIfNeed() {
+                    if (tmpInitialUrlData.wegionId) {
+                        var wegionToSelect = ths.getWegionById(tmpInitialUrlData.wegionId);
+                        if (wegionToSelect) {
+                            ths.selectWegion(wegionToSelect);
+                        }
+
+                        // Remove to not load again
+                        delete tmpInitialUrlData.wegionId;
+                        ths.getRootViewModel().initialUrlData(tmpInitialUrlData);
+                    }
+                }
 
                 if (!ko.unwrap(ths.isLoadedWegions)) {
-                    appDatacontext.getWellRegionList({
-                        company_id: ths.id,
-                        is_inclusive: true
-                    }).done(function (response) {
+                    wegionService.getInclusive(ths.id).done(function (response) {
                         ths.wegions(importWegions(response, ths));
                         ths.isLoadedWegions(true);
-
-                        if ($.isNumeric(initialData.wegionId)) {
-                            ths.selectWegionById(initialData.wegionId, initialData);
-                        }
+                        selectWegionIfNeed();
                     });
                 }
                 else {
-                    if ($.isNumeric(initialData.wegionId)) {
-                        ths.selectWegionById(initialData.wegionId, initialData);
-                    }
+                    selectWegionIfNeed();
                 }
             };
 
@@ -386,13 +400,13 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="ajax-request.html">helpers/ajax-request</a></li><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="prop-spec.html">models/prop-spec</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="stage-base.html">models/stage-base</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-field-map.html">models/well-field-map</a></li><li><a href="well-file.html">models/well-file</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="wield.html">models/wield</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="section-base.html">sections/section-base</a></li><li><a href="section-of-company.html">sections/section-of-company</a></li><li><a href="section-of-wegion.html">sections/section-of-wegion</a></li><li><a href="section-of-well.html">sections/section-of-well</a></li><li><a href="section-of-wield.html">sections/section-of-wield</a></li><li><a href="section-of-wroup.html">sections/section-of-wroup</a></li><li><a href="company_.html">services/company</a></li><li><a href="company-user.html">services/company-user</a></li><li><a href="register.html">services/register</a></li><li><a href="workspace.html">viewmodels/workspace</a></li><li><a href="sketch.html">well/sketch</a></li><li><a href="volume.html">well/volume</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="stage-constants.html">constants/stage-constants</a></li><li><a href="svg-elem-type-constants.html">constants/svg-elem-type-constants</a></li><li><a href="bindings.html">filters/bindings</a></li><li><a href="ajax-request.html">helpers/ajax-request</a></li><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="log-helper.html">helpers/log-helper</a></li><li><a href="area-of-map-of-wield.html">models/area-of-map-of-wield</a></li><li><a href="column-attribute.html">models/column-attribute</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="file-spec-of-history-of-well.html">models/file-spec-of-history-of-well</a></li><li><a href="history-of-well.html">models/history-of-well</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="log-of-well.html">models/log-of-well</a></li><li><a href="map-of-wield.html">models/map-of-wield</a></li><li><a href="prop-spec.html">models/prop-spec</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="stage-base.html">models/stage-base</a></li><li><a href="svg-elem.html">models/svg-elem</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="volume-of-well.html">models/volume-of-well</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-file.html">models/well-file</a></li><li><a href="wfm-image.html">models/wfm-image</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="widget.html">models/widget</a></li><li><a href="widgock.html">models/widgock</a></li><li><a href="widgout.html">models/widgout</a></li><li><a href="wield.html">models/wield</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="section-base.html">sections/section-base</a></li><li><a href="section-of-company.html">sections/section-of-company</a></li><li><a href="section-of-wegion.html">sections/section-of-wegion</a></li><li><a href="section-of-well.html">sections/section-of-well</a></li><li><a href="section-of-wield.html">sections/section-of-wield</a></li><li><a href="section-of-wroup.html">sections/section-of-wroup</a></li><li><a href="company_.html">services/company</a></li><li><a href="company-user.html">services/company-user</a></li><li><a href="file-spec_.html">services/file-spec</a></li><li><a href="file-spec-of-history-of-well_.html">services/file-spec-of-history-of-well</a></li><li><a href="image-of-history-of-well.html">services/image-of-history-of-well</a></li><li><a href="log-of-well_.html">services/log-of-well</a></li><li><a href="register.html">services/register</a></li><li><a href="svg-elem-of-log-of-well.html">services/svg-elem-of-log-of-well</a></li><li><a href="volume-of-well_.html">services/volume-of-well</a></li><li><a href="wegion_.html">services/wegion</a></li><li><a href="well_.html">services/well</a></li><li><a href="widget_.html">services/widget</a></li><li><a href="widgout_.html">services/widgout</a></li><li><a href="wield_.html">services/wield</a></li><li><a href="wroup_.html">services/wroup</a></li><li><a href="workspace.html">viewmodels/workspace</a></li><li><a href="sketch.html">well/sketch</a></li><li><a href="widget-summary.html">widgets/widget-summary</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0</a> on Sun Dec 22 2013 16:39:01 GMT+0400 (MSK)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0</a> on Thu Jan 16 2014 20:35:04 GMT+0200 (EET)
 </footer>
 
 <script> prettyPrint(); </script>

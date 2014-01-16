@@ -26,18 +26,26 @@
     <section>
         <article>
             <pre class="prettyprint source"><code>﻿/** @module */
-define([], function () {
+define(['helpers/app-helper'], function (appHelper) {
     'use strict';
 
     var historyHelper = {};
 
-    ////var routes = [
-    ////        { url: '/companies' },
-    ////        { url: '/companies/{companyId:guid}/well-regions' },
-    ////        { url: '/companies/{companyId:guid}/well-regions/{wegionId:int}' },
-    ////        { url: '/account/logon' }, // may be with some query params, like redirectUrl
-    ////        { url: '/account/register' }
-    ////];
+    var routes = [
+            { url: '/companies' },
+            { url: '/companies/{companyId:guid}' },
+            { url: '/companies/{companyId:guid}/sections/{companySectionId}' },
+            { url: '/companies/{companyId:guid}/well-regions/{wegionId:int}' },
+            { url: '/companies/{companyId:guid}/well-regions/{wegionId:int}/sections/{wegionSectionId}' },
+            { url: '/companies/{companyId:guid}/well-regions/{wegionId:int}/well-fields/{wieldId:int}' },
+            { url: '/companies/{companyId:guid}/well-regions/{wegionId:int}/well-fields/{wieldId:int}/sections/{wieldSectionId}' },
+            { url: '/companies/{companyId:guid}/well-regions/{wegionId:int}/well-fields/{wieldId:int}/well-groups/{wroupId:int}' },
+            { url: '/companies/{companyId:guid}/well-regions/{wegionId:int}/well-fields/{wieldId:int}/well-groups/{wroupId:int}/sections/{wroupSectionId}' },
+            { url: '/companies/{companyId:guid}/well-regions/{wegionId:int}/well-fields/{wieldId:int}/well-groups/{wroupId:int}/wells/{wellId:int}' },
+            { url: '/companies/{companyId:guid}/well-regions/{wegionId:int}/well-fields/{wieldId:int}/well-groups/{wroupId:int}/wells/{wellId:int}/sections/{wellSectionId}' },
+            { url: '/account/logon' }, // may be with some query params, like redirectUrl
+            { url: '/account/register' }
+    ];
 
     /**
     * Returns initial data from hash: companyId, wellId, etc.
@@ -47,31 +55,101 @@ define([], function () {
     historyHelper.getInitialData = function (str) {
         var initialData = {};
 
-        // TODO: make from routes
-        if (str.length > 1) {
-            var paramArr = str.split('/');
-            if (paramArr[1] === 'companies') {
-                if (paramArr[2]) {
-                    initialData.companyId = paramArr[2];
-                    if (paramArr[3] === 'well-regions') {
-                        if (paramArr[4]) {
-                            initialData.wegionId = parseInt(paramArr[4], 10);
-                            if (paramArr[5] === 'well-fields') {
-                                if (paramArr[6]) {
-                                    initialData.wieldId = parseInt(paramArr[6], 10);
-                                }
-                            }
-                            else if (paramArr[5] === 'sections') {
-                                if (paramArr[6]) {
-                                    initialData.wegionSectionId = paramArr[6];
-                                }
-                            }
-                        }
+        var currentUrlArr = str.split('/');
+        // Remove empty parts
+        currentUrlArr = currentUrlArr.filter(function (elem) {
+            return elem.length > 0;
+        });
+
+        var needRoute;
+
+        // https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/every
+        routes.every(function (route) {
+            // Foreached route params
+            var routeUrlArr = route.url.split('/');
+            routeUrlArr = routeUrlArr.filter(function (elem) { return elem.length > 0; });
+
+            // Match length of routes
+            // If equals then check by parts
+            // Else - next route
+            if (routeUrlArr.length !== currentUrlArr.length) {
+                // exit and continue with next route
+                return true;
+            }
+
+            // Be default - are equals
+            var isMatch = true;
+
+            for (var i = 0; i &lt; routeUrlArr.length; i += 1) {
+                // If not a parameter then 
+                // match current url part with route url part
+                // If equals then next part (current route)
+                // If not equal then break (match with next route)
+                if (routeUrlArr[i][0] !== '{') {
+                    if (routeUrlArr[i] !== currentUrlArr[i]) {
+                        isMatch = false;
                     }
                 }
             }
+
+            if (isMatch) {
+                needRoute = route;
+                // Exit and break from cycle
+                return false;
+            }
+            else {
+                // Exit and continue cycle with next route (check next route)
+                return true;
+            }
+        });
+
+        // If route is not found
+        if (!needRoute) {
+            // No data - leave on the main page
+            return initialData;
         }
 
+        ////// Add current route with params
+        ////initialData.route = needRoute;
+
+        // Need route url arr of parts
+        var needRouteUrlArr = needRoute.url.split('/').filter(function (elem) { return elem.length > 0; });
+
+        needRouteUrlArr.forEach(function (elem, elemIndex) {
+            // If parameter
+            // Then add to initial data
+            if (elem[0] === '{') {
+                var paramPartArr = elem.replace(/[{}]/g, '').split(':');
+                var paramKey = paramPartArr[0];
+                var paramType = paramPartArr[1];
+                var isTypeSuccess = true;
+                if (paramType) {
+                    switch (paramType) {
+                        case 'guid':
+                            isTypeSuccess = appHelper.isGuidValid(currentUrlArr[elemIndex]);
+                            break;
+                        case 'int':
+                            isTypeSuccess = currentUrlArr[elemIndex] % 1 === 0;
+                            if (isTypeSuccess) {
+                                // Convert to integer type
+                                currentUrlArr[elemIndex] = parseInt(currentUrlArr[elemIndex]);
+                            }
+                            break;
+                        default:
+                            // If no type then error
+                            isTypeSuccess = false;
+                            break;
+                    }
+
+                }
+
+                if (isTypeSuccess) {
+                    initialData[paramKey] = currentUrlArr[elemIndex];
+                }
+            }
+        });
+
+        console.log(initialData);
         return initialData;
     };
 
@@ -92,13 +170,13 @@ define([], function () {
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="ajax-request.html">helpers/ajax-request</a></li><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="prop-spec.html">models/prop-spec</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="stage-base.html">models/stage-base</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-field-map.html">models/well-field-map</a></li><li><a href="well-file.html">models/well-file</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="wield.html">models/wield</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="section-base.html">sections/section-base</a></li><li><a href="section-of-company.html">sections/section-of-company</a></li><li><a href="section-of-wegion.html">sections/section-of-wegion</a></li><li><a href="section-of-well.html">sections/section-of-well</a></li><li><a href="section-of-wield.html">sections/section-of-wield</a></li><li><a href="section-of-wroup.html">sections/section-of-wroup</a></li><li><a href="company_.html">services/company</a></li><li><a href="company-user.html">services/company-user</a></li><li><a href="register.html">services/register</a></li><li><a href="workspace.html">viewmodels/workspace</a></li><li><a href="sketch.html">well/sketch</a></li><li><a href="volume.html">well/volume</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="stage-constants.html">constants/stage-constants</a></li><li><a href="svg-elem-type-constants.html">constants/svg-elem-type-constants</a></li><li><a href="bindings.html">filters/bindings</a></li><li><a href="ajax-request.html">helpers/ajax-request</a></li><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="log-helper.html">helpers/log-helper</a></li><li><a href="area-of-map-of-wield.html">models/area-of-map-of-wield</a></li><li><a href="column-attribute.html">models/column-attribute</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="file-spec-of-history-of-well.html">models/file-spec-of-history-of-well</a></li><li><a href="history-of-well.html">models/history-of-well</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="log-of-well.html">models/log-of-well</a></li><li><a href="map-of-wield.html">models/map-of-wield</a></li><li><a href="prop-spec.html">models/prop-spec</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="stage-base.html">models/stage-base</a></li><li><a href="svg-elem.html">models/svg-elem</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="volume-of-well.html">models/volume-of-well</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-file.html">models/well-file</a></li><li><a href="wfm-image.html">models/wfm-image</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="widget.html">models/widget</a></li><li><a href="widgock.html">models/widgock</a></li><li><a href="widgout.html">models/widgout</a></li><li><a href="wield.html">models/wield</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="section-base.html">sections/section-base</a></li><li><a href="section-of-company.html">sections/section-of-company</a></li><li><a href="section-of-wegion.html">sections/section-of-wegion</a></li><li><a href="section-of-well.html">sections/section-of-well</a></li><li><a href="section-of-wield.html">sections/section-of-wield</a></li><li><a href="section-of-wroup.html">sections/section-of-wroup</a></li><li><a href="company_.html">services/company</a></li><li><a href="company-user.html">services/company-user</a></li><li><a href="file-spec_.html">services/file-spec</a></li><li><a href="file-spec-of-history-of-well_.html">services/file-spec-of-history-of-well</a></li><li><a href="image-of-history-of-well.html">services/image-of-history-of-well</a></li><li><a href="log-of-well_.html">services/log-of-well</a></li><li><a href="register.html">services/register</a></li><li><a href="svg-elem-of-log-of-well.html">services/svg-elem-of-log-of-well</a></li><li><a href="volume-of-well_.html">services/volume-of-well</a></li><li><a href="wegion_.html">services/wegion</a></li><li><a href="well_.html">services/well</a></li><li><a href="widget_.html">services/widget</a></li><li><a href="widgout_.html">services/widgout</a></li><li><a href="wield_.html">services/wield</a></li><li><a href="wroup_.html">services/wroup</a></li><li><a href="workspace.html">viewmodels/workspace</a></li><li><a href="sketch.html">well/sketch</a></li><li><a href="widget-summary.html">widgets/widget-summary</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0</a> on Sun Dec 22 2013 16:39:01 GMT+0400 (MSK)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0</a> on Thu Jan 16 2014 20:35:03 GMT+0200 (EET)
 </footer>
 
 <script> prettyPrint(); </script>
