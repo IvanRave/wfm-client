@@ -1,3 +1,15 @@
+<a name="v0.8.7"></a>
+### v0.8.7 (2014-01-16)
+
+
+#### Bug Fixes
+
+* **historyImage:** fix for new file system ([d9e35f79](https://github.com/IvanRave/wfm/commit/d9e35f7960a98a036aa73d434d3f986c48c49394))
+* **wellHistoryFile:** fix for new file system ([15831b6f](https://github.com/IvanRave/wfm/commit/15831b6f31af5fac179faa4877e02fae87842eba))
+* **wellLog:**
+  * img figures model and service ([9d62985c](https://github.com/IvanRave/wfm/commit/9d62985c30bfd48b1c41cfe0c098853d722b1973))
+  * separate logs from files ([985f56c1](https://github.com/IvanRave/wfm/commit/985f56c12ea86c530bddc0c99dce1b28c4efa37d))
+
 <a name="v0.8.3"></a>
 ### v0.8.3 (2013-12-17)
 
