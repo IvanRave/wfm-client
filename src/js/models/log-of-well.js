@@ -63,34 +63,20 @@ define(['jquery', 'knockout',
             this.representationUrl = logOfWellService.getUrl(ths.idOfWell, ths.id);
 
             /**
-            * Draw log text
-            */
-            this.drawLogText = function (currentWellItem, event) {
-                var drawTextBlock = event.currentTarget;
-                ////drawTextBlock.style.filter = 'alpha(opacity=50)';
-                // coord accordingly drawTextBlock
-                var posX = parseFloat(event.pageX - $(drawTextBlock).offset().left);
-                var posY = parseFloat(event.pageY - $(drawTextBlock).offset().top);
-
-                // Create new imgFigure: text
-                // Add to the history list: set isNew = true
-                // When save - add only where isNew = true (change isNew to false)
-                // When click 'return' - remove last element from list where isNew = true (old elements can't be removed)
-
-                require(['helpers/log-helper'], function (logHelper) {
-                    logHelper.drawText(posX, posY, drawTextBlock);
-                });
-            };
-
-            /**
             * Figures in this log image: loaded with log-of-well
             */
             this.imgFigures = ko.observableArray(importImgFigures(data.ListOfSvgElemDto));
 
             /**
-            * Add new figures and remove deleted figures (saveWellLogSelectedFileImagePart)
+            * Whether saving is enabled 
+            * @type {boolean}
             */
-            this.saveImgFigures = function () {
+            this.isEnabledSavingSvgElems = ko.observable(true);
+
+            /**
+            * Add new figures and remove deleted figures
+            */
+            this.saveSvgElems = function () {
                 var tmpImgFigures = ko.unwrap(ths.imgFigures);
 
                 // Figures without ids: created figures
@@ -98,49 +84,25 @@ define(['jquery', 'knockout',
                     return (!elem.id);
                 });
 
+                // Nothing to save
+                if (createdImgFigures.length === 0) { return; }
+
+                ths.isEnabledSavingSvgElems(false);
+
                 // Add every element
-                // TODO: try to make one request
-                createdImgFigures.forEach(function (elem) {
+                // TODO: try to make one request: one request per few figures: it's like a put well log event
+                createdImgFigures.forEach(function (elem, elemIndex) {
                     svgElemOfLogOfWellService.post(ths.id, elem.toDto()).done(function (res) {
-                        console.log(res);
+                        // After adding new figures - set ids
+                        elem.id = res.Id;
+
+                        // Allow retry saving
+                        if (elemIndex === createdImgFigures.length - 1) {
+                            ths.isEnabledSavingSvgElems(true);
+                        }
                     });
                 });
-
-                // One request per few figures: it's like a put well log event
-                // After adding new figures - set ids
-
-                console.log(createdImgFigures);
-                // Send to the server
             };
-
-            // TODO: remove links and method
-            /** Save part of image */
-            ////this.saveWellLogSelectedFileImagePart = function () {
-            ////    // TODO: Post part of image
-            ////    alert('Saving feature is under construction');
-            ////    //public HttpResponseMessage Post([FromUri] int well_id, [FromUri] string purpose, [FromUri] string status, [FromUri] string file_name, [FromBody] ByteImagePart byteImagePart)
-
-            ////    ////var urlQueryParams = {
-            ////    ////    well_id: selectedFile.WellId,
-            ////    ////    purpose: selectedFile.Purpose,
-            ////    ////    status: selectedFile.Status,
-            ////    ////    file_name: selectedFile.Name
-            ////    ////};
-
-            ////    ////var cnvs = document.getElementById('log_cnvs');
-
-            ////    ////require(['models/byte-image-part'], function () {
-            ////    ////    var createdByteImagePart = datacontext.createByteImagePart({
-            ////    ////        Base64String: cnvs.toDataURL('image/png').replace('data:image/png;base64,', ''),
-            ////    ////        StartY: Math.abs($('#log_img').position().top)
-            ////    ////        ////StartY: $(cnvs).position().top
-            ////    ////    });
-
-            ////    ////    datacontext.postWellFile(urlQueryParams, createdByteImagePart).done(function (response, statusText, request) {
-            ////    ////        ths.WellLogImageUrl(request.getResponseHeader('Location') + '#' + appMoment().format('mmss'));
-            ////    ////    });
-            ////    ////});
-            ////};
 
             /** Checbox with tools: by default - hand */
             this.checkedLogTool = ko.observable('tool-hand');

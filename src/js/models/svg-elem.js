@@ -33,24 +33,6 @@ define(['knockout'], function (ko) {
         */
         this.opts = ko.observable(JSON.parse(data.Opts));
 
-        ////this.startX = ko.observable(data.StartX);
-        ////this.startY = ko.observable(data.StartY);
-        ////this.lastX = ko.observable(data.LastX);
-        ////this.lastY = ko.observable(data.LastY);
-
-        ////if (this.tpe === tpeConstants.arrowFigure.id) {
-        ////    // call arrow
-        ////}
-        ////else if (this.tpe === tpeConstants.lineFigure.id) {
-        ////    // call line
-        ////}
-        ////else if (this.tpe === tpeConstants.textFigure.id) {
-        ////    // call text
-        ////}
-        ////else {
-        ////    throw new Error('noSuchType');
-        ////}
-
         /** Convert to server data transfer object */
         this.toDto = function () {
             return {

@@ -256,7 +256,7 @@ define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-he
         };
 
         /** Figures in draw block */
-        function initLogLasDraw(drawCnvs, logCntx, imgFigures, koCheckedLogTool) {
+        function initLogLasDraw(drawCnvs, logCntx, imgFigures, koCheckedLogTool, logLasImg) {
             var startX = 0,
             startY = 0,
             lastX = 0,
@@ -284,27 +284,30 @@ define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-he
                     drawCntx.clearRect(0, 0, drawCnvs.width, drawCnvs.height);
                     isPainting = false;
 
-                    require(['helpers/log-helper'], function (logHelper) {
-                        logHelper.drawLineCntx(logCntx, startX, startY, lastX, lastY, isArrowXorLine);
+                    require(['models/svg-elem', 'constants/svg-elem-type-constants'], function (SvgElem, svgElemTypeConstants) {
+                        // Create line or arrow object
+                        var logLasImgTopPos = Math.abs($(logLasImg).position().top);
+                        console.log(logLasImgTopPos);
+                        var createdImgFigure = new SvgElem({
+                            Color: '#000',
+                            Tpe: svgElemTypeConstants.line.id,
+                            Opts: JSON.stringify({
+                                StartX: startX,
+                                StartY: startY + logLasImgTopPos,
+                                LastX: lastX,
+                                LastY: lastY + logLasImgTopPos,
+                                IsArrow: isArrowXorLine
+                            })
+                        });
 
-                        require(['models/svg-elem', 'constants/svg-elem-type-constants'], function (SvgElem, svgElemTypeConstants) {
-                            // Create line or arrow object
-                            var createdImgFigure = new SvgElem({
-                                Color: '#000',
-                                Tpe: svgElemTypeConstants.line.id,
-                                Opts: JSON.stringify({
-                                    StartX: startX,
-                                    StartY: startY,
-                                    LastX: lastX,
-                                    LastY: lastY,
-                                    IsArrow: isArrowXorLine
-                                })
-                            });
+                        // Add to the log element img figures
+                        imgFigures.push(createdImgFigure);
 
-                            // Add to the log element img figures
-                            imgFigures.push(createdImgFigure);
+                        console.log(imgFigures);
 
-                            console.log(imgFigures);
+                        // Draw
+                        require(['helpers/log-helper'], function (logHelper) {
+                            logHelper.drawLineCntx(logCntx, startX, startY, lastX, lastY, isArrowXorLine);
                         });
                     });
                 }
@@ -323,6 +326,120 @@ define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-he
                         logHelper.drawLineCntx(drawCntx, startX, startY, lastX, lastY, isArrowXorLine);
                     });
                 }
+            });
+        }
+
+        function initLogLasText(logLasText, logCntx, koSvgElems, logLasImg) {
+            $(logLasText).off('click').on('click', function (event) {
+                ////drawTextBlock.style.filter = 'alpha(opacity=50)';
+                // coord accordingly drawTextBlock
+                var posX = parseFloat(event.pageX - $(logLasText).offset().left);
+                var posY = parseFloat(event.pageY - $(logLasText).offset().top);
+
+                // Create new imgFigure: text
+                // Add to the history list: set isNew = true
+                // When save - add only where isNew = true (change isNew to false)
+                // When click 'return' - remove last element from list where isNew = true (old elements can't be removed)
+
+                require(['helpers/log-helper'], function (logHelper) {
+                    var podl = document.createElement('span');
+                    $(podl).css({
+                        'position': 'absolute',
+                        'top': (posY - 9),
+                        'left': posX,
+                        'white-space': 'nowrap',
+                        'color': '#888',
+                        'font-size': '12px',
+                        'font-family': 'sans-serif',
+                        'z-index': '15'
+                    }).html('enter text...');
+
+                    var pTag = document.createElement('span');
+                    $(pTag).prop({ 'contenteditable': true }).css({
+                        'position': 'absolute',
+                        'top': (posY - 9),
+                        'left': posX,
+                        'white-space': 'nowrap',
+                        'font-size': '12px',
+                        'font-family': 'sans-serif',
+                        'z-index': '15'
+                    }).on('keypress', function (e) {
+                        var code = (e.keyCode ? e.keyCode : e.which);
+                        // Enter keycode
+                        if (code === 13) {
+                            e.preventDefault();
+                            var s = $(pTag).html();
+                            $(podl).remove();
+                            $(pTag).remove();
+
+                            require(['models/svg-elem', 'constants/svg-elem-type-constants'], function (SvgElem, svgElemTypeConstants) {
+
+                                var logLasImgTopPos = Math.abs($(logLasImg).position().top);
+
+                                ////    ////        StartY: 
+                                // Create line or arrow object
+                                var createdImgFigure = new SvgElem({
+                                    Color: '#000',
+                                    Tpe: svgElemTypeConstants.text.id,
+                                    Opts: JSON.stringify({
+                                        StartX: posX,
+                                        StartY: posY + logLasImgTopPos,
+                                        TextContent: s
+                                    })
+                                });
+
+                                console.log(createdImgFigure);
+
+                                // Add to the log element img figures
+                                koSvgElems.push(createdImgFigure);
+
+                                // Draw
+                                logHelper.drawTextCntx(logCntx, s, posX, posY);
+                            });
+                        }
+                    }).on('keyup', function (e) {
+                        var s = $(pTag).html();
+
+                        if (s.length === 0) {
+                            $(podl).show();
+                        }
+                        else {
+                            $(podl).hide();
+                        }
+
+                        var code = (e.keyCode ? e.keyCode : e.which);
+                        if (code === 27) {
+                            $(podl).remove();
+                            $(pTag).remove();
+                        }
+                    }).on('focusout', function () {
+                        $(podl).remove();
+                        $(pTag).remove();
+                    });
+
+                    $(logLasText).append(podl, pTag);
+                    $(pTag).focus();
+                });
+            });
+        }
+
+        /* Redraw elements */
+        function drawLogElements(logCntx, svgElements, jqrLogLasImg) {
+            var logLasImgTopPos = Math.abs(jqrLogLasImg.position().top);
+            require(['helpers/log-helper'], function (logHelper) {
+                svgElements.forEach(function (elem) {
+                    var opts = ko.unwrap(elem.opts);
+
+                    switch (elem.tpe) {
+                        case 'line':
+                            logHelper.drawLineCntx(logCntx, opts.StartX, opts.StartY - logLasImgTopPos, opts.LastX, opts.LastY - logLasImgTopPos, opts.IsArrow);
+                            break;
+                        case 'text':
+                            logHelper.drawTextCntx(logCntx, opts.TextContent, opts.StartX, opts.StartY - logLasImgTopPos);
+                            break;
+                        default: throw new Error('NoSuchTypeForLogFigure');
+                    }
+                });
             });
         }
 
@@ -354,7 +471,12 @@ define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-he
 
                     var maxCanvasHeight = 480;
 
-                    $(logLasImg).parent().off('scroll').on('scroll', function () { });
+                    var jqrLogLasImg = $(logLasImg);
+                    // Add scroll event for image
+                    jqrLogLasImg.parent().off('scroll').on('scroll', function () {
+                        logCntx.clearRect(0, 0, logLasBase.width, logLasBase.height);
+                        drawLogElements(logCntx, ko.unwrap(accessor.imgFigures), jqrLogLasImg);
+                    });
 
                     var tmpImgClientHeight = logLasImg.clientHeight;
 
@@ -365,17 +487,21 @@ define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-he
                     // Set height to all elements
                     logLasBase.height = tmpImgClientHeight;
                     logLasDraw.height = tmpImgClientHeight;
-                    $(logLasText).css({ 'height': tmpImgClientHeight });
+                    $(logLasText).css({
+                        'height': tmpImgClientHeight
+                    });
 
                     // Width - const = 624
                     ////cnvs.width = logImg.clientWidth;
                     ////drawCnvsLog.width = logImg.clientWidth;
                     ////$(textCnvsLog).css({ 'width': logImg.clientWidth });
 
-                    // Draw all image figures
-                    console.log(accessor.imgFigures);
+                    // Draw all image figures on logCntx
+                    drawLogElements(logCntx, ko.unwrap(accessor.imgFigures), jqrLogLasImg);
 
-                    initLogLasDraw(logLasDraw, logCntx, accessor.imgFigures, accessor.checkedLogTool);
+                    initLogLasDraw(logLasDraw, logCntx, accessor.imgFigures, accessor.checkedLogTool, logLasImg);
+
+                    initLogLasText(logLasText, logCntx, accessor.imgFigures, logLasImg);
                 };
 
                 // Load img and all handlers
@@ -394,8 +520,8 @@ define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-he
                 var logLasImg = element.getElementsByClassName('log-las-img')[0];
                 if (!logLasImg) { throw new Error('no element'); }
 
-                var opts = valueAccessor();
-                var checkedLogTool = ko.unwrap(opts.checkedLogTool);
+                var accessor = valueAccessor();
+                var checkedLogTool = ko.unwrap(accessor.checkedLogTool);
 
                 // Hide all blocks by default
                 $(logLasDraw).hide();

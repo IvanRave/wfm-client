@@ -2,7 +2,17 @@
   <div class="clearfix">
     <div class="pull-left">
       <div data-bind="with: slcLogOfWell">
-        <div class="clearfix" data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
+        <div style="position: relative; z-index: 1;" data-bind="logLas: { imgSrc: representationUrl, checkedLogTool: checkedLogTool, imgFigures: imgFigures }">
+          <div class="log-las-img-wrap">
+            <img class="log-las-img" src="#" alt="Log representation" />
+          </div>
+          <canvas class="log-las-base" width="624" height="480"></canvas>
+          <div>
+            <canvas class="log-las-draw" width="624" height="480"></canvas>
+            <div class="log-las-text"></div>
+          </div>
+        </div>
+        <div class="clearfix min-top-margin" data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
           <div class="pull-left">
             <div>
               <label class="radio-inline">
@@ -20,26 +30,11 @@
             </div>
           </div>
           <div class="pull-right" style="margin-right: 22px">
-            <button type="button" class="btn btn-xs btn-default" data-bind="click: saveImgFigures">Save</button>
+            <button type="button" class="btn btn-sm btn-default" data-bind="click: saveSvgElems, enable: isEnabledSavingSvgElems">
+              <i class="glyphicon glyphicon-floppy-saved"></i> Save
+            </button>
           </div>
         </div>
-        <!-- ko if: $root.userProfile.selectedEmployee().isEditMode -->
-        <div style="position: relative; z-index: 1;" data-bind="logLas: { imgSrc: representationUrl, checkedLogTool: checkedLogTool, imgFigures: imgFigures }">
-          <div class="log-las-img-wrap">
-            <img class="log-las-img" id="log_img" src="#" alt="Log representation" />
-          </div>
-          <canvas class="log-las-base" id="log_cnvs" width="624" height="480"></canvas>
-          <div>
-            <canvas class="log-las-draw" id="draw_cnvs_log" width="624" height="480"></canvas>
-            <div class="log-las-text" id="text_cnvs_log" data-bind="click: drawLogText"></div>
-          </div>
-        </div>
-        <!-- /ko -->
-        <!-- ko ifnot: $root.userProfile.selectedEmployee().isEditMode -->
-        <div class="log-las-img-wrap">
-          <img class="log-las-img" src="#" alt="Log representation" data-bind="attr: {src: representationUrl}" />
-        </div>
-        <!-- /ko -->
       </div>
     </div>
     <div class="pull-right" style="width: 280px">
