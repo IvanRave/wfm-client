@@ -1,7 +1,7 @@
 {
-  "name": "wfm",
+  "name": "WFM",
   "version": "0.8.8",
-  "homepage": "https://github.com/IvanRave/wfm",
+  "homepage": "https://github.com/IvanRave/wfm-client",
   "description": "Well file manager",
   "license": "MIT",
   "ignore": [
