@@ -544,22 +544,79 @@ define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-he
             }
         };
 
-        // svg graph (like perfomance)
+        // svg (like perfomance graph or field map)
         ko.bindingHandlers.svgResponsive = {
             init: function (element, valueAccessor) {
+                var accessor = valueAccessor();
+
                 function updateWidth() {
-                    valueAccessor().tmpPrfGraphWidth($(element).parent().width());
+                    accessor.koSvgWidth($(element).parent().width());
                 }
 
-                // When change window size - update graph size
+                // When change window size - update svg size
                 $(window).resize(updateWidth);
 
-                // When toggle left menu - update graph size
-                valueAccessor().tmpIsVisibleMenu.subscribe(updateWidth);
+                // When toggle left menu - update svg size
+                accessor.tmpIsVisibleMenu.subscribe(updateWidth);
 
                 // Update initial
                 updateWidth();
                 // svg viewbox size need to init before creating of this element
+            }
+        };
+
+        /** Create svg image using svg and xlink namespaces */
+        function createSvgImg(imgUrl) {
+            var svgImg = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+            svgImg.setAttributeNS(null, 'height', '600');
+            svgImg.setAttributeNS(null, 'width', '1200');
+            svgImg.setAttributeNS('http://www.w3.org/1999/xlink', 'href', imgUrl);
+            svgImg.setAttributeNS(null, 'x', '0');
+            svgImg.setAttributeNS(null, 'y', '0');
+            svgImg.setAttributeNS(null, 'visibility', 'visible');
+            return svgImg;
+        }
+
+        /** Svg map */
+        ko.bindingHandlers.svgMap = {
+            init: function (element, valueAccessor) {
+                var accessor = valueAccessor();
+                var imgUrl = ko.unwrap(accessor.imgUrl);
+                element.appendChild(createSvgImg(imgUrl));
+
+                require(['d3'], function (d3) {
+                    var groupElem = d3.select(element);
+
+                    var width = 1200,
+                        height = 600;
+
+                    var x = d3.scale.linear()
+                        .domain([-width / 2, width / 2])
+                        .range([width, 0]);
+
+                    var y = d3.scale.linear()
+                        .domain([-height / 2, height / 2])
+                        .range([height, 0]);
+
+                    function zoomed() {
+                        var tmpScale = d3.event.scale;
+                        var translateX = d3.event.translate[0],
+                            translateY = d3.event.translate[1];
+                        groupElem.select('image')
+                            .attr('x', translateX)
+                            .attr('y', translateY)
+                            .attr('width', width * tmpScale)
+                            .attr('height', height * tmpScale);
+                    }
+
+                    var zoom = d3.behavior.zoom()
+                        .x(x)
+                        .y(y)
+                        .scaleExtent([0.5, 10])
+                        .on('zoom', zoomed);
+
+                    groupElem.call(zoom);
+                });
             }
         };
 
@@ -599,6 +656,37 @@ define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-he
                 }
             }
         };
+
+        // TODO: remove and remove libs to leaflet after creating svg map
+        ////ko.bindingHandlers.leafletMap = {
+        ////    init: function (element, valueAccessor) {
+        ////        var accessor = valueAccessor();
+        ////        var tmpImgUrl = ko.unwrap(accessor.imgUrl);
+
+        ////        if (!tmpImgUrl) { return; }
+
+        ////        // TileSize = 256px by default
+        ////        require(['leaflet'], function (lfl) {
+        ////            var map = lfl.map(element, {
+        ////                center: [0, 0],
+        ////                zoom: 0,
+        ////                minZoom: 0,
+        ////                maxZoom: 4,
+        ////                // http://leafletjs.com/reference.html#icrs
+        ////                crs: lfl.CRS.Simple
+        ////            });
+
+        ////            ////lfl.imageOverlay(tmpImgUrl, imgBounds).addTo(map);
+        ////            lfl.tileLayer(tmpImgUrl).addTo(map);
+
+        ////            lfl.marker([0,0]).addTo(map)
+        ////            .bindPopup('00 pretty CSS3 popup. <br> Easily customizable.')
+        ////            .openPopup();
+
+        ////            console.log(map.getBounds());
+        ////        });
+        ////    }
+        ////};
 
         ko.bindingHandlers.svgZoomGraph = {
             update: function (element, valueAccessor) {

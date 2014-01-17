@@ -1,18 +1,26 @@
 ﻿<div>
   <div class="row">
-    <div class="col-md-8">
-      <div style="width: 620px; height: 512px; border: 1px dotted #ccc">
+    <div class="col-md-9">
+      <div data-bind="with: selectedWieldMap">
+        <svg class="wield-map-svg" version="1.1" width="100%" viewbox="0 0 1200 600"
+             data-bind="attr: { height: mapWrap.height }, svgResponsive: {imgUrl: fileSpec.fileUrl, koSvgWidth: mapWrap.width, tmpIsVisibleMenu: $root.isVisibleMenu}">
+          <rect width="1200" height="600"></rect>
+          <g data-bind="svgMap: {imgUrl: fileSpec.fileUrl}"></g>
+        </svg>
+        <!--<div style="width: 100%; height: 200px" data-bind="leafletMap: {imgUrl: fileSpec.fileUrl}"></div>-->
+      </div>
+      <!--<div style="width: 620px; height: 512px; border: 1px dotted #ccc">
         <div data-bind="with: selectedWieldMap">
           <div data-bind="template: {afterRender: afterRenderMapObj }">
             <div style="width: 620px; height: 512px" id="map"></div>
           </div>
         </div>
-      </div>
+      </div>-->
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
       <div class="clearfix">
         <h4 class="pull-right">
-          <button class="btn btn-default" data-bind="click: createMapFromFile">Add map...</button>
+          <button class="btn btn-default btn-sm" data-bind="click: createMapFromFile">Add map...</button>
         </h4>
       </div>
       <!-- ko foreach: WellFieldMaps -->
@@ -47,7 +55,7 @@
     </div>
   </div>
 
-  <div>
+  <!--<div>
     <h4>Map help:</h4>
     <div>
       <h5>Scale:</h5>
@@ -64,5 +72,5 @@
       <div>2. Click "Add area" on the map toolbar</div>
       <div>3. Hover on selected area to get the result (square meters)</div>
     </div>
-  </div>
+  </div>-->
 </div>

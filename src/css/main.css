@@ -909,3 +909,12 @@ ul.wfm-light-list {
     border: 2px dashed #aaa;
     display: none;
 }
+
+.wield-map-svg {
+    font: 20px sans-serif;
+    shape-rendering: crispEdges;
+}
+
+    .wield-map-svg rect {
+        fill: #efefef;
+    }

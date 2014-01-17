@@ -1,6 +1,6 @@
 ﻿<div class="pd-graph-wrap">
   <!-- viewbox = prfGraph.viewBox.size + all margins -->
-  <svg version="1.1" width="100%" data-bind="attr: { height: prfGraph.height }, svgResponsive: { tmpPrfGraphWidth: prfGraph.width, tmpIsVisibleMenu: $root.isVisibleMenu }" viewbox="0 0 1200 400">
+  <svg version="1.1" width="100%" data-bind="attr: { height: prfGraph.height }, svgResponsive: { koSvgWidth: prfGraph.width, tmpIsVisibleMenu: $root.isVisibleMenu }" viewbox="0 0 1200 400">
     <g data-bind="attr: { transform: 'translate(' + prfGraph.viewBox.margin.left + ', ' + prfGraph.viewBox.margin.top + ')' }, svgZoomGraph: { prfGraphViewBox: prfGraph.viewBox, productionDataSetSvgPath: productionDataSetSvgPath, filteredByDateProductionDataSet: filteredByDateProductionDataSet, prfGraphZoom: prfGraph.zoom, prfGraphAxis: prfGraph.axis }">
       <g class="axis x" data-bind="attr: { transform: 'translate(0,' + prfGraph.viewBox.height + ')' }"></g>
       <g class="axis y"></g>

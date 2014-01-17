@@ -3,8 +3,8 @@
         //baseUrl: '.',
         paths: {
             'jquery.bootstrap': 'bootstrap',
-            // The basic File Upload plugin
-            'yandex-map': 'http://api-maps.yandex.ru/2.0/?load=package.full&lang=en-US'
+            ////'leaflet': '../libs/leaflet/leaflet',
+            ////'yandex-map': 'http://api-maps.yandex.ru/2.0/?load=package.full&lang=en-US'
             ////'blob-js': 'blobjs/Blob.min',
             ////'blob-builder': 'blobjs/BlobBuilder.min',
             ////'filesaver': 'filesaverjs/filesaver.min',
