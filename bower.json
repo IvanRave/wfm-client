@@ -25,7 +25,7 @@
     "jcrop": "~0.9.12",
     "blueimp-file-upload": "~9.5.0",
     "bootstrap": "~3.0.3",
-    "d3": "~3.3.11",
-    "pickadate": "~3.3.1"
+    "pickadate": "~3.3.1",
+    "d3": "~3.4.1"
   }
 }
