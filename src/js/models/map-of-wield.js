@@ -111,7 +111,7 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
 
             this.mapWrap = {};
 
-            this.mapWrap.ratio = 1/2;
+            this.mapWrap.ratio = 1 / 2;
 
             this.mapWrap.width = ko.observable();
 

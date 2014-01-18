@@ -1,6 +1,6 @@
 ﻿/** @module */
-define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-helper',
-    'jquery.slimscroll', 'jquery.bootstrap', 'picker.date'], function ($, ko, appMoment, bootstrapModal, fileHelper) {
+define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-helper', 'd3',
+    'jquery.slimscroll', 'jquery.bootstrap', 'picker.date'], function ($, ko, appMoment, bootstrapModal, fileHelper, d3) {
         'use strict';
 
         // Controls whether or not the text in a textbox is selected based on a model property
@@ -565,58 +565,73 @@ define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-he
             }
         };
 
-        /** Create svg image using svg and xlink namespaces */
-        function createSvgImg(imgUrl) {
-            var svgImg = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-            svgImg.setAttributeNS(null, 'height', '600');
-            svgImg.setAttributeNS(null, 'width', '1200');
-            svgImg.setAttributeNS('http://www.w3.org/1999/xlink', 'href', imgUrl);
-            svgImg.setAttributeNS(null, 'x', '0');
-            svgImg.setAttributeNS(null, 'y', '0');
-            svgImg.setAttributeNS(null, 'visibility', 'visible');
-            return svgImg;
-        }
-
         /** Svg map */
         ko.bindingHandlers.svgMap = {
             init: function (element, valueAccessor) {
                 var accessor = valueAccessor();
                 var imgUrl = ko.unwrap(accessor.imgUrl);
-                element.appendChild(createSvgImg(imgUrl));
 
-                require(['d3'], function (d3) {
-                    var groupElem = d3.select(element);
+                var d3Group = d3.select(element);
 
-                    var width = 1200,
-                        height = 600;
+                var width = 1200,
+                    height = 600;
 
-                    var x = d3.scale.linear()
-                        .domain([-width / 2, width / 2])
-                        .range([width, 0]);
+                d3Group.append('image')
+                    .attr('height', height)
+                    .attr('width', width)
+                    .attr('xlink:href', imgUrl)
+                    .attr('x', 0)
+                    .attr('y', 0);
 
-                    var y = d3.scale.linear()
-                        .domain([-height / 2, height / 2])
-                        .range([height, 0]);
+                var d3Image = d3Group.select('image');
 
-                    function zoomed() {
-                        var tmpScale = d3.event.scale;
-                        var translateX = d3.event.translate[0],
-                            translateY = d3.event.translate[1];
-                        groupElem.select('image')
-                            .attr('x', translateX)
-                            .attr('y', translateY)
-                            .attr('width', width * tmpScale)
-                            .attr('height', height * tmpScale);
-                    }
-
-                    var zoom = d3.behavior.zoom()
-                        .x(x)
-                        .y(y)
-                        .scaleExtent([0.5, 10])
-                        .on('zoom', zoomed);
-
-                    groupElem.call(zoom);
+                d3Image.on('click', function () {
+                    // this = d3Image
+                    var coords = d3.mouse(this);
+                    console.log(coords);
+                    d3Group.append('circle')
+                        .attr('cx', coords[0])
+                        .attr('cy', coords[1])
+                        .attr('r', 10)
+                        .on('click', function () {
+                            console.log('circle hoora');
+                        });
                 });
+
+                var x = d3.scale.linear()
+                    .domain([-width / 2, width / 2])
+                    .range([width, 0]);
+
+                var y = d3.scale.linear()
+                    .domain([-height / 2, height / 2])
+                    .range([height, 0]);
+
+                function zoomed() {
+                    var tmpScale = d3.event.scale;
+                    var translateX = d3.event.translate[0],
+                        translateY = d3.event.translate[1];
+                    d3Image
+                        .attr('x', translateX)
+                        .attr('y', translateY)
+                        .attr('width', width * tmpScale)
+                        .attr('height', height * tmpScale);
+
+                    var circles = d3Group.selectAll('circle');
+                    console.log(circles);
+                    //var circleCx = circles[0].attr('cx'),
+                    //    circleCy = circles[0].attr('cy');
+                    //console.log(circleCx, circleCy, translateX, translateY);
+                    ////circles.attr('cx', translateX)
+                    ////    .attr('cy', translateY);
+                }
+
+                var zoom = d3.behavior.zoom()
+                    .x(x)
+                    .y(y)
+                    .scaleExtent([0.5, 10])
+                    .on('zoom', zoomed);
+
+                d3Group.call(zoom);
             }
         };
 
