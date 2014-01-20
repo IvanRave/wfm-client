@@ -1,8 +1,8 @@
 ﻿/** @module */
 define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
-    'helpers/app-helper', 'models/file-spec',
+    'helpers/app-helper', 'models/file-spec', 'services/map-of-wield',
     'models/area-of-map-of-wield', 'models/well-of-map-of-wield'],
-    function ($, ko, datacontext, bootstrapModal, appHelper, FileSpec) {
+    function ($, ko, datacontext, bootstrapModal, appHelper, FileSpec, mapOfWieldService, AreaOfMapOfWield, WellOfMapOfWield) {
         'use strict';
 
         function importWellFieldMapAreasDto(data, parent) {
@@ -13,7 +13,7 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
 
         function importWellInWellFieldMapsDto(data, parent) {
             return (data || []).map(function (item) {
-                return datacontext.createWellInWellFieldMap(item, parent);
+                return new WellOfMapOfWield(item, parent);
             });
         }
 
@@ -84,12 +84,6 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
             * @type {number}
             */
             this.WellFieldId = data.WellFieldId;
-
-            /** 
-            * Map image (full url)
-            * @type {string}
-            */
-            this.fullImgUrl = datacontext.getWieldMapsUrl(this.WellFieldId, this.Id); //img_url: this.IdOfFileSpec
 
             /** 
             * Map width
@@ -679,7 +673,7 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
 
                 // save real coords in database
 
-                var wellInWellFieldMapForAdd = datacontext.createWellInWellFieldMap({
+                var wellInWellFieldMapForAdd = new WellOfMapOfWield({
                     WellFieldMapId: self.Id,
                     WellId: wellId,
                     Longitude: longitude,
@@ -688,7 +682,7 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
 
                 datacontext.saveNewWellInWellFieldMap(wellInWellFieldMapForAdd).done(function (result) {
                     // redefine object from result
-                    wellInWellFieldMapForAdd = datacontext.createWellInWellFieldMap(result, self);
+                    wellInWellFieldMapForAdd = new WellOfMapOfWield(result, self);
                     // draw in map
 
                     self.WellInWellFieldMaps.push(wellInWellFieldMapForAdd);
@@ -698,7 +692,7 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
             };
 
             self.setScaleCoefficient = function () {
-                datacontext.putWieldMap(self.WellFieldId, self.Id, self.toPlainJson());
+                mapOfWieldService.put(self.WellFieldId, self.id, self.toPlainJson());
             };
 
             self.editWellFieldMap = function () {
@@ -727,7 +721,7 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
                     self.name($(inputName).val());
                     self.Description($(inputDescription).val());
                     self.ScaleCoefficient($(inputScaleCoefficient).val());
-                    datacontext.putWieldMap(self.WellFieldId, self.Id, self.toPlainJson()).done(function (result) {
+                    mapOfWieldService.put(self.WellFieldId, self.Id, self.toPlainJson()).done(function (result) {
                         self.name(result.Name);
                         self.Description(result.Description);
                         self.ScaleCoefficient(result.ScaleCoefficient);

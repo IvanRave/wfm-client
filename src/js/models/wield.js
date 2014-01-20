@@ -6,6 +6,7 @@ define(['jquery',
     'helpers/modal-helper',
     'models/stage-base',
     'models/map-of-wield',
+    'services/map-of-wield',
     'models/view-models/maps-of-wield-vwm',
     'models/sections/section-of-wield',
     'models/wroup',
@@ -13,7 +14,7 @@ define(['jquery',
     'services/wield',
     'services/wroup',
     'constants/stage-constants'], function ($, ko, datacontext,
-        fileHelper, bootstrapModal, StageBase, MapOfWield, MapsOfWieldVwm, SectionOfWield, WellGroup,
+        fileHelper, bootstrapModal, StageBase, MapOfWield, mapOfWieldService, MapsOfWieldVwm, SectionOfWield, WellGroup,
         PropSpec, wieldService, wroupService, stageConstants) {
         'use strict';
 
@@ -199,9 +200,10 @@ define(['jquery',
                 }
             };
 
-            this.deleteWellFieldMap = function (itemToDelete) {
+            /** Remove map from field */
+            this.removeMapOfWield = function (itemToDelete) {
                 if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(itemToDelete.name) + '"?')) {
-                    datacontext.deleteWellFieldMap(ths.Id, itemToDelete.Id).done(function () {
+                    mapOfWieldService.remove(ths.id, itemToDelete.id).done(function () {
                         ths.WellFieldMaps.remove(itemToDelete);
                     });
                 }
@@ -217,7 +219,7 @@ define(['jquery',
             this.loadMapsOfWield = function () {
                 if (ko.unwrap(ths.isLoadedMapsOfWield)) { return; }
 
-                datacontext.getWellFieldMaps(ths.id).done(function (result) {
+                mapOfWieldService.get(ths.id).done(function (result) {
                     ths.isLoadedMapsOfWield(true);
                     ths.WellFieldMaps(importWellFieldMapsDto(result, ths));
                 });
@@ -249,7 +251,7 @@ define(['jquery',
                     }
 
                     // Create map on the server with this file
-                    datacontext.postMapOfWield(ths.id, {
+                    mapOfWieldService.post(ths.id, {
                         WellFieldId: ths.id,
                         ScaleCoefficient: 1,
                         Description: '',

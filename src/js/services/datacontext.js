@@ -14,15 +14,6 @@
         return '{{conf.requrl}}/api/section-patterns';
     }
 
-    /** 
-    * Well field maps url
-    * @param {number} wieldId - Well field id
-    * @param {number} [mapId] - Id of map of well field
-    */
-    function wieldMapsUrl(wieldId, mapId) {
-        return '{{conf.requrl}}/api/well-fields/' + wieldId + '/maps' + (mapId ? ('/' + mapId) : '');
-    }
-
     function wellFieldMapAreaUrl(uqp) {
         return '{{conf.requrl}}/api/wellfieldmaparea/' + (uqp ? ('?' + $.param(uqp)) : '');
     }
@@ -353,45 +344,6 @@
 
     datacontext.postCompanyJobType = function (companyId, jobTypeData) {
         return ajaxRequest('POST', companyJobTypeUrl(companyId), jobTypeData);
-    };
-
-    /** Get url of map of well field */
-    datacontext.getWieldMapsUrl = function (wieldId, mapId) {
-        return wieldMapsUrl(wieldId, mapId);
-    };
-
-    /**
-    * Post map of well field
-    * @param {number} wieldId - Well field id
-    * @param {number} mapId - Map id
-    * @param {object} mapData - Map data
-    */
-    datacontext.postMapOfWield = function (wieldId, mapData) {
-        return ajaxRequest('POST', wieldMapsUrl(wieldId), mapData);
-    };
-
-    /** Get list of maps of well field */
-    datacontext.getWellFieldMaps = function (wieldId) {
-        return ajaxRequest('GET', wieldMapsUrl(wieldId));
-    };
-
-    /** 
-    * Save changed map of well field
-    * @param {number} wieldId - Well field (parent) id
-    * @param {number} mapId - Well field map id (primary key)
-    * @param {Object.<WellFieldMap>} item - Map object to change
-    */
-    datacontext.putWieldMap = function (wieldId, mapId, mapData) {
-        return ajaxRequest('PUT', wieldMapsUrl(wieldId, mapId), mapData);
-    };
-
-    /** 
-    * Delete map of well field
-    * @param {number} wieldId - Id of well field (parent of the map)
-    * @param {number} id - Map id
-    */
-    datacontext.deleteWellFieldMap = function (wieldId, mapId) {
-        return ajaxRequest('DELETE', wieldMapsUrl(wieldId, mapId));
     };
 
     datacontext.getListOfSectionPattern = function () {
