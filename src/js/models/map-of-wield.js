@@ -1,8 +1,9 @@
 ﻿/** @module */
 define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
     'helpers/app-helper', 'models/file-spec', 'services/map-of-wield',
-    'models/area-of-map-of-wield', 'models/well-of-map-of-wield'],
-    function ($, ko, datacontext, bootstrapModal, appHelper, FileSpec, mapOfWieldService, AreaOfMapOfWield, WellOfMapOfWield) {
+    'models/area-of-map-of-wield', 'models/well-marker-of-map-of-wield', 'services/well-marker-of-map-of-wield'],
+    function ($, ko, datacontext, bootstrapModal, appHelper, FileSpec, mapOfWieldService,
+        AreaOfMapOfWield, WellOfMapOfWield, wellMarkerService) {
         'use strict';
 
         function importWellFieldMapAreasDto(data, parent) {
@@ -11,7 +12,7 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
             });
         }
 
-        function importWellInWellFieldMapsDto(data, parent) {
+        function importWellMarkers(data, parent) {
             return (data || []).map(function (item) {
                 return new WellOfMapOfWield(item, parent);
             });
@@ -518,7 +519,7 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
                         myBalloonContentBodyLayout.superclass.clear.call(this);
                     },
                     delWellFromMap: function () {
-                        wellInWellFieldMapItem.deleteWellInWellFieldMap();
+                        ths.removeWellMarker(wellInWellFieldMapItem);
                         needMap.geoObjects.remove(pointObject);
                     }
                 });
@@ -661,7 +662,14 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
                 });
             };
 
-            self.addWellInWellFieldMap = function (wellId, longitude, latitude, fncMapImage) {
+            /** Remove well marker from this map */
+            this.removeWellMarker = function (wellMarkerToRemove) {
+                wellMarkerService.remove(ths.id, wellMarkerToRemove.idOfWell).done(function () {
+                    ths.WellInWellFieldMaps.remove(wellMarkerToRemove);
+                });
+            };
+
+            this.addWellInWellFieldMap = function (wellId, longitude, latitude, fncMapImage) {
                 // width or height need more than 255 , else do not load maps
                 ////var tileLength = 255;
                 ////var coordX = 0, coordY = 0;
@@ -672,17 +680,14 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
                 ////coordY = (tileLength - longitude) * mapCoordScale;
 
                 // save real coords in database
-
-                var wellInWellFieldMapForAdd = new WellOfMapOfWield({
-                    WellFieldMapId: self.Id,
+                wellMarkerService.post(ths.id, {
+                    WellFieldMapId: self.id,
                     WellId: wellId,
                     Longitude: longitude,
                     Latitude: latitude
-                }, ths);
-
-                datacontext.saveNewWellInWellFieldMap(wellInWellFieldMapForAdd).done(function (result) {
+                }).done(function (result) {
                     // redefine object from result
-                    wellInWellFieldMapForAdd = new WellOfMapOfWield(result, self);
+                    var wellInWellFieldMapForAdd = new WellOfMapOfWield(result, self);
                     // draw in map
 
                     self.WellInWellFieldMaps.push(wellInWellFieldMapForAdd);
@@ -736,7 +741,7 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
 
             // get areas
             self.WellFieldMapAreas(importWellFieldMapAreasDto(data.WellFieldMapAreasDto, self));
-            self.WellInWellFieldMaps(importWellInWellFieldMapsDto(data.WellInWellFieldMapsDto, self));
+            self.WellInWellFieldMaps(importWellMarkers(data.ListOfDtoOfWellMarker, self));
         };
 
         return exports;

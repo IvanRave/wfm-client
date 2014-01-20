@@ -17,9 +17,6 @@
     function wellFieldMapAreaUrl(uqp) {
         return '{{conf.requrl}}/api/wellfieldmaparea/' + (uqp ? ('?' + $.param(uqp)) : '');
     }
-    function wellInWellFieldMapUrl(uqp) {
-        return '{{conf.requrl}}/api/wellinwellfieldmap/' + (uqp ? ('?' + $.param(uqp)) : '');
-    }
     
     function userProfileUrl(uqp) {
         return '{{conf.requrl}}/api/userprofile/' + (uqp ? ('?' + $.param(uqp)) : '');
@@ -177,23 +174,6 @@
         return ajaxRequest('DELETE', wellFieldMapAreaUrl({ 'id': item.Id }));
     }
 
-    // 12. WellInWellFieldMap
-    function getWellInWellFieldMaps(urlQueryParams) {
-        return ajaxRequest('GET', wellInWellFieldMapUrl(urlQueryParams));
-    }
-
-    function saveNewWellInWellFieldMap(item) {
-        return ajaxRequest('POST', wellInWellFieldMapUrl(), item);
-    }
-
-    function saveChangedWellInWellFieldMap(item) {
-        return ajaxRequest('PUT', wellInWellFieldMapUrl(), item);
-    }
-
-    function deleteWellInWellFieldMap(urlQueryParams) {
-        return ajaxRequest('DELETE', wellInWellFieldMapUrl(urlQueryParams));
-    }
-
     // user profile
     function createUserProfile(data) {
         return new datacontext.userProfile(data); // from cabinet.model.js
@@ -307,11 +287,6 @@
         saveNewWellFieldMapArea: saveNewWellFieldMapArea,
         saveChangedWellFieldMapArea: saveChangedWellFieldMapArea,
         deleteWellFieldMapArea: deleteWellFieldMapArea,
-        // WellInWellFieldMap
-        getWellInWellFieldMaps: getWellInWellFieldMaps,
-        saveNewWellInWellFieldMap: saveNewWellInWellFieldMap,
-        saveChangedWellInWellFieldMap: saveChangedWellInWellFieldMap,
-        deleteWellInWellFieldMap: deleteWellInWellFieldMap,
         // section list
         getSectionList: getSectionList,
         imageMimeTypes: imageMimeTypes,

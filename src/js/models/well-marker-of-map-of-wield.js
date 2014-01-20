@@ -1,5 +1,5 @@
 ﻿/** @module */
-define(['knockout', 'services/datacontext'], function (ko, datacontext) {
+define(['knockout'], function (ko) {
 
     /**
     * Model: well in map of well field
@@ -15,20 +15,23 @@ define(['knockout', 'services/datacontext'], function (ko, datacontext) {
         };
 
         /**
-        * Pixels from top of map image
+        * Pixels from left of map image (X coords)
         * @type {number}
         */
         this.longitude = ko.observable(data.Longitude);
 
         /**
-        * Pixels from left of map image
+        * Pixels from top of map image (Y coords)
         * @type {number}
         */
         this.latitude = ko.observable(data.Latitude);
 
-        this.WellFieldMapId = data.WellFieldMapId;
-        // change well - remove and create object
-        this.WellId = data.WellId;
+        this.WellFieldMapId = data.IdOfMapOfWield;
+
+        // to change well - remove and create object
+        this.WellId = data.IdOfWell;
+
+        this.idOfWell = data.IdOfWell;
 
         var tileLength = 255;
         var mapCoordScale = Math.max(ths.getWellFieldMap().Width, ths.getWellFieldMap().Height) / tileLength;
@@ -60,15 +63,6 @@ define(['knockout', 'services/datacontext'], function (ko, datacontext) {
             }
 
             return null;
-        };
-
-        this.deleteWellInWellFieldMap = function () {
-            // TODO: are you sure dialog
-            datacontext.deleteWellInWellFieldMap({ 'well_id': ths.WellId, 'wellfieldmap_id': ths.WellFieldMapId }).done(function () {
-                // remove from map
-                // GOTO: create parent in header; delete from parent array
-                ths.getWellFieldMap().WellInWellFieldMaps.remove(ths);
-            });
         };
 
         this.toPlainJson = function () { return ko.toJS(ths); };
