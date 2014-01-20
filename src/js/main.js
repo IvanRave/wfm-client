@@ -2,7 +2,7 @@
     'use strict';
 
     require(['console-shim', 'es5-shim'], function () {
-        require(['jquery', 'knockout', 'viewmodels/workspace', 'filters/bindings', 'jquery.panzoom'], function ($, ko, WorkspaceViewModel) {
+        require(['jquery', 'knockout', 'viewmodels/workspace', 'bindings/all-bindings', 'bindings/svg-bindings', 'jquery.panzoom'], function ($, ko, WorkspaceViewModel) {
             var workspaceViewModel = new WorkspaceViewModel();
 
             $(function () {

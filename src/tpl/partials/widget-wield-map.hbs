@@ -1,0 +1,14 @@
+﻿<script type="text/html" id="widget-tpl-wield-map">
+  <div data-bind="if: widget.isVisSettingPanel">
+    <div class="widget-setting-panel">
+      <select class="input-sm" data-bind="options: $parents[3].WellFieldMaps, optionsText: 'name', value: widgetVwm.model, optionsCaption: '{{capitalizeFirst lang.selectMap}}...'"></select>
+    </div>
+  </div>
+  <div class="widget-content">
+    <div data-bind="with: $parents[3]">
+    </div>
+    <div data-bind="with: widgetVwm">
+      {{> wield-map-image }}
+    </div>
+  </div>
+</script>

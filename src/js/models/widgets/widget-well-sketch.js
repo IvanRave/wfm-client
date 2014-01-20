@@ -2,7 +2,7 @@
     'use strict';
 
     // Widget for sketch (image plus desc)
-    function WidgetSketch(opts) {
+    var exports = function (opts) {
         var self = this;
         opts = opts || {};
 
@@ -15,7 +15,7 @@
                 'IsVisDescription': ko.unwrap(self.isVisDescription)
             };
         };
-    }
+    };
 
-    return WidgetSketch;
+    return exports;
 });

@@ -1,8 +1,12 @@
-﻿define(['jquery', 'knockout'], function ($, ko) {
+﻿/** @module */
+define(['jquery', 'knockout'], function ($, ko) {
     'use strict';
 
-    // Well history view for history section, report section and history widgets
-    function HistoryView(opts, koHistoryList) {
+    /**
+    * Well history view for history section, report section and history widgets
+    * @constructor
+    */
+    var exports = function (opts, koHistoryList) {
         var vw = this;
 
         // UTC unix time (in seconds)
@@ -62,7 +66,7 @@
         vw.changeSortByDateOrder = function () {
             vw.sortByDateOrder(-parseInt(ko.unwrap(vw.sortByDateOrder), 10));
         };
-    }
+    };
 
-    return HistoryView;
+    return exports;
 });

@@ -1,4 +1,5 @@
-﻿define(['jquery', 'services/datacontext', 'helpers/ajax-request'], function ($, datacontext, ajaxRequest) {
+﻿/** @module */
+define(['jquery', 'helpers/ajax-request'], function ($, ajaxRequest) {
     'use strict';
 
     function accountLogoffUrl(uqp) {
@@ -11,18 +12,23 @@
         return '{{conf.requrl}}/api/account/info';
     }
 
-    // Account logoff
-    datacontext.accountLogoff = function (uqp) {
+    /** Auth service */
+    var exports = {};
+
+    /** Account logoff */
+    exports.accountLogoff = function (uqp) {
         return ajaxRequest('POST', accountLogoffUrl(uqp));
     };
 
-    // Account logon
-    datacontext.accountLogon = function (uqp, data) {
+    /** Account logon */
+    exports.accountLogon = function (uqp, data) {
         return ajaxRequest('POST', accountLogonUrl(uqp), data);
     };
 
     /** Get account info */
-    datacontext.getAccountInfo = function () {
+    exports.getAccountInfo = function () {
         return ajaxRequest('GET', accountInfoUrl());
     };
+
+    return exports;
 });

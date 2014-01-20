@@ -199,7 +199,8 @@ module.exports = function (grunt) {
                     ////useSourceUrl: true,
                     //  wrap: true, // wrap in closure
                     // jQuery automatically excluded if it's loaded from CDN
-                    include: ['es5-shim', 'console-shim', 'jquery', 'jquery.bootstrap', 'jquery.panzoom', 'filters/bindings',
+                    include: ['es5-shim', 'console-shim', 'jquery', 'jquery.bootstrap', 'jquery.panzoom', 
+                    'bindings/all-bindings', 'bindings/svg-bindings',
                     'knockout', 'helpers/knockout-lazy', 'viewmodels/workspace', 'services/datacontext']
                 }
             }

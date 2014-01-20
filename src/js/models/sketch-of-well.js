@@ -1,5 +1,5 @@
 ﻿/** @module */
-define(['knockout', 'models/file-spec', 'services/well/sketch'], function (ko, FileSpec, sketchOfWellService) {
+define(['knockout', 'models/file-spec', 'services/sketch-of-well'], function (ko, FileSpec, sketchOfWellService) {
     'use strict';
 
     /**

@@ -6,28 +6,29 @@ define(['jquery',
     'helpers/modal-helper',
     'models/stage-base',
     'models/map-of-wield',
+    'models/view-models/map-of-wield-vwm',
     'models/sections/section-of-wield',
     'models/wroup',
     'models/prop-spec',
     'services/wield',
     'services/wroup',
     'constants/stage-constants'], function ($, ko, datacontext,
-        fileHelper, bootstrapModal, StageBase, WellFieldMap, SectionOfWield, WellGroup,
+        fileHelper, bootstrapModal, StageBase, MapOfWield, MapOfWieldVwm, SectionOfWield, WellGroup,
         PropSpec, wieldService, wroupService, stageConstants) {
         'use strict';
 
         // 10. WellFieldMaps (convert data objects into array)
         function importWellFieldMapsDto(data, parent) {
-            return data.map(function (item) { return new WellFieldMap(item, parent); });
+            return (data || []).map(function (item) { return new MapOfWield(item, parent); });
         }
 
         // 3. WellGroup (convert data objects into array)
         function importWroupDtoList(data, parent) {
-            return data.map(function (item) { return new WellGroup(item, parent); });
+            return (data || []).map(function (item) { return new WellGroup(item, parent); });
         }
 
         function importListOfSectionOfWieldDto(data, parent) {
-            return data.map(function (item) { return new SectionOfWield(item, parent); });
+            return (data || []).map(function (item) { return new SectionOfWield(item, parent); });
         }
 
         /** Main properties for company: headers can be translated here if needed */
@@ -105,8 +106,7 @@ define(['jquery',
                     if (needWell) {
                         wroupToSelect.selectWell(needWell);
                     }
-                    else
-                    {
+                    else {
                         alert('Well from url is not found');
                     }
 
@@ -184,17 +184,28 @@ define(['jquery',
             this.WellFieldMaps = ko.observableArray();
 
             /** Selected map */
-            this.selectedWieldMap = ko.observable();
+            this.slcMapOfWield = ko.observable();
+
+            /** Select map */
+            this.selectMapOfWield = function (mapOfWieldToSelect) {
+                ths.slcMapOfWield(mapOfWieldToSelect);
+            };
+
+            /**
+            * Main view model for this model: can be used one model per few view models
+            * @type {<module:models/view-models/map-of-wield-vwm>}
+            */
+            this.mainVwm = new MapOfWieldVwm(ths.slcMapOfWield, {});
 
             /** Set this section as selected */
             this.loadSectionContent = function (idOfSectionPattern) {
                 switch (idOfSectionPattern) {
                     case 'wield-map':
                         // Get all maps from this field
-                        ths.getWellFieldMaps(function () {
+                        ths.loadMapsOfWield(function () {
                             var arr = ko.unwrap(ths.WellFieldMaps);
                             if (arr.length > 0) {
-                                arr[0].showWellFieldMap();
+                                ths.selectMapOfWield(arr[0]);
                             }
                         });
 
@@ -211,9 +222,18 @@ define(['jquery',
                 }
             };
 
-            this.getWellFieldMaps = function (callbackFunction) {
-                if (ths.WellFieldMaps().length === 0) {
+            /**
+            * Whether maps are loaded
+            * @type {boolean}
+            */
+            this.isLoadedMapsOfWield = ko.observable(false);
+
+            /** Load all maps for this field */
+            this.loadMapsOfWield = function (callbackFunction) {
+                if (ko.unwrap(ths.isLoadedMapsOfWield) === false) {
                     datacontext.getWellFieldMaps(ths.Id).done(function (result) {
+                        ths.isLoadedMapsOfWield(true);
+
                         ths.WellFieldMaps(importWellFieldMapsDto(result, ths));
 
                         if ($.isFunction(callbackFunction) === true) {
@@ -262,7 +282,7 @@ define(['jquery',
                         Name: ko.unwrap(selectedFileSpecs[0].name),
                         IdOfFileSpec: selectedFileSpecs[0].id
                     }).done(function (r) {
-                        ths.WellFieldMaps.push(new WellFieldMap(r, ths));
+                        ths.WellFieldMaps.push(new MapOfWield(r, ths));
 
                         // Push to well field map list
                         tmpModalFileMgr.hide();
@@ -303,6 +323,16 @@ define(['jquery',
                 },
                 deferEvaluation: true
             });
+
+            this.loadDashboard = function () {
+                ths.loadMapsOfWield();
+                ////ths.sketchOfWell.load();
+                ////// TODO: load data only if there is one or more perfomance widgets (only once) for entire well
+                ////ths.getWellGroup().getWellGroupWfmParameterList();
+                ////ths.perfomancePartial.forecastEvolution.getDict();
+                ////ths.perfomancePartial.getHstProductionDataSet();
+                ////ths.loadWellHistoryList();
+            };
 
             this.addWellGroup = function () {
                 var inputName = document.createElement('input');

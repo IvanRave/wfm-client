@@ -8,11 +8,11 @@ define([
     'helpers/app-helper',
     'moment',
     'models/stage-base',
-    'models/well-partials/perfomance-partial',
-    'models/well-partials/history-view',
+    'models/stage-partials/well-perfomance-partial',
+    'models/view-models/vm-well-history',
     'models/sections/section-of-well',
     'models/well-file',
-    'models/well/sketch',
+    'models/sketch-of-well',
     'models/prop-spec',
     'services/well',
     'constants/stage-constants',
@@ -27,7 +27,8 @@ define([
 ], function ($, ko, datacontext, fileHelper, bootstrapModal,
     appHelper, appMoment, StageBase, wellPerfomancePartial,
     HistoryView, SectionOfWell, WellFile, SketchOfWell,
-    PropSpec, wellService, stageConstants, VolumeOfWell,
+    PropSpec, wellService,
+    stageConstants, VolumeOfWell,
     volumeOfWellService, HistoryOfWell,
     LogOfWell, logOfWellService,
     fileSpecService, ColumnAttribute) {
@@ -241,7 +242,7 @@ define([
                     // find wellfield_id 
                     var wellFieldItem = ths.getWellGroup().getWellField();
 
-                    wellFieldItem.getWellFieldMaps(function () {
+                    wellFieldItem.loadMapsOfWield(function () {
                         var arr = ko.unwrap(wellFieldItem.WellFieldMaps);
                         // TODO:???
                         ////arr = $.grep(arr, function (arrElem, arrIndex) {
@@ -256,7 +257,7 @@ define([
                         ////});
 
                         if (arr.length > 0) {
-                            arr[0].showWellFieldMap();
+                            wellFieldItem.selectMapOfWield(arr[0]);
                         }
                     });
 
@@ -663,7 +664,7 @@ define([
 
         ////this.checkReportSection = function (checkedReportSection) {
         ////    switch (checkedReportSection.id) {
-        ////        case 'map': ths.getWellGroup().getWellField().getWellFieldMaps(); break;
+        ////        case 'map': ths.getWellGroup().getWellField().loadMapsOfWield(); break;
         ////        case 'history': ths.loadWellHistoryList(); break;
         ////        case 'log': ths.getWellFileList('log', 'work'); break;
         ////        case 'pd': ths.perfomancePartial.getHstProductionDataSet(); break;
@@ -1167,7 +1168,7 @@ define([
 
         this.perfomancePartial = wellPerfomancePartial.init(ths);
 
-        // Load column attributes - all loading logic in this file (not separated - not in perfomance-partial file)
+        // Load column attributes - all loading logic in this file (not separated - not in well-perfomance-partial file)
         this.perfomancePartial.prdColumnAttributeList(importColumnAttributes(datacontext.getColumnAttributesLocal()));
 
         this.mainPerfomanceView = ths.perfomancePartial.createPerfomanceView({

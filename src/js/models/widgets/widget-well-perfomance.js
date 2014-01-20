@@ -3,7 +3,7 @@ define(['knockout'], function (ko) {
     'use strict';
 
     // Subtype from Widget
-    function WidgetPerfomance(opts, widgockItem) {
+    var exports = function (opts, widgockItem) {
         var self = this;
         opts = opts || {};
 
@@ -26,7 +26,7 @@ define(['knockout'], function (ko) {
                 'StartMonth': ko.unwrap(self.perfomanceView['WPDDateStartMonth'])
             };
         };
-    }
+    };
 
-    return WidgetPerfomance;
+    return exports;
 });

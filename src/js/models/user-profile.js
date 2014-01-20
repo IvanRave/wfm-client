@@ -1,8 +1,8 @@
 ﻿/** @module */
-define(['knockout', 'models/employee', 'services/register', 'helpers/lang-helper', 'services/company-user', 'services/company',
-    'services/datacontext',
-    'helpers/history-helper', 'services/auth'], function (ko, Employee, registerService, langHelper, companyUserService, companyService,
-        appDatacontext, historyHelper) {
+define(['knockout', 'models/employee', 'services/register', 'helpers/lang-helper',
+    'services/company-user', 'services/company',
+    'helpers/history-helper', 'services/auth'], function (ko, Employee, registerService, langHelper,
+        companyUserService, companyService, historyHelper, authService) {
         'use strict';
 
         /** Import employees for this user */
@@ -70,7 +70,7 @@ define(['knockout', 'models/employee', 'services/register', 'helpers/lang-helper
                 var demoEmail = 'wfm@example.com',
                     demoPwd = '123321';
 
-                appDatacontext.accountLogon({}, {
+                authService.accountLogon({}, {
                     'email': demoEmail,
                     'password': demoPwd
                 }).done(function () {
@@ -89,7 +89,7 @@ define(['knockout', 'models/employee', 'services/register', 'helpers/lang-helper
                     tmpPwd = ko.unwrap(ths.pwd),
                     tmpRememberMe = ko.unwrap(ths.rememberMe);
 
-                appDatacontext.accountLogon({}, {
+                authService.accountLogon({}, {
                     'email': tmpEmail,
                     'password': tmpPwd,
                     'rememberMe': tmpRememberMe
@@ -110,7 +110,7 @@ define(['knockout', 'models/employee', 'services/register', 'helpers/lang-helper
 
             /** Log out from app: clean objects, set isLogged to false */
             this.logOff = function () {
-                appDatacontext.accountLogoff().done(function () {
+                authService.accountLogoff().done(function () {
                     ths.isLogged(false);
                 });
             };
@@ -176,7 +176,7 @@ define(['knockout', 'models/employee', 'services/register', 'helpers/lang-helper
             this.loadAccountInfo = function () {
                 ths.isLoadedAccountInfo(false);
                 ths.isLogged(false);
-                appDatacontext.getAccountInfo().done(function (r) {
+                authService.getAccountInfo().done(function (r) {
                     ths.email(r.Email);
                     ths.isLogged(true);
                     ths.loadEmployees();

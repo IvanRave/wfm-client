@@ -109,23 +109,6 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
             */
             this.coefWH = this.Width / this.Height;
 
-            this.mapWrap = {};
-
-            this.mapWrap.ratio = 1 / 2;
-
-            this.mapWrap.width = ko.observable();
-
-            // actual height of map wrap and y-axis
-            this.mapWrap.height = ko.computed({
-                read: function () {
-                    var tmpWidth = ko.unwrap(ths.mapWrap.width);
-                    if (tmpWidth && $.isNumeric(tmpWidth)) {
-                        return tmpWidth * ths.mapWrap.ratio;
-                    }
-                },
-                deferEvaluation: true
-            });
-
             /** 
             * Map areas
             * @type {Array.<WellFieldMapArea>}
@@ -648,10 +631,6 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
                 ////mapRuler.close();    
             }
 
-            self.showWellFieldMap = function () {
-                self.getWellField().selectedWieldMap(self);
-            };
-
             ////self.afterRenderMapObj = function () {
             ////    require(['yandex-map'], function () {
             ////        ymaps.ready(function () {
@@ -705,7 +684,7 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
                     WellId: wellId,
                     Longitude: longitude,
                     Latitude: latitude
-                }, self);
+                }, ths);
 
                 datacontext.saveNewWellInWellFieldMap(wellInWellFieldMapForAdd).done(function (result) {
                     // redefine object from result

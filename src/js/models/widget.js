@@ -1,11 +1,12 @@
 ﻿/** @module */
 define(['knockout',
     'services/widget',
-    'models/widgets/widget-perfomance',
-    'models/widgets/widget-summary',
-    'models/widgets/widget-sketch',
-    'models/widgets/widget-history'
-], function (ko, widgetService, WidgetPerfomance, WidgetSummary, WidgetSketch, WidgetHistory) {
+    'models/widgets/widget-well-perfomance',
+    'models/widgets/widget-default-summary',
+    'models/widgets/widget-well-sketch',
+    'models/widgets/widget-well-history',
+    'models/widgets/widget-wield-map'
+], function (ko, widgetService, WidgetWellPerfomance, WidgetDefaultSummary, WidgetWellSketch, WidgetWellHistory, WidgetWieldMap) {
     'use strict';
 
     /**
@@ -31,7 +32,7 @@ define(['knockout',
         * Widget template name: for summary - default summary section
         * @type {string}
         */
-        this.widgetTpl = (ths.idOfSectionPattern.indexOf('-summary') > 0 ? 'default-summary' : ths.idOfSectionPattern) + '-widget-tpl';
+        this.widgetTpl = 'widget-tpl-' + (ths.idOfSectionPattern.indexOf('-summary') > 0 ? 'default-summary' : ths.idOfSectionPattern);
 
         this.isVisSettingPanel = ko.observable(false);
 
@@ -48,18 +49,25 @@ define(['knockout',
         var optsObj = JSON.parse(data.Opts);
 
         switch (this.idOfSectionPattern) {
-            case 'well-perfomance':
-                WidgetPerfomance.call(ths, optsObj, ths.getWidgock());
-                break;
             case 'well-summary':
+            case 'wroup-summary':
+            case 'wield-summary':
+            case 'wegion-summary':
             case 'company-summary':
-                WidgetSummary.call(ths, optsObj, ko.unwrap(ths.getWidgock().getWidgout().getParent().propSpecList));
+                // One default summary widget for all stages
+                WidgetDefaultSummary.call(ths, optsObj, ko.unwrap(ths.getWidgock().getWidgout().getParent().propSpecList));
+                break;
+            case 'well-perfomance':
+                WidgetWellPerfomance.call(ths, optsObj, ths.getWidgock());
                 break;
             case 'well-sketch':
-                WidgetSketch.call(ths, optsObj);
+                WidgetWellSketch.call(ths, optsObj);
                 break;
             case 'well-history':
-                WidgetHistory.call(ths, optsObj, ths.getWidgock().getWidgout().getParent().historyList);
+                WidgetWellHistory.call(ths, optsObj, ths.getWidgock().getWidgout().getParent().historyList);
+                break;
+            case 'wield-map':
+                WidgetWieldMap.call(ths, optsObj, ths.getWidgock().getWidgout().getParent().WellFieldMaps);
                 break;
         }
 
