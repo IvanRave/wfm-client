@@ -125,67 +125,92 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
             var accessor = valueAccessor();
             var imgUrl = ko.unwrap(accessor.imgUrl);
 
-            var d3Group = d3.select(element);
+            // Image size
+            var realImgSize = {
+                width: ko.unwrap(accessor.imgWidth), // example: 300px
+                height: ko.unwrap(accessor.imgHeight) // example: 400px
+            };
 
-            var width = 1200,
-                height = 600;
+            // Block (svg) size without margins
+            // TODO: get from view-model
+            var svgBlockSize = {
+                width: 1200,
+                height: 600
+            };
+
+            // Calculate image size in svg viewbox
+            var svgImgSize = {};
+
+            // If height is bigger side, then calculate width
+            // if height = 600svg (400px) then width = Xsvg (300px)
+            // X = (300px * 600svg) / 400px
+            // else if width = 1200svg (300px) then height = Ysvg (400px)
+            // Y = (400px * 1200svg) / 300px
+            if (realImgSize.height > realImgSize.width) {
+                svgImgSize.height = svgBlockSize.height;
+                svgImgSize.width = (realImgSize.width * svgBlockSize.height) / realImgSize.height;
+            }
+            else {
+                svgImgSize.width = svgBlockSize.width;
+                svgImgSize.height = (realImgSize.height * svgBlockSize.width) / realImgSize.width;
+            }
+
+            var imgStartPos = {
+                x: (svgBlockSize.width - svgImgSize.width) / 2,
+                y: (svgBlockSize.height - svgImgSize.height) / 2
+            };
+
+            var d3GroupWrap = d3.select(element);
+
+            var d3Group = d3GroupWrap.select('g');
 
             d3Group.append('image')
-                .attr('height', height)
-                .attr('width', width)
                 .attr('xlink:href', imgUrl)
-                .attr('x', 0)
-                .attr('y', 0);
+                .attr('height', svgImgSize.height)
+                .attr('width', svgImgSize.width)
+                .attr('x', imgStartPos.x)
+                .attr('y', imgStartPos.y);
 
             var d3Image = d3Group.select('image');
 
             d3Image.on('click', function () {
                 // this = d3Image
                 var coords = d3.mouse(this);
-                console.log(coords);
+
+                // Calculate coords on map image in pixels
+                // realX / svgX = realWidth / svgWidth
+                var realMarkerPos = {
+                    x: (coords[0] - imgStartPos.x) * (realImgSize.width / svgImgSize.width),
+                    y: (coords[1] - imgStartPos.y) * (realImgSize.height / svgImgSize.height)
+                };
+
+                // Send to the server in PUT method (change well marker data)
+                console.log(realMarkerPos);
+
                 d3Group.append('circle')
                     .attr('cx', coords[0])
                     .attr('cy', coords[1])
-                    .attr('r', 10)
+                    .attr('r', 8)
                     .on('click', function () {
-                        console.log('circle hoora');
+                        // Show info about well in this point
+                        console.log('circle hoora', coords);
                     });
             });
 
-            var x = d3.scale.linear()
-                .domain([-width / 2, width / 2])
-                .range([width, 0]);
-
-            var y = d3.scale.linear()
-                .domain([-height / 2, height / 2])
-                .range([height, 0]);
+            var x = d3.scale.linear().range([imgStartPos.x, imgStartPos.x + svgImgSize.width]);
+            var y = d3.scale.linear().range([imgStartPos.y, imgStartPos.y + svgImgSize.height]);
 
             function zoomed() {
-                var tmpScale = d3.event.scale;
-                var translateX = d3.event.translate[0],
-                    translateY = d3.event.translate[1];
-                d3Image
-                    .attr('x', translateX)
-                    .attr('y', translateY)
-                    .attr('width', width * tmpScale)
-                    .attr('height', height * tmpScale);
-
-                var circles = d3Group.selectAll('circle');
-                console.log(circles);
-                //var circleCx = circles[0].attr('cx'),
-                //    circleCy = circles[0].attr('cy');
-                //console.log(circleCx, circleCy, translateX, translateY);
-                ////circles.attr('cx', translateX)
-                ////    .attr('cy', translateY);
+                d3Group.attr('transform', 'translate(' + d3.event.translate.join(',') + ') scale(' + d3.event.scale + ')');
             }
 
             var zoom = d3.behavior.zoom()
                 .x(x)
                 .y(y)
-                .scaleExtent([0.5, 10])
+                .scaleExtent([0.5, 15])
                 .on('zoom', zoomed);
 
-            d3Group.call(zoom);
+            d3GroupWrap.call(zoom);
         }
     };
 

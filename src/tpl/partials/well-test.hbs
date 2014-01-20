@@ -1,5 +1,5 @@
 ﻿<div>
-  <div class="clearfix" data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
+  <div class="clearfix" data-bind="if: $root.isEmployeeInEditMode">
     <!-- ko with: testScopeNewStartUnixTime -->
     <div class="pull-left">
       {{capitalizeFirst lang.date}}:

@@ -87,24 +87,6 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
             this.WellFieldId = data.WellFieldId;
 
             /** 
-            * Map width
-            * @type {number}
-            */
-            this.Width = data.Width;
-
-            /** 
-            * Map height
-            * @type {number}
-            */
-            this.Height = data.Height;
-
-            /** 
-            * Map ratio (width / height)
-            * @type {number}
-            */
-            this.coefWH = this.Width / this.Height;
-
-            /** 
             * Map areas
             * @type {Array.<WellFieldMapArea>}
             */
@@ -664,9 +646,11 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
 
             /** Remove well marker from this map */
             this.removeWellMarker = function (wellMarkerToRemove) {
-                wellMarkerService.remove(ths.id, wellMarkerToRemove.idOfWell).done(function () {
-                    ths.WellInWellFieldMaps.remove(wellMarkerToRemove);
-                });
+                if (confirm('{{capitalizeFirst lang.confirmToDelete}}?')) {
+                    wellMarkerService.remove(ths.id, wellMarkerToRemove.idOfWell).done(function () {
+                        ths.WellInWellFieldMaps.remove(wellMarkerToRemove);
+                    });
+                }
             };
 
             this.addWellInWellFieldMap = function (wellId, longitude, latitude, fncMapImage) {
@@ -700,7 +684,58 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
                 mapOfWieldService.put(self.WellFieldId, self.id, self.toPlainJson());
             };
 
-            self.editWellFieldMap = function () {
+            /**
+            * Field wells, not in this map
+            * @type {Array.<module:models/well>}
+            */
+            this.outWellsOfWield = ko.computed({
+                read: function () {
+                    var wellMarkersOnMap = ko.unwrap(ths.WellInWellFieldMaps);
+
+                    /** IDs of wells, which placed on this map */
+                    var idsOfWellsOfMap = wellMarkersOnMap.map(function (wellMarkerItem) {
+                        return wellMarkerItem.idOfWell;
+                    });
+
+                    var wroupsOfWield = ko.unwrap(ths.getWellField().wroups);
+
+                    var wellsOfWield = [];
+
+                    wroupsOfWield.forEach(function (wroupItem) {
+                        wellsOfWield = wellsOfWield.concat(ko.unwrap(wroupItem.Wells));
+                    });
+
+                    return wellsOfWield.filter(function (wellItem) {
+                        return ($.inArray(wellItem.id, idsOfWellsOfMap) === -1);
+                    });
+                },
+                deferEvaluation: true
+            });
+
+            /**
+            * Well for adding to this map: selected through select box
+            * @type {<module:models/well>}
+            */
+            this.wellToAddToMap = ko.observable();
+
+            /** Add well marker */
+            this.addWellMarkerToMap = function () {
+                var tmpWellToAddToMap = ko.unwrap(ths.wellToAddToMap);
+                if (!tmpWellToAddToMap) { return; }
+
+                wellMarkerService.post(ths.id, {
+                    IdOfWell: tmpWellToAddToMap.id,
+                    IdOfMapOfWield: ths.id
+                }).done(function (r) {
+                    // Clear selection
+                    ths.wellToAddToMap(null);
+
+                    // Send to the server
+                    ths.WellInWellFieldMaps.push(new WellOfMapOfWield(r, ths));
+                });
+            };
+
+            this.editWellFieldMap = function () {
                 var inputName = document.createElement('input');
                 inputName.type = 'text';
                 $(inputName).val(ko.unwrap(self.name)).prop({ 'required': true });

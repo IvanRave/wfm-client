@@ -156,6 +156,20 @@ define([
             */
             this.userProfile = new UserProfile(ths);
 
+            /**
+            * Whether current employee in edit mode: fast access for view
+            * @type {boolean}
+            */
+            this.isEmployeeInEditMode = ko.computed({
+                read: function () {
+                    var currentEmployee = ko.unwrap(ths.userProfile.selectedEmployee);
+                    if (currentEmployee){
+                        return ko.unwrap(currentEmployee.isEditMode);
+                    }
+                },
+                deferEvaluation: true
+            });
+
             this.initialUrlData = ko.observable(historyHelper.getInitialData(document.location.hash.substring(1)));
 
             /** Auth user profile and load data if successful */

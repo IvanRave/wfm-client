@@ -62,6 +62,24 @@ define(['knockout', 'moment', 'helpers/app-helper'], function (ko, appMoment, ap
         this.lengthInKb = parseInt(this.length / 1024, 10);
 
         /**
+        * Image width, in pixels (null for non-images)
+        * @type {number}
+        */
+        this.imgWidth = data.ImgWidth;
+
+        /**
+        * Image height, in pixels (null for non-images)
+        * @type {number}
+        */
+        this.imgHeight = data.ImgHeight;
+
+        /////**
+        ////* Image ratio, like 3*4 (null for non-images)
+        ////* @type {number}
+        ////*/
+        ////this.imgRatio = (ths.imgHeight && ths.imgWidth) ? (ths.imgWidth / ths.imgHeight) : null;
+
+        /**
         * Full file decription for files on small screen
         * @type {string}
         */
@@ -78,7 +96,7 @@ define(['knockout', 'moment', 'helpers/app-helper'], function (ko, appMoment, ap
         });
 
         /**
-        * Whether file is selected (in file manager)
+        * Whether file is selected (in file manager): TODO: create view for non-model properties
         * @type {boolean}
         */
         this.isSelected = ko.observable();

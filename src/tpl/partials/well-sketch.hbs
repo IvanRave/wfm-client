@@ -8,7 +8,7 @@
       </div>
     </div>
     <div class="col-sm-4 text-center">
-      <div data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
+      <div data-bind="if: $root.isEmployeeInEditMode">
         <button class="btn btn-default btn-sm btn-block" data-bind="click: createSketchFromFile">Choose sketch...</button>
       </div>
       <div data-bind="with: fileSpec">
@@ -18,7 +18,7 @@
       </div>
     </div>
     <div class="col-sm-8" data-bind="if: fileSpec">
-      <div data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
+      <div data-bind="if: $root.isEmployeeInEditMode">
         <div class="text-right">
           <button class="btn btn-xs btn-default" data-bind="click: remove">
             <i class="glyphicon glyphicon-remove"></i>
@@ -26,11 +26,11 @@
           </button>
         </div>
       </div>
-      <div data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
+      <div data-bind="if: $root.isEmployeeInEditMode">
         <textarea class="form-control" rows="10" data-bind="value: description"></textarea>
         <button class="btn btn-default btn-sm" data-bind="click: save">{{capitalizeFirst lang.toSave}} description</button>
       </div>
-      <div data-bind="ifnot: $root.userProfile.selectedEmployee().isEditMode">
+      <div data-bind="ifnot: $root.isEmployeeInEditMode">
         <span class="pre-wrap-text" data-bind="text: description"></span>
       </div>
     </div>

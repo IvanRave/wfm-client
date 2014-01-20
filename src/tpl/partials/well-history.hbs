@@ -19,7 +19,7 @@
           <small>{{capitalizeFirst lang.noWellHistoryList}}</small>
         </div>
       </div>
-      <div class="pull-right" data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
+      <div class="pull-right" data-bind="if: $root.isEmployeeInEditMode">
         <span data-bind="with: wellHistoryNew">
           <input class="input-sm" type="text" size="10" data-bind="datepicker: startUnixTime, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }" />
           <span> - </span>
@@ -36,7 +36,7 @@
           <div class="col-md-2">
             <div>
               <div class="bld">{{capitalizeFirst lang.timePeriod}}:</div>
-              <div data-bind="ifnot: $root.userProfile.selectedEmployee().isEditMode">
+              <div data-bind="ifnot: $root.isEmployeeInEditMode">
                 <div>
                   <span data-bind="unix: startUnixTime"></span>
                 </div>
@@ -44,19 +44,19 @@
                   <span data-bind="unix: endUnixTime, visible: isVisibleEndUnixTime"></span>
                 </div>
               </div>
-              <div data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
+              <div data-bind="if: $root.isEmployeeInEditMode">
                 <input class="input-sm" type="text" size="10" data-bind="datepicker: startUnixTime, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }"></input>
                 <input class="input-sm" type="text" size="10" data-bind="datepicker: endUnixTime, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }"></input>
               </div>
             </div>
             <div>
-              <div data-bind="ifnot: $root.userProfile.selectedEmployee().isEditMode">
+              <div data-bind="ifnot: $root.isEmployeeInEditMode">
                 <div data-bind="with: jobType">
                   <span class="bld">{{capitalizeFirst lang.jobType}}:</span>
                   <span data-bind="text: name"></span>
                 </div>
               </div>
-              <div data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
+              <div data-bind="if: $root.isEmployeeInEditMode">
                 <div data-bind="if: $parents[5].jobTypeList().length > 0">
                   <span class="bld">{{capitalizeFirst lang.jobType}}:</span>
                   <select class="input-sm" data-bind="options: $parents[5].jobTypeList, optionsText: 'name', optionsValue: 'id', optionsCaption: 'No job type', value: jobTypeId"></select>
@@ -64,7 +64,7 @@
                 </div>
               </div>
             </div>
-            <div data-bind="if: $root.userProfile.selectedEmployee().isEditMode" style="margin-top:8px">
+            <div data-bind="if: $root.isEmployeeInEditMode" style="margin-top:8px">
               <div class="btn-group-vertical btn-group-sm">
                 <button class="btn btn-default" type="button" data-bind="click: createFileSpecOfHistoryOfWell">
                   <i class="glyphicon glyphicon-paperclip"></i> {{capitalizeFirst lang.attachFile}}
@@ -79,12 +79,12 @@
             </div>
           </div>
           <div class="col-md-10">
-            <div data-bind="ifnot: $root.userProfile.selectedEmployee().isEditMode">
+            <div data-bind="ifnot: $root.isEmployeeInEditMode">
               <div data-bind="visible: historyText">
                 <blockquote class="pre-wrap-text" data-bind="text: historyText"></blockquote>
               </div>
             </div>
-            <div data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
+            <div data-bind="if: $root.isEmployeeInEditMode">
               <blockquote>
                 <textarea class="form-control" rows="3" style="resize: vertical" data-bind="value: historyText"></textarea>
                 <button class="btn btn-default btn-sm" type="button" data-bind="click: putWellHistory">
@@ -97,7 +97,7 @@
                 <span class="pointer" data-bind="panzoomImg: {src: croppedImageUrl}">
                   <img class="img-thumbnail elem-shadow" src="" data-bind="attr: { src: croppedImageUrl }" alt="History image" />
                 </span>
-                <span data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
+                <span data-bind="if: $root.isEmployeeInEditMode">
                   <i class="glyphicon glyphicon-remove link-icon" data-bind="click: $parent.removeWfmImage"></i>
                 </span>
               </div>
@@ -109,7 +109,7 @@
                     <span data-bind="text: namePlusExtension, click: download"></span>
                   </span>
                 </span>
-                <span data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
+                <span data-bind="if: $root.isEmployeeInEditMode">
                   <i class="glyphicon glyphicon-remove link-icon" data-bind="click: $parent.removeFileSpecOfHistoryOfWell"></i>
                 </span>
               </div>

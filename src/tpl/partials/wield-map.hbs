@@ -13,7 +13,7 @@
       </div>-->
     </div>
     <div class="col-md-3">
-      <div class="clearfix" data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
+      <div class="clearfix" data-bind="if: $root.isEmployeeInEditMode">
         <h4 class="pull-right">
           <button class="btn btn-default btn-sm" data-bind="click: createMapFromFile">{{capitalizeFirst lang.createMapOfWieldFromFile}}...</button>
         </h4>
@@ -25,24 +25,40 @@
             <div class="pull-left">
               <i class="glyphicon glyphicon-circle-arrow-down" data-bind="visible: $data === $parent.slcMapOfWield()"></i>
               <i class="glyphicon glyphicon-circle-arrow-right" data-bind="visible: $data !== $parent.slcMapOfWield()"></i>
-              <a href="#" data-bind="click: $parent.selectMapOfWield, attr: { title: Description }">
+              <span class="link-view pointer" data-bind="click: $parent.selectMapOfWield, attr: { title: Description }">
                 <span data-bind="text: name"></span>
-              </a>
+              </span>
             </div>
-            <div class="pull-right">
+            <div class="pull-right" data-bind="if: $root.isEmployeeInEditMode">
               <i class="glyphicon glyphicon-edit link-icon" data-bind="click: editWellFieldMap"></i>
               <i class="glyphicon glyphicon-remove link-icon" data-bind="click: $parents[1].removeMapOfWield"></i>
             </div>
           </div>
           <div data-bind="visible: $data === $parent.slcMapOfWield()">
             <div data-bind="foreach: WellInWellFieldMaps">
-              <div style="margin-left: 16px">
-                <i class="glyphicon glyphicon-leaf"></i><span class="min-left-margin" data-bind="text: getWell().Name()"></span>
+              <div class="min-left-margin">
+                <div class="clearfix">
+                  <div class="pull-left">
+                    <i class="glyphicon glyphicon-leaf"></i>
+                    <span class="min-left-margin" data-bind="text: getWell().Name"></span>
+                  </div>
+                  <div class="pull-right" data-bind="if: $root.isEmployeeInEditMode">
+                    <i class="glyphicon glyphicon-map-marker link-icon" title="Point on this map"></i>
+                    <i class="glyphicon glyphicon-remove link-icon" data-bind="click: $parent.removeWellMarker"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="min-left-margin" data-bind="if: $root.isEmployeeInEditMode">
+              <div data-bind="if: outWellsOfWield().length > 0">
+                <select class="input-sm" data-bind="options: outWellsOfWield, optionsText: 'Name', value: wellToAddToMap, optionsCaption: 'select well...'"></select>
+                <button class="btn btn-sm btn-default" type="button" data-bind="click: addWellMarkerToMap, enable: wellToAddToMap">Add to this map</button>
               </div>
             </div>
             <div data-bind="foreach: WellFieldMapAreas">
               <div style="margin-left: 16px">
-                <i class="glyphicon glyphicon-picture"></i><span class="min-left-margin" data-bind="text: Name"></span>
+                <i class="glyphicon glyphicon-picture"></i>
+                <span class="min-left-margin" data-bind="text: Name"></span>
               </div>
             </div>
           </div>

@@ -2,7 +2,7 @@
   <div class="clearfix">
     <div class="pull-left">
       <div data-bind="with: slcLogOfWell">
-        <div class="clearfix min-bottom-margin" data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
+        <div class="clearfix min-bottom-margin" data-bind="if: $root.isEmployeeInEditMode">
           <div class="pull-left">
             <div>
               <label class="radio-inline">
@@ -40,7 +40,7 @@
     <div class="pull-right" style="width: 280px">
       <div class="clearfix">
         <h5 class="pull-left">Logs:</h5>
-        <!-- ko if: $root.userProfile.selectedEmployee().isEditMode -->
+        <!-- ko if: $root.isEmployeeInEditMode -->
         <div class="pull-right">
           <button class="btn btn-default btn-xs" data-bind="click: createLogOfWellFromFileSpec">Create log...</button>
         </div>

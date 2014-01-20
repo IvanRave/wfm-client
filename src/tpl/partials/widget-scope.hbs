@@ -5,15 +5,15 @@
   <div class="clearfix">
     <div class="pull-left">
       <span data-bind="with: slcWidgout">
-        <span data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
+        <span data-bind="if: $root.isEmployeeInEditMode">
           <input class="input-sm" type="text" data-bind="value: name" />
         </span>
-        <span data-bind="ifnot: $root.userProfile.selectedEmployee().isEditMode">
+        <span data-bind="ifnot: $root.isEmployeeInEditMode">
           <span data-bind="text: name" />
         </span>
       </span>
     </div>
-    <div class="pull-right" data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
+    <div class="pull-right" data-bind="if: $root.isEmployeeInEditMode">
       <span data-bind="visible: slcWidgout">
         <button class="btn btn-sm btn-default" data-bind="click: removeWidgout">{{capitalizeFirst lang.toDeleteLayout}}</button>
       </span>
@@ -21,7 +21,7 @@
     <div class="pull-right" data-bind="visible: slcWidgout" style="margin-left: 32px">
       <select class="input-sm" data-bind="options: widgouts, optionsText: 'name', value: slcWidgout"></select>
     </div>
-    <div class="pull-right" data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
+    <div class="pull-right" data-bind="if: $root.isEmployeeInEditMode">
       <select class="input-sm" data-bind="options: widgoutTemplates, optionsText: 'name', value: slcWidgoutTemplate, optionsCaption: 'Choose scheme...'"></select>
       <button class="btn btn-sm btn-default" data-bind="enable: slcWidgoutTemplate, click: postWidgout">{{capitalizeFirst lang.toCreateLayout}}</button>
     </div>
@@ -40,7 +40,7 @@
                   <input type="text" class="input-sm" data-bind="value: name" />
                 </div>
               </div>
-              <div class="pull-right" data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
+              <div class="pull-right" data-bind="if: $root.isEmployeeInEditMode">
                 <div data-bind="ifnot: isVisSettingPanel">
                   <button class="btn btn-xs" type="button" data-bind="click: showVisSettingPanel">
                     <i class="glyphicon glyphicon-cog" title="{{capitalizeFirst lang.settings}}"></i>
@@ -61,7 +61,7 @@
             </div>
           </div>
         </div>
-        <div data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
+        <div data-bind="if: $root.isEmployeeInEditMode">
           <div class="widget-tile">
             <div class="widget-empty">
               <div class="text-right">
