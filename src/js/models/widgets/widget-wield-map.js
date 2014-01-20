@@ -1,33 +1,28 @@
 ﻿/** @module */
-define(['knockout', 'models/view-models/map-of-wield-vwm'], function (ko, MapOfWieldVwm) {
+define(['knockout', 'models/view-models/maps-of-wield-vwm'], function (ko, MapsOfWieldVwm) {
     'use strict';
 
-    /** Well field map widget */
+    /** Widget view model for map of well field */
     var exports = function (opts, koMapsOfWield) {
         opts = opts || {};
-        // TODO: calculate from koMapsOfWield using id
-        console.log(koMapsOfWield);
 
-        var koModel = ko.observable();
-        ////var idOfMapOfWield = opts['IdOfMapOfWield'];
-        ////if (idOfMapOfWield) {
-        ////    // Find need model from all maps
-        ////    console.log('id', idOfMapOfWield);
+        var ths = this;
 
-        ////}
+        /** Load all maps and select need, using option: mapId */
+        this.widgetVwm = new MapsOfWieldVwm(koMapsOfWield, opts);
 
-        // Load all maps and select need, using option: mapId
-        this.widgetVwm = new MapOfWieldVwm(koModel, opts);
+        /** Whether name of map is visible */
+        this.isVisName = ko.observable(opts['IsVisName']);
 
+        /** Whether map is visible */
+        this.isVisImg = ko.observable(opts['IsVisImg']);
+
+        /** Convert to plain JSON to send to the server as widget settings */
         this.toPlainOpts = function () {
-            var model = ko.unwrap(koModel);
-            if (!model) { return {}; }
             return {
-                'IdOfMapOfWield': model.id
-                ////'StartDate': ko.unwrap(self.historyView['startDate']),
-                ////'EndDate': ko.unwrap(self.historyView['endDate']),
-                ////'SortByDateOrder': ko.unwrap(self.historyView['sortByDateOrder']),
-                ////'JobTypeId': ko.unwrap(self.historyView['jobTypeId'])
+                'IdOfSlcMapOfWield': ko.unwrap(ths.widgetVwm.idOfSlcMapOfWield),
+                'IsVisName': ko.unwrap(ths.isVisName),
+                'IsVisImg': ko.unwrap(ths.isVisImg)
             };
         };
     };

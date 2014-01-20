@@ -6,14 +6,14 @@ define(['jquery',
     'helpers/modal-helper',
     'models/stage-base',
     'models/map-of-wield',
-    'models/view-models/map-of-wield-vwm',
+    'models/view-models/maps-of-wield-vwm',
     'models/sections/section-of-wield',
     'models/wroup',
     'models/prop-spec',
     'services/wield',
     'services/wroup',
     'constants/stage-constants'], function ($, ko, datacontext,
-        fileHelper, bootstrapModal, StageBase, MapOfWield, MapOfWieldVwm, SectionOfWield, WellGroup,
+        fileHelper, bootstrapModal, StageBase, MapOfWield, MapsOfWieldVwm, SectionOfWield, WellGroup,
         PropSpec, wieldService, wroupService, stageConstants) {
         'use strict';
 
@@ -183,33 +183,18 @@ define(['jquery',
             */
             this.WellFieldMaps = ko.observableArray();
 
-            /** Selected map */
-            this.slcMapOfWield = ko.observable();
-
-            /** Select map */
-            this.selectMapOfWield = function (mapOfWieldToSelect) {
-                ths.slcMapOfWield(mapOfWieldToSelect);
-            };
-
             /**
             * Main view model for this model: can be used one model per few view models
-            * @type {<module:models/view-models/map-of-wield-vwm>}
+            * @type {<module:models/view-models/maps-of-wield-vwm>}
             */
-            this.mainVwm = new MapOfWieldVwm(ths.slcMapOfWield, {});
+            this.mapsOfWieldVwm = new MapsOfWieldVwm(ths.WellFieldMaps, {});
 
             /** Set this section as selected */
             this.loadSectionContent = function (idOfSectionPattern) {
                 switch (idOfSectionPattern) {
                     case 'wield-map':
                         // Get all maps from this field
-                        ths.loadMapsOfWield(function () {
-                            var arr = ko.unwrap(ths.WellFieldMaps);
-                            if (arr.length > 0) {
-                                ths.selectMapOfWield(arr[0]);
-                            }
-                        });
-
-                        //ths.initMapFileUpload();
+                        ths.loadMapsOfWield();
                         break;
                 }
             };
@@ -229,23 +214,13 @@ define(['jquery',
             this.isLoadedMapsOfWield = ko.observable(false);
 
             /** Load all maps for this field */
-            this.loadMapsOfWield = function (callbackFunction) {
-                if (ko.unwrap(ths.isLoadedMapsOfWield) === false) {
-                    datacontext.getWellFieldMaps(ths.Id).done(function (result) {
-                        ths.isLoadedMapsOfWield(true);
+            this.loadMapsOfWield = function () {
+                if (ko.unwrap(ths.isLoadedMapsOfWield)) { return; }
 
-                        ths.WellFieldMaps(importWellFieldMapsDto(result, ths));
-
-                        if ($.isFunction(callbackFunction) === true) {
-                            callbackFunction();
-                        }
-                    });
-                }
-                else {
-                    if ($.isFunction(callbackFunction) === true) {
-                        callbackFunction();
-                    }
-                }
+                datacontext.getWellFieldMaps(ths.id).done(function (result) {
+                    ths.isLoadedMapsOfWield(true);
+                    ths.WellFieldMaps(importWellFieldMapsDto(result, ths));
+                });
             };
 
             /**
@@ -274,8 +249,8 @@ define(['jquery',
                     }
 
                     // Create map on the server with this file
-                    datacontext.postMapOfWield(ths.Id, {
-                        WellFieldId: ths.Id,
+                    datacontext.postMapOfWield(ths.id, {
+                        WellFieldId: ths.id,
                         ScaleCoefficient: 1,
                         Description: '',
                         // by default - map name = file name

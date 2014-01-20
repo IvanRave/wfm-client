@@ -242,24 +242,20 @@ define([
                     // find wellfield_id 
                     var wellFieldItem = ths.getWellGroup().getWellField();
 
-                    wellFieldItem.loadMapsOfWield(function () {
-                        var arr = ko.unwrap(wellFieldItem.WellFieldMaps);
-                        // TODO:???
-                        ////arr = $.grep(arr, function (arrElem, arrIndex) {
-                        ////    var cnt = 0;
-                        ////    $.each(arrElem.WellInWellFieldMaps(), function(wwfIndex, wwfElem){
-                        ////        if (wwfElem.Id === ths.Id) {
-                        ////            cnt++;
-                        ////        }
-                        ////    });
+                    wellFieldItem.loadMapsOfWield();
+                    ////function () {
+                    ////var arr = ko.unwrap(wellFieldItem.WellFieldMaps);
+                    // TODO:???
+                    ////arr = $.grep(arr, function (arrElem, arrIndex) {
+                    ////    var cnt = 0;
+                    ////    $.each(arrElem.WellInWellFieldMaps(), function(wwfIndex, wwfElem){
+                    ////        if (wwfElem.Id === ths.Id) {
+                    ////            cnt++;
+                    ////        }
+                    ////    });
 
-                        ////    return cnt > 0;
-                        ////});
-
-                        if (arr.length > 0) {
-                            wellFieldItem.selectMapOfWield(arr[0]);
-                        }
-                    });
+                    ////    return cnt > 0;
+                    ////});
 
                     break;
                     // no well in new map

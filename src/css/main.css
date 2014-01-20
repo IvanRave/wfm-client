@@ -918,3 +918,10 @@ ul.wfm-light-list {
     .wield-map-svg rect {
         fill: #efefef;
     }
+
+/* Redefine bootstrap alerts: small padding 
+   TODO: redefine using LESS */
+.alert {
+    padding: 8px !important;
+    margin-bottom: 8px !important;
+}

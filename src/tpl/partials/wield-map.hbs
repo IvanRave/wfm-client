@@ -1,7 +1,7 @@
 ﻿<div>
   <div class="row">
     <div class="col-md-9">
-      <div data-bind="with: mainVwm">
+      <div data-bind="with: mapsOfWieldVwm">
         {{> wield-map-image }}
       </div>
       <!--<div style="width: 620px; height: 512px; border: 1px dotted #ccc">
@@ -15,38 +15,40 @@
     <div class="col-md-3">
       <div class="clearfix" data-bind="if: $root.userProfile.selectedEmployee().isEditMode">
         <h4 class="pull-right">
-          <button class="btn btn-default btn-sm" data-bind="click: createMapFromFile">Add map...</button>
+          <button class="btn btn-default btn-sm" data-bind="click: createMapFromFile">{{capitalizeFirst lang.createMapOfWieldFromFile}}...</button>
         </h4>
       </div>
-      <!-- ko foreach: WellFieldMaps -->
-      <div>
-        <div class="clearfix">
-          <div class="pull-left">
-            <i class="glyphicon glyphicon-circle-arrow-down" data-bind="visible: $data === $parent.slcMapOfWield()"></i>
-            <i class="glyphicon glyphicon-circle-arrow-right" data-bind="visible: $data !== $parent.slcMapOfWield()"></i>
-            <a href="#" data-bind="click: $parent.selectMapOfWield, attr: { title: Description }">
-              <span data-bind="text: name"></span>
-            </a>
-          </div>
-          <div class="pull-right">
-            <i class="glyphicon glyphicon-edit link-icon" data-bind="click: editWellFieldMap"></i>
-            <i class="glyphicon glyphicon-remove link-icon" data-bind="click: $parent.deleteWellFieldMap"></i>
-          </div>
-        </div>
-        <div data-bind="visible: $data === $parent.slcMapOfWield()">
-          <div data-bind="foreach: WellInWellFieldMaps">
-            <div style="margin-left: 16px">
-              <i class="glyphicon glyphicon-leaf"></i>&nbsp;<span data-bind="text: getWell().Name()"></span>
+      <div data-bind="with: mapsOfWieldVwm">
+        <!-- ko foreach: handledMapsOfWield -->
+        <div>
+          <div class="clearfix">
+            <div class="pull-left">
+              <i class="glyphicon glyphicon-circle-arrow-down" data-bind="visible: $data === $parent.slcMapOfWield()"></i>
+              <i class="glyphicon glyphicon-circle-arrow-right" data-bind="visible: $data !== $parent.slcMapOfWield()"></i>
+              <a href="#" data-bind="click: $parent.selectMapOfWield, attr: { title: Description }">
+                <span data-bind="text: name"></span>
+              </a>
+            </div>
+            <div class="pull-right">
+              <i class="glyphicon glyphicon-edit link-icon" data-bind="click: editWellFieldMap"></i>
+              <i class="glyphicon glyphicon-remove link-icon" data-bind="click: $parents[1].deleteWellFieldMap"></i>
             </div>
           </div>
-          <div data-bind="foreach: WellFieldMapAreas">
-            <div style="margin-left: 16px">
-              <i class="glyphicon glyphicon-picture"></i>&nbsp;<span data-bind="text: Name"></span>
+          <div data-bind="visible: $data === $parent.slcMapOfWield()">
+            <div data-bind="foreach: WellInWellFieldMaps">
+              <div style="margin-left: 16px">
+                <i class="glyphicon glyphicon-leaf"></i><span class="min-left-margin" data-bind="text: getWell().Name()"></span>
+              </div>
+            </div>
+            <div data-bind="foreach: WellFieldMapAreas">
+              <div style="margin-left: 16px">
+                <i class="glyphicon glyphicon-picture"></i><span class="min-left-margin" data-bind="text: Name"></span>
+              </div>
             </div>
           </div>
         </div>
+        <!-- /ko -->
       </div>
-      <!-- /ko -->
     </div>
   </div>
 

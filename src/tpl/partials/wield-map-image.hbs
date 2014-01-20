@@ -1,12 +1,12 @@
 ﻿<div>
-    <div data-bind="ifnot: model">
-        <div class="alert alert-info">No maps.</div>
+    <div data-bind="ifnot: slcMapOfWield">
+        <div class="alert alert-warning">{{capitalizeFirst lang.noSelectedMapOfWield}}</div>
     </div>
-    <div data-bind="if: model">
+    <div data-bind="if: slcMapOfWield">
         <svg class="wield-map-svg" version="1.1" width="100%" viewbox="0 0 1200 600"
              data-bind="attr: { height: mapWrap.height }, svgResponsive: { koSvgWidth: mapWrap.width, tmpIsVisibleMenu: $root.isVisibleMenu}">
             <rect width="1200" height="600"></rect>
-            <g data-bind="with: model">
+            <g data-bind="with: slcMapOfWield">
                 <g data-bind="svgMap: {imgUrl: fileSpec.fileUrl}"></g>
             </g>
         </svg>
