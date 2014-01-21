@@ -62,9 +62,9 @@ define([
     /** Get well map list from well field maps with need well id */
     function getWellMapList(wellFieldMapList, wellId) {
         return $.grep(wellFieldMapList, function (elemValue) {
-            var wellInWellFieldMaps = ko.unwrap(elemValue.WellInWellFieldMaps);
+            var tmpWellMarkers = ko.unwrap(elemValue.wellMarkers);
 
-            var wellIdList = wellInWellFieldMaps.map(function (wfmElem) {
+            var wellIdList = tmpWellMarkers.map(function (wfmElem) {
                 return ko.unwrap(wfmElem.WellId);
             });
 
@@ -248,7 +248,7 @@ define([
                     // TODO:???
                     ////arr = $.grep(arr, function (arrElem, arrIndex) {
                     ////    var cnt = 0;
-                    ////    $.each(arrElem.WellInWellFieldMaps(), function(wwfIndex, wwfElem){
+                    ////    $.each(arrElem.wellMarkers(), function(wwfIndex, wwfElem){
                     ////        if (wwfElem.Id === ths.Id) {
                     ////            cnt++;
                     ////        }
@@ -265,7 +265,7 @@ define([
                     // get all maps
                     // get only maps where well_id == ths.Id
                     // get all maps
-                    // in WellInWellFieldMaps
+                    // in wellMarkers
                 }
             }
         };
@@ -436,7 +436,7 @@ define([
 
         // ==================================================================Well test end================================================================
 
-        this.WellInWellFieldMaps = ko.observableArray();
+        this.wellMarkers = ko.observableArray();
 
         // ================================================= Well log start =================================================
 
@@ -768,7 +768,7 @@ define([
         ////                        }
 
         ////                        if (mapBase64.length > 0) {
-        ////                            pdfHelper.writeMap(doc, mapBase64, 'Map', ths.selectedReportMap().WellInWellFieldMaps(), ths.selectedReportMap().WellFieldMapAreas());
+        ////                            pdfHelper.writeMap(doc, mapBase64, 'Map', ths.selectedReportMap().wellMarkers(), ths.selectedReportMap().WellFieldMapAreas());
         ////                        }
 
         ////                        if ($.inArray('history', ths.reportSectionIdList()) >= 0) {

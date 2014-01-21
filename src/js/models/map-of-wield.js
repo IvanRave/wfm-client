@@ -1,9 +1,9 @@
 ﻿/** @module */
 define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
     'helpers/app-helper', 'models/file-spec', 'services/map-of-wield',
-    'models/area-of-map-of-wield', 'models/well-marker-of-map-of-wield', 'services/well-marker-of-map-of-wield'],
+    'models/area-of-map-of-wield', 'models/well-marker-of-map-of-wield', 'services/well-marker-of-map-of-wield', 'models/map-tool'],
     function ($, ko, datacontext, bootstrapModal, appHelper, FileSpec, mapOfWieldService,
-        AreaOfMapOfWield, WellOfMapOfWield, wellMarkerService) {
+        AreaOfMapOfWield, WellOfMapOfWield, wellMarkerService, MapTool) {
         'use strict';
 
         function importWellFieldMapAreasDto(data, parent) {
@@ -15,6 +15,12 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
         function importWellMarkers(data, parent) {
             return (data || []).map(function (item) {
                 return new WellOfMapOfWield(item, parent);
+            });
+        }
+
+        function importMapTools(data, koIdOfSlcMapTool) {
+            return (data || []).map(function (item) {
+                return new MapTool(item, koIdOfSlcMapTool);
             });
         }
 
@@ -96,7 +102,77 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
             * Wells on this map
             * @type {Array.<Well>}
             */
-            this.WellInWellFieldMaps = ko.observableArray();
+            this.wellMarkers = ko.observableArray();
+
+            /**
+            * Id of selected tool
+            * @type {string}
+            */
+            this.idOfSlcMapTool = ko.observable();
+
+            /**
+            * Selected tool: wellMarker, area, ruler, set scale, etc.
+            * @type {string}
+            */
+            this.slcMapTool = ko.computed({
+                read: function () {
+                    var tmpMapTools = ko.unwrap(ths.mapTools);
+                    if (tmpMapTools.length > 0) {
+                        var tmpId = ko.unwrap(ths.idOfSlcMapTool);
+
+                        if (tmpId) {
+                            return tmpMapTools.filter(function (elem) {
+                                return elem.id === tmpId;
+                            })[0];
+                        }
+                        else {
+                            // If no id - return first tool: by default: hand
+                            // and set to id
+                            ths.idOfSlcMapTool(tmpMapTools[0].id);
+                            return tmpMapTools[0];
+                        }
+                    }
+                },
+                deferEvaluation: true
+            });
+
+            /**
+            * Map tools
+            * @type {Array.<module:models/map-tool>}
+            */
+            this.mapTools = importMapTools([
+                {
+                    id: 'hand',
+                    name: '{{capitalizeFirst lang.mapToolHand}}',
+                    icon: 'glyphicon glyphicon-hand-up'
+                },
+                {
+                    id: 'marker',
+                    name: '{{capitalizeFirst lang.mapToolWellMarker}}',
+                    icon: 'glyphicon glyphicon-map-marker'
+                },
+                {
+                    id: 'ruler',
+                    name: '{{capitalizeFirst lang.mapToolRuler}}',
+                    icon: 'glyphicon glyphicon-resize-full'
+                },
+                {
+                    id: 'area',
+                    name: '{{capitalizeFirst lang.mapToolArea}}',
+                    icon: 'glyphicon glyphicon-retweet'
+                },
+                {
+                    id: 'scale',
+                    name: '{{capitalizeFirst lang.mapToolScale}}',
+                    icon: 'glyphicon glyphicon-screenshot'
+                }
+            ], ths.slcMapTool);
+
+            /** Select map tool */
+            this.selectMapTool = function (mapToolToSelect) {
+                // Select id -> system automatically sets tool as selected
+                ths.idOfSlcMapTool(mapToolToSelect.id);
+            };
 
             ////function initYandexMap(wellFieldMapItem, wellFieldItem) {
             ////    ////if (myMap) { myMap.destroy(); }
@@ -365,8 +441,8 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
 
             ////function selectWellForMap(coords, needMap, wellFieldMapItem, wellFieldItem) {
             ////    var drawIdArray = [];
-            ////    for (var tk = 0; tk < wellFieldMapItem.WellInWellFieldMaps().length; tk++) {
-            ////        drawIdArray.push(wellFieldMapItem.WellInWellFieldMaps()[tk].WellId);
+            ////    for (var tk = 0; tk < wellFieldMapItem.wellMarkers().length; tk++) {
+            ////        drawIdArray.push(wellFieldMapItem.wellMarkers()[tk].WellId);
             ////    }
 
             ////    var notAddedCount = 0;
@@ -479,56 +555,56 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
             ////    ////}));
             ////}
 
-            function drawWellInWellFieldMap(needMap, wellInWellFieldMapItem) {
-                var divString = '<div style="padding: 0 8px">' +
-                    '<h5 class="text-center">$[properties.name]</h5>' +
-                    '<p class="break-word" style="max-height: 40px; overflow: auto">$[properties.description]</p>' +
-                    '<div class="text-center">' +
-                    '<button class="btn btn-xs btn-default" id="del_well_from_map">Remove from this map</button>' +
-                    '</div>' +
-                    '</div>';
+            ////function drawWellInWellFieldMap(needMap, wellInWellFieldMapItem) {
+            ////    var divString = '<div style="padding: 0 8px">' +
+            ////        '<h5 class="text-center">$[properties.name]</h5>' +
+            ////        '<p class="break-word" style="max-height: 40px; overflow: auto">$[properties.description]</p>' +
+            ////        '<div class="text-center">' +
+            ////        '<button class="btn btn-xs btn-default" id="del_well_from_map">Remove from this map</button>' +
+            ////        '</div>' +
+            ////        '</div>';
 
-                // с префиксом balloon. В данном случае options.contentBodyLayout - вложенный макет.
-                var myBalloonContentLayout = ymaps.templateLayoutFactory.createClass('<p>$[[options.contentBodyLayout]]</p>');
-                // Создание макета основного содержимого контента балуна.
-                var myBalloonContentBodyLayout = ymaps.templateLayoutFactory.createClass(divString, {
-                    build: function () {
-                        myBalloonContentBodyLayout.superclass.build.call(this);
-                        $('#del_well_from_map').on('click', this.delWellFromMap);
-                    },
-                    clear: function () {
-                        $('#del_well_from_map').off('click', this.delWellFromMap);
-                        myBalloonContentBodyLayout.superclass.clear.call(this);
-                    },
-                    delWellFromMap: function () {
-                        ths.removeWellMarker(wellInWellFieldMapItem);
-                        needMap.geoObjects.remove(pointObject);
-                    }
-                });
+            ////    // с префиксом balloon. В данном случае options.contentBodyLayout - вложенный макет.
+            ////    var myBalloonContentLayout = ymaps.templateLayoutFactory.createClass('<p>$[[options.contentBodyLayout]]</p>');
+            ////    // Создание макета основного содержимого контента балуна.
+            ////    var myBalloonContentBodyLayout = ymaps.templateLayoutFactory.createClass(divString, {
+            ////        build: function () {
+            ////            myBalloonContentBodyLayout.superclass.build.call(this);
+            ////            $('#del_well_from_map').on('click', this.delWellFromMap);
+            ////        },
+            ////        clear: function () {
+            ////            $('#del_well_from_map').off('click', this.delWellFromMap);
+            ////            myBalloonContentBodyLayout.superclass.clear.call(this);
+            ////        },
+            ////        delWellFromMap: function () {
+            ////            ths.removeWellMarker(wellInWellFieldMapItem);
+            ////            needMap.geoObjects.remove(pointObject);
+            ////        }
+            ////    });
 
-                var currentWell = wellInWellFieldMapItem.getWell();
+            ////    var currentWell = wellInWellFieldMapItem.getWell();
 
-                var pointObject = new ymaps.GeoObject({
-                    geometry: {
-                        type: "Point",
-                        coordinates: [wellInWellFieldMapItem.longitude(), wellInWellFieldMapItem.latitude()]
-                    },
-                    properties: {
-                        name: currentWell.Name(),
-                        hintContent: currentWell.Name(),
-                        description: currentWell.Description()
-                        //name: wellInWellFieldMapItem.LinkWell().Name(),
-                        //metaDataProperty: {
-                        //    description: wellInWellFieldMapItem.LinkWell().Description()
-                        //}
-                    }
-                }, {
-                    balloonContentBodyLayout: myBalloonContentBodyLayout,
-                    balloonContentLayout: myBalloonContentLayout
-                });
-                // place to map
-                needMap.geoObjects.add(pointObject);
-            }
+            ////    var pointObject = new ymaps.GeoObject({
+            ////        geometry: {
+            ////            type: "Point",
+            ////            coordinates: [wellInWellFieldMapItem.coords()[0], wellInWellFieldMapItem.coords()[1]]
+            ////        },
+            ////        properties: {
+            ////            name: currentWell.Name(),
+            ////            hintContent: currentWell.Name(),
+            ////            description: currentWell.Description()
+            ////            //name: wellInWellFieldMapItem.LinkWell().Name(),
+            ////            //metaDataProperty: {
+            ////            //    description: wellInWellFieldMapItem.LinkWell().Description()
+            ////            //}
+            ////        }
+            ////    }, {
+            ////        balloonContentBodyLayout: myBalloonContentBodyLayout,
+            ////        balloonContentLayout: myBalloonContentLayout
+            ////    });
+            ////    // place to map
+            ////    needMap.geoObjects.add(pointObject);
+            ////}
 
             function drawWellFieldMapArea(needMap, wellFieldMapAreaItem, isShowEditBalloon) {
                 var divString = '<div style="padding: 0 8px">' +
@@ -613,9 +689,9 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
             ////        ymaps.ready(function () {
             ////            var tmpMap = initYandexMap(self, self.getWellField());
 
-            ////            for (var i = 0; i < self.WellInWellFieldMaps().length; i++) {
+            ////            for (var i = 0; i < self.wellMarkers().length; i++) {
             ////                // define well item
-            ////                drawWellInWellFieldMap(tmpMap, self.WellInWellFieldMaps()[i]);
+            ////                drawWellInWellFieldMap(tmpMap, self.wellMarkers()[i]);
             ////            }
 
             ////            //  add areas to the map
@@ -648,37 +724,48 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
             this.removeWellMarker = function (wellMarkerToRemove) {
                 if (confirm('{{capitalizeFirst lang.confirmToDelete}}?')) {
                     wellMarkerService.remove(ths.id, wellMarkerToRemove.idOfWell).done(function () {
-                        ths.WellInWellFieldMaps.remove(wellMarkerToRemove);
+                        ths.wellMarkers.remove(wellMarkerToRemove);
                     });
                 }
             };
 
-            this.addWellInWellFieldMap = function (wellId, longitude, latitude, fncMapImage) {
-                // width or height need more than 255 , else do not load maps
-                ////var tileLength = 255;
-                ////var coordX = 0, coordY = 0;
-                ////// if width > height
-                ////var mapCoordScale = Math.max(self.Width, self.Height) / tileLength;
+            /**
+            * Selected well marker
+            * @type {<module:models/well-marker-of-map-of-wield>}
+            */
+            this.slcWellMarker = ko.observable();
 
-                ////coordX = latitude * mapCoordScale;
-                ////coordY = (tileLength - longitude) * mapCoordScale;
-
-                // save real coords in database
-                wellMarkerService.post(ths.id, {
-                    WellFieldMapId: self.id,
-                    WellId: wellId,
-                    Longitude: longitude,
-                    Latitude: latitude
-                }).done(function (result) {
-                    // redefine object from result
-                    var wellInWellFieldMapForAdd = new WellOfMapOfWield(result, self);
-                    // draw in map
-
-                    self.WellInWellFieldMaps.push(wellInWellFieldMapForAdd);
-
-                    drawWellInWellFieldMap(fncMapImage, wellInWellFieldMapForAdd);
-                });
+            /** Select well marker */
+            this.selectWellMarker = function (wellMarkerToSelect) {
+                ths.slcWellMarker(wellMarkerToSelect);
             };
+
+            ////this.addWellInWellFieldMap = function (idOfWell, coordX, coordY, fncMapImage) {
+            ////    // width or height need more than 255 , else do not load maps
+            ////    ////var tileLength = 255;
+            ////    ////var coordX = 0, coordY = 0;
+            ////    ////// if width > height
+            ////    ////var mapCoordScale = Math.max(self.Width, self.Height) / tileLength;
+
+            ////    ////coordX = latitude * mapCoordScale;
+            ////    ////coordY = (tileLength - longitude) * mapCoordScale;
+
+            ////    // save real coords in database
+            ////    wellMarkerService.post(ths.id, {
+            ////        IdOfMapOfWield: self.id,
+            ////        idOfWell: idOfWell,
+            ////        CoordX: coordX,
+            ////        CoordY: coordY
+            ////    }).done(function (result) {
+            ////        // redefine object from result
+            ////        var wellInWellFieldMapForAdd = new WellOfMapOfWield(result, self);
+            ////        // draw in map
+
+            ////        self.wellMarkers.push(wellInWellFieldMapForAdd);
+
+            ////        drawWellInWellFieldMap(fncMapImage, wellInWellFieldMapForAdd);
+            ////    });
+            ////};
 
             self.setScaleCoefficient = function () {
                 mapOfWieldService.put(self.WellFieldId, self.id, self.toPlainJson());
@@ -690,7 +777,7 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
             */
             this.outWellsOfWield = ko.computed({
                 read: function () {
-                    var wellMarkersOnMap = ko.unwrap(ths.WellInWellFieldMaps);
+                    var wellMarkersOnMap = ko.unwrap(ths.wellMarkers);
 
                     /** IDs of wells, which placed on this map */
                     var idsOfWellsOfMap = wellMarkersOnMap.map(function (wellMarkerItem) {
@@ -731,7 +818,7 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
                     ths.wellToAddToMap(null);
 
                     // Send to the server
-                    ths.WellInWellFieldMaps.push(new WellOfMapOfWield(r, ths));
+                    ths.wellMarkers.push(new WellOfMapOfWield(r, ths));
                 });
             };
 
@@ -776,7 +863,7 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
 
             // get areas
             self.WellFieldMapAreas(importWellFieldMapAreasDto(data.WellFieldMapAreasDto, self));
-            self.WellInWellFieldMaps(importWellMarkers(data.ListOfDtoOfWellMarker, self));
+            self.wellMarkers(importWellMarkers(data.ListOfDtoOfWellMarker, self));
         };
 
         return exports;

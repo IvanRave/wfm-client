@@ -15,7 +15,7 @@
         <span data-bind="text: Name"></span>&nbsp;maps:
       </h4>
       <!--<div data-bind="foreach: wellGroup.wellField.WellFieldMaps()">
-            <div data-bind="visible: ($.inArray($parent.Id, $.map(WellInWellFieldMaps(), function (val, i) { return val.WellId })) > -1)">-->
+            <div data-bind="visible: ($.inArray($parent.Id, $.map(wellMarkers(), function (val, i) { return val.WellId })) > -1)">-->
       <div data-bind="foreach: wellMapList">
         <div class="clearfix">
           <div class="pull-left">
@@ -31,7 +31,7 @@
           </div>
         </div>
         <div data-bind="visible: $data === $parent.getWellGroup().getWellField().slcMapOfWield()">
-          <div data-bind="foreach: WellInWellFieldMaps">
+          <div data-bind="foreach: wellMarkers">
             <div style="margin-left: 16px">
               <i class="glyphicon glyphicon-leaf"></i>&nbsp;<span data-bind="text: getWell().Name()"></span>
             </div>

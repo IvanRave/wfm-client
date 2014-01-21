@@ -20,7 +20,7 @@
       </div>
       <div data-bind="with: mapsOfWieldVwm">
         <!-- ko foreach: handledMapsOfWield -->
-        <div>
+        <div class="min-top-margin">
           <div class="clearfix">
             <div class="pull-left">
               <i class="glyphicon glyphicon-circle-arrow-down" data-bind="visible: $data === $parent.slcMapOfWield()"></i>
@@ -35,15 +35,15 @@
             </div>
           </div>
           <div data-bind="visible: $data === $parent.slcMapOfWield()">
-            <div data-bind="foreach: WellInWellFieldMaps">
+            <div data-bind="foreach: wellMarkers">
               <div class="min-left-margin">
                 <div class="clearfix">
                   <div class="pull-left">
                     <i class="glyphicon glyphicon-leaf"></i>
-                    <span class="min-left-margin" data-bind="text: getWell().Name"></span>
+                    <span class="link-view pointer" data-bind="text: wellName, click: $parent.selectWellMarker"></span>
                   </div>
                   <div class="pull-right" data-bind="if: $root.isEmployeeInEditMode">
-                    <i class="glyphicon glyphicon-map-marker link-icon" title="Point on this map"></i>
+                    <!--<i class="glyphicon glyphicon-map-marker link-icon" title="Point on this map" data-bind="click: $parent.pointWellMarker"></i>-->
                     <i class="glyphicon glyphicon-remove link-icon" data-bind="click: $parent.removeWellMarker"></i>
                   </div>
                 </div>

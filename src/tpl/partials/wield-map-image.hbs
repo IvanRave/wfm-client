@@ -3,16 +3,27 @@
     <div class="alert alert-warning">{{capitalizeFirst lang.noSelectedMapOfWield}}</div>
   </div>
   <div data-bind="if: slcMapOfWield">
+    <div style="position: absolute" data-bind="with: slcMapOfWield">
+      <div class="min-top-margin min-left-margin" data-bind="foreach: mapTools">
+        <button class="btn btn-sm btn-default" data-bind="click: $parent.selectMapTool, css: { 'active': isSlc}">
+          <i data-bind="css: icon, attr: {title: name}"></i>
+        </button>
+      </div>
+    </div>
     <svg class="wield-map-svg" version="1.1" width="100%" viewbox="0 0 1200 600"
          data-bind="attr: { height: mapWrap.height }, svgResponsive: { koSvgWidth: mapWrap.width, tmpIsVisibleMenu: $root.isVisibleMenu}">
       <rect width="1200" height="600"></rect>
       <!-- ko with: slcMapOfWield -->
-      <g data-bind="svgMap: {imgUrl: fileSpec.fileUrl, imgWidth: fileSpec.imgWidth, imgHeight: fileSpec.imgHeight }">
+      <g data-bind="svgMap: {imgUrl: fileSpec.fileUrl, imgWidth: fileSpec.imgWidth, imgHeight: fileSpec.imgHeight, wellMarkers: wellMarkers, wellMarkerRadius: 8, svgBlockWidth: 1200, svgBlockHeight: 600, idOfSlcMapTool: idOfSlcMapTool, slcWellMarker: slcWellMarker}">
         <g>
-          <!--for transforming and scale group with image and points and areas-->
+          <!--inner group for transforming and scale group of next elements: image, well markers and areas-->
         </g>
       </g>
       <!-- /ko -->
     </svg>
+    <div class="well-marker-tooltip"></div>
+    <!--var div = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);-->
   </div>
 </div>

@@ -119,41 +119,102 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
         }
     };
 
+    /** Calculate svg image size using real size and svg block size */
+    function calcSvgImgSize(realImgSize, svgBlockSize) {
+        var svgImgSize = {};
+        // If height is bigger side, then calculate width
+        // if height = 600svg (400px) then width = Xsvg (300px)
+        // X = (300px * 600svg) / 400px
+        // else if width = 1200svg (300px) then height = Ysvg (400px)
+        // Y = (400px * 1200svg) / 300px
+        if ((realImgSize.height * svgBlockSize.ratio) > realImgSize.width) {
+            svgImgSize.height = svgBlockSize.height;
+            svgImgSize.width = (realImgSize.width * svgBlockSize.height) / realImgSize.height;
+        }
+        else {
+            svgImgSize.width = svgBlockSize.width;
+            svgImgSize.height = (realImgSize.height * svgBlockSize.width) / realImgSize.width;
+        }
+
+        return svgImgSize;
+    }
+
+    /** Drag and drop for circles */
+    function getDragSvgCircle(wellMarkerItem, coefVgToPx) {
+        var imgBounds = {};
+        // TODO: get radius from view
+        var markerRadius = 8;
+        var dragSvgCircle = d3.behavior.drag()
+        ////.origin()
+        .on('dragstart', function () {
+            // silence other listeners
+            d3.event.sourceEvent.stopPropagation();
+
+            var d3BoundImage = d3.select(this).select(function () { return this.parentNode; }).select('image');
+
+            var boundCoords = {
+                left: +d3BoundImage.attr('x'),
+                right: +d3BoundImage.attr('x') + (+d3BoundImage.attr('width')),
+                top: +d3BoundImage.attr('y'),
+                bottom: +d3BoundImage.attr('y') + (+d3BoundImage.attr('height'))
+            };
+
+            imgBounds = boundCoords;
+        })
+        .on('drag', function () {
+            // Change circle coords
+            ////console.log('event', d3.event.x, d3.event.y);
+            ////console.log('mouse', d3.mouse(this));
+            var xNew = Math.max(Math.min(d3.event.x, imgBounds.right - markerRadius), imgBounds.left + markerRadius),
+                yNew = Math.max(Math.min(d3.event.y, imgBounds.bottom -markerRadius), imgBounds.top + markerRadius);
+
+            d3.select(this)
+                .attr('cx', xNew)
+                .attr('cy', yNew);
+        })
+        .on('dragend', function () {
+            var tmpElem = d3.select(this);
+            wellMarkerItem.coords([(+tmpElem.attr('cx') - imgBounds.left) / coefVgToPx.x,
+                (+tmpElem.attr('cy') - imgBounds.top) / coefVgToPx.y]);
+
+            ////console.log(tmpCoords);
+            ////console.log(wellMarkerItem);
+        });
+
+        return dragSvgCircle;
+    }
+
+    function getCoefVgToPx(imgSizeInPx, imgSizeInVg) {
+        return {
+            x: imgSizeInVg.width / imgSizeInPx.width,
+            y: imgSizeInVg.height / imgSizeInPx.height
+        };
+    }
+
     /** Svg map */
     ko.bindingHandlers.svgMap = {
         init: function (element, valueAccessor) {
             var accessor = valueAccessor();
+
+            // Only non-observable objects or initial states of objects
+            // Image url doesn't change
             var imgUrl = ko.unwrap(accessor.imgUrl);
 
-            // Image size
+            // Image size doesn't change
             var realImgSize = {
                 width: ko.unwrap(accessor.imgWidth), // example: 300px
                 height: ko.unwrap(accessor.imgHeight) // example: 400px
             };
 
-            // Block (svg) size without margins
-            // TODO: get from view-model
+            // Block (svg) size without margins (doesn't change)
             var svgBlockSize = {
-                width: 1200,
-                height: 600
+                width: accessor.svgBlockWidth,
+                height: accessor.svgBlockHeight,
+                ratio: accessor.svgBlockWidth / accessor.svgBlockHeight
             };
 
             // Calculate image size in svg viewbox
-            var svgImgSize = {};
-
-            // If height is bigger side, then calculate width
-            // if height = 600svg (400px) then width = Xsvg (300px)
-            // X = (300px * 600svg) / 400px
-            // else if width = 1200svg (300px) then height = Ysvg (400px)
-            // Y = (400px * 1200svg) / 300px
-            if (realImgSize.height > realImgSize.width) {
-                svgImgSize.height = svgBlockSize.height;
-                svgImgSize.width = (realImgSize.width * svgBlockSize.height) / realImgSize.height;
-            }
-            else {
-                svgImgSize.width = svgBlockSize.width;
-                svgImgSize.height = (realImgSize.height * svgBlockSize.width) / realImgSize.width;
-            }
+            var svgImgSize = calcSvgImgSize(realImgSize, svgBlockSize);
 
             var imgStartPos = {
                 x: (svgBlockSize.width - svgImgSize.width) / 2,
@@ -164,6 +225,7 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 
             var d3Group = d3GroupWrap.select('g');
 
+            // Append image with map (only once on init event)
             d3Group.append('image')
                 .attr('xlink:href', imgUrl)
                 .attr('height', svgImgSize.height)
@@ -171,32 +233,7 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
                 .attr('x', imgStartPos.x)
                 .attr('y', imgStartPos.y);
 
-            var d3Image = d3Group.select('image');
-
-            d3Image.on('click', function () {
-                // this = d3Image
-                var coords = d3.mouse(this);
-
-                // Calculate coords on map image in pixels
-                // realX / svgX = realWidth / svgWidth
-                var realMarkerPos = {
-                    x: (coords[0] - imgStartPos.x) * (realImgSize.width / svgImgSize.width),
-                    y: (coords[1] - imgStartPos.y) * (realImgSize.height / svgImgSize.height)
-                };
-
-                // Send to the server in PUT method (change well marker data)
-                console.log(realMarkerPos);
-
-                d3Group.append('circle')
-                    .attr('cx', coords[0])
-                    .attr('cy', coords[1])
-                    .attr('r', 8)
-                    .on('click', function () {
-                        // Show info about well in this point
-                        console.log('circle hoora', coords);
-                    });
-            });
-
+            // Add zoom for all elements (group) only once on init event
             var x = d3.scale.linear().range([imgStartPos.x, imgStartPos.x + svgImgSize.width]);
             var y = d3.scale.linear().range([imgStartPos.y, imgStartPos.y + svgImgSize.height]);
 
@@ -211,6 +248,132 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
                 .on('zoom', zoomed);
 
             d3GroupWrap.call(zoom);
+        },
+        update: function (element, valueAccessor) {
+            // Working with observables values
+            var accessor = valueAccessor();
+            var idOfSlcMapTool = ko.unwrap(accessor.idOfSlcMapTool);
+            var slcWellMarker = ko.unwrap(accessor.slcWellMarker);
+
+            // Image size
+            var realImgSize = {
+                width: ko.unwrap(accessor.imgWidth), // example: 300px
+                height: ko.unwrap(accessor.imgHeight) // example: 400px
+            };
+
+            // Block (svg) size without margins
+            var svgBlockSize = {
+                width: accessor.svgBlockWidth,
+                height: accessor.svgBlockHeight,
+                ratio: accessor.svgBlockWidth / accessor.svgBlockHeight
+            };
+
+            // Calculate image size in svg viewbox
+            var svgImgSize = calcSvgImgSize(realImgSize, svgBlockSize);
+
+            var coefVgToPx = getCoefVgToPx(realImgSize, svgImgSize);
+
+            console.log('coefVgToPx', coefVgToPx);
+
+            var imgStartPos = {
+                x: (svgBlockSize.width - svgImgSize.width) / 2,
+                y: (svgBlockSize.height - svgImgSize.height) / 2
+            };
+
+            var wellMarkers = ko.unwrap(accessor.wellMarkers);
+            var wellMarkerRadius = ko.unwrap(accessor.wellMarkerRadius);
+            // Draw well markers
+            var d3GroupWrap = d3.select(element);
+
+            var d3Group = d3GroupWrap.select('g');
+
+            var d3Image = d3Group.select('image');
+
+            function addWellMarker(cx, cy) {
+                d3Group.append('circle')
+                    .attr('cx', cx)
+                    .attr('cy', cy)
+                    .attr('r', wellMarkerRadius)
+                    .on('click', function () {
+                        // Show info about well in this point
+                        if (d3.event.defaultPrevented) { return; }
+                        console.log('circle hoora', cx, cy);
+                    })
+                    .call(getDragSvgCircle());
+            }
+
+            d3Image.on('click', function () {
+                console.log(idOfSlcMapTool);
+                if (idOfSlcMapTool !== 'ruler') { console.log('no ruler'); return; }
+                // this = d3Image
+                var coords = d3.mouse(this);
+
+                // Calculate coords on map image in pixels
+                // realX / svgX = realWidth / svgWidth
+                var realMarkerPos = {
+                    x: (coords[0] - imgStartPos.x) * (realImgSize.width / svgImgSize.width),
+                    y: (coords[1] - imgStartPos.y) * (realImgSize.height / svgImgSize.height)
+                };
+
+                // Send to the server in PUT method (change well marker data)
+                console.log(realMarkerPos);
+                addWellMarker(coords[0], coords[1]);
+            });
+
+            // Redraw all well markers: user can remove/add/change coords or any actions with markers outside of svg block
+            // Clear all values
+            d3Group.selectAll('circle').remove();
+
+            // Add fresh values
+            wellMarkers.forEach(function (wellMarkerItem) {
+                // Convert empty coords
+                var wellMarkerCoordsInPx = ko.unwrap(wellMarkerItem.coords);
+
+                console.log('wellMarkerCoordsInPx', wellMarkerCoordsInPx);
+
+                if (!wellMarkerCoordsInPx[0] || !wellMarkerCoordsInPx[1]) {
+                    // set to the center of image
+                    wellMarkerCoordsInPx = [realImgSize.width / 2, realImgSize.height / 2];
+                }
+
+                /** In svg units (abbr: vg) */
+                ////var wellMarkerCoordsInVg = convertCoordsPxToVg(wellMarkerCoordsInPx, realImgSize, svgBlockSize);
+                //// F.E.: convert([300px, 300px], {width: 500px, height: 700px}, {width: 1200vg, height: 600vg, ratio: 2})
+                ////addWellMarker
+                var tmpCx = wellMarkerCoordsInPx[0] * coefVgToPx.x + imgStartPos.x;
+                var tmpCy = wellMarkerCoordsInPx[1] * coefVgToPx.y + imgStartPos.y;
+                d3Group.append('circle')
+                    .attr('cx', tmpCx)
+                    .attr('cy', tmpCy)
+                    .attr('r', wellMarkerRadius)
+                    .on('click', function () {
+                        // Show info about well in this point
+                        if (d3.event.defaultPrevented) { return; }
+                        //console.log('circle hoora', cx, cy);
+                    })
+                    .call(getDragSvgCircle(wellMarkerItem, coefVgToPx));
+            });
+
+            console.log('markers', wellMarkers);
+
+            // Point and scale map to selected well marker
+            if (slcWellMarker) {
+                ////// Set to the center and scale to 10 * 8 (marker radius) = 80units
+                ////// Center of svg block
+                var svgCenterCoords = [svgBlockSize.width / 2, svgBlockSize.height / 2];
+                ////// Svg marker coords = Real marker coords (in pixels) -> Real marker coords (in svg units) + Image margin (in svg units)
+                var wellMarkerCoordsInPx = ko.unwrap(slcWellMarker.coords);
+                // TODO: change null values
+
+                var wellMarkerCoordsInVg = [wellMarkerCoordsInPx[0] * coefVgToPx.x + imgStartPos.x, wellMarkerCoordsInPx[1] * coefVgToPx.y + imgStartPos.y];
+
+                var transformCoords = [svgCenterCoords[0] - wellMarkerCoordsInVg[0], svgCenterCoords[1] - wellMarkerCoordsInVg[1]];
+
+                d3Group.attr('transform', 'translate(' + transformCoords.join(',') + ')');
+                // scale(' + 1 + ')'
+            }
+
+            console.log('slcWell', slcWellMarker);
         }
     };
 
