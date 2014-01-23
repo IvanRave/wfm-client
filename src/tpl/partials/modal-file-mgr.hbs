@@ -1,23 +1,29 @@
-﻿<!-- Block with company context -->
-<div class="modal fade" role="dialog" tabindex="-1" aria-hidden="true" data-bind="modalWindow: {isOpenFileMgr: modalFileMgr.isOpen, fileMgrHiddenCallback: modalFileMgr.hiddenCallback}">
+﻿<!--<div data-bind="with: mdlCompany">-->
+<!-- Block with company context -->
+<div class="modal fade" role="dialog" tabindex="-1" aria-hidden="true" data-bind="modalWindow: {isOpenFileMgr: mdlCompany.modalFileMgr.isOpen, fileMgrHiddenCallback: mdlCompany.modalFileMgr.hiddenCallback}">
   <div class="modal-dialog modal-fullscreen">
     <div class="modal-content full-min-height">
-      <div class="modal-header clearfix" data-bind="visible: modalFileMgr.okCallback">
-        <h4 class="modal-title pull-left" data-bind="text: modalFileMgr.okDescription"></h4>
+      <div class="modal-header clearfix" data-bind="visible: mdlCompany.modalFileMgr.okCallback">
+        <h4 class="modal-title pull-left" data-bind="text: mdlCompany.modalFileMgr.okDescription"></h4>
         <div class="pull-right min-right-margin">
-          <span class="min-right-margin" style="color:red" data-bind="text: modalFileMgr.okError"></span>
-          <button class="btn btn-primary btn-sm" type="button" data-bind="click: modalFileMgr.okCallback()">OK</button>
-          <button class="btn btn-primary btn-sm" type="button" data-bind="click: modalFileMgr.hide">Cancel</button>
+          <span class="min-right-margin" style="color:red" data-bind="text: mdlCompany.modalFileMgr.okError"></span>
+          <button class="btn btn-primary btn-sm" type="button" data-bind="click: mdlCompany.modalFileMgr.okCallback()">OK</button>
+          <button class="btn btn-primary btn-sm" type="button" data-bind="click: mdlCompany.modalFileMgr.hide">Cancel</button>
         </div>
       </div>
-      <!-- ko ifnot: selectedWegion -->
+      <!-- ko ifnot: vwmWegion -->
+      <!-- ko with: mdlCompany -->
       {{> modal-file-mgr-panel }}
       <!-- /ko -->
-      <!-- ko with: selectedWegion -->
-      <!-- ko ifnot: selectedWield -->
+      <!-- /ko -->
+      <!-- ko with: vwmWegion -->
+      <!-- ko ifnot: vwmWield -->
+      <!-- ko with: mdlWegion -->
       {{> modal-file-mgr-panel }}
       <!-- /ko -->
-      <!-- ko with: selectedWield -->
+      <!-- /ko -->
+      <!-- ko with: vwmWield -->
+      <!-- ko with: mdlWield -->
       <!-- ko ifnot: selectedWroup -->
       {{> modal-file-mgr-panel }}
       <!-- /ko -->
@@ -27,6 +33,7 @@
       <!-- /ko -->
       <!-- ko with: selectedWell -->
       {{> modal-file-mgr-panel }}
+      <!-- /ko -->
       <!-- /ko -->
       <!-- /ko -->
       <!-- /ko -->

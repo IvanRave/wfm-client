@@ -93,6 +93,25 @@ If needed, properties can be moved from pattern to the section level: for exampl
 * Widget block may contain widgets
 * Widget has options (depending of widget type)
 
+### Oil field map - Map with wells, areas and other objects
+* Oil field can contain few maps
+* One map can contain few wells (areas etc.)
+* Map - is an image (png, jpeg, svg, etc.) with width and height (in pixels)
+* Map has a scale coefficient (scaleCoefficient) - pixels per unit of measurement (meter or foot: by default - meter)
+* Start point - top-left corner [0,0]
+* End point - bottom-right [img.width, img.height]
+* Any object on a map has coords: [0 - img.width, 0 - img.height]
+
+#### Map view (for oil field map)
+One map can have few map views (in well-map section, in field-map section, in any of widgets...)
+
+##### Properties
+* Zoom
+* Selected tool
+* Translate (for panning)
+* Selected well marker
+* Selected area
+
 ### Well test - Измерение показателей скважины
 * Сперва пользователь определяет необходимые параметры для замера.
 Все возможные параметры можно получить с помощью GET запроса соотвествующего API

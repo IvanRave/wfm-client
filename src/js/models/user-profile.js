@@ -43,26 +43,36 @@ define(['knockout', 'models/employee', 'services/register', 'helpers/lang-helper
             this.rememberMe = ko.observable(false);
 
             /**
-            * Whether user is logged. If not - guest.
-            * @type {boolean}
-            */
-            this.isLogged = ko.observable(false);
-
-            /**
             * Random token to confirm registration: sended to registered user through email
             * @type {string}
             */
             this.confirmationToken = ko.observable();
 
             /**
-            * Whether user is registered: define page: logon or register
+    * Whether user is logged. If not - guest.
+    * @type {boolean}
+    */
+            this.isLogged = ko.observable(false);
+
+            /**
+            * Whether info for user profile is loaded
             * @type {boolean}
             */
-            this.isRegistered = ko.observable(true);
+            this.isLoadedAccountInfo = ko.observable(false);
 
-            /** Toggle registered state: login or registered page */
-            this.toggleIsRegistered = function () {
-                ths.isRegistered(!ko.unwrap(ths.isRegistered));
+            /**
+            * Get account info: Email, Roles, IsLogged
+            */
+            this.loadAccountInfo = function () {
+                ths.isLoadedAccountInfo(false);
+                ths.isLogged(false);
+                authService.getAccountInfo().done(function (r) {
+                    ths.email(r.Email);
+                    ths.isLogged(true);
+                    ths.loadEmployees();
+                }).always(function () {
+                    ths.isLoadedAccountInfo(true);
+                });
             };
 
             /** Demo logon */
@@ -161,27 +171,6 @@ define(['knockout', 'models/employee', 'services/register', 'helpers/lang-helper
                         tmpProcessError += (langHelper.translate(resJson.errId) || '{{lang.unknownError}}');
                         ths.confirmRegistrationError(tmpProcessError);
                     }
-                });
-            };
-
-            /**
-            * Whether info for user profile is loaded
-            * @type {boolean}
-            */
-            this.isLoadedAccountInfo = ko.observable(false);
-
-            /**
-            * Get account info: Email, Roles, IsLogged
-            */
-            this.loadAccountInfo = function () {
-                ths.isLoadedAccountInfo(false);
-                ths.isLogged(false);
-                authService.getAccountInfo().done(function (r) {
-                    ths.email(r.Email);
-                    ths.isLogged(true);
-                    ths.loadEmployees();
-                }).always(function () {
-                    ths.isLoadedAccountInfo(true);
                 });
             };
 
@@ -319,6 +308,53 @@ define(['knockout', 'models/employee', 'services/register', 'helpers/lang-helper
                 },
                 deferEvaluation: true
             });
+
+            /**
+            * Current selected employee
+            * @type {module:models/employee}
+            */
+            this.selectedEmployee = ko.observable();
+
+            /**
+            * Select employee
+            * @param {module:models/employee} employeeToSelect - Employee to select
+            */
+            this.selectEmployee = function (employeeToSelect) {
+                var tmpInitialUrlData = ko.unwrap(vm.initialUrlData);
+
+                var tmpCompany = employeeToSelect.company;
+
+                // Load all regions for company of selected employee
+                tmpCompany.loadWegions();
+
+                // If not selected children, then select first section
+                if (tmpInitialUrlData.wegionId) {
+                    // Select child after loading well regions
+                    // If no well-regions then redirect to the main page
+                }
+                else if (tmpInitialUrlData.companySectionId) {
+                    // Select section
+
+                    var tmpSection = tmpCompany.getSectionByPatternId('company-' + tmpInitialUrlData.companySectionId);
+                    tmpCompany.selectSection(tmpSection);
+
+                    // Remove section id from
+                    delete tmpInitialUrlData.companySectionId;
+                    vm.initialUrlData(tmpInitialUrlData);
+                }
+                else {
+                    // Unselect child
+                    employeeToSelect.company.selectedWegion(null);
+                    // Show dashboard
+                    tmpCompany.unselectSection();
+
+                }
+
+                // Select ths
+                ths.selectedEmployee(employeeToSelect);
+
+                // Select parents (no need)
+            };
         };
 
         return exports;

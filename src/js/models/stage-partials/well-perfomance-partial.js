@@ -2,7 +2,7 @@
     'knockout',
     'services/datacontext',
     'helpers/app-helper',
-    'models/view-models/vm-well-perfomance',
+    'viewmodels/well-perfomance',
     'moment',
     'models/production-data', // Add constructor to datacontext
     'models/forecast-evolution' // Add constructor to datacontext

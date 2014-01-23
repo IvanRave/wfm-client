@@ -7,14 +7,13 @@ define(['jquery',
     'models/stage-base',
     'models/map-of-wield',
     'services/map-of-wield',
-    'models/view-models/maps-of-wield-vwm',
     'models/sections/section-of-wield',
     'models/wroup',
     'models/prop-spec',
     'services/wield',
     'services/wroup',
     'constants/stage-constants'], function ($, ko, datacontext,
-        fileHelper, bootstrapModal, StageBase, MapOfWield, mapOfWieldService, MapsOfWieldVwm, SectionOfWield, WellGroup,
+        fileHelper, bootstrapModal, StageBase, MapOfWield, mapOfWieldService, SectionOfWield, WellGroup,
         PropSpec, wieldService, wroupService, stageConstants) {
         'use strict';
 
@@ -183,12 +182,6 @@ define(['jquery',
             * @type {Array.<module:models/map-of-wield>}
             */
             this.WellFieldMaps = ko.observableArray();
-
-            /**
-            * Main view model for this model: can be used one model per few view models
-            * @type {<module:models/view-models/maps-of-wield-vwm>}
-            */
-            this.mapsOfWieldVwm = new MapsOfWieldVwm(ths.WellFieldMaps, {});
 
             /** Set this section as selected */
             this.loadSectionContent = function (idOfSectionPattern) {

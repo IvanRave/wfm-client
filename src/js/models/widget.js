@@ -67,7 +67,7 @@ define(['knockout',
                 WidgetWellHistory.call(ths, optsObj, ths.getWidgock().getWidgout().getParent().historyList);
                 break;
             case 'wield-map':
-                WidgetWieldMap.call(ths, optsObj, ths.getWidgock().getWidgout().getParent().WellFieldMaps);
+                WidgetWieldMap.call(ths, optsObj, ths.getWidgock().getWidgout().getParent());
                 break;
         }
 

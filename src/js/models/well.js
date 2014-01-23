@@ -9,7 +9,7 @@ define([
     'moment',
     'models/stage-base',
     'models/stage-partials/well-perfomance-partial',
-    'models/view-models/vm-well-history',
+    'viewmodels/well-history',
     'models/sections/section-of-well',
     'models/well-file',
     'models/sketch-of-well',

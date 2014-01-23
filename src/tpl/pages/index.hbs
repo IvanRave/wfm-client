@@ -21,13 +21,13 @@
     <!--[if lt IE 9]><p class="chromeframe">You are using an <strong>outdated</strong> browser. Please upgrade your browser.</p><![endif]-->
     <div id="workspace-project">
         <div class="spinner"></div>
-        <div data-bind="with: userProfile">
+        <div data-bind="with: vwmUserProfile">
             <nav class="wfm-nav clearfix navbar-inverse">
                 <div class="pull-left">
-                    <span class="link-view-inverse" data-bind="click: loadAccountInfo">{{lang.wfm}}</span>
+                    <span class="link-view-inverse" data-bind="click: mdlUserProfile.loadAccountInfo">{{lang.wfm}}</span>
                 </div>
-                <div class="pull-right" style="display:none" data-bind="visible: isLogged">
-                    <button type="button" class="btn btn-xs btn-inverse" data-bind="click: logOff">
+                <div class="pull-right" style="display:none" data-bind="visible: mdlUserProfile.isLogged">
+                    <button type="button" class="btn btn-xs btn-inverse" data-bind="click: mdlUserProfile.logOff">
                         <i class="glyphicon glyphicon-off"></i>
                         {{capitalizeFirst lang.logOut}}
                     </button>
@@ -35,73 +35,91 @@
             </nav>
             <div class="wfm-content-wrap">
                 <div>
-                    <div style="display:none" data-bind="visible: isLoadedAccountInfo">
-                        <div data-bind="ifnot: isLogged">
+                    <div style="display:none" data-bind="visible: mdlUserProfile.isLoadedAccountInfo">
+                        <div data-bind="ifnot: mdlUserProfile.isLogged">
                             <div data-bind="if: isRegistered">
-                                {{> account-logon }}
+                                <div data-bind="with: mdlUserProfile">
+                                    {{> account-logon }}
+                                </div>
                             </div>
                             <div data-bind="ifnot: isRegistered">
-                                {{> account-register }}
+                                <div data-bind="with: mdlUserProfile">
+                                    {{> account-register }}
+                                </div>
                             </div>
                         </div>
-                        <div data-bind="visible: isLogged">
-                            <div data-bind="ifnot: isLoadedEmployees">{{lang.loading}}</div>
-                            <div style="display:none" data-bind="visible: isLoadedEmployees">
-                                <div data-bind="ifnot: selectedEmployee">
-                                    {{> employee-list }}
+                        <div data-bind="visible: mdlUserProfile.isLogged">
+                            <div data-bind="ifnot: mdlUserProfile.isLoadedEmployees">{{lang.loading}}</div>
+                            <div style="display:none" data-bind="visible: mdlUserProfile.isLoadedEmployees">
+                                <!-- If no selected employee -->
+                                <div data-bind="ifnot: vwmEmployee">
+                                    <div data-bind="with: mdlUserProfile">
+                                        {{> employee-list }}
+                                    </div>
                                 </div>
-                                <div data-bind="with: selectedEmployee">
-                                    <div data-bind="if: canEditAll">
+                                <div data-bind="with: vwmEmployee">
+                                    <div data-bind="if: mdlEmployee.canEditAll">
                                         {{> edit-mode-btn }}
                                     </div>
                                     <div>
-                                        <div class="clearfix">
-                                            <div class="sidebar-toggle" data-bind="css: $root.sidebarToggleCss">
-                                                <button type="button" data-bind="click: $root.toggleIsVisibleMenu" title="Hide/show menu">
-                                                    <i class="glyphicon glyphicon-chevron-left" data-bind="visible: $root.isVisibleMenu"></i>
-                                                    <i class="glyphicon glyphicon-chevron-right" data-bind="hidden: $root.isVisibleMenu"></i>
-                                                </button>
-                                            </div>
-                                            <div class="sidebar-wrap" data-bind="css: $root.sidebarWrapCss">
-                                                <div data-bind="scroller: { }">
-                                                    {{> workspace-menu }}
-                                                </div>
-                                            </div>
-                                            <div class="workspace-container" data-bind="with: company, css: $root.workAreaCss">
-                                                <div class="wfm-top-tab-panel file-mgr-block">
-                                                    <button class="btn btn-inverse btn-sm" type="button" data-bind="click: modalFileMgr.show">
-                                                        <i class="glyphicon glyphicon-folder-open"></i>&nbsp;&nbsp;<span>{{capitalizeFirst lang.fileManager}}</span>
+                                        <div>
+                                            <div class="clearfix">
+                                                <div class="sidebar-toggle" data-bind="css: $root.sidebarToggleCss">
+                                                    <button type="button" data-bind="click: $root.toggleIsVisibleMenu" title="Hide/show menu">
+                                                        <i class="glyphicon glyphicon-chevron-left" data-bind="visible: $root.isVisibleMenu"></i>
+                                                        <i class="glyphicon glyphicon-chevron-right" data-bind="hidden: $root.isVisibleMenu"></i>
                                                     </button>
                                                 </div>
-                                                {{> modal-file-mgr }}
-                                                <div data-bind="ifnot: selectedWegion">
-                                                    {{> section-panel-standard }}
-                                                    {{> dashboard-block }}
-                                                    {{> company }}
-                                                </div>
-                                                <div data-bind="with: selectedWegion">
-                                                    <div data-bind="ifnot: selectedWield">
-                                                        {{> section-panel-standard }}
-                                                        {{> dashboard-block }}
-                                                        {{> wegion }}
+                                                <div class="sidebar-wrap" data-bind="css: $root.sidebarWrapCss">
+                                                    <div data-bind="scroller: { }">
+                                                        {{> workspace-menu }}
                                                     </div>
-                                                    <div data-bind="with: selectedWield">
-                                                        <div data-bind="ifnot: selectedWroup">
+                                                </div>
+                                                <div class="workspace-container" data-bind="with: vwmCompany, css: $root.workAreaCss">
+                                                    <div class="wfm-top-tab-panel file-mgr-block">
+                                                        <button class="btn btn-inverse btn-sm" type="button" data-bind="click: mdlCompany.modalFileMgr.show">
+                                                            <i class="glyphicon glyphicon-folder-open"></i>&nbsp;&nbsp;<span>{{capitalizeFirst lang.fileManager}}</span>
+                                                        </button>
+                                                    </div>
+                                                    {{> modal-file-mgr }}
+                                                    <div data-bind="ifnot: vwmWegion">
+                                                        <div data-bind="with: mdlCompany">
                                                             {{> section-panel-standard }}
                                                             {{> dashboard-block }}
-                                                            {{> wield }}
+                                                            {{> company }}
                                                         </div>
-                                                        <div data-bind="with: selectedWroup">
-                                                            <div data-bind="ifnot: selectedWell">
+                                                    </div>
+                                                    <div data-bind="with: vwmWegion">
+                                                        <div data-bind="ifnot: vwmWield">
+                                                            <div data-bind="with: mdlWegion">
                                                                 {{> section-panel-standard }}
                                                                 {{> dashboard-block }}
-                                                                {{> wroup }}
+                                                                {{> wegion }}
                                                             </div>
-                                                            <div data-bind="with: selectedWell">
-                                                                {{> section-panel-well }}
-                                                                {{> dashboard-block }}
-                                                                {{> well }}
+                                                        </div>
+                                                        <div data-bind="with: vwmWield">
+                                                            <div data-bind="ifnot: vwmWroup">
+                                                                <div data-bind="with: mdlWield">
+                                                                    {{> section-panel-standard }}
+                                                                    {{> dashboard-block }}
+                                                                </div>
+																{{> wield }}
                                                             </div>
+                                                            <div data-bind="with: vwmWroup">
+                                                                <div data-bind="with: mdlWroup">
+                                                                    <div data-bind="ifnot: selectedWell">
+                                                                        {{> section-panel-standard }}
+                                                                        {{> dashboard-block }}
+                                                                        {{> wroup }}
+                                                                    </div>
+                                                                    <div data-bind="with: selectedWell">
+                                                                        {{> section-panel-well }}
+                                                                        {{> dashboard-block }}
+                                                                        {{> well }}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
                                                         </div>
                                                     </div>
                                                 </div>

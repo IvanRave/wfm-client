@@ -1,29 +1,31 @@
 ﻿/** @module */
-define(['knockout'], function (ko) {
+define(['knockout', 'viewmodels/wroup'], function (ko, VwmWroup) {
     'use strict';
 
     /**
     * View for well field maps: contains filtered maps and selected map
     * @constructor
-    * @param {Array.<module:models/map-of-wield>} koMapsOfWield - models for maps (knockout wrapped)
-    * @param {object} opts - options for this view, like id of selected map, sort direction, filters etc.
     */
-    var exports = function (koMapsOfWield, opts) {
+    var exports = function (mdlWield) {
+        ////* @param {object} opts - options for this view, like id of selected map, sort direction, filters etc.
+        ////* @param {Array.<module:models/map-of-wield>} koMapsOfWield - models for maps (knockout wrapped)
 
         /** Alternative for this */
         var ths = this;
 
+        this.mdlWield = mdlWield;
+
         /** Sorted and filtered maps */
         this.handledMapsOfWield = ko.computed({
             read: function () {
-                var allMaps = ko.unwrap(koMapsOfWield);
-                return allMaps;
+                var allMaps = ko.unwrap(mdlWield.WellFieldMaps);
+                return allMaps || [];
             },
             deferEvaluation: true
         }); 
 
         /** Id of selected map for this view: different views can be with different selections */
-        this.idOfSlcMapOfWield = ko.observable(opts['IdOfSlcMapOfWield']);
+        this.idOfSlcMapOfWield = ko.observable();
 
         /** Selected map */
         this.slcMapOfWield = ko.computed({
@@ -43,7 +45,7 @@ define(['knockout'], function (ko) {
                     return slcMap;
                 }
             },
-            deferEvalution: true
+            deferEvaluation: true
         });
 
         /** Select map */
@@ -53,18 +55,11 @@ define(['knockout'], function (ko) {
             // Automatically will be selected map model
         };
 
-        this.mapWrap = {};
-
-        this.mapWrap.ratio = 1 / 2;
-
-        this.mapWrap.width = ko.observable();
-
-        // actual height of map wrap and y-axis
-        this.mapWrap.height = ko.computed({
+        this.vwmWroup = ko.computed({
             read: function () {
-                var tmpWidth = ko.unwrap(ths.mapWrap.width);
-                if (tmpWidth) {
-                    return tmpWidth * ths.mapWrap.ratio;
+                var tmpWroup = ko.unwrap(ths.mdlWield.selectedWroup);
+                if (tmpWroup) {
+                    return new VwmWroup(tmpWroup);
                 }
             },
             deferEvaluation: true

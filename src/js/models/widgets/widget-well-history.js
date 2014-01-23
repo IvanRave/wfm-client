@@ -1,5 +1,5 @@
 ﻿/** @module */
-define(['knockout', 'models/view-models/vm-well-history'], function (ko, WellHistoryViewModel) {
+define(['knockout', 'viewmodels/well-history'], function (ko, WellHistoryViewModel) {
     'use strict';
 
     /** History widget with date filter, asc or desc */

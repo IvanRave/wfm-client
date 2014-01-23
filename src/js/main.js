@@ -2,8 +2,10 @@
     'use strict';
 
     require(['console-shim', 'es5-shim'], function () {
-        require(['jquery', 'knockout', 'viewmodels/workspace', 'bindings/all-bindings', 'bindings/svg-bindings', 'jquery.panzoom'], function ($, ko, WorkspaceViewModel) {
-            var workspaceViewModel = new WorkspaceViewModel();
+        require(['jquery', 'knockout', 'viewmodels/workspace', 'models/workspace', 'bindings/all-bindings', 'bindings/svg-bindings', 'jquery.panzoom'], function ($, ko, VwmWorkspace, MdlWorkspace) {
+
+            var mdlWorkspace = new MdlWorkspace();
+            var vwmWorkspace = new VwmWorkspace(mdlWorkspace);
 
             $(function () {
                 // ======================================= pan zoom =======================
@@ -27,7 +29,7 @@
                 });
                 // ======================================= pan zoom end =======================
 
-                ko.applyBindings(workspaceViewModel, document.getElementById('workspace-project'));
+                ko.applyBindings(vwmWorkspace, document.getElementById('workspace-project'));
             });
         });
     });

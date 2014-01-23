@@ -11,7 +11,7 @@ define(['knockout','models/company', 'services/company'], function (ko, Company,
         data = data || {};
 
         /** Alternative of this */
-        var ths = this;
+        ////var ths = this;
 
         /**
         * Company guid
@@ -54,19 +54,6 @@ define(['knockout','models/company', 'services/company'], function (ko, Company,
         * @type {boolean}
         */
         this.canManageAll = (this.accessLevel & 1) === 1;
-
-        /**
-        * Whether edit mode is turn on
-        * @type {boolean}
-        */
-        this.isEditMode = ko.observable(false);
-
-        /** Toggle edit mode: only if user can edit all */
-        this.toggleEditMode = function () {
-            if (ths.canEditAll) {
-                ths.isEditMode(!ko.unwrap(ths.isEditMode));
-            }
-        };
 
         /** Remove company with employee */
         this.removeChild = function (companyToRemove) {
