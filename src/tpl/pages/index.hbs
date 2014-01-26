@@ -19,15 +19,16 @@
 </head>
 <body>
     <!--[if lt IE 9]><p class="chromeframe">You are using an <strong>outdated</strong> browser. Please upgrade your browser.</p><![endif]-->
-    <div id="workspace-project">
+    <div class="hide" id="workspace-project">
         <div class="spinner"></div>
-        <div data-bind="with: vwmUserProfile">
-            <nav class="wfm-nav clearfix navbar-inverse">
+        <div>
+            <!-- current: vwmWorkspace-->
+            <nav class="wfm-nav clearfix navbar-inverse" data-bind="with: vwmUserProfile">
                 <div class="pull-left">
-                    <span class="link-view-inverse" data-bind="click: mdlUserProfile.loadAccountInfo">{{lang.wfm}}</span>
+                    <span class="link-view-inverse" data-bind="click: unselectVwmChild">{{lang.wfm}}</span>
                 </div>
-                <div class="pull-right" style="display:none" data-bind="visible: mdlUserProfile.isLogged">
-                    <button type="button" class="btn btn-xs btn-inverse" data-bind="click: mdlUserProfile.logOff">
+                <div class="pull-right">
+                    <button type="button" class="btn btn-xs btn-inverse" data-bind="click: $parent.mdlWorkspace.logOff">
                         <i class="glyphicon glyphicon-off"></i>
                         {{capitalizeFirst lang.logOut}}
                     </button>
@@ -35,29 +36,27 @@
             </nav>
             <div class="wfm-content-wrap">
                 <div>
-                    <div style="display:none" data-bind="visible: mdlUserProfile.isLoadedAccountInfo">
-                        <div data-bind="ifnot: mdlUserProfile.isLogged">
-                            <div data-bind="if: isRegistered">
-                                <div data-bind="with: mdlUserProfile">
-                                    {{> account-logon }}
-                                </div>
+                    <div data-bind="visible: mdlWorkspace.isTriedToLoadUserProfile">
+                        <div data-bind="ifnot: vwmUserProfile">
+                            <div data-bind="slideVisible: isRegisteredPage">
+                                <!-- register page -->
+                                {{> account-logon }}
                             </div>
-                            <div data-bind="ifnot: isRegistered">
-                                <div data-bind="with: mdlUserProfile">
-                                    {{> account-register }}
-                                </div>
+                            <div data-bind="slideHidden: isRegisteredPage">
+                                <!-- login page -->
+                                {{> account-register }}
                             </div>
                         </div>
-                        <div data-bind="visible: mdlUserProfile.isLogged">
-                            <div data-bind="ifnot: mdlUserProfile.isLoadedEmployees">{{lang.loading}}</div>
-                            <div style="display:none" data-bind="visible: mdlUserProfile.isLoadedEmployees">
-                                <!-- If no selected employee -->
-                                <div data-bind="ifnot: vwmEmployee">
-                                    <div data-bind="with: mdlUserProfile">
-                                        {{> employee-list }}
-                                    </div>
+                        <div data-bind="with: vwmUserProfile">
+                            <!-- current: vwmUserProfile -->
+                            <div data-bind="ifnot: mdlStage.isLoadedEmployees">{{lang.loading}}</div>
+                            <div data-bind="if: mdlStage.isLoadedEmployees">
+                                <!-- If no selected employee: show list of employees -->
+                                <div data-bind="ifnot: slcVwmChild">
+                                    {{> employee-list }}
                                 </div>
-                                <div data-bind="with: vwmEmployee">
+                                <div data-bind="with: slcVwmChild">
+                                    <!-- current: vwmEmployee-->
                                     <div data-bind="if: mdlEmployee.canEditAll">
                                         {{> edit-mode-btn }}
                                     </div>
@@ -76,50 +75,47 @@
                                                     </div>
                                                 </div>
                                                 <div class="workspace-container" data-bind="with: vwmCompany, css: $root.workAreaCss">
+                                                    <!-- current: vwmCompany-->
                                                     <div class="wfm-top-tab-panel file-mgr-block">
-                                                        <button class="btn btn-inverse btn-sm" type="button" data-bind="click: mdlCompany.modalFileMgr.show">
+                                                        <button class="btn btn-inverse btn-sm" type="button" data-bind="click: mdlStage.modalFileMgr.show">
                                                             <i class="glyphicon glyphicon-folder-open"></i>&nbsp;&nbsp;<span>{{capitalizeFirst lang.fileManager}}</span>
                                                         </button>
                                                     </div>
                                                     {{> modal-file-mgr }}
-                                                    <div data-bind="ifnot: vwmWegion">
-                                                        <div data-bind="with: mdlCompany">
+                                                    <div data-bind="ifnot: slcVwmChild">
+                                                        <!-- if no selected wegion -->
+                                                        {{> section-panel-standard }}
+                                                        {{> dashboard-block }}
+                                                        {{> company }}
+                                                    </div>
+                                                    <div data-bind="with: slcVwmChild">
+                                                        <!-- current: vwmWegion -->
+                                                        <div data-bind="ifnot: slcVwmChild">
                                                             {{> section-panel-standard }}
                                                             {{> dashboard-block }}
-                                                            {{> company }}
+                                                            {{> wegion }}
                                                         </div>
-                                                    </div>
-                                                    <div data-bind="with: vwmWegion">
-                                                        <div data-bind="ifnot: vwmWield">
-                                                            <div data-bind="with: mdlWegion">
+                                                        <div data-bind="with: slcVwmChild">
+                                                            <!-- current: vwmWield-->
+                                                            <div data-bind="ifnot: slcVwmChild">
                                                                 {{> section-panel-standard }}
                                                                 {{> dashboard-block }}
-                                                                {{> wegion }}
+                                                                {{> wield }}
                                                             </div>
-                                                        </div>
-                                                        <div data-bind="with: vwmWield">
-                                                            <div data-bind="ifnot: vwmWroup">
-                                                                <div data-bind="with: mdlWield">
+                                                            <div data-bind="with: slcVwmChild">
+                                                                <!-- current: vwmWroup -->
+                                                                <div data-bind="ifnot: slcVwmChild">
                                                                     {{> section-panel-standard }}
                                                                     {{> dashboard-block }}
+                                                                    {{> wroup }}
                                                                 </div>
-																{{> wield }}
-                                                            </div>
-                                                            <div data-bind="with: vwmWroup">
-                                                                <div data-bind="with: mdlWroup">
-                                                                    <div data-bind="ifnot: selectedWell">
-                                                                        {{> section-panel-standard }}
-                                                                        {{> dashboard-block }}
-                                                                        {{> wroup }}
-                                                                    </div>
-                                                                    <div data-bind="with: selectedWell">
-                                                                        {{> section-panel-well }}
-                                                                        {{> dashboard-block }}
-                                                                        {{> well }}
-                                                                    </div>
+                                                                <div data-bind="with: slcVwmChild">
+                                                                    <!-- current: vwmWell -->
+                                                                    {{> section-panel-well }}
+                                                                    {{> dashboard-block }}
+                                                                    {{> well }}
                                                                 </div>
                                                             </div>
-
                                                         </div>
                                                     </div>
                                                 </div>

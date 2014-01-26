@@ -5,8 +5,8 @@ define(['jquery',
     'helpers/modal-helper',
     'models/well',
     'models/wfm-parameter-of-wroup',
-    'models/sections/section-of-wroup',
-    'models/stage-base',
+    'models/section-of-stage',
+    'models/bases/stage-base',
     'models/prop-spec',
     'services/wroup',
     'constants/stage-constants'], function ($, ko, datacontext, bootstrapModal, Well, WellGroupWfmParameter,
@@ -55,8 +55,8 @@ define(['jquery',
             };
 
             /** Get root view model */
-            this.getRootViewModel = function () {
-                return this.getWellField().getRootViewModel();
+            this.getRootMdl = function () {
+                return this.getWellField().getRootMdl();
             };
 
             /**
@@ -107,91 +107,7 @@ define(['jquery',
                 return tmpWells.filter(function (elem) {
                     return elem.id === idOfWell;
                 })[0];
-            };
-
-            /**
-            * Select well (child)
-            * @param {module:models/well} wellToSelect - Well to select
-            */
-            this.selectWell = function (wellToSelect) {
-                /** Initial function for all select stage functions */
-                ths.selectChildStage(wellToSelect);
-
-
-                var tmpInitialUrlData = ko.unwrap(ths.getRootViewModel().initialUrlData);
-
-                if (tmpInitialUrlData.wellSectionId) {
-                    // Select section
-
-                    var tmpSection = wellToSelect.getSectionByPatternId('well-' + tmpInitialUrlData.wellSectionId);
-                    wellToSelect.selectSection(tmpSection);
-
-                    // Remove section id from
-                    delete tmpInitialUrlData.wellSectionId;
-                    ths.getRootViewModel().initialUrlData(tmpInitialUrlData);
-                }
-                else
-                {
-                    // Check previous section
-
-
-                    // By default - no template - show widget page
-                    // Previous - by default - summary ths.sectionList[0].id;
-                    var previousSelectedSection;
-
-                    var prevSlcWellRegion = ko.unwrap(ths.getWellField().getWellRegion().getCompany().selectedWegion);
-
-                    // get previous selected section (if exists)
-                    if (prevSlcWellRegion) {
-                        var prevSlcWellField = ko.unwrap(prevSlcWellRegion.selectedWield);
-                        if (prevSlcWellField) {
-                            var prevSlcWellGroup = ko.unwrap(prevSlcWellField.selectedWroup);
-                            if (prevSlcWellGroup) {
-                                // previous selected well
-                                var prevSlcWell = ko.unwrap(prevSlcWellGroup.selectedWell);
-                                if (prevSlcWell) {
-                                    previousSelectedSection = ko.unwrap(prevSlcWell.selectedSection);
-
-                                    // If selected perfomance section
-                                    var tmpSelectedAttrGroupId = ko.unwrap(prevSlcWell.mainPerfomanceView.selectedAttrGroupId);
-                                    if (tmpSelectedAttrGroupId) {
-                                        wellToSelect.mainPerfomanceView.selectedAttrGroupId(tmpSelectedAttrGroupId);
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    if (previousSelectedSection) {
-                        wellToSelect.selectSection(wellToSelect.getSectionByPatternId(previousSelectedSection.sectionPatternId));
-                    }
-                    else {
-                        wellToSelect.unselectSection();
-                    }
-                }
-                    
-
-
-                // set new selected data (plus region in the end)
-                var slcWellGroup = ths;
-                var slcWellField = ths.getWellField();
-                var slcWellRegion = slcWellField.getWellRegion();
-                var slcCompany = slcWellRegion.getCompany();
-
-                // 2. Well
-                // set selected items in DESC order (can be redraw each time if ASC order)
-                // set selected well
-                slcWellGroup.selectedWell(wellToSelect);
-
-                // 3. Group: set selected well group
-                slcWellField.selectedWroup(slcWellGroup);
-
-                // 4: Field: set selected well field
-                slcWellRegion.selectedWield(slcWellField);
-
-                // 5. Region
-                slcCompany.selectedWegion(slcWellRegion);
-            };
+            };            
 
             /**
             * List of wfm parameters for this group
@@ -218,7 +134,7 @@ define(['jquery',
             this.unselectedWfmParameterList = ko.computed({
                 read: function () {
                     // two arrays
-                    return $.grep(ko.unwrap(ths.getRootViewModel().wfmParameterList), function (prmElem) {
+                    return $.grep(ko.unwrap(ths.getRootMdl().wfmParameterList), function (prmElem) {
                         var isParamExist = false;
                         $.each(ko.unwrap(ths.wellGroupWfmParameterList), function (wlgIndex, wlgElem) {
                             if (wlgElem.wfmParameterId === prmElem.id) {
@@ -346,31 +262,6 @@ define(['jquery',
             this.save = function () {
                 wroupService.put(ths.Id, ths.toDto());
             };
-
-            /** Whether item and parent are selected */
-            this.isSelectedItem = ko.computed({
-                read: function () {
-                    var tmpField = ths.getWellField();
-                    if (ko.unwrap(tmpField.isSelectedItem)) {
-                        if (ths === ko.unwrap(tmpField.selectedWroup)) {
-                            return true;
-                        }
-                    }
-                },
-                deferEvaluation: true
-            });
-
-            /** Is item selected and showed on the page */
-            this.isShowedItem = ko.computed({
-                read: function () {
-                    if (ko.unwrap(ths.isSelectedItem)) {
-                        if (!ko.unwrap(ths.selectedWell)) {
-                            return true;
-                        }
-                    }
-                },
-                deferEvaluation: true
-            });
 
             this.toDto = function () {
                 var dtoObj = {

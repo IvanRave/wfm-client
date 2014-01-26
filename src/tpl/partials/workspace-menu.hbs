@@ -1,109 +1,66 @@
-﻿<!--data-bind="with: mdlEmployee"-->
-<div class="wfm-list">
+﻿<div class="wfm-list">
+  <!-- parent: vwmUserProfile -->
+  <!-- current: slcVwmEmployee (slcVwmChild) -->
   <ul class="list-unstyled">
+    <!-- ko with: vwmCompany -->
     <li>
-      <!-- TODO: move selectEmployee to view -->
-      <div class="wfm-menu-item wfm-menu-header" data-bind="click: $parent.mdlUserProfile.selectEmployee">
-        <span data-bind="with: vwmCompany">
-          <span data-bind="text: mdlCompany.name, attr: {title: mdlCompany.name}"></span>
-        </span>
+      <div class="wfm-menu-item wfm-menu-header" data-bind="click: $parents[1].selectVwmChild, css: { 'wfm-slc-menu-item': isShowedVwmStage }">
+        <!-- select company view, using userprofile parent -->
+        <span data-bind="text: mdlStage.name, attr: {title: mdlStage.name}"></span>
       </div>
     </li>
-    <!-- ko with: vwmCompany -->
-    <!-- ko with: mdlCompany-->
-    <!-- ko ifnot: isLoadedWegions -->
+    <!-- ko ifnot: mdlStage.isLoadedWegions -->
     <li>
       <div class="wfm-menu-item wfm-menu-header text-center">
         <img src="img/ajax-line-loader.gif" alt="{{lang.loading}}"/>
       </div>
     </li>
     <!-- /ko -->
-    <!-- ko foreach: wegions -->
+    <!-- ko foreach: listOfVwmChild -->
+    <!-- current: vwmWegion-->
     <li>
       <div class="clearfix">
         <i class="glyphicon" data-bind="css:{ 'glyphicon-circle-arrow-down' : isOpenItem, 'glyphicon-circle-arrow-right' : !isOpenItem() }, click: toggleItem"></i>
-        <div class="wfm-menu-item" data-bind="click: $parent.selectWegion, css: { 'wfm-slc-menu-item': isShowedItem }">
+        <div class="wfm-menu-item" data-bind="click: $parent.selectVwmChild, css: { 'wfm-slc-menu-item': isShowedVwmStage }">
           <div class="pull-right">
             <small>
               <i class="glyphicon glyphicon-globe"></i>
             </small>
           </div>
-          <div>
+          <div data-bind="with: mdlStage">
             <span data-bind="text: name, attr: {title: name}"></span>
           </div>
         </div>
       </div>
       <ul class="list-unstyled wfm-child" data-bind="visible: isOpenItem">
-        <!-- ko foreach: wields -->
+        <!-- ko foreach: listOfVwmChild -->
+        <!-- current: vwmWield -->
         <li>
           <div class="clearfix">
             <i class="glyphicon" data-bind="css:{ 'glyphicon-circle-arrow-down' : isOpenItem, 'glyphicon-circle-arrow-right' : !isOpenItem() }, click: toggleItem"></i>
-            <div class="wfm-menu-item" data-bind="click: $parent.selectWield, css: { 'wfm-slc-menu-item': isShowedItem }">
+            <div class="wfm-menu-item" data-bind="click: $parent.selectVwmChild, css: { 'wfm-slc-menu-item': isShowedVwmStage }">
               <div class="pull-right">
                 <small>
                   <i class="glyphicon glyphicon-home"></i>
                 </small>
               </div>
-              <div>
+              <div data-bind="with: mdlStage">
                 <span data-bind="text: name, attr: {title: name}"></span>
               </div>
             </div>
           </div>
-          <ul class="list-unstyled wfm-child" data-bind="visible: isOpenItem">
-            <!-- ko foreach: wroups -->
-            <li>
-              <div class="clearfix">
-                <i class="glyphicon" data-bind="css:{ 'glyphicon-circle-arrow-down' : isOpenItem, 'glyphicon-circle-arrow-right' : !isOpenItem() }, click: toggleItem"></i>
-                <div class="wfm-menu-item" data-bind="click: $parent.selectWroup, css: { 'wfm-slc-menu-item': isShowedItem }">
-                  <div class="pull-right">
-                    <small>
-                      <i class="glyphicon glyphicon-list"></i>
-                    </small>
-                  </div>
-                  <div>
-                    <span data-bind="text: Name, attr: {title: Name}"></span>
-                  </div>
-                </div>
-              </div>
-              <ul class="list-unstyled wfm-child" data-bind="visible: isOpenItem">
-                <!-- ko foreach: Wells -->
-                <li>
-                  <div class="clearfix">
-                    <div class="wfm-menu-item" data-bind="click: $parent.selectWell, css: { 'wfm-slc-menu-item': isSelectedItem }">
-                      <div class="pull-right">
-                        <small>
-                          <i class="glyphicon glyphicon-leaf"></i>
-                        </small>
-                      </div>
-                      <div>
-                        <span data-bind="text: Name, attr: {title: Name}"></span>
-                      </div>
-                    </div>
-                  </div>
-                </li>
-                <!-- /ko -->
-                <li data-bind="if: $root.isEmployeeInEditMode">
-                  <button class="btn btn-xs" data-bind="click: addWell" type="button">Add well</button>
-                </li>
-              </ul>
-            </li>
-            <!-- /ko -->
-            <li data-bind="if: $root.isEmployeeInEditMode">
-              <button class="btn btn-xs" data-bind="click: addWellGroup" type="button">Add group</button>
-            </li>
-          </ul>
+          <!--snippet-->
         </li>
         <!-- /ko -->
         <li data-bind="if: $root.isEmployeeInEditMode">
-          <button class="btn btn-xs" data-bind="click: addWellField" type="button">Add field</button>
+          <button class="btn btn-xs" data-bind="click: mdlStage.addWellField" type="button">Add field</button>
         </li>
       </ul>
     </li>
     <!-- /ko -->
     <li data-bind="if: $root.isEmployeeInEditMode">
-      <button class="btn btn-xs" data-bind="click: postWegion" type="button">Add region</button>
+      <button class="btn btn-xs" data-bind="click: mdlStage.postWegion" type="button">Add region</button>
     </li>
-    <!-- /ko -->
     <!-- /ko -->
   </ul>
 </div>

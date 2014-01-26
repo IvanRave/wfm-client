@@ -3,6 +3,59 @@ define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-he
     'jquery.slimscroll', 'jquery.bootstrap', 'picker.date'], function ($, ko, appMoment, bootstrapModal, fileHelper) {
         'use strict';
 
+        ko.bindingHandlers.hidden = {
+            update: function (element, valueAccessor) {
+                ko.bindingHandlers.visible.update(element, function () {
+                    return !ko.unwrap(valueAccessor());
+                });
+            }
+        };
+
+        /** Hide or show elements with slide animation */
+        ko.bindingHandlers.slideVisible = {
+            ////init: function (element, valueAccessor) {
+            ////    var value = ko.unwrap(valueAccessor());
+
+            ////    var $element = $(element);
+
+            ////    if (value) {
+            ////        $element.show();
+            ////    }
+            ////    else {
+            ////        $element.hide();
+            ////    }
+            ////    console.log('exexxx');
+            ////},
+            update: function (element, valueAccessor, allBindingsAccessor) {
+                console.log('exexxxView');
+                var value = ko.unwrap(valueAccessor());
+
+                var $element = $(element);
+
+                var allBindings = allBindingsAccessor();
+
+                // Grab data from binding property
+                var duration = allBindings.duration || 500;
+                var isCurrentlyVisible = element.style.display !== 'none';
+
+                if (value && !isCurrentlyVisible) {
+                    $element.show(duration);
+                }
+                else if ((!value) && isCurrentlyVisible) {
+                    $element.hide(duration);
+                }
+            }
+        };
+
+        /** Hide element with slide animation */
+        ko.bindingHandlers.slideHidden = {
+            update: function (element, valueAccessor, allBindingsAccessor) {
+                ko.bindingHandlers.slideVisible.update(element, function () {
+                    return !ko.unwrap(valueAccessor());
+                }, allBindingsAccessor);
+            }
+        };
+
         // Controls whether or not the text in a textbox is selected based on a model property
         ko.bindingHandlers.selected = {
             init: function (elem, valueAccessor) {
@@ -80,14 +133,6 @@ define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-he
                 else {
                     element.innerHTML = String(Math.round(p * 100) / 100);
                 }
-            }
-        };
-
-        ko.bindingHandlers.hidden = {
-            update: function (element, valueAccessor) {
-                ko.bindingHandlers.visible.update(element, function () {
-                    return !ko.utils.unwrapObservable(valueAccessor());
-                });
             }
         };
 
@@ -579,5 +624,5 @@ define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-he
                     $(element).modal('hide');
                 }
             }
-        };       
+        };
     });

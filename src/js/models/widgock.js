@@ -48,6 +48,7 @@ define(['jquery',
             var tmpStagePattern = ko.unwrap(ths.slcStagePatternForWidget);
             if (tmpStagePattern) {
                 var tmpWidgetList = ko.unwrap(ths.widgetList);
+
                 // Get order number of last widget
                 var lastOrderNumber;
 

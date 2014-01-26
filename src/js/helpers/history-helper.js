@@ -1,8 +1,49 @@
 ﻿/** @module */
-define(['helpers/app-helper'], function (appHelper) {
+define(['helpers/app-helper', 'constants/stage-constants'], function (appHelper, stageConstants) {
     'use strict';
 
-    var historyHelper = {};
+    var historyHelper = {
+        /**
+        * Get array for navigation url: builded from childstage and sections
+        * @param {object} childStage - Child stage: well, wroup...
+        */
+        getNavigationArr: function (childStage) {
+            var navigationArr;
+            switch (childStage.stageKey) {
+                case stageConstants.upro.id:
+                    navigationArr = [stageConstants.company.plural];
+                    break;
+                case stageConstants.company.id:
+                    navigationArr = [stageConstants.company.plural, childStage.id];
+                    break;
+                case stageConstants.wegion.id:
+                    navigationArr = [stageConstants.company.plural, childStage.getCompany().id,
+                        stageConstants.wegion.plural, childStage.id];
+                    break;
+                case stageConstants.wield.id:
+                    navigationArr = [stageConstants.company.plural, childStage.getWellRegion().getCompany().id,
+                        stageConstants.wegion.plural, childStage.getWellRegion().id,
+                        stageConstants.wield.plural, childStage.id];
+                    break;
+                case stageConstants.wroup.id:
+                    navigationArr = [stageConstants.company.plural, childStage.getWellField().getWellRegion().getCompany().id,
+                        stageConstants.wegion.plural, childStage.getWellField().getWellRegion().id,
+                        stageConstants.wield.plural, childStage.getWellField().id,
+                        stageConstants.wroup.plural, childStage.id];
+                    break;
+                case stageConstants.well.id:
+                    navigationArr = [stageConstants.company.plural, childStage.getWellGroup().getWellField().getWellRegion().getCompany().id,
+                        stageConstants.wegion.plural, childStage.getWellGroup().getWellField().getWellRegion().id,
+                        stageConstants.wield.plural, childStage.getWellGroup().getWellField().id,
+                        stageConstants.wroup.plural, childStage.getWellGroup().id,
+                        stageConstants.well.plural, childStage.id];
+                    break;
+                default: throw new Error('No child stage');
+            }
+
+            return navigationArr;
+        }
+    };
 
     var routes = [
             { url: '/companies' },
@@ -122,7 +163,7 @@ define(['helpers/app-helper'], function (appHelper) {
             }
         });
 
-        console.log(initialData);
+        console.log('url data for selection: ', initialData);
         return initialData;
     };
 

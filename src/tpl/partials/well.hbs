@@ -1,56 +1,59 @@
-﻿<div>
+﻿<!-- current: vwmStage (Well) -->
+<div>
   <div class="wfm-top-tab-panel clearfix" style="left: 500px">
     <div class="pull-left" style="margin-top:1px">
-      <button class="btn btn-inverse btn-sm" type="button" data-bind="click: showFmg">
-        <i class="glyphicon glyphicon-folder-open"></i>&nbsp;&nbsp;<span>{{capitalizeFirst lang.fileManager}}</span>
+      <button class="btn btn-inverse btn-sm" type="button" data-bind="click: mdlStage.showFmg">
+        <i class="glyphicon glyphicon-folder-open"></i><span class="min-left-margin">{{capitalizeFirst lang.fileManager}}</span>
       </button>
     </div>
   </div>
-
   <div class="tab-content-pad">
-    <div data-bind="if: selectedSection() === null">
+    <div data-bind="if: slcVwmSectionWrk() === null">
+      <!-- ko with: mdlStage -->
       {{> widget-well-perfomance}}
       {{> widget-well-sketch}}
       {{> widget-default-summary}}
       {{> widget-well-history}}
 
       {{> widget-scope}}
+      <!-- /ko -->
     </div>
-    <div data-bind="if: selectedSection">
-      <div data-bind="if: selectedSection().sectionPatternId === 'well-history'">
+    <div data-bind="if: slcVwmSectionWrk">
+      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'well-history'">
         {{> well-history}}
       </div>
-      <div data-bind="if: selectedSection().sectionPatternId === 'well-integrity'">
+      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'well-integrity'">
         {{> well-integrity}}
       </div>
-      <div data-bind="if: selectedSection().sectionPatternId === 'well-log'">
+      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'well-log'">
         {{> well-log}}
       </div>
-      <div data-bind="if: selectedSection().sectionPatternId === 'well-map'">
+      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'well-map'">
         {{> well-map}}
       </div>
-      <div data-bind="if: selectedSection().sectionPatternId === 'well-nodalanalysis'">
+      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'well-nodalanalysis'">
         {{> well-nodalanalysis}}
       </div>
-      <div data-bind="if: selectedSection().sectionPatternId === 'well-perfomance'">
+      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'well-perfomance'">
         {{> well-pd}}
       </div>
-      <div data-bind="if: selectedSection().sectionPatternId === 'well-report'">
+      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'well-report'">
         {{> well-report}}
       </div>
-      <div data-bind="if: selectedSection().sectionPatternId === 'well-sketch'">
+      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'well-sketch'">
         {{> well-sketch}}
       </div>
-      <div data-bind="if: selectedSection().sectionPatternId === 'well-summary'">
+      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'well-summary'">
         {{> summary-standard }}
       </div>
-      <div data-bind="if: selectedSection().sectionPatternId === 'well-test'">
+      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'well-test'">
         {{> well-test}}
       </div>
-      <div data-bind="if: selectedSection().sectionPatternId === 'well-volume'">
+      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'well-volume'">
         {{> well-volume}}
       </div>
     </div>
   </div>
+  <!-- TODO: remove -->
   {{> modal-file-manager}}
 </div>

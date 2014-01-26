@@ -4,15 +4,16 @@ define(['jquery',
     'services/datacontext',
     'helpers/file-helper',
     'helpers/modal-helper',
-    'models/stage-base',
+    'models/bases/stage-base',
     'models/map-of-wield',
     'services/map-of-wield',
-    'models/sections/section-of-wield',
+    'models/section-of-stage',
     'models/wroup',
     'models/prop-spec',
     'services/wield',
     'services/wroup',
-    'constants/stage-constants'], function ($, ko, datacontext,
+    'constants/stage-constants'],
+    function ($, ko, datacontext,
         fileHelper, bootstrapModal, StageBase, MapOfWield, mapOfWieldService, SectionOfWield, WellGroup,
         PropSpec, wieldService, wroupService, stageConstants) {
         'use strict';
@@ -54,8 +55,8 @@ define(['jquery',
             };
 
             /** Get root view model */
-            this.getRootViewModel = function () {
-                return this.getWellRegion().getRootViewModel();
+            this.getRootMdl = function () {
+                return this.getWellRegion().getRootMdl();
             };
 
             this.propSpecList = wieldPropSpecList;
@@ -90,81 +91,6 @@ define(['jquery',
             * @type {Array.<module:models/wroup>}
             */
             this.wroups = ko.observableArray();
-
-            /** Selected group */
-            this.selectedWroup = ko.observable();
-
-            /** Select well group */
-            this.selectWroup = function (wroupToSelect) {
-                /** Initial function for all select stage functions */
-                ths.selectChildStage(wroupToSelect);
-
-                var tmpInitialUrlData = ko.unwrap(ths.getRootViewModel().initialUrlData);
-
-                if (tmpInitialUrlData.wellId) {
-                    var needWell = wroupToSelect.getWellById(tmpInitialUrlData.wellId);
-                    if (needWell) {
-                        wroupToSelect.selectWell(needWell);
-                    }
-                    else {
-                        alert('Well from url is not found');
-                    }
-
-                    // Clean unnecessary ids
-                    delete tmpInitialUrlData.wellId;
-                    ths.getRootViewModel().initialUrlData(tmpInitialUrlData);
-                }
-                else if (tmpInitialUrlData.wroupSectionId) {
-                    // Select section
-
-                    var tmpSection = wroupToSelect.getSectionByPatternId('wroup-' + tmpInitialUrlData.wroupSectionId);
-                    wroupToSelect.selectSection(tmpSection);
-
-                    // Remove section id from
-                    delete tmpInitialUrlData.wroupSectionId;
-                    ths.getRootViewModel().initialUrlData(tmpInitialUrlData);
-                }
-                else {
-                    // Show dashboard
-                    wroupToSelect.unselectSection();
-                    // Unselect child to show parent content
-                    wroupToSelect.selectedWell(null);
-                }
-
-                // Set group as selected
-                ths.selectedWroup(wroupToSelect);
-
-                // Set all parents as selected
-                ths.getWellRegion().selectedWield(ths);
-                ths.getWellRegion().getCompany().selectedWegion(ths.getWellRegion());
-
-                // get last approved scopes of every well (one request)
-                // insert in every well
-                // get all test data for every with total
-
-                var wellIdList = wroupToSelect.Wells().map(function (el) {
-                    return el.Id;
-                });
-
-                if (wellIdList.length === 0) { return; }
-
-                wroupToSelect.getWellGroupWfmParameterList();
-
-                datacontext.getTestScope({ wellIdList: wellIdList }).done(function (result) {
-                    if (result.length > 0) {
-                        //for (var w = 0, wMax = ths.Wells().length; w < wMax; w++) {
-                        $.each(wroupToSelect.Wells(), function (wellIndex, wellValue) {
-                            //for (var i = 0, iMax = objSet.length; i < iMax; i++) {
-                            $.each(result, function (objIndex, objValue) {
-                                if (wellValue.Id === objValue.WellId) {
-                                    wellValue.lastTestScope(datacontext.createTestScope(objValue, wellValue));
-                                    return false;
-                                }
-                            });
-                        });
-                    }
-                });
-            };
 
             /**
             * Get well group by id
@@ -268,31 +194,6 @@ define(['jquery',
                 // Open file manager
                 tmpModalFileMgr.show();
             };
-
-            /** Whether item and parent are selected */
-            this.isSelectedItem = ko.computed({
-                read: function () {
-                    var tmpRegion = ths.getWellRegion();
-                    if (ko.unwrap(tmpRegion.isSelectedItem)) {
-                        if (ths === ko.unwrap(tmpRegion.selectedWield)) {
-                            return true;
-                        }
-                    }
-                },
-                deferEvaluation: true
-            });
-
-            /** Is item selected and showed on the page */
-            this.isShowedItem = ko.computed({
-                read: function () {
-                    if (ko.unwrap(ths.isSelectedItem)) {
-                        if (!ko.unwrap(ths.selectedWroup)) {
-                            return true;
-                        }
-                    }
-                },
-                deferEvaluation: true
-            });
 
             this.loadDashboard = function () {
                 ths.loadMapsOfWield();

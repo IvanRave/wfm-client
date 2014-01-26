@@ -1,11 +1,12 @@
-﻿<div class="wfm-section-panel wfm-bottom-fix clearfix">
+﻿<!-- current: vwmStage (well) -->
+<div class="wfm-section-panel wfm-bottom-fix clearfix">
   <div class="pull-left">
-    <ul class="nav nav-pills" data-bind="foreach: listOfSection">
-      <!-- ko if: isVisibleAsView -->
-      <!-- ko if: (sectionPatternId !== 'well-perfomance') -->
-      <li data-bind="css: {'active': isSelectedSection }">
-        <div data-bind="click: $parent.selectSection">
-          <span data-bind="with: sectionPattern">
+    <ul class="nav nav-pills" data-bind="foreach: listOfVwmSection">
+      <!-- ko if: mdlSection.isVisibleAsView -->
+      <!-- ko if: (mdlSection.sectionPatternId !== 'well-perfomance') -->
+      <li data-bind="css: {'active': isSlcVwmSectionWrk }">
+        <div data-bind="click: $parent.selectVwmSectionWrk">
+          <span data-bind="with: mdlSection.sectionPattern">
             <span data-bind="text: name"></span>
           </span>
           <br />
@@ -13,10 +14,10 @@
         </div>
       </li>
       <!-- /ko -->
-      <!-- ko if: (sectionPatternId === 'well-perfomance') -->
-      <li class="dropup" data-bind="css: {'active': isSelectedSection }">
+      <!-- ko if: (mdlSection.sectionPatternId === 'well-perfomance') -->
+      <li class="dropup" data-bind="css: {'active': isSlcVwmSectionWrk }">
         <div class="dropdown-toggle" data-toggle="dropdown" data-bind="drpdwn: {}">
-          <span data-bind="with: sectionPattern">
+          <span data-bind="with: mdlSection.sectionPattern">
             <span data-bind="text: name"></span>
           </span>
           <br />
@@ -25,6 +26,7 @@
         </div>
         <ul class="dropdown-menu" data-bind="foreach: $root.wfmParamSquadList">
           <li>
+            <!-- TODO: redraw -->
             <div data-bind="click: function() { $parents[1].selectSection($parents[1].getSectionByPatternId('well-perfomance')); $parents[1].mainPerfomanceView.selectAttrGroupId($data.id); }">
               <span data-bind="text: id"></span>
             </div>

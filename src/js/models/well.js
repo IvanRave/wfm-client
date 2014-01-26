@@ -7,10 +7,10 @@ define([
     'helpers/modal-helper',
     'helpers/app-helper',
     'moment',
-    'models/stage-base',
+    'models/bases/stage-base',
     'models/stage-partials/well-perfomance-partial',
     'viewmodels/well-history',
-    'models/sections/section-of-well',
+    'models/section-of-stage',
     'models/well-file',
     'models/sketch-of-well',
     'models/prop-spec',
@@ -106,8 +106,8 @@ define([
         };
 
         /** Get workspace view model */
-        this.getRootViewModel = function () {
-            return this.getWellGroup().getRootViewModel();
+        this.getRootMdl = function () {
+            return this.getWellGroup().getRootMdl();
         };
 
         /**
@@ -301,19 +301,6 @@ define([
             read: function () {
                 if (ko.unwrap(ths.sectionWellFiles)) {
                     return ko.unwrap(ths.sectionWellFiles).length > 0;
-                }
-            },
-            deferEvaluation: true
-        });
-
-        /** Whether item and parent are selected */
-        this.isSelectedItem = ko.computed({
-            read: function () {
-                var tmpGroup = ths.getWellGroup();
-                if (ko.unwrap(tmpGroup.isSelectedItem)) {
-                    if (ths === ko.unwrap(tmpGroup.selectedWell)) {
-                        return true;
-                    }
                 }
             },
             deferEvaluation: true

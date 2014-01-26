@@ -50,6 +50,13 @@ contains words (with translation) for all WFM services
 
 Each stage contains properties, like name, description, logo
 
+### Models and viewmodels
+* Every data model can be represented as a different view
+Workspace model - Workspace viewmodel (contain one userprofile)
+UserProfile model - UserProfile viewmodel (contains few employees)
+Employee model - Employee viewmodel (contain one company)
+Company -> Wegion -> Wield -> Wroup -> Well
+
 ### Sections
 
 Section - it is a part of page view (or part of file manager like a folder).

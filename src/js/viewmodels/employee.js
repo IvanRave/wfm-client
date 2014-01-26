@@ -6,7 +6,7 @@ define(['knockout', 'viewmodels/company'], function (ko, VwmCompany) {
     * Employee view model (user in company)
     * @constructor
     */
-    var exports = function (mdlEmployee) {
+    var exports = function (mdlEmployee, koSlcVwmStage, defaultSlcData) {
         var ths = this;
 
         /**
@@ -14,6 +14,15 @@ define(['knockout', 'viewmodels/company'], function (ko, VwmCompany) {
         * @type {<module:models/employee>}
         */
         this.mdlEmployee = mdlEmployee;
+
+        /**
+        * Main view model for company
+        * @type {<module:viewmodels/company>}
+        */
+        this.vwmCompany = new VwmCompany(ths.mdlEmployee.company, koSlcVwmStage, defaultSlcData);
+
+        /** Unique id of view: id of employee = id of company */
+        this.unq = this.vwmCompany.unq;
 
         /**
         * Whether edit mode is turn on
@@ -27,12 +36,6 @@ define(['knockout', 'viewmodels/company'], function (ko, VwmCompany) {
                 ths.isEditMode(!ko.unwrap(ths.isEditMode));
             }
         };
-
-        /**
-        * Main view model for company
-        * @type {<module:viewmodels/company>}
-        */
-        ths.vwmCompany = new VwmCompany(ths.mdlEmployee.company);
     };
 
     return exports;

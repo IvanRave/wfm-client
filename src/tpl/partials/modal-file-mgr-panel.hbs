@@ -1,14 +1,15 @@
-﻿<div class="modal-header clearfix" data-bind="hidden: $root.vwmUserProfile.vwmEmployee().vwmCompany.mdlCompany.modalFileMgr.okCallback">
+﻿<!-- current: vwmStage (company, wegion .. well) -->
+<div class="modal-header clearfix" data-bind="hidden: $root.vwmUserProfile().slcVwmChild().vwmCompany.mdlStage.modalFileMgr.okCallback">
   <div class="clearfix">
     <div class="pull-right min-right-margin">
-      <button class="btn btn-primary btn-sm" type="button" data-bind="click: $root.vwmUserProfile.vwmEmployee().vwmCompany.mdlCompany.modalFileMgr.hide">Close</button>
+      <button class="btn btn-primary btn-sm" type="button" data-bind="click: $root.vwmUserProfile().slcVwmChild().vwmCompany.mdlStage.modalFileMgr.hide">Close</button>
     </div>
     <div class="pull-left">
-      <div class="btn-group" data-bind="foreach: listOfSection">
-        <!-- ko if: sectionPattern -->
-        <!-- ko if: sectionPattern().isFolder -->
-        <button class="btn btn-sm btn-default" data-bind="css: {'active': isSelectedFileSection }, click: $parent.selectFileSection">
-          <span data-bind="with: sectionPattern">
+      <div class="btn-group" data-bind="foreach: listOfVwmSection">
+        <!-- ko if: mdlSection.sectionPattern -->
+        <!-- ko if: mdlSection.sectionPattern().isFolder -->
+        <button class="btn btn-sm btn-default" data-bind="css: {'active': isSlcVwmSectionFmg }, click: $parent.selectVwmSectionFmg">
+          <span data-bind="with: mdlSection.sectionPattern">
             <span data-bind="text: name"></span>
           </span>
         </button>
@@ -19,22 +20,22 @@
   </div>
 </div>
 <div class="modal-body">
-  <!-- ko with: selectedFileSection -->
-  <!-- ko if: sectionPattern -->
+  <!-- ko with: slcVwmSectionFmg -->
+  <!-- ko if: mdlSection.sectionPattern -->
   <div>
     <span class="btn btn-sm btn-inverse fileinput-button">
       <i class="glyphicon glyphicon-plus"></i>
       <span>Add file...</span>
-      <input data-bind="filoader: getSectionFiloader()" type="file"></input>
+      <input data-bind="filoader: mdlSection.getSectionFiloader()" type="file"></input>
     </span>
-    <button class="btn btn-sm btn-inverse" data-bind="click: deleteSelectedFileSpecs, enable: isSelectedAnyFile">
+    <button class="btn btn-sm btn-inverse" data-bind="click: mdlSection.deleteSelectedFileSpecs, enable: mdlSection.isSelectedAnyFile">
       <i class="glyphicon glyphicon-remove"></i> {{capitalizeFirst lang.toDelete}}
     </button>
   </div>
-  <div class="text-center" data-bind="visible: readyListOfFileSpec().length === 0">
+  <div class="text-center" data-bind="visible: mdlSection.readyListOfFileSpec().length === 0">
     <span>No files</span>
   </div>
-  <div class="clearfix" data-bind="visible: readyListOfFileSpec().length > 0">
+  <div class="clearfix" data-bind="visible: mdlSection.readyListOfFileSpec().length > 0">
     <div class="col-sm-8">
       <span class="bld" title="File name">Name</span>
     </div>
@@ -49,7 +50,7 @@
     </div>
   </div>
 
-  <div data-bind="foreach: readyListOfFileSpec">
+  <div data-bind="foreach: mdlSection.readyListOfFileSpec">
     <div class="clearfix">
       <div class="col-sm-8">
         <div class="checkbox">

@@ -1,31 +1,27 @@
 ﻿<div>
+  <!-- current: vwmStage (vwmWieldStage) -->
   <div class="tab-content-pad">
-    <div data-bind="with: mdlWield">
-      <div data-bind="if: selectedSection() === null">
+    <div data-bind="if: slcVwmSectionWrk() === null">
         {{> widget-default-summary }}
         {{> widget-wield-map }}
 
         {{> widget-scope}}
-      </div>
     </div>
-    <div data-bind="if: mdlWield.selectedSection">
-      <div data-bind="if: mdlWield.selectedSection().sectionPatternId === 'wield-map'">
-        <!-- context: vwmWield -->
+    <div data-bind="if: slcVwmSectionWrk">
+      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'wield-summary'">
+        {{> summary-standard }}
+      </div>
+      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'wield-map'">
         {{> wield-map}}
       </div>
-      <div data-bind="with: mdlWield">
-        <div data-bind="if: selectedSection().sectionPatternId === 'wield-pvt'">
-          {{> wield-pvt}}
-        </div>
-        <div data-bind="if: selectedSection().sectionPatternId === 'wield-summary'">
-          {{> summary-standard }}
-        </div>
-        <div data-bind="if: selectedSection().sectionPatternId === 'wield-reservoir'">
-          {{> wield-reservoir}}
-        </div>
-        <div data-bind="if: selectedSection().sectionPatternId === 'wield-potential'">
-          {{> wield-potential}}
-        </div>
+      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'wield-pvt'">
+        {{> wield-pvt}}
+      </div>      
+      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'wield-reservoir'">
+        {{> wield-reservoir}}
+      </div>
+      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'wield-potential'">
+        {{> wield-potential}}
       </div>
     </div>
   </div>

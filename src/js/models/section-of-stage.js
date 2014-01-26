@@ -17,9 +17,20 @@ define(['knockout',
         * @constructor
         * @param {object} data - Section data
         */
-        var exports = function (data) {
+        var exports = function (data, parentStage, idOfParentStage) {
             /** Alternative */
             var ths = this;
+
+            /** Get parent (well) */
+            this.getParent = function () {
+                return parentStage;
+            };
+
+            /**
+            * Id of parent stage of section. Duplicated in section.parentId and section.parent.id
+            * @type {number||string}
+            */
+            this.idOfParentStage = idOfParentStage;
 
             /**
             * Stage, like 'well', 'wield', 'wroup', 'wegion', 'company'
@@ -80,30 +91,6 @@ define(['knockout',
                     }
                 },
                 deferEvaluation: true
-            });
-
-            /**
-            * Whether section is selected
-            * @type {boolean}
-            */
-            this.isSelectedSection = ko.computed({
-                read: function () {
-                    return (ko.unwrap(this.getParent().selectedSection) === this);
-                },
-                deferEvaluation: true,
-                owner: this
-            });
-
-            /**
-            * Whether this file section is selected (the same section, only for file manager)
-            * @type {boolean}
-            */
-            this.isSelectedFileSection = ko.computed({
-                read: function () {
-                    return (ko.unwrap(this.getParent().selectedFileSection) === this);
-                },
-                deferEvaluation: true,
-                owner: this
             });
 
             /**

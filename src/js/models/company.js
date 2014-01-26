@@ -1,6 +1,6 @@
 ﻿/** @module */
 define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/datacontext',
-    'helpers/modal-helper', 'helpers/history-helper', 'models/stage-base', 'models/sections/section-of-company',
+    'helpers/modal-helper', 'helpers/history-helper', 'models/bases/stage-base', 'models/section-of-stage',
     'models/prop-spec', 'services/company', 'models/file-spec', 'services/wegion', 'constants/stage-constants',
     'helpers/knockout-lazy'], function ($, ko, Wegion, JobType, appDatacontext, modalHelper, historyHelper,
         StageBase, SectionOfCompany, PropSpec, companyService, FileSpec, wegionService, stageConstants) {
@@ -18,7 +18,10 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
 
         /** Import company sections */
         function importListOfSectionOfCompanyDto(data, parent) {
-            return data.map(function (item) { return new SectionOfCompany(item, parent); });
+            return data.map(function (item) {
+                return new SectionOfCompany(item, parent, item.CompanyId);
+            });
+            // item.CompanyId === parent.id
         }
 
         /** Main properties for company: headers can be translated here if needed */
@@ -38,13 +41,13 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
         * @constructor
         * @param {object} data - Company data
         */
-        var exports = function (data, rootViewModel) {
+        var exports = function (data, mdlEmployee) {
             data = data || {};
 
             var ths = this;
 
-            this.getRootViewModel = function () {
-                return rootViewModel;
+            this.getRootMdl = function () {
+                return mdlEmployee.getRootMdl();
             };
 
             /**
@@ -166,58 +169,6 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
             };
 
             /**
-            * Selected region
-            * @type {module:models/wegion}
-            */
-            this.selectedWegion = ko.observable();
-
-            /**
-            * Select well region
-            * @param {module:models/wegion} wegionToSelect - Well region to select
-            */
-            this.selectWegion = function (wegionToSelect) {
-                /** Initial function for all select stage functions */
-                ths.selectChildStage(wegionToSelect);
-
-                var tmpInitialUrlData = ko.unwrap(ths.getRootViewModel().initialUrlData);
-
-                // 1. Check url to child stage
-                if (tmpInitialUrlData.wieldId) {
-                    var needWield = wegionToSelect.getWieldById(tmpInitialUrlData.wieldId);
-                    if (needWield) {
-                        wegionToSelect.selectWield(needWield);
-                    }
-                    else {
-                        alert('Well field is not found');
-                    }
-
-                    delete tmpInitialUrlData.wieldId;
-                    ths.getRootViewModel().initialUrlData(tmpInitialUrlData);
-                }
-                else if (tmpInitialUrlData.wegionSectionId) {
-                    // Select section
-
-                    var tmpSection = wegionToSelect.getSectionByPatternId('wegion-' + tmpInitialUrlData.wegionSectionId);
-                    wegionToSelect.selectSection(tmpSection);
-
-                    // Remove section id from
-                    delete tmpInitialUrlData.wegionSectionId;
-                    ths.getRootViewModel().initialUrlData(tmpInitialUrlData);
-                }
-                else {
-                    // Show dashboard
-                    wegionToSelect.unselectSection();
-                    // Unselect child to show parent content
-                    wegionToSelect.selectedWield(null);
-                }
-                
-                // Set as selected: only after select all children
-                ths.selectedWegion(wegionToSelect);
-
-                // Select parents (not need)
-            };
-
-            /**
             * Select region by id: wrap for select wegion function
             * @param {number} wegionId - Id of well region
             */
@@ -238,9 +189,6 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
                 if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(wellRegionForDelete.name) + '"?')) {
                     wegionService.remove(wellRegionForDelete.id).done(function () {
                         ths.wegions.remove(wellRegionForDelete);
-
-                        ths.selectedWegion(null);
-
                         ////window.location.hash = window.location.hash.split('?')[0];
                     });
                 }
@@ -318,31 +266,27 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
             * Load wegions of this company
             */
             this.loadWegions = function () {
-                var tmpInitialUrlData = ko.unwrap(ths.getRootViewModel().initialUrlData);
+                ////var tmpInitialUrlData = ko.unwrap(ths.getRootMdl().initialUrlData);
 
-                function selectWegionIfNeed() {
-                    if (tmpInitialUrlData.wegionId) {
-                        var wegionToSelect = ths.getWegionById(tmpInitialUrlData.wegionId);
-                        if (wegionToSelect) {
-                            ths.selectWegion(wegionToSelect);
-                        }
+                ////function selectWegionIfNeed() {
+                ////    if (tmpInitialUrlData.wegionId) {
+                ////        var wegionToSelect = ths.getWegionById(tmpInitialUrlData.wegionId);
+                ////        if (wegionToSelect) {
+                ////            ths.selectWegion(wegionToSelect);
+                ////        }
 
-                        // Remove to not load again
-                        delete tmpInitialUrlData.wegionId;
-                        ths.getRootViewModel().initialUrlData(tmpInitialUrlData);
-                    }
-                }
+                ////        // Remove to not load again
+                ////        delete tmpInitialUrlData.wegionId;
+                ////        ths.getRootMdl().initialUrlData(tmpInitialUrlData);
+                ////    }
+                ////}
 
-                if (!ko.unwrap(ths.isLoadedWegions)) {
-                    wegionService.getInclusive(ths.id).done(function (response) {
-                        ths.wegions(importWegions(response, ths));
-                        ths.isLoadedWegions(true);
-                        selectWegionIfNeed();
-                    });
-                }
-                else {
-                    selectWegionIfNeed();
-                }
+                if (ko.unwrap(ths.isLoadedWegions)) { return; }
+
+                wegionService.getInclusive(ths.id).done(function (response) {
+                    ths.wegions(importWegions(response, ths));
+                    ths.isLoadedWegions(true);
+                });
             };
 
             /** Convert to data transfer object to sent to the server*/
@@ -360,6 +304,9 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
 
             /** Load sections */
             this.listOfSection(importListOfSectionOfCompanyDto(data.ListOfSectionOfCompanyDto, ths));
+
+            /** Load inner object after initialization: only one time per user profile selection */
+            this.loadWegions();
         };
 
         return exports;

@@ -29,7 +29,10 @@
                 });
                 // ======================================= pan zoom end =======================
 
-                ko.applyBindings(vwmWorkspace, document.getElementById('workspace-project'));
+                var workspaceProjectBlock = document.getElementById('workspace-project');
+
+                ko.applyBindings(vwmWorkspace, workspaceProjectBlock);
+                $(workspaceProjectBlock).removeClass('hide');
             });
         });
     });

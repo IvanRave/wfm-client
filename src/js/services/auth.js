@@ -2,11 +2,11 @@
 define(['jquery', 'helpers/ajax-request'], function ($, ajaxRequest) {
     'use strict';
 
-    function accountLogoffUrl(uqp) {
-        return '{{conf.requrl}}/api/account/logoff/' + (uqp ? ('?' + $.param(uqp)) : '');
+    function accountLogoffUrl() {
+        return '{{conf.requrl}}/api/account/logoff';
     }
-    function accountLogonUrl(uqp) {
-        return '{{conf.requrl}}/api/account/logon/' + (uqp ? ('?' + $.param(uqp)) : '');
+    function accountLogonUrl() {
+        return '{{conf.requrl}}/api/account/logon';
     }
     function accountInfoUrl() {
         return '{{conf.requrl}}/api/account/info';
@@ -16,17 +16,17 @@ define(['jquery', 'helpers/ajax-request'], function ($, ajaxRequest) {
     var exports = {};
 
     /** Account logoff */
-    exports.accountLogoff = function (uqp) {
-        return ajaxRequest('POST', accountLogoffUrl(uqp));
+    exports.accountLogoff = function () {
+        return ajaxRequest('POST', accountLogoffUrl());
     };
 
     /** Account logon */
-    exports.accountLogon = function (uqp, data) {
-        return ajaxRequest('POST', accountLogonUrl(uqp), data);
+    exports.accountLogon = function (data) {
+        return ajaxRequest('POST', accountLogonUrl(), data);
     };
 
     /** Get account info */
-    exports.getAccountInfo = function () {
+    exports.getUserProfile = function () {
         return ajaxRequest('GET', accountInfoUrl());
     };
 

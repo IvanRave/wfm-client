@@ -44,7 +44,7 @@
 
         vw.selectedAttrGroup = ko.computed({
             read: function () {
-                var tmpWfmParamSquadList = ko.unwrap(prfPartial.getWellObj().getRootViewModel().wfmParamSquadList);
+                var tmpWfmParamSquadList = ko.unwrap(prfPartial.getWellObj().getRootMdl().wfmParamSquadList);
 
                 var tmpAttrGroup = $.grep(tmpWfmParamSquadList, function (elemValue) {
                     return elemValue.id === ko.unwrap(vw.selectedAttrGroupId);

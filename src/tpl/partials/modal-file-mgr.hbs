@@ -1,40 +1,38 @@
-﻿<!--<div data-bind="with: mdlCompany">-->
-<!-- Block with company context -->
-<div class="modal fade" role="dialog" tabindex="-1" aria-hidden="true" data-bind="modalWindow: {isOpenFileMgr: mdlCompany.modalFileMgr.isOpen, fileMgrHiddenCallback: mdlCompany.modalFileMgr.hiddenCallback}">
+﻿<!-- current: vwmCompany -->
+<div class="modal fade" role="dialog" tabindex="-1" aria-hidden="true" data-bind="modalWindow: {isOpenFileMgr: mdlStage.modalFileMgr.isOpen, fileMgrHiddenCallback: mdlStage.modalFileMgr.hiddenCallback}">
   <div class="modal-dialog modal-fullscreen">
     <div class="modal-content full-min-height">
-      <div class="modal-header clearfix" data-bind="visible: mdlCompany.modalFileMgr.okCallback">
-        <h4 class="modal-title pull-left" data-bind="text: mdlCompany.modalFileMgr.okDescription"></h4>
+      <div class="modal-header clearfix" data-bind="visible: mdlStage.modalFileMgr.okCallback">
+        <h4 class="modal-title pull-left" data-bind="text: mdlStage.modalFileMgr.okDescription"></h4>
         <div class="pull-right min-right-margin">
-          <span class="min-right-margin" style="color:red" data-bind="text: mdlCompany.modalFileMgr.okError"></span>
-          <button class="btn btn-primary btn-sm" type="button" data-bind="click: mdlCompany.modalFileMgr.okCallback()">OK</button>
-          <button class="btn btn-primary btn-sm" type="button" data-bind="click: mdlCompany.modalFileMgr.hide">Cancel</button>
+          <span class="min-right-margin" style="color:red" data-bind="text: mdlStage.modalFileMgr.okError"></span>
+          <button class="btn btn-primary btn-sm" type="button" data-bind="click: mdlStage.modalFileMgr.okCallback()">OK</button>
+          <button class="btn btn-primary btn-sm" type="button" data-bind="click: mdlStage.modalFileMgr.hide">Cancel</button>
         </div>
       </div>
-      <!-- ko ifnot: vwmWegion -->
-      <!-- ko with: mdlCompany -->
+      <!-- ko ifnot: slcVwmChild -->
       {{> modal-file-mgr-panel }}
       <!-- /ko -->
-      <!-- /ko -->
-      <!-- ko with: vwmWegion -->
-      <!-- ko ifnot: vwmWield -->
-      <!-- ko with: mdlWegion -->
+
+      <!-- ko with: slcVwmChild -->
+      <!-- ko ifnot: slcVwmChild -->
       {{> modal-file-mgr-panel }}
       <!-- /ko -->
-      <!-- /ko -->
-      <!-- ko with: vwmWield -->
-      <!-- ko with: mdlWield -->
-      <!-- ko ifnot: selectedWroup -->
+
+      <!-- ko with: slcVwmChild -->
+      <!-- ko ifnot: slcVwmChild -->
       {{> modal-file-mgr-panel }}
       <!-- /ko -->
-      <!-- ko with: selectedWroup-->
-      <!-- ko ifnot: selectedWell-->
+
+      <!-- ko with: slcVwmChild -->
+      <!-- ko ifnot: slcVwmChild -->
       {{> modal-file-mgr-panel }}
       <!-- /ko -->
-      <!-- ko with: selectedWell -->
+
+      <!-- ko with: slcVwmChild -->
       {{> modal-file-mgr-panel }}
       <!-- /ko -->
-      <!-- /ko -->
+
       <!-- /ko -->
       <!-- /ko -->
       <!-- /ko -->

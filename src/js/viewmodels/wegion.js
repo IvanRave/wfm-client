@@ -1,35 +1,44 @@
 ﻿/** @module */
-define(['knockout', 'viewmodels/wield'], function (ko, VwmWield) {
-    'use strict';
-
-    /**
-    * Well region view model
-    * @constructor
-    */
-    var exports = function (mdlWegion) {
-
-        var ths = this;
+define(['knockout',
+    'viewmodels/wield',
+    'viewmodels/bases/stage-child-base',
+    'viewmodels/bases/stage-base'],
+    function (ko, VwmWield, VwmStageChildBase, VwmStageBase) {
+        'use strict';
 
         /**
-        * Model wegion
-        * @type {<module:models/wegion>}
+        * Well region view model
+        * @constructor
         */
-        this.mdlWegion = mdlWegion;
+        var exports = function (mdlWegion, koSlcVwmStage, defaultSlcData) {
+            var ths = this;
 
-        /**
-        * Well region view model (selected well region)
-        * @type {<module:viewmodels/wegion>}
-        */
-        this.vwmWield = ko.computed({
-            read: function () {
-                var tmpWield = ko.unwrap(ths.mdlWegion.selectedWield);
-                if (tmpWield) {
-                    return new VwmWield(tmpWield);
-                }
-            },
-            deferEvaluation: true
-        });
-    };
+            /**
+            * Model wegion
+            * @type {<module:models/wegion>}
+            */
+            this.mdlStage = mdlWegion;
 
-    return exports;
-});
+            /** Unique id for view */
+            this.unq = mdlWegion.id;
+
+            /**
+            * List of views of well fields 
+            * @type {Array.<module:viewmodels/wield>}
+            */
+            this.listOfVwmChild = ko.computed({
+                read: function () {
+                    return ko.unwrap(mdlWegion.wields).map(function (elem) {
+                        return new VwmWield(elem, ths.slcVwmChild, defaultSlcData);
+                    });
+                },
+                deferEvaluation: true
+            });
+
+            VwmStageBase.call(this, koSlcVwmStage, defaultSlcData.wegionSectionId);
+
+            VwmStageChildBase.call(this, defaultSlcData.wieldId);
+        };
+
+        return exports;
+    });

@@ -7,6 +7,7 @@ define([], function () {
     * @constructor
     */
     var exports = {
+        upro: { id: 'upro', single: 'user-profile', plural: 'user-profiles' },
         company: { id: 'company', single: 'company', plural: 'companies' },
         wegion: { id: 'wegion', single: 'well-region', plural: 'well-regions' },
         wield: { id: 'wield', single: 'well-field', plural: 'well-fields' },

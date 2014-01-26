@@ -3,8 +3,9 @@ define(['jquery',
     'knockout',
     'services/datacontext',
     'helpers/modal-helper',
-    'models/wield', 'models/stage-base',
-    'models/sections/section-of-wegion',
+    'models/wield',
+    'models/bases/stage-base',
+    'models/section-of-stage',
     'models/prop-spec',
     'services/wegion',
     'services/wield',
@@ -43,8 +44,8 @@ define(['jquery',
             };
 
             /** Get root view model */
-            this.getRootViewModel = function () {
-                return this.getCompany().getRootViewModel();
+            this.getRootMdl = function () {
+                return this.getCompany().getRootMdl();
             };
 
             // Persisted properties
@@ -63,31 +64,6 @@ define(['jquery',
             /** Base for all stages */
             StageBase.call(this, data);
 
-            /** Is selected item */
-            this.isSelectedItem = ko.computed({
-                read: function () {
-                    return (ths === ko.unwrap(ths.getCompany().selectedWegion));
-                },
-                deferEvaluation: true
-            });
-
-            /** 
-            * Is item selected and showed on the page 
-            * @type {boolean}
-            */
-            this.isShowedItem = ko.computed({
-                read: function () {
-                    if (ko.unwrap(ths.isSelectedItem)) {
-                        if (!ko.unwrap(ths.selectedWield)) {
-                            return true;
-                        }
-                    }
-                },
-                deferEvaluation: true
-            });
-
-            this.selectedWield = ko.observable();
-
             /**
             * Get well field by id
             * @param {number} idOfWield - Well field id
@@ -97,58 +73,6 @@ define(['jquery',
                 return tmpWields.filter(function (elem) {
                     return elem.id === idOfWield;
                 })[0];
-            };
-
-            /** Select well field */
-            this.selectWield = function (wieldToSelect) {
-                ths.selectChildStage(wieldToSelect);
-
-                var tmpInitialUrlData = ko.unwrap(ths.getRootViewModel().initialUrlData);
-
-                if (tmpInitialUrlData.wroupId) {
-                    var needWroup = wieldToSelect.getWroupById(tmpInitialUrlData.wroupId);
-                    if (needWroup) {
-                        wieldToSelect.selectWroup(needWroup);
-                    }
-                    else
-                    {
-                        alert('Well group from url is not found');
-                    }
-
-                    delete tmpInitialUrlData.wroupId;
-                    ths.getRootViewModel().initialUrlData(tmpInitialUrlData);
-                }
-                else if (tmpInitialUrlData.wieldSectionId) {
-                    // Select section
-
-                    var tmpSection = wieldToSelect.getSectionByPatternId('wield-' + tmpInitialUrlData.wieldSectionId);
-                    wieldToSelect.selectSection(tmpSection);
-
-                    // Remove section id from
-                    delete tmpInitialUrlData.wieldSectionId;
-                    ths.getRootViewModel().initialUrlData(tmpInitialUrlData);
-                }
-                else {
-                    // Show dashboard
-                    wieldToSelect.unselectSection();
-                    // Unselect child to show parent content
-                    wieldToSelect.selectedWroup(null);
-                }
-
-                // Select ths
-                ths.selectedWield(wieldToSelect);
-
-                // Select parents
-                ths.getCompany().selectedWegion(ths);
-
-                // Select section by default (or selected section from prevous selected field)
-                ////var needSection = $.grep(ko.unwrap(wieldToSelect.listOfSection), function (arrElem) {
-                ////    return (arrElem.sectionPatternId === 'wield-map');
-                ////})[0];
-
-                ////if (needSection) {
-                ////    wieldToSelect.selectSection(needSection);
-                ////}
             };
 
             this.removeChild = function (wellFieldForDelete) {
