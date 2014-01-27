@@ -10,7 +10,7 @@ define(['knockout',
         * Well region view model
         * @constructor
         */
-        var exports = function (mdlWegion, koSlcVwmStage, defaultSlcData) {
+        var exports = function (mdlWegion, koSlcVwmStage, defaultSlcData, fmgrLink) {
             var ths = this;
 
             /**
@@ -22,6 +22,9 @@ define(['knockout',
             /** Unique id for view */
             this.unq = mdlWegion.id;
 
+            /** Link to file manager of company */
+            this.fmgr = fmgrLink;
+
             /**
             * List of views of well fields 
             * @type {Array.<module:viewmodels/wield>}
@@ -29,7 +32,7 @@ define(['knockout',
             this.listOfVwmChild = ko.computed({
                 read: function () {
                     return ko.unwrap(mdlWegion.wields).map(function (elem) {
-                        return new VwmWield(elem, ths.slcVwmChild, defaultSlcData);
+                        return new VwmWield(elem, ths.slcVwmChild, defaultSlcData, ths.fmgr);
                     });
                 },
                 deferEvaluation: true

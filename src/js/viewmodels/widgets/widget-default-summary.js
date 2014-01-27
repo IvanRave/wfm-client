@@ -17,7 +17,7 @@ define(['knockout'], function (ko) {
             }
         });
 
-        this.toPlainOpts = function () {
+        this.toStringifyOpts = function () {
             var obj = {};
 
             propSpecList.forEach(function (propSpec) {
@@ -26,7 +26,7 @@ define(['knockout'], function (ko) {
                 }
             });
 
-            return obj;
+            return JSON.stringify(obj);
         };
     };
 

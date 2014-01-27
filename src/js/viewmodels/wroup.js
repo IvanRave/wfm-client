@@ -7,7 +7,13 @@ define([], function () {
     * @constructor
     */
     var exports = function (mdlWroup) {
-        this.mdlWroup = mdlWroup;
+        //var ths = this;
+
+        this.mdlStage = mdlWroup;
+
+        this.unq = mdlWroup.id;
+        
+        // TODO: add other fields
     };
 
     return exports;

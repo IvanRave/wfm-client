@@ -38,39 +38,30 @@ define(['jquery',
 
         this.widgetList = ko.observableArray();
 
-        /**
-        * Selected section pattern for widget (of this stage)
-        * @type {module:models/section-pattern}
-        */
-        this.slcStagePatternForWidget = ko.observable();
+        this.addWidget = function (tmpWidgetName, tmpIdOfSectionPattern) {
+            var tmpWidgetList = ko.unwrap(ths.widgetList);
 
-        this.addWidget = function () {
-            var tmpStagePattern = ko.unwrap(ths.slcStagePatternForWidget);
-            if (tmpStagePattern) {
-                var tmpWidgetList = ko.unwrap(ths.widgetList);
+            // Get order number of last widget
+            var lastOrderNumber;
 
-                // Get order number of last widget
-                var lastOrderNumber;
-
-                if (tmpWidgetList.length > 0) {
-                    lastOrderNumber = ko.unwrap(tmpWidgetList[tmpWidgetList.length - 1].orderNumber);
-                }
-                else {
-                    lastOrderNumber = 0;
-                }
-
-                widgetService.post(ths.getWidgout().getParent().stageKey, ths.id, {
-                    Name: ko.unwrap(tmpStagePattern.name),
-                    IdOfSectionPattern: tmpStagePattern.id,
-                    OrderNumber: lastOrderNumber + 1,
-                    Opts: '{}',
-                    WidgockId: ths.id
-                }).done(function (createdWidget) {
-                    var widgetNew = new Widget(createdWidget, ths);
-                    ths.widgetList.push(widgetNew);
-                    widgetNew.showVisSettingPanel();
-                });
+            if (tmpWidgetList.length > 0) {
+                lastOrderNumber = ko.unwrap(tmpWidgetList[tmpWidgetList.length - 1].orderNumber);
             }
+            else {
+                lastOrderNumber = 0;
+            }
+
+            widgetService.post(ths.getWidgout().getParent().stageKey, ths.id, {
+                Name: tmpWidgetName,
+                IdOfSectionPattern: tmpIdOfSectionPattern,
+                OrderNumber: lastOrderNumber + 1,
+                Opts: '{}',
+                WidgockId: ths.id
+            }).done(function (createdWidget) {
+                var widgetNew = new Widget(createdWidget, ths);
+                ths.widgetList.push(widgetNew);
+                widgetNew.showVisSettingPanel();
+            });
         };
 
         /** Remove widget from widget block */

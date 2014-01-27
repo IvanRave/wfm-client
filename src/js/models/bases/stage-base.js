@@ -108,9 +108,6 @@ define(['knockout',
             });
         };
 
-        /** Selected widget layouts: may be defined by default from client storage (cookies..) */
-        this.slcWidgout = ko.observable();
-
         /** Possible widget layout list to insert */
         this.widgoutTemplates = widgoutService.getWidgoutTemplates();
 
@@ -129,16 +126,38 @@ define(['knockout',
             }
         };
 
-        /** Remove widget layout from this stage */
-        this.removeWidgout = function () {
-            var widgoutToDelete = ko.unwrap(ths.slcWidgout);
-            if (widgoutToDelete) {
-                if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(widgoutToDelete.name) + '"?')) {
-                    widgoutService.remove(ths.stageKey, ths.id || ths.Id, widgoutToDelete.id).done(function () {
-                        ths.widgouts.remove(widgoutToDelete);
-                    });
-                }
+        this.removeWidgout = function (widgoutToRemove) {
+            if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(widgoutToRemove.name) + '"?')) {
+                widgoutService.remove(ths.stageKey, ths.id || ths.Id, widgoutToRemove.id).done(function () {
+                    ths.widgouts.remove(widgoutToRemove);
+                });
             }
+        };
+
+        /**
+        * Delete only link to file - without removing physically and from section
+        * @param {module/prop-spec} fileSpecProp - Property data
+        */
+        this.deleteImgFileSpec = function (fileSpecProp) {
+            // Clean property of this image and nested property with image link (like FileSpec and idOfFileSpec)
+            ths[fileSpecProp.addtData.nestedClientId](null);
+            ths[fileSpecProp.clientId](null);
+
+            // Every stage has a save method to save current state of model
+            ths.save();
+
+            ////var tmpFileSpecElem = ko.unwrap(ths[fileSpecProp.clientId]);
+            ////if (!tmpFileSpecElem) { return; }
+            ////// Select file section with logos
+
+            ////var idOfFileSpec = tmpFileSpecElem.id;
+            ////console.log(idOfFileSpec);
+            ////var needSection = ths.getSectionByPatternId('company-summary');
+            ////// Remove from file section + clean FileSpec (delete from logo tables)
+            ////needSection.deleteFileSpecById(idOfFileSpec, function () {
+            ////ths[fileSpecProp.addtData.nestedClientId](null);
+            ////ths[fileSpecProp.clientId](null);
+            ////});
         };
     };
 

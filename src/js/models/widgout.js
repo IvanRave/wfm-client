@@ -3,7 +3,7 @@ define(['knockout', 'models/widgock', 'services/widgout'], function (ko, Widgock
     'use strict';
 
     /** Import widget block list to layout */
-    function importWidgockList(data, widgoutItem) {
+    function importWidgocks(data, widgoutItem) {
         return (data || []).map(function (item) { return new Widgock(item, widgoutItem); });
     }
 
@@ -19,7 +19,12 @@ define(['knockout', 'models/widgock', 'services/widgout'], function (ko, Widgock
             return parent;
         };
 
+        /**
+        * Layout id (guid)
+        * @type {string}
+        */
         this.id = data.Id;
+
         this.name = ko.observable(data.Name);
 
         this.save = function () {
@@ -34,10 +39,8 @@ define(['knockout', 'models/widgock', 'services/widgout'], function (ko, Widgock
 
         this.name.subscribe(ths.save);
 
-        // Well widget block list
-        this.widgockList = ko.observableArray();
-
-        this.widgockList(importWidgockList(data.WidgockDtoList, ths));
+        /** Well widget block list */
+        this.widgocks = ko.observableArray(importWidgocks(data.WidgockDtoList, ths));
     };
 
     return exports;

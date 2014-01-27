@@ -8,12 +8,14 @@
           <span data-bind="with: vwmCompany">
             <span class="pointer" data-bind="click: $parents[1].selectVwmChild">
               <!-- current: vwmCompany-->
-              <span data-bind="with: mdlStage.fileSpecOfLogo">
+              <!-- ko with: mdlStage -->
+              <span data-bind="with: fileSpecOfLogo">
                 <img class="company-logo" src="#" data-bind="attr: {src: fileUrl, width: $parent.getPropSpecByClientId('fileSpecOfLogo').addtData.width }" title="{{capitalizeFirst lang.toView}} {{lang.wfm}}" />
               </span>
-              <span data-bind="ifnot: mdlStage.fileSpecOfLogo">
+              <span data-bind="ifnot: fileSpecOfLogo">
                 <img class="company-logo" src="img/question.jpg"></img>
               </span>
+              <!-- /ko -->
             </span>
           </span>
         </div>

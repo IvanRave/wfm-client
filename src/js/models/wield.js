@@ -144,55 +144,20 @@ define(['jquery',
                 });
             };
 
-            /**
-            * Create map from file
-            */
-            this.createMapFromFile = function () {
-                var needSection = ths.getSectionByPatternId('wield-map');
+            this.postMapOfWield = function (tmpIdOfFileSpec, tmpNameOfFileSpec, scsCallback) {
+                // Create map on the server with this file
+                mapOfWieldService.post(ths.id, {
+                    WellFieldId: ths.id,
+                    ScaleCoefficient: 1,
+                    Description: '',
+                    // by default - map name = file name
+                    Name: tmpNameOfFileSpec,
+                    IdOfFileSpec: tmpIdOfFileSpec
+                }).done(function (r) {
+                    ths.WellFieldMaps.push(new MapOfWield(r, ths));
 
-                // Select file section with maps (load and unselect files)
-                ths.selectFileSection(needSection);
-
-                var tmpModalFileMgr = ths.getWellRegion().getCompany().modalFileMgr;
-
-                // Calback for selected file
-                // Click "Select file for map" ... (only image files)
-                function mgrCallback() {
-                    tmpModalFileMgr.okError('');
-                    // Select file from file manager
-                    var selectedFileSpecs = ko.unwrap(needSection.listOfFileSpec).filter(function (elem) {
-                        return ko.unwrap(elem.isSelected);
-                    });
-
-                    if (selectedFileSpecs.length !== 1) {
-                        tmpModalFileMgr.okError('need to select one file');
-                        return;
-                    }
-
-                    // Create map on the server with this file
-                    mapOfWieldService.post(ths.id, {
-                        WellFieldId: ths.id,
-                        ScaleCoefficient: 1,
-                        Description: '',
-                        // by default - map name = file name
-                        Name: ko.unwrap(selectedFileSpecs[0].name),
-                        IdOfFileSpec: selectedFileSpecs[0].id
-                    }).done(function (r) {
-                        ths.WellFieldMaps.push(new MapOfWield(r, ths));
-
-                        // Push to well field map list
-                        tmpModalFileMgr.hide();
-                    });
-                }
-
-                // Add to observable
-                tmpModalFileMgr.okCallback(mgrCallback);
-
-                // Notification
-                tmpModalFileMgr.okDescription('Please select a file for a map');
-
-                // Open file manager
-                tmpModalFileMgr.show();
+                    scsCallback();
+                });
             };
 
             this.loadDashboard = function () {

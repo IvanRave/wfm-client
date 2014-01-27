@@ -20,7 +20,7 @@
     <!-- current: vwmWegion-->
     <li>
       <div class="clearfix">
-        <i class="glyphicon" data-bind="css:{ 'glyphicon-circle-arrow-down' : isOpenItem, 'glyphicon-circle-arrow-right' : !isOpenItem() }, click: toggleItem"></i>
+        <i class="glyphicon" data-bind="css: menuItemCss, click: toggleItem"></i>
         <div class="wfm-menu-item" data-bind="click: $parent.selectVwmChild, css: { 'wfm-slc-menu-item': isShowedVwmStage }">
           <div class="pull-right">
             <small>
@@ -32,12 +32,12 @@
           </div>
         </div>
       </div>
-      <ul class="list-unstyled wfm-child" data-bind="visible: isOpenItem">
+      <ul class="list-unstyled wfm-child" data-bind="visible: isOpenedItem">
         <!-- ko foreach: listOfVwmChild -->
         <!-- current: vwmWield -->
         <li>
           <div class="clearfix">
-            <i class="glyphicon" data-bind="css:{ 'glyphicon-circle-arrow-down' : isOpenItem, 'glyphicon-circle-arrow-right' : !isOpenItem() }, click: toggleItem"></i>
+            <i class="glyphicon" data-bind="css: menuItemCss, click: toggleItem"></i>
             <div class="wfm-menu-item" data-bind="click: $parent.selectVwmChild, css: { 'wfm-slc-menu-item': isShowedVwmStage }">
               <div class="pull-right">
                 <small>

@@ -1,13 +1,13 @@
-﻿<!-- current: vwmCompany -->
-<div class="modal fade" role="dialog" tabindex="-1" aria-hidden="true" data-bind="modalWindow: {isOpenFileMgr: mdlStage.modalFileMgr.isOpen, fileMgrHiddenCallback: mdlStage.modalFileMgr.hiddenCallback}">
+﻿<!-- current: vwmStage (vwmCompany) -->
+<div class="modal fade" role="dialog" tabindex="-1" aria-hidden="true" data-bind="modalWindow: {isOpenFileMgr: fmgr.isOpen, fileMgrHiddenCallback: fmgr.hiddenCallback}">
   <div class="modal-dialog modal-fullscreen">
     <div class="modal-content full-min-height">
-      <div class="modal-header clearfix" data-bind="visible: mdlStage.modalFileMgr.okCallback">
-        <h4 class="modal-title pull-left" data-bind="text: mdlStage.modalFileMgr.okDescription"></h4>
+      <div class="modal-header clearfix" data-bind="visible: fmgr.okCallback">
+        <h4 class="modal-title pull-left" data-bind="text: fmgr.okDescription"></h4>
         <div class="pull-right min-right-margin">
-          <span class="min-right-margin" style="color:red" data-bind="text: mdlStage.modalFileMgr.okError"></span>
-          <button class="btn btn-primary btn-sm" type="button" data-bind="click: mdlStage.modalFileMgr.okCallback()">OK</button>
-          <button class="btn btn-primary btn-sm" type="button" data-bind="click: mdlStage.modalFileMgr.hide">Cancel</button>
+          <span class="min-right-margin" style="color:red" data-bind="text: fmgr.okError"></span>
+          <button class="btn btn-primary btn-sm" type="button" data-bind="click: fmgr.okCallback()">OK</button>
+          <button class="btn btn-primary btn-sm" type="button" data-bind="click: fmgr.hide">Cancel</button>
         </div>
       </div>
       <!-- ko ifnot: slcVwmChild -->

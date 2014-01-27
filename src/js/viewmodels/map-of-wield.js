@@ -13,11 +13,33 @@ define(['knockout', 'models/map-tool'], function (ko, MapTool) {
     * View for well field map: contains selected objects, zoom, translate options
     * @constructor
     */
-    var exports = function (mdlMapOfWield) {
+    var exports = function (mdlMapOfWield, koSlcVwmMapOfWield) {
         /** Alternative for this */
         var ths = this;
 
         this.mdlMapOfWield = mdlMapOfWield;
+
+        /** View id === model id. CAUTION: few views from one model
+        * @type {number}
+        */
+        this.vid = mdlMapOfWield.id;
+
+        /**
+        * Name link to model: need for options list
+        * @type {string}
+        */
+        this.name = mdlMapOfWield.name;
+
+        /**
+        * Whether view is selected
+        * @type {boolean}
+        */
+        this.isSlcVwmMapOfWield = ko.computed({
+            read: function () {
+                return ths.vid === ko.unwrap(koSlcVwmMapOfWield).vid;
+            },
+            deferEvaluation: true
+        });
 
         /** Filtered and sorted well markers */
         this.handledWellMarkers = ko.computed({

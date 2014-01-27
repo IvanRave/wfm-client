@@ -24,10 +24,8 @@ define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-he
             ////    else {
             ////        $element.hide();
             ////    }
-            ////    console.log('exexxx');
             ////},
             update: function (element, valueAccessor, allBindingsAccessor) {
-                console.log('exexxxView');
                 var value = ko.unwrap(valueAccessor());
 
                 var $element = $(element);

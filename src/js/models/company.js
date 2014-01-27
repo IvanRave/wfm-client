@@ -86,74 +86,6 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
                 });
             }, this);
 
-            /**
-            * Delete only link to file - without removing physically and from section
-            * @param {module/prop-spec} fileSpecProp - Property data
-            */
-            this.deleteImgFileSpec = function (fileSpecProp) {
-                ths[fileSpecProp.addtData.nestedClientId](null);
-                ths[fileSpecProp.clientId](null);
-
-                ths.save();
-
-                ////var tmpFileSpecElem = ko.unwrap(ths[fileSpecProp.clientId]);
-                ////if (!tmpFileSpecElem) { return; }
-                ////// Select file section with logos
-
-                ////var idOfFileSpec = tmpFileSpecElem.id;
-                ////console.log(idOfFileSpec);
-                ////var needSection = ths.getSectionByPatternId('company-summary');
-                ////// Remove from file section + clean FileSpec (delete from logo tables)
-                ////needSection.deleteFileSpecById(idOfFileSpec, function () {
-                ////ths[fileSpecProp.addtData.nestedClientId](null);
-                ////ths[fileSpecProp.clientId](null);
-                ////});
-            };
-
-            /** Select file for any image */
-            this.selectImgFileSpec = function (fileSpecProp) {
-                ////console.log();
-                var needSection = ths.getSectionByPatternId('company-summary');
-                // Select file section with logos (load and unselect files)
-                ths.selectFileSection(needSection);
-
-                function mgrCallback() {
-                    ths.modalFileMgr.okError('');
-                    // Select file from file manager
-                    var selectedFileSpecs = ko.unwrap(needSection.listOfFileSpec).filter(function (elem) {
-                        return ko.unwrap(elem.isSelected);
-                    });
-
-                    if (selectedFileSpecs.length !== 1) {
-                        ths.modalFileMgr.okError('need to select one file');
-                        return;
-                    }
-
-                    // Get prop id
-                    ths[fileSpecProp.addtData.nestedClientId](selectedFileSpecs[0].id);
-                    ths.save();
-                    ths.modalFileMgr.hide();
-                    // Change sketch (create if not exists)
-                    ////sketchOfWellService.put(ths.idOfWell, {
-                    ////    idOfWell: ths.idOfWell,
-                    ////    idOfFileSpec: selectedFileSpecs[0].id,
-                    ////    name: ko.unwrap(selectedFileSpecs[0].name) || '',
-                    ////    description: ko.unwrap(ths.description) || ''
-                    ////}).done(function (resSketch) {
-                    ////    ths.name(resSketch.Name);
-                    ////    ths.description(resSketch.Description);
-                    ////    ths.idOfFileSpec(resSketch.IdOfFileSpec);
-                    ////    ths.fileSpec(new FileSpec(resSketch.FileSpecDto));
-                    ////    tmpModalFileMgr.hide();
-                    ////});
-                }
-
-                ths.modalFileMgr.okCallback(mgrCallback);
-                ths.modalFileMgr.okDescription('Please select image for company logo');
-
-                ths.modalFileMgr.show();
-            };
-
             /** Modal window for adding job type */
             this.goToPostingJobType = function () {
                 var jobTypeNewName = window.prompt('{{capitalizeFirst lang.toAddJobTypeToList}}');
@@ -216,28 +148,6 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
 
                     modalHelper.closeModalWindow();
                 });
-            };
-
-            this.modalFileMgr = {
-                isOpen: ko.observable(false),
-                okDescription: ko.observable(''),
-                okError: ko.observable(''),
-                // Callback for Ok button
-                okCallback: ko.observable(),
-                // When click from view using data-bind click event, then first argument - it is context
-                show: function () {
-                    // TODO: add ok callback description: 'choose map file...'
-                    ths.modalFileMgr.isOpen(true);
-                },
-                hide: function () {
-                    ths.modalFileMgr.isOpen(false);
-                },
-                hiddenCallback: function () {
-                    ths.modalFileMgr.isOpen(false);
-                    ths.modalFileMgr.okDescription('');
-                    ths.modalFileMgr.okError('');
-                    ths.modalFileMgr.okCallback(null);
-                }
             };
 
             /** Save properties */

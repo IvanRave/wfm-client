@@ -63,8 +63,11 @@
               <span data-bind="if: $parent[clientId]">
                 <img data-bind="attr: {width: addtData.width, src: $parent[clientId]().fileUrl }"></img>
               </span>
-              <button class="btn btn-default btn-sm" data-bind="click: $parent.selectImgFileSpec">Select image...</button>
+              <!-- parent: mdlStage (only for stages with image types, like company logo) -->
+              <!-- parents[1]: vwmStage -->
+              <button class="btn btn-default btn-sm" data-bind="click: $parents[1].selectImgFileSpec">Select image...</button>
               <span data-bind="if: $parent[clientId]">
+                <!-- parent: mdlStage -->
                 <button class="btn btn-default btn-sm" data-bind="click: $parent.deleteImgFileSpec">Delete image</button>
               </span>
             </span>

@@ -4,25 +4,23 @@
     <div class="col-md-9">
       <!--view: maps-->
       <div>
-        <div data-bind="ifnot: slcMapOfWield">
+        <div data-bind="ifnot: slcVwmMapOfWield">
           <div class="alert alert-warning">{{capitalizeFirst lang.noSelectedMapOfWield}}</div>
         </div>
-        <div data-bind="with: slcMapOfWield">
+        <div data-bind="with: slcVwmMapOfWield">
           <!-- view: map -->
-          <div data-bind="with: vwmForWieldSection">
-            <div style="position: absolute">
-              <div class="min-top-margin min-left-margin" data-bind="foreach: mapTools">
-                <button class="btn btn-sm btn-default" data-bind="click: $parent.selectMapTool, css: { 'active': isSlc}">
-                  <i data-bind="css: icon, attr: {title: name}"></i>
-                </button>
-              </div>
+          <div style="position: absolute">
+            <div class="min-top-margin min-left-margin" data-bind="foreach: mapTools">
+              <button class="btn btn-sm btn-default" data-bind="click: $parent.selectMapTool, css: { 'active': isSlc}">
+                <i data-bind="css: icon, attr: {title: name}"></i>
+              </button>
             </div>
-            {{> wield-map-image }}
           </div>
+          {{> wield-map-image }}
         </div>
       </div>
       <!--<div style="width: 620px; height: 512px; border: 1px dotted #ccc">
-        <div data-bind="with: slcMapOfWield">
+        <div data-bind="with: slcVwmMapOfWield">
           <div data-bind="template: {afterRender: afterRenderMapObj }">
             <div style="width: 620px; height: 512px" id="map"></div>
           </div>
@@ -32,54 +30,60 @@
     <div class="col-md-3">
       <div class="clearfix" data-bind="if: $root.isEmployeeInEditMode">
         <h4 class="pull-right">
-          <button class="btn btn-default btn-sm" data-bind="click: mdlWield.createMapFromFile">{{capitalizeFirst lang.createMapOfWieldFromFile}}...</button>
+          <button class="btn btn-default btn-sm" data-bind="click: createMapFromFile">{{capitalizeFirst lang.createMapOfWieldFromFile}}...</button>
         </h4>
       </div>
       <div>
-        <!-- ko foreach: handledMapsOfWield -->
+        <!-- ko foreach: listOfVwmMapOfWield -->
         <div class="min-top-margin">
           <div class="clearfix">
             <div class="pull-left">
-              <i class="glyphicon glyphicon-circle-arrow-down" data-bind="visible: $data === $parent.slcMapOfWield()"></i>
-              <i class="glyphicon glyphicon-circle-arrow-right" data-bind="visible: $data !== $parent.slcMapOfWield()"></i>
-              <span class="link-view pointer" data-bind="click: $parent.selectMapOfWield, attr: { title: description }">
-                <span data-bind="text: name"></span>
+              <i class="glyphicon glyphicon-circle-arrow-down" data-bind="visible: isSlcVwmMapOfWield"></i>
+              <i class="glyphicon glyphicon-circle-arrow-right" data-bind="hidden: isSlcVwmMapOfWield"></i>
+              <span class="link-view pointer" data-bind="click: $parent.selectVwmMapOfWield">
+                <span data-bind="with: mdlMapOfWield">
+                  <span data-bind="text: name, attr: { title: description }"></span>
+                </span>
               </span>
             </div>
             <div class="pull-right" data-bind="if: $root.isEmployeeInEditMode">
-              <i class="glyphicon glyphicon-edit link-icon" data-bind="click: editWellFieldMap"></i>
-              <i class="glyphicon glyphicon-remove link-icon" data-bind="click: $parents[1].removeMapOfWield"></i>
+              <span data-bind="with: mdlMapOfWield">
+                <!-- TODO: replace method -->
+                <i class="glyphicon glyphicon-edit link-icon" data-bind="click: editWellFieldMap"></i>
+                <!-- parent: vwmMapOfWield -->
+                <!-- parents[1]: vwmWield -->
+                <i class="glyphicon glyphicon-remove link-icon" data-bind="click: $parents[1].mdlStage.removeMapOfWield"></i>
+              </span>
             </div>
           </div>
-          <div data-bind="visible: $data === $parent.slcMapOfWield()">
-            <div data-bind="with: vwmForWieldSection">
-              <div data-bind="foreach: handledWellMarkers">
-                <div class="min-left-margin">
-                  <div class="clearfix">
-                    <div class="pull-left">
-                      <i class="glyphicon glyphicon-leaf"></i>
-                      <span class="link-view pointer" data-bind="text: wellName, click: $parent.selectWellMarker"></span>
-                    </div>
-                    <div class="pull-right" data-bind="if: $root.isEmployeeInEditMode">
-                      <!--<i class="glyphicon glyphicon-map-marker link-icon" title="Point on this map" data-bind="click: $parent.pointWellMarker"></i>-->
-                      <i class="glyphicon glyphicon-remove link-icon" data-bind="click: $parent.removeWellMarker"></i>
-                    </div>
+          <div data-bind="slideVisible: isSlcVwmMapOfWield">
+            <div data-bind="foreach: handledWellMarkers">
+              <div class="min-left-margin">
+                <div class="clearfix">
+                  <div class="pull-left">
+                    <i class="glyphicon glyphicon-leaf"></i>
+                    <span class="link-view pointer" data-bind="text: wellName, click: $parent.selectWellMarker"></span>
+                  </div>
+                  <div class="pull-right" data-bind="if: $root.isEmployeeInEditMode">
+                    <!--<i class="glyphicon glyphicon-map-marker link-icon" title="Point on this map" data-bind="click: $parent.pointWellMarker"></i>-->
+                    <i class="glyphicon glyphicon-remove link-icon" data-bind="click: $parent.removeWellMarker"></i>
                   </div>
                 </div>
               </div>
-              <div class="min-left-margin" data-bind="if: $root.isEmployeeInEditMode">
-                <div data-bind="if: $parent.outWellsOfWield().length > 0">
-                  <div data-bind="with: vwmForWieldSection">
-                    <select class="input-sm" data-bind="options: $parent.outWellsOfWield, optionsText: 'Name', value: wellToAddToMap, optionsCaption: 'select well...'"></select>
-                    <button class="btn btn-sm btn-default" type="button" data-bind="click: addWellMarkerToMap, enable: wellToAddToMap">Add to this map</button>
-                  </div>
+            </div>
+            <!-- TODO: replace marker adding -->
+            <!--<div class="min-left-margin" data-bind="if: $root.isEmployeeInEditMode">
+              <div data-bind="if: $parent.outWellsOfWield().length > 0">
+                <div data-bind="with: vwmForWieldSection">
+                  <select class="input-sm" data-bind="options: $parent.outWellsOfWield, optionsText: 'Name', value: wellToAddToMap, optionsCaption: 'select well...'"></select>
+                  <button class="btn btn-sm btn-default" type="button" data-bind="click: addWellMarkerToMap, enable: wellToAddToMap">Add to this map</button>
                 </div>
               </div>
-              <div data-bind="foreach: handledAreas">
-                <div style="margin-left: 16px">
-                  <i class="glyphicon glyphicon-picture"></i>
-                  <span class="min-left-margin" data-bind="text: Name"></span>
-                </div>
+            </div>-->
+            <div data-bind="foreach: handledAreas">
+              <div style="margin-left: 16px">
+                <i class="glyphicon glyphicon-picture"></i>
+                <span class="min-left-margin" data-bind="text: Name"></span>
               </div>
             </div>
           </div>

@@ -7,76 +7,80 @@
     <div data-bind="if: mdlStage.widgouts().length === 0">
       {{ capitalizeFirst lang.dashboard }} is empty
     </div>
-    <div class="clearfix" data-bind="with: mdlStage">
+    <div class="clearfix" >
       <div class="pull-left">
-        <span data-bind="with: slcWidgout">
+        <span data-bind="with: slcVwmWidgout">
           <span data-bind="if: $root.isEmployeeInEditMode">
-            <input class="input-sm" type="text" data-bind="value: name" />
+            <input class="input-sm" type="text" data-bind="value: mdlWidgout.name" />
           </span>
           <span data-bind="ifnot: $root.isEmployeeInEditMode">
-            <span data-bind="text: name" />
+            <span data-bind="text: mdlWidgout.name" />
           </span>
         </span>
       </div>
       <div class="pull-right" data-bind="if: $root.isEmployeeInEditMode">
-        <span data-bind="visible: slcWidgout">
-          <button class="btn btn-sm btn-default" data-bind="click: removeWidgout">{{capitalizeFirst lang.toDeleteLayout}}</button>
+        <span data-bind="with: slcVwmWidgout">
+          <button class="btn btn-sm btn-default" data-bind="click: $parent.removeVwmWidgout">{{capitalizeFirst lang.toDeleteLayout}}</button>
         </span>
       </div>
-      <div class="pull-right" data-bind="visible: slcWidgout" style="margin-left: 32px">
-        <select class="input-sm" data-bind="options: widgouts, optionsText: 'name', value: slcWidgout"></select>
+      <div class="pull-right" data-bind="visible: slcVwmWidgout" style="margin-left: 32px">
+        <select class="input-sm" data-bind="options: listOfVwmWidgout, optionsText: 'name', value: slcVwmWidgout"></select>
       </div>
       <div class="pull-right" data-bind="if: $root.isEmployeeInEditMode">
-        <select class="input-sm" data-bind="options: widgoutTemplates, optionsText: 'name', value: slcWidgoutTemplate, optionsCaption: 'Choose scheme...'"></select>
-        <button class="btn btn-sm btn-default" data-bind="enable: slcWidgoutTemplate, click: postWidgout">{{capitalizeFirst lang.toCreateLayout}}</button>
+        <div data-bind="with: mdlStage">
+          <select class="input-sm" data-bind="options: widgoutTemplates, optionsText: 'name', value: slcWidgoutTemplate, optionsCaption: 'Choose scheme...'"></select>
+          <button class="btn btn-sm btn-default" data-bind="enable: slcWidgoutTemplate, click: postWidgout">{{capitalizeFirst lang.toCreateLayout}}</button>
+        </div>
       </div>
     </div>
-    <div data-bind="with: mdlStage">
-      <div data-bind="with: slcWidgout">
-        <div class="row" data-bind="foreach: widgockList">
-          <div data-bind="css: columnStyle">
-            <div data-bind="foreach: widgetList">
-              <div class="widget-tile">
-                <div class="clearfix widget-tile-header">
-                  <div class="pull-left">
-                    <div data-bind="ifnot: isVisSettingPanel">
-                      <b data-bind="text: name"></b>
-                    </div>
-                    <div data-bind="if: isVisSettingPanel">
-                      <input type="text" class="input-sm" data-bind="value: name" />
-                    </div>
+    <div data-bind="with: slcVwmWidgout">
+      <div class="row" data-bind="foreach: listOfVwmWidgock">
+        <div data-bind="css: mdlWidgock.columnStyle">
+          <div data-bind="foreach: listOfVwmWidget">
+            <div class="widget-tile">
+              <div class="clearfix widget-tile-header">
+                <div class="pull-left">
+                  <div data-bind="ifnot: isVisSettingPanel">
+                    <b data-bind="text: mdlWidget.name"></b>
                   </div>
-                  <div class="pull-right" data-bind="if: $root.isEmployeeInEditMode">
-                    <div data-bind="ifnot: isVisSettingPanel">
-                      <button class="btn btn-xs" type="button" data-bind="click: showVisSettingPanel">
-                        <i class="glyphicon glyphicon-cog" title="{{capitalizeFirst lang.settings}}"></i>
-                      </button>
-                      <button class="btn btn-xs" type="button" data-bind="click: $parent.removeWidget">
-                        <i class="glyphicon glyphicon-remove" title="{{capitalizeFirst lang.toDelete}}"></i>
-                      </button>
-                    </div>
-                    <div data-bind="if: isVisSettingPanel">
-                      <button class="btn btn-sm btn-success" type="button" data-bind="click: putWidget">
-                        {{capitalizeFirst lang.toSave}}
-                      </button>
-                    </div>
+                  <div data-bind="if: isVisSettingPanel">
+                    <input type="text" class="input-sm" data-bind="value: mdlWidget.name" />
                   </div>
                 </div>
-                <div class="widget-tile-content">
-                  <div data-bind="template: { name: widgetTpl, data: $data, as: 'widget' }"></div>
-                </div>
-              </div>
-            </div>
-            <div data-bind="if: $root.isEmployeeInEditMode">
-              <div class="widget-tile">
-                <div class="widget-empty">
-                  <div class="text-right">
-                    <!--sectionIdList-->
-                    <select class="input-sm" data-bind="options: $parents[1].stagePatternsForWidget, optionsText: 'name', value: slcStagePatternForWidget, optionsCaption: 'choose widget...'"></select>
-                    <button class="btn btn-default btn-sm" type="button" data-bind="click: addWidget, enable: slcStagePatternForWidget">
-                      {{capitalizeFirst lang.toAdd}}
+                <div class="pull-right" data-bind="if: $root.isEmployeeInEditMode">
+                  <div data-bind="ifnot: isVisSettingPanel">
+                    <button class="btn btn-xs" type="button" data-bind="click: showVisSettingPanel">
+                      <i class="glyphicon glyphicon-cog" title="{{capitalizeFirst lang.settings}}"></i>
+                    </button>
+                    <!-- parent: vwmWidgock -->
+                    <button class="btn btn-xs" type="button" data-bind="click: $parent.mdlWidgock.removeWidget">
+                      <i class="glyphicon glyphicon-remove" title="{{capitalizeFirst lang.toDelete}}"></i>
                     </button>
                   </div>
+                  <div data-bind="if: isVisSettingPanel">
+                    <button class="btn btn-sm btn-success" type="button" data-bind="click: saveVwmWidget">
+                      {{capitalizeFirst lang.toSave}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="widget-tile-content">
+                <div data-bind="template: { name: mdlWidget.widgetTpl, data: $data, as: 'vwmWidget' }"></div>
+              </div>
+            </div>
+          </div>
+          <div data-bind="if: $root.isEmployeeInEditMode">
+            <div class="widget-tile">
+              <div class="widget-empty">
+                <div class="text-right">
+                  <!--sectionIdList-->
+                  <!-- current: vwmWidgock -->
+                  <!-- parent: vwmWidgout -->
+                  <!-- parents[1]: vwmStage -->
+                  <select class="input-sm" data-bind="options: $parents[1].mdlStage.stagePatternsForWidget, optionsText: 'name', value: slcStagePatternForWidget, optionsCaption: 'choose widget...'"></select>
+                  <button class="btn btn-default btn-sm" type="button" data-bind="click: addVwmWidget, enable: slcStagePatternForWidget">
+                    {{capitalizeFirst lang.toAdd}}
+                  </button>
                 </div>
               </div>
             </div>

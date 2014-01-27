@@ -1,7 +1,12 @@
 ﻿/** @module */
 define(['knockout',
     'helpers/history-helper',
-    'viewmodels/section-of-stage'], function (ko, historyHelper, VwmStageSection) {
+    'viewmodels/section-of-stage',
+    'viewmodels/widgout'],
+    function (ko,
+        historyHelper,
+        VwmStageSection,
+        VwmWidgout) {
         'use strict';
 
         /**
@@ -30,12 +35,32 @@ define(['knockout',
             * Whether menu item is opened: showed inner object in menu without main content
             * @type {boolean}
             */
-            this.isOpenItem = ko.observable(false);
+            this.isOpenedItem = ko.observable(false);
 
             /** Toggle isOpen state */
             this.toggleItem = function () {
-                ths.isOpenItem(!ko.unwrap(ths.isOpenItem));
+                ths.isOpenedItem(!ko.unwrap(ths.isOpenedItem));
             };
+
+            /////**
+            ////* Opened (by click on arrow) or showed (selected stage without selected children) 
+            ////* @type {boolean}
+            ////*/
+            ////this.isOpenedOrShowedStage = ko.computed({
+            ////    read: function () {
+            ////        return ko.unwrap(ths.isOpenedItem) || ko.unwrap(ths.isShowedVwmStage);
+            ////    },
+            ////    deferEvaluation: true
+            ////});
+
+            /** Css class for opened item (open or showed) */
+            this.menuItemCss = ko.computed({
+                read: function () {
+                    // { 'glyphicon-circle-arrow-down' : isOpenedItem, 'glyphicon-circle-arrow-right' : !isOpenedItem() }
+                    return ko.unwrap(ths.isOpenedItem) ? 'glyphicon-circle-arrow-down' : 'glyphicon-circle-arrow-right';
+                },
+                deferEvaluation: true
+            });
 
             /** 
             * Whether region is selected
@@ -76,17 +101,35 @@ define(['knockout',
                 deferEvaluation: true
             });
 
+            /** Unique id of selected section in file manager */
+            this.unzOfSlcVwmSectionFmg = ko.observable();
+
             /** Selected section in file manager */
-            this.slcVwmSectionFmg = ko.observable();
+            this.slcVwmSectionFmg = ko.computed({
+                read: function () {
+                    var tmpUnzOfSlcVwmSection = ko.unwrap(ths.unzOfSlcVwmSectionFmg);
+                    if (tmpUnzOfSlcVwmSection) {
+                        // Find section with this pattern id
+                        return ko.unwrap(ths.listOfVwmSection).filter(function (elem) {
+                            return elem.unz === tmpUnzOfSlcVwmSection;
+                        })[0];
+                    }
+                    else if (tmpUnzOfSlcVwmSection === null) {
+                        return null;
+                    }
+                },
+                deferEvaluation: true
+            });
 
             /** Select file section (in file manager) */
             this.selectVwmSectionFmg = function (vwmSectionToSelect) {
+
                 // Load files from server (if not loaded)
                 // If loaded - clean selected states
                 vwmSectionToSelect.mdlSection.loadListOfFileSpec();
 
                 // Set as a selected to show files
-                ths.slcVwmSectionFmg(vwmSectionToSelect);
+                ths.unzOfSlcVwmSectionFmg(vwmSectionToSelect.unz);
             };
 
             /** Id of view of selected section: unz = section pattern */
@@ -149,6 +192,67 @@ define(['knockout',
                 historyHelper.pushState('/' + navigationArr.join('/'));
                 ////console.log('mdlStageisShowed: ' + ko.unwrap(ths.isShowedVwmStage));
             });
+
+            /**
+            * List of views of widget layouts
+            * @type {Array.<module:viewmodels/widgout>}
+            */
+            this.listOfVwmWidgout = ko.computed({
+                read: function () {
+                    return ko.unwrap(ths.mdlStage.widgouts).map(function (elem) {
+                        return new VwmWidgout(elem, ths.fmgr);
+                    });
+                },
+                deferEvaluation: true
+            });
+
+            /** Selected widget layouts: may be defined by default from client storage (cookies..) */
+            this.slcVwmWidgout = ko.observable();
+
+            /** Remove widget layout from this stage */
+            this.removeVwmWidgout = function (vwmWidgoutToRemove) {
+                // Remove model -> autoremoving viewmodel
+                ths.mdlStage.removeWidgout(vwmWidgoutToRemove.mdlWidgout);
+            };
+
+            /** Select file for any image */
+            this.selectImgFileSpec = function (fileSpecProp) {
+                // Every stage has property fmgr, which is link to company fmgr
+                // Get file manager object from company view
+                // Show file manager
+                // Select file
+                // Send to need function
+
+                ths.unzOfSlcVwmSectionFmg(ths.mdlStage.stageKey + '-summary');
+
+                ths.fmgr.okCallback(function () {
+                    ths.fmgr.okError('');
+                    // Select file from file manager
+                    var slcVwmSection = ko.unwrap(ths.slcVwmSectionFmg);
+
+                    if (!slcVwmSection) { throw new Error('No selected section when select image file for stage propery'); }
+
+                    var selectedFileSpecs = ko.unwrap(slcVwmSection.mdlSection.listOfFileSpec).filter(function (elem) {
+                        return ko.unwrap(elem.isSelected);
+                    });
+
+                    if (selectedFileSpecs.length !== 1) {
+                        ths.fmgr.okError('need to select one file');
+                        return;
+                    }
+
+                    // Get prop id
+                    ths.mdlStage[fileSpecProp.addtData.nestedClientId](selectedFileSpecs[0].id);
+                    ths.mdlStage.save();
+                    ths.fmgr.hide();
+                });
+
+                ths.fmgr.okDescription('Please select one image');
+
+                ths.fmgr.show();
+            };
+
+            // ==================================== Data loading ================================================
 
             // When default section is defined (through url or smth else)
             // Load its

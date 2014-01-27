@@ -138,6 +138,7 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
                 deferEvaluation: true
             });
 
+            /** TODO: Change */
             this.editWellFieldMap = function () {
                 var inputName = document.createElement('input');
                 inputName.type = 'text';
@@ -177,15 +178,7 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
 
             this.toPlainJson = function () { return ko.toJS(ths); };
 
-            // Views after all main props
-
-            /** View for wield-map section */
-            this.vwmForWieldSection = new MapOfWieldVwm(ths);
-
-            /** View for well-map section */
-            this.vwmForWellSection = new MapOfWieldVwm(ths);
-
-            // Load data (async) after all props and views
+            // Load data (async) after all props
 
             /** Load markers */
             this.wellMarkers(importWellMarkers(data.ListOfDtoOfWellMarker, ths));
