@@ -1,42 +1,51 @@
 ﻿/** @module */
-define(['knockout', 'viewmodels/company'], function (ko, VwmCompany) {
-    'use strict';
-
-    /**
-    * Employee view model (user in company)
-    * @constructor
-    */
-    var exports = function (mdlEmployee, koSlcVwmStage, defaultSlcData) {
-        var ths = this;
+define(['knockout',
+    'viewmodels/company',
+    'viewmodels/bases/stage-parent-base'],
+    function (ko,
+        VwmCompany,
+        VwmStageParentBase) {
+        'use strict';
 
         /**
-        * Data model for employee
-        * @type {<module:models/employee>}
+        * Employee view model (user in company)
+        * @constructor
+        * @param {Object} koSlcVwmStage - Selected view of employee in user-profile
         */
-        this.mdlEmployee = mdlEmployee;
+        var exports = function (mdlEmployee, koSlcVwmStage, defaultSlcData) {
+            var ths = this;
 
-        /**
-        * Main view model for company
-        * @type {<module:viewmodels/company>}
-        */
-        this.vwmCompany = new VwmCompany(ths.mdlEmployee.company, koSlcVwmStage, defaultSlcData);
+            /**
+            * Data model for employee
+            * @type {<module:models/employee>}
+            */
+            this.mdlEmployee = mdlEmployee;
 
-        /** Unique id of view: id of employee = id of company */
-        this.unq = this.vwmCompany.unq;
+            /** Employee has a parent with few employees */
+            VwmStageParentBase.call(ths, koSlcVwmStage);
 
-        /**
-        * Whether edit mode is turn on
-        * @type {boolean}
-        */
-        this.isEditMode = ko.observable(false);
+            /**
+            * Main view model for company
+            * @type {<module:viewmodels/company>}
+            */
+            this.vwmCompany = new VwmCompany(ths.mdlEmployee.company, defaultSlcData);
 
-        /** Toggle edit mode: only if user can edit all */
-        this.toggleEditMode = function () {
-            if (ths.mdlEmployee.canEditAll) {
-                ths.isEditMode(!ko.unwrap(ths.isEditMode));
-            }
+            /** Unique id of view: id of employee = id of company */
+            this.unq = this.vwmCompany.unq;
+
+            /**
+            * Whether edit mode is turn on
+            * @type {boolean}
+            */
+            this.isEditMode = ko.observable(false);
+
+            /** Toggle edit mode: only if user can edit all */
+            this.toggleEditMode = function () {
+                if (ths.mdlEmployee.canEditAll) {
+                    ths.isEditMode(!ko.unwrap(ths.isEditMode));
+                }
+            };
         };
-    };
 
-    return exports;
-});
+        return exports;
+    });

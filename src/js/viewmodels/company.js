@@ -1,13 +1,19 @@
 ﻿/** @module */
-define(['knockout', 'viewmodels/wegion',
-    'viewmodels/bases/stage-base', 'viewmodels/bases/stage-child-base'], function (ko, VwmWegion, VwmStageBase, VwmStageChildBase) {
+define(['knockout',
+    'viewmodels/wegion',
+    'viewmodels/bases/stage-base',
+    'viewmodels/bases/stage-child-base'],
+    function (ko,
+        VwmWegion,
+        VwmStageBase,
+        VwmStageChildBase) {
         'use strict';
 
         /**
         * Company view model
         * @constructor
         */
-        var exports = function (mdlCompany, koSlcVwmStage, defaultSlcData) {
+        var exports = function (mdlCompany, defaultSlcData) {
 
             /** Alternative of this */
             var ths = this;
@@ -17,6 +23,8 @@ define(['knockout', 'viewmodels/wegion',
             * @type {<module:models/company>}
             */
             this.mdlStage = mdlCompany;
+
+            this.unq = mdlCompany.id;
 
             /** File manager as modal window for this view: created from modalFileMgr */
             this.fmgr = {
@@ -56,10 +64,12 @@ define(['knockout', 'viewmodels/wegion',
             });
 
             /** Base for all stages: with selected view of wegion */
-            VwmStageBase.call(this, koSlcVwmStage, defaultSlcData.companySectionId);
+            VwmStageBase.call(this, defaultSlcData.companySectionId);
 
             /** Base for all stages with childs */
             VwmStageChildBase.call(this, defaultSlcData.wegionId);
+
+            // Has no parent with few companies (no VwmParentStageBase)
 
             /////**
             ////* Well region view model (selected well region)

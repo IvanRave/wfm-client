@@ -22,7 +22,7 @@ define(['knockout', 'viewmodels/employee', 'viewmodels/bases/stage-child-base'],
         this.mdlStage = mdlUserProfile;
 
         /**
-        * User profile may contain few employee (companies)
+        * User profile may contain few employee (with companies)
         * @type {Array.<module:viewmodels/employee>}
         */
         this.listOfVwmChild = ko.computed({
@@ -35,7 +35,12 @@ define(['knockout', 'viewmodels/employee', 'viewmodels/bases/stage-child-base'],
             deferEvaluation: true
         });
 
+        /** Has few children to select */
         VwmStageChildBase.call(this, defaultSlcData.companyId);
+
+        // Other stagebase view
+        // Has no sections and widgets - StageChildBase
+        // Has no parent with few user profiles - StageParentBase
     };
 
     return exports;

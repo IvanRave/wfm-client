@@ -2,8 +2,9 @@
 define(['knockout',
     'viewmodels/wield',
     'viewmodels/bases/stage-child-base',
-    'viewmodels/bases/stage-base'],
-    function (ko, VwmWield, VwmStageChildBase, VwmStageBase) {
+    'viewmodels/bases/stage-base',
+    'viewmodels/bases/stage-parent-base'],
+    function (ko, VwmWield, VwmStageChildBase, VwmStageBase, VwmStageParentBase) {
         'use strict';
 
         /**
@@ -38,9 +39,9 @@ define(['knockout',
                 deferEvaluation: true
             });
 
-            VwmStageBase.call(this, koSlcVwmStage, defaultSlcData.wegionSectionId);
-
+            VwmStageParentBase.call(ths, koSlcVwmStage);
             VwmStageChildBase.call(this, defaultSlcData.wieldId);
+            VwmStageBase.call(this, defaultSlcData.wegionSectionId);
         };
 
         return exports;

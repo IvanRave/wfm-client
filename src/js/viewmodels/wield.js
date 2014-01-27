@@ -3,8 +3,9 @@ define(['knockout',
     'viewmodels/wroup',
     'viewmodels/map-of-wield',
     'viewmodels/bases/stage-child-base',
-    'viewmodels/bases/stage-base'],
-    function (ko, VwmWroup, VwmMapOfWield, VwmStageChildBase, VwmStageBase) {
+    'viewmodels/bases/stage-base',
+    'viewmodels/bases/stage-parent-base'],
+    function (ko, VwmWroup, VwmMapOfWield, VwmStageChildBase, VwmStageBase, VwmStageParentBase) {
         'use strict';
 
         /**
@@ -38,9 +39,12 @@ define(['knockout',
                 deferEvaluation: true
             });
 
-            VwmStageBase.call(this, koSlcVwmWield, defaultSlcData.wieldSectionId);
-
+            // Has a parent with few wields
+            VwmStageParentBase.call(this, koSlcVwmWield);
+            // Has a children (wroups)
             VwmStageChildBase.call(this, defaultSlcData.wroupId);
+            // Has sections and widgets
+            VwmStageBase.call(this, defaultSlcData.wieldSectionId);
 
             /** List of views of maps of this well field view*/
             this.listOfVwmMapOfWield = ko.computed({

@@ -2,13 +2,17 @@
   <!-- parent: vwmUserProfile -->
   <!-- current: slcVwmEmployee (slcVwmChild) -->
   <ul class="list-unstyled">
-    <!-- ko with: vwmCompany -->
     <li>
-      <div class="wfm-menu-item wfm-menu-header" data-bind="click: $parents[1].selectVwmChild, css: { 'wfm-slc-menu-item': isShowedVwmStage }">
-        <!-- select company view, using userprofile parent -->
-        <span data-bind="text: mdlStage.name, attr: {title: mdlStage.name}"></span>
+      <div class="wfm-menu-item wfm-menu-header" data-bind="click: $parent.selectVwmChild">
+        <!-- ko with: vwmCompany-->
+        <span data-bind="css: { 'bld': isShowedVwmStage }">
+          <!-- select company view, using userprofile parent -->
+          <span data-bind="text: mdlStage.name, attr: {title: mdlStage.name}"></span>
+        </span>
+        <!-- /ko -->
       </div>
     </li>
+    <!-- ko with: vwmCompany -->
     <!-- ko ifnot: mdlStage.isLoadedWegions -->
     <li>
       <div class="wfm-menu-item wfm-menu-header text-center">

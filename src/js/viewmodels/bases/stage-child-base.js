@@ -7,6 +7,7 @@ define(['knockout',
 
         /**
         * Base view for manage childs of main stages: userProfile, company, wegion, wield, wroup (well has no childrens)
+        *    If stage has children
         * @constructor
         */
         var exports = function (defaultUnqOfSlcVwmChild) {
@@ -32,23 +33,40 @@ define(['knockout',
                 deferEvaluation: true
             });
 
-            /** Select view of child */
+            /**
+            * Select view of child
+            *    For userProfile - employee (
+            */
             this.selectVwmChild = function (vwmChildToSelect) {
-                console.log('vwmChildToSelect', vwmChildToSelect);
-                // Unselect all childs for child (to show content only for this stage);
-                vwmChildToSelect.unqOfSlcVwmChild(null);
+                console.log('selected', vwmChildToSelect);
+                ////// Unselect previous child
+                ths.unqOfSlcVwmChild(null);
 
-                ths.unqOfSlcVwmChild(vwmChildToSelect.unq);
+                var navigationArr = '';
+                if (vwmChildToSelect.unqOfSlcVwmChild) {
+                    vwmChildToSelect.unqOfSlcVwmChild(null);
+                    navigationArr = historyHelper.getNavigationArr(vwmChildToSelect.mdlStage);
 
-                // if no section is defined, then set to null (show dashboard)
-                vwmChildToSelect.unselectVwmSectionWrk();
+                    // if no section is defined, then set to null (show dashboard)
+                    vwmChildToSelect.unselectVwmSectionWrk();
+                }
+                else if (vwmChildToSelect.vwmCompany) {
+                    vwmChildToSelect.vwmCompany.unqOfSlcVwmChild(null);
+                    navigationArr = historyHelper.getNavigationArr(vwmChildToSelect.vwmCompany.mdlStage);
+                    vwmChildToSelect.vwmCompany.unselectVwmSectionWrk();
+                }
 
-                vwmChildToSelect.isOpenedItem(true);
-
-                var navigationArr = historyHelper.getNavigationArr(vwmChildToSelect.mdlStage);
-                
                 historyHelper.pushState('/' + navigationArr.join('/'));
+
+                // Select current child
+                ths.unqOfSlcVwmChild(vwmChildToSelect.unq);
             };
+
+            ////this.showVwmChildContent = function (vwmChildToShow) {
+
+            ////    // Select this child stage (if not selected)
+            ////    // Hide child stages of this child stage
+            ////};
 
             /** Unselect: show content of parent node, like WFM logo click: unselect choosed company and show company list */
             this.unselectVwmChild = function () {

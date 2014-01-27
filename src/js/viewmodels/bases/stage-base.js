@@ -13,72 +13,12 @@ define(['knockout',
         * Base for stages
         * @constructor
         */
-        var exports = function (koSlcVwmStage, partOfUnzOfSlcVwmSectionWrk) {
+        var exports = function (partOfUnzOfSlcVwmSectionWrk) {
 
             var ths = this;
             ////console.log('defaultSectionId', defaultSectionId);
-            /** By default: view unique id = model.id */
-            this.unq = ths.mdlStage.id;
-
-            /** List of section views */
-            this.listOfVwmSection = ko.computed({
-                read: function () {
-                    var tmpListOfSection = ko.unwrap(ths.mdlStage.listOfSection);
-                    return tmpListOfSection.map(function (elem) {
-                        return new VwmStageSection(elem, ths);
-                    });
-                },
-                deferEvaluation: true
-            });
-
-            /**
-            * Whether menu item is opened: showed inner object in menu without main content
-            * @type {boolean}
-            */
-            this.isOpenedItem = ko.observable(false);
-
-            /** Toggle isOpen state */
-            this.toggleItem = function () {
-                ths.isOpenedItem(!ko.unwrap(ths.isOpenedItem));
-            };
-
-            /////**
-            ////* Opened (by click on arrow) or showed (selected stage without selected children) 
-            ////* @type {boolean}
-            ////*/
-            ////this.isOpenedOrShowedStage = ko.computed({
-            ////    read: function () {
-            ////        return ko.unwrap(ths.isOpenedItem) || ko.unwrap(ths.isShowedVwmStage);
-            ////    },
-            ////    deferEvaluation: true
-            ////});
-
-            /** Css class for opened item (open or showed) */
-            this.menuItemCss = ko.computed({
-                read: function () {
-                    // { 'glyphicon-circle-arrow-down' : isOpenedItem, 'glyphicon-circle-arrow-right' : !isOpenedItem() }
-                    return ko.unwrap(ths.isOpenedItem) ? 'glyphicon-circle-arrow-down' : 'glyphicon-circle-arrow-right';
-                },
-                deferEvaluation: true
-            });
-
-            /** 
-            * Whether region is selected
-            *    Company has wegions. This wegion is selected. Always true
-            * @type {boolean}
-            */
-            this.isSlcVwmStage = ko.computed({
-                read: function () {
-                    // TODO: Check
-                    // Selected child of this stage (stage with lewer level)
-                    var tmpSlcVwmStage = ko.unwrap(koSlcVwmStage);
-                    if (tmpSlcVwmStage) {
-                        return (ths.unq === tmpSlcVwmStage.unq);
-                    }
-                    return false;
-                },
-                deferEvaluation: true
-            });
+            /////** By default: view unique id = model.id */
+            ////this.unq = ths.mdlStage.id;
 
             /** 
             * Whether stage content is selected and showed on the page (child object are not selected)
@@ -86,8 +26,8 @@ define(['knockout',
             */
             this.isShowedVwmStage = ko.computed({
                 read: function () {
-                    // If stage is selected
-                    if (ko.unwrap(ths.isSlcVwmStage)) {
+                    // If stage is selected (or not exists)
+                    if (ko.unwrap(ths.isSlcVwmStage) !== false) {
                         // And no selected childs
                         // Well stage is always selected (has no children)
                         if (!ko.unwrap(ths.slcVwmChild)) {
@@ -97,6 +37,17 @@ define(['knockout',
                     }
 
                     return false;
+                },
+                deferEvaluation: true
+            });
+
+            /** List of section views */
+            this.listOfVwmSection = ko.computed({
+                read: function () {
+                    var tmpListOfSection = ko.unwrap(ths.mdlStage.listOfSection);
+                    return tmpListOfSection.map(function (elem) {
+                        return new VwmStageSection(elem, ths);
+                    });
                 },
                 deferEvaluation: true
             });

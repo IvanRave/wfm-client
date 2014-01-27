@@ -5,8 +5,9 @@
     <li class="list-group-item">
       <div class="clearfix" data-bind="if: mdlEmployee.canViewAll">
         <div class="pull-left">
-          <span data-bind="with: vwmCompany">
-            <span class="pointer" data-bind="click: $parents[1].selectVwmChild">
+          <!-- select employee -->
+          <span class="pointer" data-bind="click: $parent.selectVwmChild">
+            <span data-bind="with: vwmCompany">
               <!-- current: vwmCompany-->
               <!-- ko with: mdlStage -->
               <span data-bind="with: fileSpecOfLogo">
