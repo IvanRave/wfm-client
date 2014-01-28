@@ -72,9 +72,9 @@ define(['knockout', 'services/well-marker-of-map-of-wield'], function (ko, wellM
         this.getWell = function () {
             var wellFieldItem = ths.getWellFieldMap().getWellField();
             for (var WellGroupKey = 0; WellGroupKey < wellFieldItem.wroups().length; WellGroupKey++) {
-                for (var WellKey = 0; WellKey < wellFieldItem.wroups()[WellGroupKey].Wells().length; WellKey++) {
-                    if (wellFieldItem.wroups()[WellGroupKey].Wells()[WellKey].Id === ths.idOfWell) {
-                        return wellFieldItem.wroups()[WellGroupKey].Wells()[WellKey];
+                for (var WellKey = 0; WellKey < wellFieldItem.wroups()[WellGroupKey].wells().length; WellKey++) {
+                    if (wellFieldItem.wroups()[WellGroupKey].wells()[WellKey].Id === ths.idOfWell) {
+                        return wellFieldItem.wroups()[WellGroupKey].wells()[WellKey];
                     }
                 }
             }

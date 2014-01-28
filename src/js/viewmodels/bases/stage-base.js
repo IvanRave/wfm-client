@@ -116,8 +116,9 @@ define(['knockout',
 
             /** When change selected section */
             this.slcVwmSectionWrk.subscribe(function (vwmSectionItem) {
+                console.log('subscribe section', vwmSectionItem);
                 var navigationArr = historyHelper.getNavigationArr(ths.mdlStage);
-                console.log('unz: ', vwmSectionItem);
+                
                 if (vwmSectionItem) {
                     if (ths.mdlStage.loadSectionContent) {
                         ths.mdlStage.loadSectionContent(vwmSectionItem.mdlSection.sectionPatternId);

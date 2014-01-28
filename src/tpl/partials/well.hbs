@@ -1,22 +1,18 @@
 ﻿<!-- current: vwmStage (Well) -->
 <div>
-  <div class="wfm-top-tab-panel clearfix" style="left: 500px">
+  <!--<div class="wfm-top-tab-panel clearfix" style="left: 500px">
     <div class="pull-left" style="margin-top:1px">
       <button class="btn btn-inverse btn-sm" type="button" data-bind="click: mdlStage.showFmg">
         <i class="glyphicon glyphicon-folder-open"></i><span class="min-left-margin">{{capitalizeFirst lang.fileManager}}</span>
       </button>
     </div>
-  </div>
+  </div>-->
   <div class="tab-content-pad">
     <div data-bind="if: slcVwmSectionWrk() === null">
-      <!-- ko with: mdlStage -->
-      {{> widget-well-perfomance}}
-      {{> widget-well-sketch}}
       {{> widget-default-summary}}
-      {{> widget-well-history}}
-
+      <!-- snippet: well-widget -->
+      
       {{> widget-scope}}
-      <!-- /ko -->
     </div>
     <div data-bind="if: slcVwmSectionWrk">
       <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'well-history'">
@@ -54,6 +50,5 @@
       </div>
     </div>
   </div>
-  <!-- TODO: remove -->
-  {{> modal-file-manager}}
+  <!-- snippet: old-fmg -->
 </div>

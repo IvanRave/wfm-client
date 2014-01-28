@@ -42,7 +42,27 @@
             this.addVwmWidget = function () {
                 var tmpStagePattern = ko.unwrap(ths.slcStagePatternForWidget);
                 if (tmpStagePattern) {
-                    mdlWidgock.addWidget(ko.unwrap(tmpStagePattern.name), tmpStagePattern.id);
+                    mdlWidgock.addWidget(ko.unwrap(tmpStagePattern.name), tmpStagePattern.id, function (idOfCreatedWidget) {
+                        // Find created widget
+                        var createdVwmWidget = ko.unwrap(ths.listOfVwmWidget).filter(function (elem) {
+                            return elem.mdlWidget.id === idOfCreatedWidget;
+                        })[0];
+
+                        // Open settings
+                        if (createdVwmWidget) {
+                            createdVwmWidget.showVisSettingPanel();
+                        }
+                    });
+                }
+            };
+
+            /**
+            * Remove widget model and viewmodel
+            */
+            this.removeVwmWidget = function (vwmWidgetToRemove) {
+                var tmpMdl = vwmWidgetToRemove.mdlWidget;
+                if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(tmpMdl.name) + '"?')) {
+                    ths.mdlWidgock.removeWidget(tmpMdl);
                 }
             };
         };

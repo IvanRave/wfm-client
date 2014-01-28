@@ -19,7 +19,7 @@ define(['jquery',
         }
 
         // 4. Wells (convert data objects into array)
-        function importWellsDto(data, parent) {
+        function importWells(data, parent) {
             return data.map(function (item) { return new Well(item, parent); });
         }
 
@@ -90,21 +90,14 @@ define(['jquery',
             * List of well for this group
             * @type {Array.<module:models/well>}
             */
-            this.Wells = ko.observableArray();
-
-            /**
-            * Selected well
-            * @type {module:models/well}
-            */
-            this.selectedWell = ko.observable();
+            this.wells = ko.observableArray();
 
             /**
             * Get well by id
             * @param {number} idOfWell - Id of well
             */
             this.getWellById = function (idOfWell) {
-                var tmpWells = ko.unwrap(ths.Wells);
-                return tmpWells.filter(function (elem) {
+                return ko.unwrap(ths.wells).filter(function (elem) {
                     return elem.id === idOfWell;
                 })[0];
             };            
@@ -240,7 +233,7 @@ define(['jquery',
                         Description: '',
                         WellGroupId: ths.Id
                     }).done(function (result) {
-                        ths.Wells.push(new Well(result, ths));
+                        ths.wells.push(new Well(result, ths));
                     });
 
                     bootstrapModal.closeModalWindow();
@@ -252,7 +245,7 @@ define(['jquery',
             this.removeChild = function (wellForDelete) {
                 if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(wellForDelete.Name) + '"?')) {
                     datacontext.deleteWell(wellForDelete).done(function () {
-                        ths.Wells.remove(wellForDelete);
+                        ths.wells.remove(wellForDelete);
                         // Select this wroup
                         ths.getWellField().selectWroup(ths);
                     });
@@ -277,7 +270,7 @@ define(['jquery',
             };
 
             // load wells
-            this.Wells(importWellsDto(data.WellsDto, ths));
+            this.wells(importWells(data.WellsDto, ths));
 
             /** Load sections */
             this.listOfSection(importListOfSectionOfWroupDto(data.ListOfSectionOfWroupDto, ths));

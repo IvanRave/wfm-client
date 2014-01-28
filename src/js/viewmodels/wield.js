@@ -5,7 +5,12 @@ define(['knockout',
     'viewmodels/bases/stage-child-base',
     'viewmodels/bases/stage-base',
     'viewmodels/bases/stage-parent-base'],
-    function (ko, VwmWroup, VwmMapOfWield, VwmStageChildBase, VwmStageBase, VwmStageParentBase) {
+    function (ko,
+        VwmWroup,
+        VwmMapOfWield,
+        VwmStageChildBase,
+        VwmStageBase,
+        VwmStageParentBase) {
         'use strict';
 
         /**

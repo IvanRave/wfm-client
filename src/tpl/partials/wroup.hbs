@@ -2,11 +2,9 @@
   <!-- current: vwmStage (wroup) -->
   <div class="tab-content-pad">
     <div data-bind="if: slcVwmSectionWrk() === null">
-      <!-- ko with: mdlStage -->
       <!-- with wroup model -->
       {{> widget-default-summary }}
       {{> widget-scope}}
-      <!-- /ko -->
     </div>
     <div data-bind="if: slcVwmSectionWrk">
       <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'wroup-summary'">

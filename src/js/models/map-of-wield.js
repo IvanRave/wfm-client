@@ -84,7 +84,7 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
             this.areas = ko.observableArray();
 
             /** 
-            * Wells on this map
+            * Well markers on this map
             * @type {Array.<Well>}
             */
             this.wellMarkers = ko.observableArray();
@@ -128,7 +128,7 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
                     var wellsOfWield = [];
 
                     wroupsOfWield.forEach(function (wroupItem) {
-                        wellsOfWield = wellsOfWield.concat(ko.unwrap(wroupItem.Wells));
+                        wellsOfWield = wellsOfWield.concat(ko.unwrap(wroupItem.wells));
                     });
 
                     return wellsOfWield.filter(function (wellItem) {

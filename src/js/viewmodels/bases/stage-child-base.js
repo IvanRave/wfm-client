@@ -42,7 +42,7 @@ define(['knockout',
                 ////// Unselect previous child
                 ths.unqOfSlcVwmChild(null);
 
-                var navigationArr = '';
+                var navigationArr = [];
                 if (vwmChildToSelect.unqOfSlcVwmChild) {
                     vwmChildToSelect.unqOfSlcVwmChild(null);
                     navigationArr = historyHelper.getNavigationArr(vwmChildToSelect.mdlStage);
@@ -54,6 +54,13 @@ define(['knockout',
                     vwmChildToSelect.vwmCompany.unqOfSlcVwmChild(null);
                     navigationArr = historyHelper.getNavigationArr(vwmChildToSelect.vwmCompany.mdlStage);
                     vwmChildToSelect.vwmCompany.unselectVwmSectionWrk();
+                }
+                else {
+                    // For wells without childs
+                    navigationArr = historyHelper.getNavigationArr(vwmChildToSelect.mdlStage);
+
+                    // if no section is defined, then set to null (show dashboard)
+                    vwmChildToSelect.unselectVwmSectionWrk();
                 }
 
                 historyHelper.pushState('/' + navigationArr.join('/'));
