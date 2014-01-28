@@ -145,12 +145,12 @@ define(['knockout',
                 function mgrCallback() {
                     ths.fmgr.okError('');
 
-                    var slcVwmSection = ko.unwrap(ths.slcVwmSectionFmg);
+                    var tmpSlcVwmSection = ko.unwrap(ths.slcVwmSectionFmg);
 
-                    if (!slcVwmSection) { throw new Error('No selected section'); }
+                    if (!tmpSlcVwmSection) { throw new Error('No selected section'); }
 
                     // Select file from file manager
-                    var selectedFileSpecs = ko.unwrap(slcVwmSection.mdlSection.listOfFileSpec).filter(function (elem) {
+                    var selectedFileSpecs = ko.unwrap(tmpSlcVwmSection.mdlSection.listOfFileSpec).filter(function (elem) {
                         return ko.unwrap(elem.isSelected);
                     });
 

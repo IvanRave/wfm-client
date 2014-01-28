@@ -3,7 +3,6 @@ define(['knockout',
     'services/widget'
     ////'models/widgets/widget-well-perfomance',
     ////'models/widgets/widget-default-summary',
-    ////'models/widgets/widget-well-sketch',
     ////'models/widgets/widget-well-history',
     ////'models/widgets/widget-wield-map'
 ], function (ko, widgetService
@@ -54,25 +53,11 @@ define(['knockout',
         };        
 
         ////switch (this.idOfSectionPattern) {
-        ////    case 'well-summary':
-        ////    case 'wroup-summary':
-        ////    case 'wield-summary':
-        ////    case 'wegion-summary':
-        ////    case 'company-summary':
-        ////        // One default summary widget for all stages
-        ////        WidgetDefaultSummary.call(ths, optsObj, ko.unwrap(ths.getWidgock().getWidgout().getParent().propSpecList));
-        ////        break;
         ////    case 'well-perfomance':
         ////        WidgetWellPerfomance.call(ths, optsObj, ths.getWidgock());
         ////        break;
-        ////    case 'well-sketch':
-        ////        WidgetWellSketch.call(ths, optsObj);
-        ////        break;
         ////    case 'well-history':
         ////        WidgetWellHistory.call(ths, optsObj, ths.getWidgock().getWidgout().getParent().historyList);
-        ////        break;
-        ////    case 'wield-map':
-        ////        WidgetWieldMap.call(ths, optsObj, ths.getWidgock().getWidgout().getParent());
         ////        break;
         ////}
 

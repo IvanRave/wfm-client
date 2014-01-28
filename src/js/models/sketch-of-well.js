@@ -88,7 +88,7 @@ define(['knockout', 'models/file-spec', 'services/sketch-of-well'], function (ko
             });
         };
 
-        this.remove = function () {
+        this.clearSketchOfWell = function () {
             if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(ths.name) + '"?')) {
                 sketchOfWellService.remove(ths.idOfWell).done(function () {
                     // Remove from well on the client
@@ -100,51 +100,20 @@ define(['knockout', 'models/file-spec', 'services/sketch-of-well'], function (ko
             }
         };
 
-        /** Create sketch from file: select file and create sketch */
-        this.createSketchFromFile = function () {
-            var needSection = ths.getWell().getSectionByPatternId('well-sketch');
-
-            // Select file section with sketches (load and unselect files)
-            ths.getWell().selectFileSection(needSection);
-
-            var tmpModalFileMgr = ths.getWell().getWellGroup().getWellField().getWellRegion().getCompany().modalFileMgr;
-
-            // Calback for selected file
-            function mgrCallback() {
-                tmpModalFileMgr.okError('');
-                // Select file from file manager
-                var selectedFileSpecs = ko.unwrap(needSection.listOfFileSpec).filter(function (elem) {
-                    return ko.unwrap(elem.isSelected);
-                });
-
-                if (selectedFileSpecs.length !== 1) {
-                    tmpModalFileMgr.okError('need to select one file');
-                    return;
-                }
-
-                // Change sketch (create if not exists)
-                sketchOfWellService.put(ths.idOfWell, {
-                    idOfWell: ths.idOfWell,
-                    idOfFileSpec: selectedFileSpecs[0].id,
-                    name: ko.unwrap(selectedFileSpecs[0].name) || '',
-                    description: ko.unwrap(ths.description) || ''
-                }).done(function (resSketch) {
-                    ths.name(resSketch.Name);
-                    ths.description(resSketch.Description);
-                    ths.idOfFileSpec(resSketch.IdOfFileSpec);
-                    ths.fileSpec(new FileSpec(resSketch.FileSpecDto));
-                    tmpModalFileMgr.hide();
-                });
-            }
-
-            // Add to observable
-            tmpModalFileMgr.okCallback(mgrCallback);
-
-            // Notification
-            tmpModalFileMgr.okDescription('Please select a file for a sketch');
-
-            // Open file manager
-            tmpModalFileMgr.show();
+        this.putSketchOfWell = function (tmpIdOfFileSpec, tmpName, scsCallback) {
+            // Change sketch (create if not exists)
+            sketchOfWellService.put(ths.idOfWell, {
+                idOfWell: ths.idOfWell,
+                idOfFileSpec: tmpIdOfFileSpec,
+                name: tmpName || '',
+                description: ko.unwrap(ths.description) || ''
+            }).done(function (resSketch) {
+                ths.name(resSketch.Name);
+                ths.description(resSketch.Description);
+                ths.idOfFileSpec(resSketch.IdOfFileSpec);
+                ths.fileSpec(new FileSpec(resSketch.FileSpecDto));
+                scsCallback();
+            });
         };
     };
 

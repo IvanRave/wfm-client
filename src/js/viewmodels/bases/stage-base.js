@@ -72,13 +72,19 @@ define(['knockout',
                 deferEvaluation: true
             });
 
+            /**
+            * Load files for this file section
+            */
+            this.slcVwmSectionFmg.subscribe(function (tmpSlcVwmSection) {
+                if (tmpSlcVwmSection) {
+                    // Load files from server (if not loaded)
+                    // If loaded - clean selected states
+                    tmpSlcVwmSection.mdlSection.loadListOfFileSpec();
+                }
+            });
+
             /** Select file section (in file manager) */
             this.selectVwmSectionFmg = function (vwmSectionToSelect) {
-
-                // Load files from server (if not loaded)
-                // If loaded - clean selected states
-                vwmSectionToSelect.mdlSection.loadListOfFileSpec();
-
                 // Set as a selected to show files
                 ths.unzOfSlcVwmSectionFmg(vwmSectionToSelect.unz);
             };

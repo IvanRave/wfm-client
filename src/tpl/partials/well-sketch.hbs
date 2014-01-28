@@ -1,7 +1,8 @@
-﻿<div data-bind="with: sketchOfWell">
+﻿<!-- current: vwmWell -->
+<div data-bind="with: vwmSketchOfWell">
   <div class="row">
-    <div data-bind="isLoaded">
-      <div data-bind="ifnot: fileSpec">
+    <div data-bind="mdlSketchOfWell.isLoaded">
+      <div data-bind="ifnot: mdlSketchOfWell.fileSpec">
         <div class="alert alert-warning">
           No sketch. Use edit mode to load new sketch.
         </div>
@@ -11,18 +12,19 @@
       <div data-bind="if: $root.isEmployeeInEditMode">
         <button class="btn btn-default btn-sm btn-block" data-bind="click: createSketchFromFile">Choose sketch...</button>
       </div>
-      <div data-bind="with: fileSpec">
+      <div data-bind="with: mdlSketchOfWell.fileSpec">
         <span class="pointer" data-bind="panzoomImg: {src: fileUrl}">
           <img src="#" class="img-responsive" data-bind="attr: { src: fileUrl }" alt="Sketch image" />
         </span>
       </div>
     </div>
+    <!-- ko with: mdlSketchOfWell -->
     <div class="col-sm-8" data-bind="if: fileSpec">
       <div data-bind="if: $root.isEmployeeInEditMode">
         <div class="text-right">
-          <button class="btn btn-xs btn-default" data-bind="click: remove">
+          <button class="btn btn-xs btn-default" data-bind="click: clearSketchOfWell">
             <i class="glyphicon glyphicon-remove"></i>
-            Delete sketch
+            {{ capitalizeFirst lang.toDelete}} sketch
           </button>
         </div>
       </div>
@@ -34,5 +36,6 @@
         <span class="pre-wrap-text" data-bind="text: description"></span>
       </div>
     </div>
+    <!-- /ko -->
   </div>
 </div>

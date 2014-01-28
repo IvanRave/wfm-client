@@ -1,8 +1,10 @@
 ﻿/** @module */
 define(['viewmodels/bases/stage-base',
-    'viewmodels/bases/stage-parent-base'],
+    'viewmodels/bases/stage-parent-base',
+    'viewmodels/sketch-of-well'],
     function (VwmStageBase,
-        VwmStageParentBase) {
+        VwmStageParentBase,
+        VwmSketchOfWell) {
         'use strict';
 
         /**
@@ -10,7 +12,7 @@ define(['viewmodels/bases/stage-base',
         * @constructor
         */
         var exports = function (mdlWell, koSlcVwmWell, defaultSlcData, fmgrLink) {
-            ////var ths = this;
+            var ths = this;
 
             this.mdlStage = mdlWell;
 
@@ -18,11 +20,13 @@ define(['viewmodels/bases/stage-base',
 
             this.fmgr = fmgrLink;
 
-            // TODO: add other fields
             VwmStageParentBase.call(this, koSlcVwmWell);
 
             // Has sections and widgets
             VwmStageBase.call(this, defaultSlcData.wellSectionId);
+
+            //mdlSketchOfWell, koWellUnzOfSlcVwmSectionFmg, koSlcVwmSectionFmg,  fmgrLink
+            this.vwmSketchOfWell = new VwmSketchOfWell(ths.mdlStage.sketchOfWell, ths.unzOfSlcVwmSectionFmg, ths.slcVwmSectionFmg, ths.fmgr);
         };
 
         return exports;

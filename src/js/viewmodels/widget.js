@@ -1,11 +1,12 @@
 ﻿define(['knockout',
     'viewmodels/widgets/widget-default-summary',
     ////'models/widgets/widget-well-perfomance',
-    ////'models/widgets/widget-well-sketch',
+    'viewmodels/widgets/widget-well-sketch',
     ////'models/widgets/widget-well-history',
     'viewmodels/widgets/widget-wield-map'],
     function (ko,
         VwmWidgetDefaultSummary,
+        VwmWidgetWellSketch,
         VwmWidgetWieldMap) {
         'use strict';
 
@@ -58,6 +59,9 @@
                     ////});
                     var tmpMdlWield = ths.mdlWidget.getWidgock().getWidgout().getParent();
                     VwmWidgetWieldMap.call(ths, widgetOpts, tmpMdlWield);
+                    break;
+                case 'well-sketch':
+                    VwmWidgetWellSketch.call(ths, widgetOpts);
                     break;
             }
 
