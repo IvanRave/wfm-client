@@ -1,10 +1,15 @@
-﻿<div>
-  <span data-bind="ifnot: isLoadedHistoryList">{{capitalizeFirst lang.loading}}...</span>
-  <div data-bind="if: isLoadedHistoryList">
+﻿<!-- current: vwmWell -->
+<div>
+  <span data-bind="ifnot: mdlStage.isLoadedHistoryList">{{capitalizeFirst lang.loading}}...</span>
+  <div data-bind="if: mdlStage.isLoadedHistoryList">
     <div class="clearfix">
       <div class="pull-left">
-        <div data-bind="if: historyList().length > 0">
-          <div data-bind="with: historyView">
+        <div data-bind="if: mdlStage.historyList().length === 0">
+          <small>{{capitalizeFirst lang.noWellHistoryList}}</small>
+        </div>
+        <div data-bind="if: mdlStage.historyList().length > 0">
+          <!-- TODO: view -->
+          <div data-bind="with: vwmScopeOfHistoryOfWell">
             <span>{{capitalizeFirst lang.filterByDate}}:</span>
             <input class="input-sm" type="text" size="10" data-bind="datepicker: startDate, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }" />
             <span> - </span>
@@ -12,11 +17,8 @@
             <button class="btn btn-default btn-sm" type="button" data-bind="click: changeSortByDateOrder">
               {{capitalizeFirst lang.sortByDate}} <i class="glyphicon" data-bind="css: sortByDateCss"></i>
             </button>
-            <select class="input-sm" data-bind="options: $parents[4].jobTypeList, optionsText: 'name', optionsValue: 'id', value: jobTypeId, optionsCaption: '{{capitalizeFirst lang.filterByJobType}}...'"></select>
+            <select class="input-sm" data-bind="options: jobTypeList, optionsText: 'name', optionsValue: 'id', value: jobTypeId, optionsCaption: '{{capitalizeFirst lang.filterByJobType}}...'"></select>
           </div>
-        </div>
-        <div data-bind="if: historyList().length === 0">
-          <small>{{capitalizeFirst lang.noWellHistoryList}}</small>
         </div>
       </div>
       <div class="pull-right" data-bind="if: $root.isEmployeeInEditMode">
@@ -30,7 +32,7 @@
         </button>
       </div>
     </div>
-    <div data-bind="with: historyView">
+    <div data-bind="with: vwmScopeOfHistoryOfWell">
       <div data-bind="foreach: sortedHistoryList">
         <div class="row well-history-block">
           <div class="col-md-2">

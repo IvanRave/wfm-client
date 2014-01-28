@@ -3,12 +3,14 @@ define(['knockout',
     'viewmodels/bases/stage-base',
     'viewmodels/bases/stage-parent-base',
     'viewmodels/sketch-of-well',
-    'viewmodels/volume-of-well'],
+    'viewmodels/volume-of-well',
+    'viewmodels/scope-of-history-of-well'],
     function (ko,
         VwmStageBase,
         VwmStageParentBase,
         VwmSketchOfWell,
-        VwmVolumeOfWell) {
+        VwmVolumeOfWell,
+        VwmScopeOfHistoryOfWell) {
         'use strict';
 
         /**
@@ -129,6 +131,26 @@ define(['knockout',
                 // Open file manager
                 ths.fmgr.show();
             };
+
+            // ================================= History section =========================
+            
+            ////this.historyView = new HistoryView({}, ths.historyList);
+
+            /////**
+            ////* List of viewmodels of history records
+            ////* @type {Array.<module:viewmodels/history-of-well>}
+            ////*/
+            ////this.listOfVwmHistoryOfWell = ko.computed({
+            ////    read: function () {
+            ////        return ko.unwrap(ths.mdlStage.historyList).map(function (elem) {
+            ////            return new VwmHistoryOfWell(elem);
+            ////        });
+            ////    },
+            ////    deferEvaluation: true
+            ////});
+            
+            this.vwmScopeOfHistoryOfWell = new VwmScopeOfHistoryOfWell({}, ths.mdlStage.historyList, ths.mdlStage.getWellGroup().getWellField().getWellRegion().getCompany().jobTypeList);
+            
         };
 
         return exports;

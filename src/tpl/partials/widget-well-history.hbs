@@ -1,7 +1,7 @@
 ﻿<script type="text/html" id="widget-tpl-well-history">
-  <div data-bind="if: widget.isVisSettingPanel">
+  <div data-bind="if: vwmWidget.isVisSettingPanel">
     <div class="widget-setting-panel">
-      <div data-bind="with: widget.historyView">
+      <div data-bind="with: vwmWidget.vwmScopeOfHistoryOfWell">
         <span>{{capitalizeFirst lang.filterByDate}}:</span>
         <input class="input-sm" type="text" size="10" data-bind="datepicker: startDate, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }" />
         <span> - </span>
@@ -9,18 +9,19 @@
         <button class="btn btn-default btn-sm" type="button" data-bind="click: changeSortByDateOrder">
           {{capitalizeFirst lang.sortByDate}} <i class="glyphicon" data-bind="css: sortByDateCss"></i>
         </button>
-        <select class="input-sm" data-bind="options: $root.jobTypeList, optionsText: 'name', optionsValue: 'id', value: jobTypeId, optionsCaption: '{{capitalizeFirst lang.filterByJobType}}...'"></select>
+        <select class="input-sm" data-bind="options: jobTypeList, optionsText: 'name', optionsValue: 'id', value: jobTypeId, optionsCaption: '{{capitalizeFirst lang.filterByJobType}}...'"></select>
       </div>
     </div>
   </div>
   <div class="widget-content">
-    <div data-bind="with: $parents[3]">
+    <!-- with well -->
+    <div data-bind="with: $parents[3].mdlStage">
       <div data-bind="if: isLoadedHistoryList">
         <div data-bind="if: historyList().length === 0">
           <small>{{capitalizeFirst lang.noWellHistoryList}}</small>
         </div>
         <div data-bind="if: historyList().length > 0">
-          <div data-bind="with: widget.historyView">
+          <div data-bind="with: vwmWidget.vwmScopeOfHistoryOfWell">
             <div data-bind="foreach: sortedHistoryList">
               <div class="well-history-block">
                 <div class="text-center">

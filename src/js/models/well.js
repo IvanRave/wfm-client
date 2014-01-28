@@ -9,7 +9,6 @@ define([
     'moment',
     'models/bases/stage-base',
     'models/stage-partials/well-perfomance-partial',
-    'viewmodels/well-history',
     'models/section-of-stage',
     'models/well-file',
     'models/sketch-of-well',
@@ -26,7 +25,7 @@ define([
     'models/test-scope',
 ], function ($, ko, datacontext, fileHelper, bootstrapModal,
     appHelper, appMoment, StageBase, wellPerfomancePartial,
-    HistoryView, SectionOfWell, WellFile, SketchOfWell,
+    SectionOfWell, WellFile, SketchOfWell,
     PropSpec, wellService,
     stageConstants, VolumeOfWell,
     volumeOfWellService, HistoryOfWell,
@@ -574,6 +573,10 @@ define([
 
         // ================================================= Well history section start =======================================
 
+        /**
+        * List of history records
+        * @type {Array.<module:models/history-of-well>}
+        */
         this.historyList = ko.observableArray();
 
         this.isLoadedHistoryList = ko.observable(false);
@@ -633,8 +636,6 @@ define([
                 });
             }
         };
-
-        this.historyView = new HistoryView({}, ths.historyList);
 
         // ============================================================= Well history end ===============================================
 

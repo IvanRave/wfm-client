@@ -5,7 +5,8 @@ define(['knockout',
     ////'models/widgets/widget-default-summary',
     ////'models/widgets/widget-well-history',
     ////'models/widgets/widget-wield-map'
-], function (ko, widgetService
+], function (ko,
+    widgetService
     //, WidgetWellPerfomance, WidgetDefaultSummary, WidgetWellSketch, WidgetWellHistory, WidgetWieldMap
     ) {
     'use strict';
@@ -50,27 +51,7 @@ define(['knockout',
                 orderNumber: ko.unwrap(ths.orderNumber),
                 opts: tmpWidgetOptsString
             }).done(scsCallback);
-        };        
-
-        ////switch (this.idOfSectionPattern) {
-        ////    case 'well-perfomance':
-        ////        WidgetWellPerfomance.call(ths, optsObj, ths.getWidgock());
-        ////        break;
-        ////    case 'well-history':
-        ////        WidgetWellHistory.call(ths, optsObj, ths.getWidgock().getWidgout().getParent().historyList);
-        ////        break;
-        ////}
-
-        ////this.toPlainJson = function () {
-        ////    return {
-        ////        id: ko.unwrap(ths.id),
-        ////        name: ko.unwrap(ths.name),
-        ////        idOfSectionPattern: ko.unwrap(ths.idOfSectionPattern),
-        ////        widgockId: ko.unwrap(ths.widgockId),
-        ////        orderNumber: ko.unwrap(ths.orderNumber),
-        ////        opts: JSON.stringify(ths.toPlainOpts())
-        ////    };
-        ////};
+        };
     };
 
     return exports;

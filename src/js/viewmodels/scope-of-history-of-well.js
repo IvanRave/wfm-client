@@ -6,8 +6,13 @@ define(['jquery', 'knockout'], function ($, ko) {
     * Well history view for history section, report section and history widgets
     * @constructor
     */
-    var exports = function (opts, koHistoryList) {
+    var exports = function (opts, koHistoryList, koJobTypeList) {
         var vw = this;
+
+        /**
+        * Link to company job type list (observable)
+        */
+        vw.jobTypeList = koJobTypeList;
 
         // UTC unix time (in seconds)
         vw.startDate = ko.observable(opts['StartDate']);
@@ -23,6 +28,10 @@ define(['jquery', 'knockout'], function ($, ko) {
             },
             deferEvaluation: true
         });
+
+        vw.changeSortByDateOrder = function () {
+            vw.sortByDateOrder(-parseInt(ko.unwrap(vw.sortByDateOrder), 10));
+        };
 
         vw.sortedHistoryList = ko.computed(function () {
             var sortFilterArr = ko.unwrap(koHistoryList);
@@ -62,10 +71,6 @@ define(['jquery', 'knockout'], function ($, ko) {
                 return ko.unwrap(left.startUnixTime) === ko.unwrap(right.startUnixTime) ? 0 : (ko.unwrap(left.startUnixTime) > ko.unwrap(right.startUnixTime) ? tmpOrder : -tmpOrder);
             });
         });
-
-        vw.changeSortByDateOrder = function () {
-            vw.sortByDateOrder(-parseInt(ko.unwrap(vw.sortByDateOrder), 10));
-        };
     };
 
     return exports;
