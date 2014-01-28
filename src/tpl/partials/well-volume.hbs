@@ -1,23 +1,25 @@
-﻿<div class="row">
+﻿<!-- current: vwmWell -->
+<div class="row">
   <div class="col-md-8">
-    <div data-bind="with: slcVolume">
+    <div data-bind="with: slcVwmVolumeOfWell">
+      <!-- ko with: mdlVolumeOfWell -->
       <span data-bind="with: fileSpec">
         <span class="pointer" data-bind="panzoomImg: {src: fileUrl}">
           <img class="img-responsive" src="#" data-bind="attr: {src: fileUrl}"></img>
         </span>
       </span>
-      <h4 data-bind="text: name"></h4>
-      <h5 data-bind="text: description"></h5>
+      <h6 data-bind="text: description"></h6>
+      <!-- /ko -->
     </div>
-    <div data-bind="ifnot: slcVolume">
+    <div data-bind="ifnot: slcVwmVolumeOfWell ">
       No selected volume
     </div>
   </div>
   <div class="col-md-4">
     <button class="btn btn-xs btn-default" type="button" data-bind="click: createVolumeFromFile">Add volume...</button>
-    <div class="min-top-margin" data-bind="foreach: volumes">
-      <div>
-        <span class="pointer link-view" data-bind="text: name, click: $parent.selectVolume"></span>
+    <div class="min-top-margin" data-bind="foreach: listOfVwmVolumeOfWell">
+      <div data-bind="css: { 'bld': isSlcVwmVolumeOfWell }">
+        <span class="pointer link-view" data-bind="text: mdlVolumeOfWell.name, click: $parent.selectVwmVolumeOfWell"></span>
       </div>
     </div>
   </div>

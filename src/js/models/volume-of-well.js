@@ -6,10 +6,10 @@ define(['knockout', 'models/file-spec'], function (ko, FileSpec) {
     * Volume of well model
     * @constructor
     */
-    var exports = function (data, slcVolume) {
+    var exports = function (data) {
         data = data || {};
         
-        var ths = this;
+        ////var ths = this;
 
         /**
         * Id of parent
@@ -34,17 +34,6 @@ define(['knockout', 'models/file-spec'], function (ko, FileSpec) {
         * @type {module:models/file-spec}
         */
         this.fileSpec = new FileSpec(data.FileSpecDto);
-
-        /**
-        * Whether current volume is selected
-        * @type {boolean}
-        */
-        this.isSlcVolume = ko.computed({
-            read: function () {
-                return ths === ko.unwrap(slcVolume);
-            },
-            deferEvaluation: true
-        });
     };
 
     return exports;

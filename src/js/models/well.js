@@ -34,8 +34,8 @@ define([
     fileSpecService, ColumnAttribute) {
     'use strict';
 
-    function importVolumes(data, slcVolume) {
-        return (data || []).map(function (item) { return new VolumeOfWell(item, slcVolume); });
+    function importVolumes(data) {
+        return (data || []).map(function (item) { return new VolumeOfWell(item); });
     }
 
     function importLogsOfWell(data, slcLogOfWell) {
@@ -1005,79 +1005,28 @@ define([
         */
         this.isLoadedVolumes = ko.observable(false);
 
-        /**
-        * Selected volume
-        * @type {module:models/volume-of-well}
-        */
-        this.slcVolume = ko.observable();
-
-        /** Select volume to view */
-        this.selectVolume = function (volumeToSelect) {
-            ths.slcVolume(volumeToSelect);
-        };
-
         /** Load volumes */
         this.loadVolumes = function () {
             if (ko.unwrap(ths.isLoadedVolumes)) { return; }
 
             volumeOfWellService.get(ths.id).done(function (res) {
                 ths.isLoadedVolumes(true);
-                ths.volumes(importVolumes(res, ths.slcVolume));
+                ths.volumes(importVolumes(res));
             });
         };
 
-        /** Create volume from file: select file and create volume */
-        this.createVolumeFromFile = function () {
-            var needSection = ths.getSectionByPatternId('well-volume');
-
-            // Select file section with volumes (load and unselect files)
-            ths.selectFileSection(needSection);
-
-            var tmpModalFileMgr = ths.getWellGroup().getWellField().getWellRegion().getCompany().modalFileMgr;
-
-            // Calback for selected file
-            function mgrCallback() {
-                tmpModalFileMgr.okError('');
-                // Select file from file manager
-                var selectedFileSpecs = ko.unwrap(needSection.listOfFileSpec).filter(function (elem) {
-                    return ko.unwrap(elem.isSelected);
-                });
-
-                if (selectedFileSpecs.length !== 1) {
-                    tmpModalFileMgr.okError('need to select one file');
-                    return;
-                }
-
-                var tmpIdOfFileSpec = selectedFileSpecs[0].id;
-
-                volumeOfWellService.post(ths.id, {
-                    idOfWell: ths.id,
-                    idOfFileSpec: tmpIdOfFileSpec,
-                    name: ko.unwrap(selectedFileSpecs[0].name) || '',
-                    description: ''
-                }).done(function (res) {
-                    // Add to the current array
-                    ths.volumes.push(new VolumeOfWell(res, ths.slcVolume));
-                    tmpModalFileMgr.hide();
-                }).fail(function (jqXHR) {
-                    if (jqXHR.status === 422) {
-                        var resJson = jqXHR.responseJSON;
-                        require(['helpers/lang-helper'], function (langHelper) {
-                            var tmpProcessError = (langHelper.translate(resJson.errId) || '{{lang.unknownError}}');
-                            tmpModalFileMgr.okError(tmpProcessError);
-                        });
-                    }
-                });
-            }
-
-            // Add to observable
-            tmpModalFileMgr.okCallback(mgrCallback);
-
-            // Notification
-            tmpModalFileMgr.okDescription('Please select a file for a volume');
-
-            // Open file manager
-            tmpModalFileMgr.show();
+        /** Send volume to the server */
+        this.postVolumeOfWell = function (tmpIdOfFileSpec, tmpName, scsCallback, errCallback) {
+            volumeOfWellService.post(ths.id, {
+                idOfWell: ths.id,
+                idOfFileSpec: tmpIdOfFileSpec,
+                name: tmpName || '',
+                description: ''
+            }).done(function (res) {
+                // Add to the current array
+                ths.volumes.push(new VolumeOfWell(res));
+                scsCallback();
+            }).fail(errCallback);
         };
 
         //================================================= Edit well ======================================
