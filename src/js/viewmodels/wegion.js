@@ -2,16 +2,15 @@
 define(['knockout',
     'viewmodels/wield',
     'viewmodels/bases/stage-child-base',
-    'viewmodels/bases/stage-base',
-    'viewmodels/bases/stage-parent-base'],
-    function (ko, VwmWield, VwmStageChildBase, VwmStageBase, VwmStageParentBase) {
+    'viewmodels/bases/stage-base'],
+    function (ko, VwmWield, VwmStageChildBase, VwmStageBase) {
         'use strict';
 
         /**
         * Well region view model
         * @constructor
         */
-        var exports = function (mdlWegion, koSlcVwmStage, defaultSlcData, fmgrLink) {
+        var exports = function (mdlWegion, koUnqOfSlcVwmWegion, defaultSlcData, fmgrLink) {
             var ths = this;
 
             /**
@@ -33,15 +32,14 @@ define(['knockout',
             this.listOfVwmChild = ko.computed({
                 read: function () {
                     return ko.unwrap(mdlWegion.wields).map(function (elem) {
-                        return new VwmWield(elem, ths.slcVwmChild, defaultSlcData, ths.fmgr);
+                        return new VwmWield(elem, ths.unqOfSlcVwmChild, defaultSlcData, ths.fmgr);
                     });
                 },
                 deferEvaluation: true
             });
 
-            VwmStageParentBase.call(ths, koSlcVwmStage);
             VwmStageChildBase.call(this, defaultSlcData.wieldId);
-            VwmStageBase.call(this, defaultSlcData.wegionSectionId);
+            VwmStageBase.call(this, defaultSlcData.wegionSectionId, koUnqOfSlcVwmWegion);
         };
 
         return exports;

@@ -13,7 +13,7 @@ define(['knockout',
         * Base for stages
         * @constructor
         */
-        var exports = function (partOfUnzOfSlcVwmSectionWrk) {
+        var exports = function (partOfUnzOfSlcVwmSectionWrk, koUnqOfSlcVwmStage) {
 
             var ths = this;
             ////console.log('defaultSectionId', defaultSectionId);
@@ -24,14 +24,17 @@ define(['knockout',
             * Whether stage content is selected and showed on the page (child object are not selected)
             * @type {boolean}
             */
-            this.isShowedVwmStage = ko.computed({
+            this.isActiveVwmStage = ko.computed({
                 read: function () {
                     // If stage is selected (or not exists)
-                    if (ko.unwrap(ths.isSlcVwmStage) !== false) {
-                        // And no selected childs
+                    // isSlcVwmStage = koSlcVwmChild === this
+                    // 1. Is this stage is selected
+                    if (ko.unwrap(ths.unq) === ko.unwrap(koUnqOfSlcVwmStage)) {
+                        // 2. And no selected childs
                         // Well stage is always selected (has no children)
                         if (!ko.unwrap(ths.slcVwmChild)) {
                             console.log('stage is showed', ths.mdlStage.stageKey);
+                            // TODO: 3. And all parents are selected
                             return true;
                         }
                     }
@@ -124,7 +127,7 @@ define(['knockout',
             this.slcVwmSectionWrk.subscribe(function (vwmSectionItem) {
                 console.log('subscribe section', vwmSectionItem);
                 var navigationArr = historyHelper.getNavigationArr(ths.mdlStage);
-                
+
                 if (vwmSectionItem) {
                     if (ths.mdlStage.loadSectionContent) {
                         ths.mdlStage.loadSectionContent(vwmSectionItem.mdlSection.sectionPatternId);
@@ -148,7 +151,6 @@ define(['knockout',
                 }
 
                 historyHelper.pushState('/' + navigationArr.join('/'));
-                ////console.log('mdlStageisShowed: ' + ko.unwrap(ths.isShowedVwmStage));
             });
 
             /**
@@ -158,7 +160,7 @@ define(['knockout',
             this.listOfVwmWidgout = ko.computed({
                 read: function () {
                     return ko.unwrap(ths.mdlStage.widgouts).map(function (elem) {
-                        return new VwmWidgout(elem, ths.fmgr);
+                        return new VwmWidgout(elem, ths);
                     });
                 },
                 deferEvaluation: true

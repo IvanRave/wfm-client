@@ -15,7 +15,7 @@
         * Viewmodel: widget
         * @constructor
         */
-        var exports = function (mdlWidget, fmgrLink) {
+        var exports = function (mdlWidget, vwmWidgock) {
 
             var ths = this;
 
@@ -25,7 +25,9 @@
             */
             this.mdlWidget = mdlWidget;
 
-            this.fmgr = fmgrLink;
+            this.getVwmWidgock = function () {
+                return vwmWidgock;
+            };
 
             this.isVisSettingPanel = ko.observable(false);
 
@@ -36,6 +38,8 @@
             var widgetOpts = mdlWidget.widgetOpts;
 
             var tmpWidgetMdlStage = ths.mdlWidget.getWidgock().getWidgout().getParent();
+
+            var tmpParentVwmStage = ths.getVwmWidgock().getVwmWidgout().getParentVwmStage();
 
             switch (mdlWidget.idOfSectionPattern) {
                 case 'well-summary':
@@ -51,8 +55,7 @@
                     ////    WidgetWellPerfomance.call(ths, optsObj, ths.getWidgock());
                     ////    break;
                 case 'well-history':
-                    var koJobTypeList = tmpWidgetMdlStage.getWellGroup().getWellField().getWellRegion().getCompany().jobTypeList;
-                    VwmWidgetWellHistory.call(ths, widgetOpts, tmpWidgetMdlStage.historyList, koJobTypeList);
+                    VwmWidgetWellHistory.call(ths, widgetOpts, tmpParentVwmStage);
                     break;
                 case 'wield-map':
                     ////require(['viewmodels/wield'], function (asdf) {

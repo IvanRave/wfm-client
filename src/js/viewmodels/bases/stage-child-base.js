@@ -34,55 +34,85 @@ define(['knockout',
             });
 
             /**
-            * Select view of child
-            *    For userProfile - employee (
+            * Activate view of child stage: select all parents
+            *    1. Unselect all children
+            *    2. Select this
+            *    3. Select all parents (For userProfile - employee (company))
+            *    4. Set url fot this stage
             */
-            this.selectVwmChild = function (vwmChildToSelect) {
-                console.log('selected', vwmChildToSelect);
-                ////// Unselect previous child
-                ths.unqOfSlcVwmChild(null);
+            this.activateVwmChild = function (vwmChildToActivate) {
+                console.log('activate: ', vwmChildToActivate);
 
+                // Unselect previous child: todo: why?
+                ////ths.unqOfSlcVwmChild(null);
+
+                // Unselect 
                 var navigationArr = [];
-                if (vwmChildToSelect.unqOfSlcVwmChild) {
-                    vwmChildToSelect.unqOfSlcVwmChild(null);
-                    navigationArr = historyHelper.getNavigationArr(vwmChildToSelect.mdlStage);
 
-                    // if no section is defined, then set to null (show dashboard)
-                    vwmChildToSelect.unselectVwmSectionWrk();
-                }
-                else if (vwmChildToSelect.vwmCompany) {
-                    vwmChildToSelect.vwmCompany.unqOfSlcVwmChild(null);
-                    navigationArr = historyHelper.getNavigationArr(vwmChildToSelect.vwmCompany.mdlStage);
-                    vwmChildToSelect.vwmCompany.unselectVwmSectionWrk();
-                }
-                else {
-                    // For wells without childs
-                    navigationArr = historyHelper.getNavigationArr(vwmChildToSelect.mdlStage);
-
-                    // if no section is defined, then set to null (show dashboard)
-                    vwmChildToSelect.unselectVwmSectionWrk();
+                // For company - stage == employee
+                if (vwmChildToActivate.vwmCompany) {
+                    vwmChildToActivate = vwmChildToActivate.vwmCompany;
                 }
 
+                if (typeof (vwmChildToActivate.unqOfSlcVwmChild) !== 'undefined') {
+                    vwmChildToActivate.unqOfSlcVwmChild(null);
+                }
+                
+                vwmChildToActivate.unselectVwmSectionWrk(); 
+
+                navigationArr = historyHelper.getNavigationArr(vwmChildToActivate.mdlStage);
                 historyHelper.pushState('/' + navigationArr.join('/'));
 
                 // Select current child
-                ths.unqOfSlcVwmChild(vwmChildToSelect.unq);
+                ths.unqOfSlcVwmChild(vwmChildToActivate.unq);
+
+                // Select all parents of this child
+                // ths - parent (like company)
+                // vwmChild - child (like wegion)
+                // slcVwmChild - selected child (like wegion)
+                // If parent - it is a child of other parent (company, employee -- it is a child of the userprofile)
+                // UserProflie.slcVwmChild(thisEmployee of this company)
             };
 
-            ////this.showVwmChildContent = function (vwmChildToShow) {
-
-            ////    // Select this child stage (if not selected)
-            ////    // Hide child stages of this child stage
-            ////};
-
             /** Unselect: show content of parent node, like WFM logo click: unselect choosed company and show company list */
-            this.unselectVwmChild = function () {
+            this.deactivateVwmChild = function () {
                 ths.unqOfSlcVwmChild(null);
 
                 var navigationArr = historyHelper.getNavigationArr(ths.mdlStage);
 
                 historyHelper.pushState('/' + navigationArr.join('/'));
             };
+
+            /**
+            * Whether menu item is opened: showed inner object in menu without main content
+            *    Only for sections that have children
+            * @type {boolean}
+            */
+            this.isOpenedItem = ko.observable(false);
+
+            /** Toggle isOpen state */
+            this.toggleItem = function () {
+                ths.isOpenedItem(!ko.unwrap(ths.isOpenedItem));
+            };
+
+            /** Css class for opened item (open or showed) */
+            this.menuItemCss = ko.computed({
+                read: function () {
+                    // { 'glyphicon-circle-arrow-down' : isOpenedItem, 'glyphicon-circle-arrow-right' : !isOpenedItem() }
+                    return ko.unwrap(ths.isOpenedItem) ? 'glyphicon-circle-arrow-down' : 'glyphicon-circle-arrow-right';
+                },
+                deferEvaluation: true
+            });
+
+            /** Open child after selection */
+            this.slcVwmChild.subscribe(function (tmpSlcVwmChild) {
+                if (tmpSlcVwmChild) {
+                    if (typeof (tmpSlcVwmChild.isOpenedItem) !== 'undefined') {
+                        tmpSlcVwmChild.isOpenedItem(true);
+                    }
+                }
+            });
+
         };
 
         return exports;

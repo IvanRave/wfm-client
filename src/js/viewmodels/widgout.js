@@ -10,7 +10,7 @@ define(['knockout',
         * Viewmodel: widget layout (show widget layout model)
         * @constructor
         */
-        var exports = function (mdlWidgout, fmgrLink) {
+        var exports = function (mdlWidgout, parentVwmStage) {
             
             var ths = this;
 
@@ -20,7 +20,14 @@ define(['knockout',
             */
             this.mdlWidgout = mdlWidgout;
 
-            this.fmgr = fmgrLink;
+            this.getParentVwmStage = function () {
+                return parentVwmStage;
+            };
+
+            ////this.getParentVwmStage = function () {
+            ////    return parentVwmStage;
+            ////};
+            ////fmgr = parentVwmStage
 
             /**
             * Widget layout name for view
@@ -35,7 +42,7 @@ define(['knockout',
             this.listOfVwmWidgock = ko.computed({
                 read: function () {
                     return ko.unwrap(mdlWidgout.widgocks).map(function (elem) {
-                        return new VwmWidgock(elem, ths.fmgr);
+                        return new VwmWidgock(elem, ths);
                     });
                 },
                 deferEvaluation: true

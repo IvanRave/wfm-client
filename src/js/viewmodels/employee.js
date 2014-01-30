@@ -1,18 +1,16 @@
 ﻿/** @module */
 define(['knockout',
-    'viewmodels/company',
-    'viewmodels/bases/stage-parent-base'],
+    'viewmodels/company'],
     function (ko,
-        VwmCompany,
-        VwmStageParentBase) {
+        VwmCompany) {
         'use strict';
 
         /**
         * Employee view model (user in company)
         * @constructor
-        * @param {Object} koSlcVwmStage - Selected view of employee in user-profile
+        * @param {string} koUnqOfSlcVwmStage - Id of Selected view of employee in user-profile
         */
-        var exports = function (mdlEmployee, koSlcVwmStage, defaultSlcData) {
+        var exports = function (mdlEmployee, koUnqOfSlcVwmStage, defaultSlcData) {
             var ths = this;
 
             /**
@@ -21,17 +19,14 @@ define(['knockout',
             */
             this.mdlEmployee = mdlEmployee;
 
-            /** Employee has a parent with few employees */
-            VwmStageParentBase.call(ths, koSlcVwmStage);
-
             /**
             * Main view model for company
             * @type {<module:viewmodels/company>}
             */
-            this.vwmCompany = new VwmCompany(ths.mdlEmployee.company, defaultSlcData);
+            this.vwmCompany = new VwmCompany(ths.mdlEmployee.company, koUnqOfSlcVwmStage, defaultSlcData);
 
             /** Unique id of view: id of employee = id of company */
-            this.unq = this.vwmCompany.unq;
+            this.unq = ths.vwmCompany.unq;
 
             /**
             * Whether edit mode is turn on

@@ -13,7 +13,7 @@ define(['knockout',
         * Company view model
         * @constructor
         */
-        var exports = function (mdlCompany, defaultSlcData) {
+        var exports = function (mdlCompany, koUnqOfSlcVwmStage, defaultSlcData) {
 
             /** Alternative of this */
             var ths = this;
@@ -57,14 +57,16 @@ define(['knockout',
                 read: function () {
                     var tmpListOfMdlWegion = ko.unwrap(ths.mdlStage.wegions);
                     return tmpListOfMdlWegion.map(function (elem) {
-                        return new VwmWegion(elem, ths.slcVwmChild, defaultSlcData, ths.fmgr);
+                        return new VwmWegion(elem, ths.unqOfSlcVwmChild, defaultSlcData, ths.fmgr);
                     });
                 },
                 deferEvaluation: true
             });
 
-            /** Base for all stages: with selected view of wegion */
-            VwmStageBase.call(this, defaultSlcData.companySectionId);
+            /**
+            * Base for all stages: with selected view of wegion
+            */
+            VwmStageBase.call(this, defaultSlcData.companySectionId, koUnqOfSlcVwmStage);
 
             /** Base for all stages with childs */
             VwmStageChildBase.call(this, defaultSlcData.wegionId);

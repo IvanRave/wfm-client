@@ -3,21 +3,19 @@ define(['knockout',
     'viewmodels/wroup',
     'viewmodels/map-of-wield',
     'viewmodels/bases/stage-child-base',
-    'viewmodels/bases/stage-base',
-    'viewmodels/bases/stage-parent-base'],
+    'viewmodels/bases/stage-base'],
     function (ko,
         VwmWroup,
         VwmMapOfWield,
         VwmStageChildBase,
-        VwmStageBase,
-        VwmStageParentBase) {
+        VwmStageBase) {
         'use strict';
 
         /**
         * View for well field maps: contains filtered maps and selected map
         * @constructor
         */
-        var exports = function (mdlWield, koSlcVwmWield, defaultSlcData, fmgrLink) {
+        var exports = function (mdlWield, koUnqOfSlcVwmWield, defaultSlcData, fmgrLink) {
             ////* @param {object} opts - options for this view, like id of selected map, sort direction, filters etc.
             ////* @param {Array.<module:models/map-of-wield>} koMapsOfWield - models for maps (knockout wrapped)
 
@@ -38,18 +36,16 @@ define(['knockout',
             this.listOfVwmChild = ko.computed({
                 read: function () {
                     return ko.unwrap(mdlWield.wroups).map(function (elem) {
-                        return new VwmWroup(elem, ths.slcVwmChild, defaultSlcData, ths.fmgr);
+                        return new VwmWroup(elem, ths.unqOfSlcVwmChild, defaultSlcData, ths.fmgr);
                     });
                 },
                 deferEvaluation: true
             });
 
-            // Has a parent with few wields
-            VwmStageParentBase.call(this, koSlcVwmWield);
             // Has a children (wroups)
             VwmStageChildBase.call(this, defaultSlcData.wroupId);
             // Has sections and widgets
-            VwmStageBase.call(this, defaultSlcData.wieldSectionId);
+            VwmStageBase.call(this, defaultSlcData.wieldSectionId, koUnqOfSlcVwmWield);
 
             /** List of views of maps of this well field view*/
             this.listOfVwmMapOfWield = ko.computed({

@@ -2,118 +2,127 @@
 <div>
   <span data-bind="ifnot: mdlStage.isLoadedHistoryList">{{capitalizeFirst lang.loading}}...</span>
   <div data-bind="if: mdlStage.isLoadedHistoryList">
-    <div class="clearfix">
-      <div class="pull-left">
-        <div data-bind="if: mdlStage.historyList().length === 0">
-          <small>{{capitalizeFirst lang.noWellHistoryList}}</small>
-        </div>
-        <div data-bind="if: mdlStage.historyList().length > 0">
-          <!-- TODO: view -->
-          <div data-bind="with: vwmScopeOfHistoryOfWell">
-            <span>{{capitalizeFirst lang.filterByDate}}:</span>
-            <input class="input-sm" type="text" size="10" data-bind="datepicker: startDate, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }" />
-            <span> - </span>
-            <input class="input-sm" type="text" size="10" data-bind="datepicker: endDate, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }" />
-            <button class="btn btn-default btn-sm" type="button" data-bind="click: changeSortByDateOrder">
-              {{capitalizeFirst lang.sortByDate}} <i class="glyphicon" data-bind="css: sortByDateCss"></i>
-            </button>
-            <select class="input-sm" data-bind="options: jobTypeList, optionsText: 'name', optionsValue: 'id', value: jobTypeId, optionsCaption: '{{capitalizeFirst lang.filterByJobType}}...'"></select>
-          </div>
-        </div>
-      </div>
-      <div class="pull-right" data-bind="if: $root.isEmployeeInEditMode">
-        <span data-bind="with: wellHistoryNew">
-          <input class="input-sm" type="text" size="10" data-bind="datepicker: startUnixTime, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }" />
-          <span> - </span>
-          <input class="input-sm" type="text" size="10" data-bind="datepicker: endUnixTime, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }" />
-        </span>
-        <button class="btn btn-sm btn-default" data-bind="click: postWellHistory, enable: isEnabledPostWellHistory">
-          <i class="glyphicon glyphicon-plus"></i> {{capitalizeFirst lang.toCreateRecord}}
-        </button>
-      </div>
+    <div data-bind="if: mdlStage.historyList().length === 0">
+      <small>{{capitalizeFirst lang.noWellHistoryList}}</small>
     </div>
-    <div data-bind="with: vwmScopeOfHistoryOfWell">
-      <div data-bind="foreach: sortedHistoryList">
-        <div class="row well-history-block">
-          <div class="col-md-2">
+    <div data-bind="if: mdlStage.historyList().length > 0">
+      <div data-bind="with: vwmScopeOfHistoryOfWell">
+        <div class="clearfix">
+          <div class="pull-left">
             <div>
-              <div class="bld">{{capitalizeFirst lang.timePeriod}}:</div>
-              <div data-bind="ifnot: $root.isEmployeeInEditMode">
-                <div>
-                  <span data-bind="unix: startUnixTime"></span>
-                </div>
-                <div>
-                  <span data-bind="unix: endUnixTime, visible: isVisibleEndUnixTime"></span>
-                </div>
-              </div>
-              <div data-bind="if: $root.isEmployeeInEditMode">
-                <input class="input-sm" type="text" size="10" data-bind="datepicker: startUnixTime, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }"></input>
-                <input class="input-sm" type="text" size="10" data-bind="datepicker: endUnixTime, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }"></input>
-              </div>
-            </div>
-            <div>
-              <div data-bind="ifnot: $root.isEmployeeInEditMode">
-                <div data-bind="with: jobType">
-                  <span class="bld">{{capitalizeFirst lang.jobType}}:</span>
-                  <span data-bind="text: name"></span>
-                </div>
-              </div>
-              <div data-bind="if: $root.isEmployeeInEditMode">
-                <div data-bind="if: $parents[5].jobTypeList().length > 0">
-                  <span class="bld">{{capitalizeFirst lang.jobType}}:</span>
-                  <select class="input-sm" data-bind="options: $parents[5].jobTypeList, optionsText: 'name', optionsValue: 'id', optionsCaption: 'No job type', value: jobTypeId"></select>
-                  <button class="btn btn-xs btn-link" data-bind="click: $parents[5].goToPostingJobType">{{lang.toAddJobTypeToList}}</button>
-                </div>
-              </div>
-            </div>
-            <div data-bind="if: $root.isEmployeeInEditMode" style="margin-top:8px">
-              <div class="btn-group-vertical btn-group-sm">
-                <button class="btn btn-default" type="button" data-bind="click: createFileSpecOfHistoryOfWell">
-                  <i class="glyphicon glyphicon-paperclip"></i> {{capitalizeFirst lang.attachFile}}
-                </button>
-                <button class="btn btn-default" type="button" data-bind="click: createImageFromFileSpec">
-                  <i class="glyphicon glyphicon-picture"></i> {{capitalizeFirst lang.cropImage}}
-                </button>
-                <button class="btn btn-default" type="button" data-bind="click: $parents[1].deleteWellHistory">
-                  <i class="glyphicon glyphicon-remove"></i> {{capitalizeFirst lang.toDelete}}
-                </button>
-              </div>
+              <span>{{capitalizeFirst lang.filterByDate}}:</span>
+              <input class="input-sm" type="text" size="10" data-bind="datepicker: startDate, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }" />
+              <span> - </span>
+              <input class="input-sm" type="text" size="10" data-bind="datepicker: endDate, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }" />
+              <button class="btn btn-default btn-sm" type="button" data-bind="click: changeSortByDateOrder">
+                {{capitalizeFirst lang.sortByDate}} <i class="glyphicon" data-bind="css: sortByDateCss"></i>
+              </button>
+              <select class="input-sm" data-bind="options: jobTypeList, optionsText: 'name', optionsValue: 'id', value: jobTypeId, optionsCaption: '{{capitalizeFirst lang.filterByJobType}}...'"></select>
             </div>
           </div>
-          <div class="col-md-10">
-            <div data-bind="ifnot: $root.isEmployeeInEditMode">
-              <div data-bind="visible: historyText">
-                <blockquote class="pre-wrap-text" data-bind="text: historyText"></blockquote>
+          <div class="pull-right" data-bind="if: $root.isEmployeeInEditMode">
+            <span data-bind="with: wellHistoryNew">
+              <input class="input-sm" type="text" size="10" data-bind="datepicker: startUnixTime, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }" />
+              <span> - </span>
+              <input class="input-sm" type="text" size="10" data-bind="datepicker: endUnixTime, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }" />
+            </span>
+            <button class="btn btn-sm btn-default" data-bind="click: postVwmHistoryOfWell, enable: isEnabledPostHistoryOfWell">
+              <i class="glyphicon glyphicon-plus"></i> {{capitalizeFirst lang.toCreateRecord}}
+            </button>
+          </div>
+        </div>
+        <div data-bind="foreach: listOfVwmHistoryOfWell">
+          <div data-bind="slideVisible: isVisible">
+            <div class="row well-history-block">
+              <div class="col-md-2">
+                <div>
+                  <div class="bld">{{capitalizeFirst lang.timePeriod}}:</div>
+                  <div data-bind="ifnot: $root.isEmployeeInEditMode">
+                    <div data-bind="with: mdlHistoryOfWell">
+                      <div>
+                        <span data-bind="unix: startUnixTime"></span>
+                      </div>
+                      <div>
+                        <span data-bind="unix: endUnixTime, visible: isVisibleEndUnixTime"></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div data-bind="if: $root.isEmployeeInEditMode">
+                    <div data-bind="with: mdlHistoryOfWell">
+                      <input class="input-sm" type="text" size="10" data-bind="datepicker: startUnixTime, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }"></input>
+                      <input class="input-sm" type="text" size="10" data-bind="datepicker: endUnixTime, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }"></input>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <div data-bind="ifnot: $root.isEmployeeInEditMode">
+                    <div data-bind="with: mdlHistoryOfWell">
+                      <div data-bind="with: jobType">
+                        <span class="bld">{{capitalizeFirst lang.jobType}}:</span>
+                        <span data-bind="text: name"></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div data-bind="if: $root.isEmployeeInEditMode">
+                    <div data-bind="if: $parent.jobTypeList().length > 0">
+                      <span class="bld">{{capitalizeFirst lang.jobType}}:</span>
+                      <!-- ko with: mdlHistoryOfWell -->
+                      <select class="input-sm" data-bind="options: $parents[1].jobTypeList, optionsText: 'name', optionsValue: 'id', optionsCaption: 'No job type', value: jobTypeId"></select>
+                      <!-- /ko -->
+                      <button class="btn btn-xs btn-link" data-bind="click: $parent.goToPostingJobType">{{lang.toAddJobTypeToList}}</button>
+                    </div>
+                  </div>
+                </div>
+                <div data-bind="if: $root.isEmployeeInEditMode" style="margin-top:8px">
+                  <div class="btn-group-vertical btn-group-sm">
+                    <button class="btn btn-default" type="button" data-bind="click: createFileSpecOfHistoryOfWell">
+                      <i class="glyphicon glyphicon-paperclip"></i> {{capitalizeFirst lang.attachFile}}
+                    </button>
+                    <button class="btn btn-default" type="button" data-bind="click: createImageFromFileSpec">
+                      <i class="glyphicon glyphicon-picture"></i> {{capitalizeFirst lang.cropImage}}
+                    </button>
+                    <button class="btn btn-default" type="button" data-bind="click: $parent.removeVwmHistoryOfWell">
+                      <i class="glyphicon glyphicon-remove"></i> {{capitalizeFirst lang.toDelete}}
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
-            <div data-bind="if: $root.isEmployeeInEditMode">
-              <blockquote>
-                <textarea class="form-control" rows="3" style="resize: vertical" data-bind="value: historyText"></textarea>
-                <button class="btn btn-default btn-sm" type="button" data-bind="click: putWellHistory">
-                  <i class="glyphicon glyphicon-saved"></i> {{capitalizeFirst lang.toSave}}
-                </button>
-              </blockquote>
-            </div>
-            <div data-bind="foreach: WfmImages">
-              <div>
-                <span class="pointer" data-bind="panzoomImg: {src: croppedImageUrl}">
-                  <img class="img-thumbnail elem-shadow" src="" data-bind="attr: { src: croppedImageUrl }" alt="History image" />
-                </span>
-                <span data-bind="if: $root.isEmployeeInEditMode">
-                  <i class="glyphicon glyphicon-remove link-icon" data-bind="click: $parent.removeWfmImage"></i>
-                </span>
-              </div>
-            </div>
-            <div data-bind="foreach: WellHistoryFiles" class="clearfix">
-              <div class="img-thumbnail pull-left">
-                <span class="link-view pointer">
-                  <span data-bind="with: fileSpec">
-                    <span data-bind="text: namePlusExtension, click: download"></span>
-                  </span>
-                </span>
-                <span data-bind="if: $root.isEmployeeInEditMode">
-                  <i class="glyphicon glyphicon-remove link-icon" data-bind="click: $parent.removeFileSpecOfHistoryOfWell"></i>
-                </span>
+              <div class="col-md-10" data-bind="with: mdlHistoryOfWell">
+                <div data-bind="ifnot: $root.isEmployeeInEditMode">
+                  <div data-bind="visible: historyText">
+                    <blockquote class="pre-wrap-text" data-bind="text: historyText"></blockquote>
+                  </div>
+                </div>
+                <div data-bind="if: $root.isEmployeeInEditMode">
+                  <blockquote>
+                    <textarea class="form-control" rows="3" style="resize: vertical" data-bind="value: historyText"></textarea>
+                    <button class="btn btn-default btn-sm" type="button" data-bind="click: putWellHistory">
+                      <i class="glyphicon glyphicon-saved"></i> {{capitalizeFirst lang.toSave}}
+                    </button>
+                  </blockquote>
+                </div>
+                <div data-bind="foreach: WfmImages">
+                  <div>
+                    <span class="pointer" data-bind="panzoomImg: {src: croppedImageUrl}">
+                      <img class="img-thumbnail elem-shadow" src="" data-bind="attr: { src: croppedImageUrl }" alt="History image" />
+                    </span>
+                    <span data-bind="if: $root.isEmployeeInEditMode">
+                      <i class="glyphicon glyphicon-remove link-icon" data-bind="click: $parent.removeWfmImage"></i>
+                    </span>
+                  </div>
+                </div>
+                <div data-bind="foreach: WellHistoryFiles" class="clearfix">
+                  <div class="img-thumbnail pull-left">
+                    <span class="link-view pointer">
+                      <span data-bind="with: fileSpec">
+                        <span data-bind="text: namePlusExtension, click: download"></span>
+                      </span>
+                    </span>
+                    <span data-bind="if: $root.isEmployeeInEditMode">
+                      <i class="glyphicon glyphicon-remove link-icon" data-bind="click: $parent.removeFileSpecOfHistoryOfWell"></i>
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

@@ -590,51 +590,23 @@ define([
             });
         };
 
-        this.wellHistoryNew = {
-            startUnixTime: ko.observable(),
-            endUnixTime: ko.observable(),
-            wellId: ths.Id,
-            historyText: ''
-        };
-
-        this.isEnabledPostWellHistory = ko.computed({
-            read: function () {
-                if (ko.unwrap(ths.wellHistoryNew.startUnixTime)) {
-                    return true;
-                }
-                else {
-                    return false;
-                }
-            },
-            deferEvaluation: true
-        });
-
-        this.postWellHistory = function () {
-            if (ko.unwrap(ths.isEnabledPostWellHistory)) {
-                var wellHistoryNewData = ko.toJS(ths.wellHistoryNew);
-
-                if (wellHistoryNewData.startUnixTime) {
-                    if (!wellHistoryNewData.endUnixTime) {
-                        wellHistoryNewData.endUnixTime = wellHistoryNewData.startUnixTime;
-                    }
-
-                    datacontext.postWellHistory(wellHistoryNewData).done(function (result) {
-                        ths.historyList.push(new HistoryOfWell(result, ths));
-                        // Set to null for psblty creating new well history
-                        ths.wellHistoryNew.startUnixTime(null);
-                        ths.wellHistoryNew.endUnixTime(null);
-                    });
-                }
-            }
+        this.postHistoryOfWell = function (tmpStartUnixTime, tmpEndUnixTime, scsCallback) {
+            datacontext.postWellHistory({
+                wellId: ths.id,
+                historyText: '',
+                startUnixTime: tmpStartUnixTime,
+                endUnixTime: tmpEndUnixTime
+            }).done(function (result) {
+                ths.historyList.push(new HistoryOfWell(result, ths));
+                // Clean view values
+                scsCallback();
+            });
         };
 
         this.deleteWellHistory = function (itemForDelete) {
-            var tmpStartUnixTime = ko.unwrap(itemForDelete.startUnixTime);
-            if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + appMoment(tmpStartUnixTime * 1000).format('YYYY-MM-DD') + '" record?')) {
-                datacontext.deleteWellHistory(itemForDelete.id).done(function () {
-                    ths.historyList.remove(itemForDelete);
-                });
-            }
+            datacontext.deleteWellHistory(itemForDelete.id).done(function () {
+                ths.historyList.remove(itemForDelete);
+            });
         };
 
         // ============================================================= Well history end ===============================================

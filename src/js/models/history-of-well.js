@@ -102,53 +102,16 @@ define(['jquery', 'knockout',
             /**
             * Create file spec of history of well from well section
             */
-            this.createFileSpecOfHistoryOfWell = function () {
-                var needSection = ths.getWell().getSectionByPatternId('well-history');
-
-                // Select file section with sketches (load and unselect files)
-                ths.getWell().selectFileSection(needSection);
-
-                var tmpModalFileMgr = ths.getWell().getWellGroup().getWellField().getWellRegion().getCompany().modalFileMgr;
-
-                // Calback for selected file
-                function mgrCallback() {
-                    tmpModalFileMgr.okError('');
-                    // Select file from file manager
-                    var selectedFileSpecs = ko.unwrap(needSection.listOfFileSpec).filter(function (elem) {
-                        return ko.unwrap(elem.isSelected);
-                    });
-
-                    if (selectedFileSpecs.length !== 1) {
-                        tmpModalFileMgr.okError('need to select one file');
-                        return;
-                    }
-
-                    fileSpecOfHistoryOfWellService.post(ths.id, {
-                        idOfFileSpec: selectedFileSpecs[0].id,
-                        idOfHistoryOfWell: ths.id,
-                        description: ''
-                    }).done(function (res) {
-                        ths.WellHistoryFiles.push(new FileSpecOfHistoryOfWell(res));
-                        tmpModalFileMgr.hide();
-                    }).fail(function (jqXHR) {
-                        if (jqXHR.status === 422) {
-                            var resJson = jqXHR.responseJSON;
-                            require(['helpers/lang-helper'], function (langHelper) {
-                                var tmpProcessError = (langHelper.translate(resJson.errId) || '{{lang.unknownError}}');
-                                tmpModalFileMgr.okError(tmpProcessError);
-                            });
-                        }
-                    });
-                }
-
-                // Add to observable
-                tmpModalFileMgr.okCallback(mgrCallback);
-
-                // Notification
-                tmpModalFileMgr.okDescription('Please select a file to attach to this history record');
-
-                // Open file manager
-                tmpModalFileMgr.show();
+            this.postFileSpecOfHistoryOfWell = function (tmpIdOfFileSpec, scsCallback, errCallback) {
+                fileSpecOfHistoryOfWellService.post(ths.id, {
+                    idOfFileSpec: tmpIdOfFileSpec,
+                    idOfHistoryOfWell: ths.id,
+                    description: ''
+                }).done(function (res) {
+                    ths.WellHistoryFiles.push(new FileSpecOfHistoryOfWell(res));
+                    // Hide window
+                    scsCallback();
+                }).fail(errCallback);
             };
 
             /**

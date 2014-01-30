@@ -20,11 +20,6 @@ define(['knockout'], function (ko) {
             // Select file section with sketches (load and unselect files)
             koWellUnzOfSlcVwmSectionFmg(tmpMdlWell.stageKey + '-sketch');
             
-
-            ////var needSection = tmpMdlWell.getSectionByPatternId('well-sketch');
-            ////ths.getWell().selectFileSection(needSection);
-            ////var tmpModalFileMgr = ths.getWell().getWellGroup().getWellField().getWellRegion().getCompany().modalFileMgr;
-
             // Calback for selected file
             function mgrCallback() {
                 ths.fmgr.okError('');

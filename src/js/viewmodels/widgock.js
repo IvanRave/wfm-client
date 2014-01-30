@@ -8,7 +8,7 @@
         * Viewmodel: widget block
         * @constructor
         */
-        var exports = function (mdlWidgock, fmgrLink) {
+        var exports = function (mdlWidgock, vwmWidgout) {
             var ths = this;
 
             /**
@@ -17,7 +17,9 @@
             */
             this.mdlWidgock = mdlWidgock;
 
-            this.fmgr = fmgrLink;
+            this.getVwmWidgout = function () {
+                return vwmWidgout;
+            };
 
             /**
             * List of viewmodels of widgets
@@ -26,7 +28,7 @@
             this.listOfVwmWidget = ko.computed({
                 read: function () {
                     return ko.unwrap(mdlWidgock.widgetList).map(function (elem) {
-                        return new VwmWidget(elem, ths.fmgr);
+                        return new VwmWidget(elem, ths);
                     });
                 },
                 deferEvaluation: true

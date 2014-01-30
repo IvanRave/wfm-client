@@ -1,77 +1,114 @@
 ﻿/** @module */
-define(['jquery', 'knockout'], function ($, ko) {
-    'use strict';
-
-    /**
-    * Well history view for history section, report section and history widgets
-    * @constructor
-    */
-    var exports = function (opts, koHistoryList, koJobTypeList) {
-        var vw = this;
+define(['knockout',
+    'viewmodels/history-of-well'],
+    function (ko,
+        VwmHistoryOfWell) {
+        'use strict';
 
         /**
-        * Link to company job type list (observable)
+        * Well history view for history section, report section and history widgets
+        * @constructor
         */
-        vw.jobTypeList = koJobTypeList;
+        var exports = function (opts, vwmWell) {
+            var ths = this;
 
-        // UTC unix time (in seconds)
-        vw.startDate = ko.observable(opts['StartDate']);
-        vw.endDate = ko.observable(opts['EndDate']);
+            /** Company model for this well */
+            var mdlCompany = vwmWell.mdlStage.getWellGroup().getWellField().getWellRegion().getCompany();
 
-        vw.jobTypeId = ko.observable(opts['JobTypeId']);
+            /**
+            * Link to company job type list (observable)
+            */
+            this.jobTypeList = mdlCompany.jobTypeList;
 
-        vw.sortByDateOrder = ko.observable(opts['SortByDateOrder'] || -1);
+            this.goToPostingJobType = function () {
+                var jobTypeNewName = window.prompt('{{capitalizeFirst lang.toAddJobTypeToList}}');
+                if (jobTypeNewName) {
+                    mdlCompany.postJobType(jobTypeNewName);
+                }
+            };
 
-        vw.sortByDateCss = ko.computed({
-            read: function () {
-                return ko.unwrap(vw.sortByDateOrder) === 1 ? 'glyphicon-arrow-down' : 'glyphicon-arrow-up';
-            },
-            deferEvaluation: true
-        });
+            // UTC unix time (in seconds)
+            this.startDate = ko.observable(opts['StartDate']);
+            this.endDate = ko.observable(opts['EndDate']);
 
-        vw.changeSortByDateOrder = function () {
-            vw.sortByDateOrder(-parseInt(ko.unwrap(vw.sortByDateOrder), 10));
+            this.jobTypeId = ko.observable(opts['JobTypeId']);
+
+            this.sortByDateOrder = ko.observable(opts['SortByDateOrder'] || -1);
+
+            this.sortByDateCss = ko.computed({
+                read: function () {
+                    return ko.unwrap(ths.sortByDateOrder) === 1 ? 'glyphicon-arrow-down' : 'glyphicon-arrow-up';
+                },
+                deferEvaluation: true
+            });
+
+            this.changeSortByDateOrder = function () {
+                ths.sortByDateOrder(-parseInt(ko.unwrap(ths.sortByDateOrder), 10));
+            };
+
+            this.listOfVwmHistoryOfWell = ko.computed({
+                read: function () {
+                    var tmpMdlList = ko.unwrap(vwmWell.mdlStage.historyList);
+                    console.log('recreation of list of history');
+                    var tmpVwmList = tmpMdlList.map(function (elem) {
+                        return new VwmHistoryOfWell(elem, vwmWell, ths.startDate, ths.endDate, ths.jobTypeId);
+                    });
+
+                    var tmpOrder = parseInt(ko.unwrap(ths.sortByDateOrder), 10);
+
+                    return tmpVwmList.sort(function (left, right) {
+                        return ko.unwrap(left.mdlHistoryOfWell.startUnixTime) === ko.unwrap(right.mdlHistoryOfWell.startUnixTime) ? 0 :
+                            (ko.unwrap(left.mdlHistoryOfWell.startUnixTime) > ko.unwrap(right.mdlHistoryOfWell.startUnixTime) ? tmpOrder : -tmpOrder);
+                    });
+                },
+                deferEvaluation: true
+            });
+
+            this.wellHistoryNew = {
+                startUnixTime: ko.observable(),
+                endUnixTime: ko.observable()
+            };
+
+            this.isEnabledPostHistoryOfWell = ko.computed({
+                read: function () {
+                    if (ko.unwrap(ths.wellHistoryNew.startUnixTime)) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                },
+                deferEvaluation: true
+            });
+
+            this.postVwmHistoryOfWell = function () {
+                if (ko.unwrap(ths.isEnabledPostHistoryOfWell)) {
+                    var wellHistoryNewData = ko.toJS(ths.wellHistoryNew);
+
+                    if (wellHistoryNewData.startUnixTime) {
+                        if (!wellHistoryNewData.endUnixTime) {
+                            wellHistoryNewData.endUnixTime = wellHistoryNewData.startUnixTime;
+                        }
+
+                        vwmWell.mdlStage.postHistoryOfWell(wellHistoryNewData.startUnixTime,
+                            wellHistoryNewData.endUnixTime, function () {
+                                // Set to null for psblty creating new well history
+                                ths.wellHistoryNew.startUnixTime(null);
+                                ths.wellHistoryNew.endUnixTime(null);
+                            });
+                    }
+                }
+            };
+
+            /**
+            * Remove history record: model and viewmodel
+            */
+            this.removeVwmHistoryOfWell = function (vwmHistoryOfWellToRemove) {
+                if (confirm('{{capitalizeFirst lang.confirmToDelete}} record?')) {
+                    vwmWell.mdlStage.deleteWellHistory(vwmHistoryOfWellToRemove.mdlHistoryOfWell);
+                }
+            };
         };
 
-        vw.sortedHistoryList = ko.computed(function () {
-            var sortFilterArr = ko.unwrap(koHistoryList);
-
-            // In unix time
-            var tmpStartDate = ko.unwrap(vw.startDate),
-                tmpEndDate = ko.unwrap(vw.endDate);
-
-            if (tmpStartDate || tmpEndDate) {
-                sortFilterArr = $.grep(sortFilterArr, function (elemValue) {
-                    var tmpElemStartUnixTime = ko.unwrap(elemValue.startUnixTime);
-                    if (tmpStartDate && (new Date(tmpStartDate * 1000) > new Date(tmpElemStartUnixTime * 1000))) {
-                        return false;
-                    }
-
-                    var tmpElemEndUnixTime = ko.unwrap(elemValue.endUnixTime);
-
-                    if (tmpEndDate && (new Date(tmpEndDate * 1000) < new Date(tmpElemEndUnixTime * 1000))) {
-                        return false;
-                    }
-
-                    return true;
-                });
-            }
-
-            var tmpJobTypeId = ko.unwrap(vw.jobTypeId);
-
-            if (tmpJobTypeId) {
-                sortFilterArr = $.grep(sortFilterArr, function (elemValue) {
-                    return (ko.unwrap(elemValue.jobTypeId) === tmpJobTypeId);
-                });
-            }
-
-            var tmpOrder = parseInt(ko.unwrap(vw.sortByDateOrder), 10);
-
-            return sortFilterArr.sort(function (left, right) {
-                return ko.unwrap(left.startUnixTime) === ko.unwrap(right.startUnixTime) ? 0 : (ko.unwrap(left.startUnixTime) > ko.unwrap(right.startUnixTime) ? tmpOrder : -tmpOrder);
-            });
-        });
-    };
-
-    return exports;
-});
+        return exports;
+    });

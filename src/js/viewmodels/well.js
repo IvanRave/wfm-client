@@ -1,13 +1,11 @@
 ﻿/** @module */
 define(['knockout',
     'viewmodels/bases/stage-base',
-    'viewmodels/bases/stage-parent-base',
     'viewmodels/sketch-of-well',
     'viewmodels/volume-of-well',
     'viewmodels/scope-of-history-of-well'],
     function (ko,
         VwmStageBase,
-        VwmStageParentBase,
         VwmSketchOfWell,
         VwmVolumeOfWell,
         VwmScopeOfHistoryOfWell) {
@@ -17,7 +15,7 @@ define(['knockout',
         * Well view model
         * @constructor
         */
-        var exports = function (mdlWell, koSlcVwmWell, defaultSlcData, fmgrLink) {
+        var exports = function (mdlWell, koUnqOfSlcVwmWell, defaultSlcData, fmgrLink) {
             var ths = this;
 
             this.mdlStage = mdlWell;
@@ -26,10 +24,8 @@ define(['knockout',
 
             this.fmgr = fmgrLink;
 
-            VwmStageParentBase.call(this, koSlcVwmWell);
-
             // Has sections and widgets
-            VwmStageBase.call(this, defaultSlcData.wellSectionId);
+            VwmStageBase.call(this, defaultSlcData.wellSectionId, koUnqOfSlcVwmWell);
 
             //mdlSketchOfWell, koWellUnzOfSlcVwmSectionFmg, koSlcVwmSectionFmg,  fmgrLink
             this.vwmSketchOfWell = new VwmSketchOfWell(ths.mdlStage.sketchOfWell, ths.unzOfSlcVwmSectionFmg, ths.slcVwmSectionFmg, ths.fmgr);
@@ -58,7 +54,6 @@ define(['knockout',
             */
             this.slcVwmVolumeOfWell = ko.computed({
                 read: function () {
-
                     var tmpVid = ko.unwrap(ths.vidOfSlcVwmVolumeOfWell);
                     console.log('computed: volume', tmpVid);
                     var tmpList = ko.unwrap(ths.listOfVwmVolumeOfWell);
@@ -131,26 +126,8 @@ define(['knockout',
                 // Open file manager
                 ths.fmgr.show();
             };
-
-            // ================================= History section =========================
             
-            ////this.historyView = new HistoryView({}, ths.historyList);
-
-            /////**
-            ////* List of viewmodels of history records
-            ////* @type {Array.<module:viewmodels/history-of-well>}
-            ////*/
-            ////this.listOfVwmHistoryOfWell = ko.computed({
-            ////    read: function () {
-            ////        return ko.unwrap(ths.mdlStage.historyList).map(function (elem) {
-            ////            return new VwmHistoryOfWell(elem);
-            ////        });
-            ////    },
-            ////    deferEvaluation: true
-            ////});
-            
-            this.vwmScopeOfHistoryOfWell = new VwmScopeOfHistoryOfWell({}, ths.mdlStage.historyList, ths.mdlStage.getWellGroup().getWellField().getWellRegion().getCompany().jobTypeList);
-            
+            this.vwmScopeOfHistoryOfWell = new VwmScopeOfHistoryOfWell({}, ths);     
         };
 
         return exports;

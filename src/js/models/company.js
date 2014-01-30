@@ -86,18 +86,15 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
                 });
             }, this);
 
-            /** Modal window for adding job type */
-            this.goToPostingJobType = function () {
-                var jobTypeNewName = window.prompt('{{capitalizeFirst lang.toAddJobTypeToList}}');
-                if (jobTypeNewName) {
-                    appDatacontext.postCompanyJobType(ths.id, {
-                        name: jobTypeNewName,
-                        description: '',
-                        companyId: ths.id
-                    }).done(function (jobTypeCreated) {
-                        ths.jobTypeList.push(new JobType(jobTypeCreated));
-                    });
-                }
+            /** Adding job type */
+            this.postJobType = function (tmpName) {
+                appDatacontext.postCompanyJobType(ths.id, {
+                    name: tmpName,
+                    description: '',
+                    companyId: ths.id
+                }).done(function (jobTypeCreated) {
+                    ths.jobTypeList.push(new JobType(jobTypeCreated));
+                });
             };
 
             /**
