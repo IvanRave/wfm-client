@@ -15,7 +15,7 @@ define(['jquery', 'knockout',
         * Log of well model
         * @constructor
         */
-        var exports = function (data, slcLogOfWell) {
+        var exports = function (data) {
             data = data || {};
 
             /** Alterntative */
@@ -44,17 +44,6 @@ define(['jquery', 'knockout',
 
             /** Log description */
             this.description = ko.observable(data.Description);
-
-            /**
-            * Whether current log is selected
-            * @type {boolean}
-            */
-            this.isSelected = ko.computed({
-                read: function () {
-                    return ths === ko.unwrap(slcLogOfWell);
-                },
-                deferEvaluation: true
-            });
 
             /**
             * Url of log image, generated from log file

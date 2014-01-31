@@ -37,8 +37,8 @@ define([
         return (data || []).map(function (item) { return new VolumeOfWell(item); });
     }
 
-    function importLogsOfWell(data, slcLogOfWell) {
-        return (data || []).map(function (item) { return new LogOfWell(item, slcLogOfWell); });
+    function importLogsOfWell(data) {
+        return (data || []).map(function (item) { return new LogOfWell(item); });
     }
 
     /** WellFiles (convert data objects into array) */
@@ -443,133 +443,106 @@ define([
             if (ko.unwrap(ths.isLoadedLogsOfWell)) { return; }
 
             logOfWellService.get(ths.id).done(function (res) {
-                ths.logsOfWell(importLogsOfWell(res, ths.slcLogOfWell));
+                ths.logsOfWell(importLogsOfWell(res));
                 ths.isLoadedLogsOfWell(true);
             });
         };
 
         /**
-        * Selected log of well
-        * @type {module:models/log-of-well}
+        * Get columns for log file
         */
-        this.slcLogOfWell = ko.observable();
+        this.getLogColumnAttributes = function(idOfNeedSection, idOfFileSpec, scsCallback){
+            fileSpecService.getColumnAttributes(ths.stageKey, idOfNeedSection, idOfFileSpec).done(function (res) {
+                // ColumnAttributes (convert data objects into array)
+                scsCallback(importColumnAttributes(res));
+            });
+        };
 
         /**
-        * Select log of well: do not set (slcLogOfWell) directly
+        * Create log of well
         */
-        this.selectLogOfWell = function (itemToSelect) {
-            ths.slcLogOfWell(itemToSelect);
-
-            ////logOfWellService.get(ths.idOfWell, itemToSelect.id).done(function () { });
+        this.postLogOfWell = function (tmpIdOfFileSpec, tmpName, selectedArray) {
+            logOfWellService.post(ths.id, {
+                IdOfWell: ths.id,
+                IdOfFileSpec: tmpIdOfFileSpec,
+                Name: tmpName,
+                Description: selectedArray.join(',')
+            }).done(function (createdDataOfLogOfWell) {
+                // Add to the list
+                ths.logsOfWell.push(new LogOfWell(createdDataOfLogOfWell));
+            });
         };
 
-        /** Select file and create log */
-        this.createLogOfWellFromFileSpec = function () {
-            var needSection = ths.getSectionByPatternId('well-log');
+        ////        fileSpecService.getColumnAttributes(ths.stageKey, needSection.id, tmpFileSpec.id).done(function (res) {
+        ////            // ColumnAttributes (convert data objects into array)
+        ////            var columnAttributes = importColumnAttributes(res);
 
-            // Select file section with volumes (load and unselect files)
-            ths.selectFileSection(needSection);
+        ////            // TODO: Style decor for attribute selection
+        ////            var selectDepth = document.createElement('select');
+        ////            $(selectDepth).addClass('pd-parameter');
 
-            var tmpModalFileMgr = ths.getWellGroup().getWellField().getWellRegion().getCompany().modalFileMgr;
+        ////            var selectSP = document.createElement('select');
+        ////            $(selectSP).addClass('pd-parameter');
 
-            // Calback for selected file
-            function mgrCallback() {
-                tmpModalFileMgr.okError('');
-                // Select file from file manager
-                var selectedFileSpecs = ko.unwrap(needSection.listOfFileSpec).filter(function (elem) {
-                    return ko.unwrap(elem.isSelected);
-                });
+        ////            var selectGR = document.createElement('select');
+        ////            $(selectGR).addClass('pd-parameter');
 
-                if (selectedFileSpecs.length !== 1) {
-                    tmpModalFileMgr.okError('need to select one file');
-                    return;
-                }
+        ////            var selectRS = document.createElement('select');
+        ////            $(selectRS).addClass('pd-parameter');
 
-                var tmpFileSpec = selectedFileSpecs[0];
+        ////            for (var caIndex = 0, caMaxIndex = columnAttributes.length; caIndex < caMaxIndex; caIndex++) {
+        ////                var optionColumnAttribute = document.createElement('option');
+        ////                $(optionColumnAttribute)
+        ////                    .val(columnAttributes[caIndex].Id)
+        ////                    .html(columnAttributes[caIndex].Name + (columnAttributes[caIndex].Format() ? (', ' + columnAttributes[caIndex].Format()) : ''));
 
-                // 1. Select file
-                // 2. Show column attributes modal window
+        ////                switch (columnAttributes[caIndex].Name) {
+        ////                    case 'DEPTH': case 'DEPT': selectDepth.appendChild(optionColumnAttribute); break;
+        ////                    case 'SP': case 'SPC': selectSP.appendChild(optionColumnAttribute); break;
+        ////                    case 'GR': case 'HGRT': case 'GRDS': case 'SGR': case 'NGRT': selectGR.appendChild(optionColumnAttribute); break;
+        ////                    case 'RS': case 'RES': case 'RESD': selectRS.appendChild(optionColumnAttribute); break;
+        ////                }
+        ////            }
 
-                fileSpecService.getColumnAttributes(ths.stageKey, needSection.id, tmpFileSpec.id).done(function (res) {
-                    // ColumnAttributes (convert data objects into array)
-                    var columnAttributes = importColumnAttributes(res);
+        ////            var innerDiv = document.createElement('div');
+        ////            $(innerDiv).addClass('form-horizontal').append(
+        ////                bootstrapModal.gnrtDom('Depth', selectDepth),
+        ////                bootstrapModal.gnrtDom('GR', selectGR),
+        ////                bootstrapModal.gnrtDom('SP', selectSP),
+        ////                bootstrapModal.gnrtDom('Resistivity', selectRS)
+        ////            );
 
-                    // TODO: Style decor for attribute selection
-                    var selectDepth = document.createElement('select');
-                    $(selectDepth).addClass('pd-parameter');
+        ////            function submitFunction() {
+        ////                var selectedArray = $(innerDiv).find('.pd-parameter').map(function () {
+        ////                    return $(this).val();
+        ////                }).get();
 
-                    var selectSP = document.createElement('select');
-                    $(selectSP).addClass('pd-parameter');
+        ////                if (selectedArray.length < 4) {
+        ////                    alert('All fields required');
+        ////                    return;
+        ////                }
 
-                    var selectGR = document.createElement('select');
-                    $(selectGR).addClass('pd-parameter');
+        ////                // 3. Select column attributes
+        ////                // 4. Add new log
 
-                    var selectRS = document.createElement('select');
-                    $(selectRS).addClass('pd-parameter');
+        ////                logOfWellService.post(ths.id, {
+        ////                    IdOfWell: ths.id,
+        ////                    IdOfFileSpec: tmpFileSpec.id,
+        ////                    Name: ko.unwrap(tmpFileSpec.name),
+        ////                    Description: selectedArray.join(',')
+        ////                }).done(function (createdDataOfLogOfWell) {
+        ////                    // Add to the list
+        ////                    ths.logsOfWell.push(new LogOfWell(createdDataOfLogOfWell));
+        ////                });
 
-                    for (var caIndex = 0, caMaxIndex = columnAttributes.length; caIndex < caMaxIndex; caIndex++) {
-                        var optionColumnAttribute = document.createElement('option');
-                        $(optionColumnAttribute)
-                            .val(columnAttributes[caIndex].Id)
-                            .html(columnAttributes[caIndex].Name + (columnAttributes[caIndex].Format() ? (', ' + columnAttributes[caIndex].Format()) : ''));
+        ////                bootstrapModal.closeModalWindow();
+        ////            }
 
-                        switch (columnAttributes[caIndex].Name) {
-                            case 'DEPTH': case 'DEPT': selectDepth.appendChild(optionColumnAttribute); break;
-                            case 'SP': case 'SPC': selectSP.appendChild(optionColumnAttribute); break;
-                            case 'GR': case 'HGRT': case 'GRDS': case 'SGR': case 'NGRT': selectGR.appendChild(optionColumnAttribute); break;
-                            case 'RS': case 'RES': case 'RESD': selectRS.appendChild(optionColumnAttribute); break;
-                        }
-                    }
+        ////            tmpModalFileMgr.hide();
 
-                    var innerDiv = document.createElement('div');
-                    $(innerDiv).addClass('form-horizontal').append(
-                        bootstrapModal.gnrtDom('Depth', selectDepth),
-                        bootstrapModal.gnrtDom('GR', selectGR),
-                        bootstrapModal.gnrtDom('SP', selectSP),
-                        bootstrapModal.gnrtDom('Resistivity', selectRS)
-                    );
-
-                    function submitFunction() {
-                        var selectedArray = $(innerDiv).find('.pd-parameter').map(function () {
-                            return $(this).val();
-                        }).get();
-
-                        if (selectedArray.length < 4) {
-                            alert('All fields required');
-                            return;
-                        }
-
-                        // 3. Select column attributes
-                        // 4. Add new log
-
-                        logOfWellService.post(ths.id, {
-                            IdOfWell: ths.id,
-                            IdOfFileSpec: tmpFileSpec.id,
-                            Name: ko.unwrap(tmpFileSpec.name),
-                            Description: selectedArray.join(',')
-                        }).done(function (createdDataOfLogOfWell) {
-                            // Add to the list
-                            ths.logsOfWell.push(new LogOfWell(createdDataOfLogOfWell));
-                        });
-
-                        bootstrapModal.closeModalWindow();
-                    }
-
-                    tmpModalFileMgr.hide();
-
-                    bootstrapModal.openModalWindow('Column match', innerDiv, submitFunction);
-                });
-            }
-
-            // Add to observable
-            tmpModalFileMgr.okCallback(mgrCallback);
-
-            // Notification
-            tmpModalFileMgr.okDescription('Please select a file for a log');
-
-            // Open file manager
-            tmpModalFileMgr.show();
-        };
+        ////            bootstrapModal.openModalWindow('Column match', innerDiv, submitFunction);
+             
+        ////};
 
         // ================================================= Well history section start =======================================
 

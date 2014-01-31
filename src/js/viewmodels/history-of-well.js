@@ -147,7 +147,6 @@
                     historyImgElem.onload = function () {
                         // load need libraries for cropping
                         require(['jquery.Jcrop'], function () {
-
                             var coords = [0, 0, 0, 0];
 
                             function jcropSaveCoords(c) {

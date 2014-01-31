@@ -1,38 +1,41 @@
-﻿<div>
+﻿<!-- current: vwmWell -->
+<div>
   <div class="clearfix">
     <div class="pull-left">
-      <div data-bind="with: slcLogOfWell">
-        <div class="clearfix min-bottom-margin" data-bind="if: $root.isEmployeeInEditMode">
-          <div class="pull-left">
-            <div>
-              <label class="radio-inline">
-                <input type="radio" name="log-tools" value="tool-hand" data-bind="checked: checkedLogTool" />Default
-              </label>
-              <label class="radio-inline">
-                <input type="radio" name="log-tools" value="tool-text" data-bind="checked: checkedLogTool" />Text
-              </label>
-              <label class="radio-inline">
-                <input type="radio" name="log-tools" value="tool-line" data-bind="checked: checkedLogTool" />Line
-              </label>
-              <label class="radio-inline">
-                <input type="radio" name="log-tools" value="tool-arrow" data-bind="checked: checkedLogTool" />Arrow
-              </label>
+      <div data-bind="with: slcVwmLogOfWell">
+        <div data-bind="with: mdlLogOfWell">
+          <div class="clearfix min-bottom-margin" data-bind="if: $root.isEmployeeInEditMode">
+            <div class="pull-left">
+              <div>
+                <label class="radio-inline">
+                  <input type="radio" name="log-tools" value="tool-hand" data-bind="checked: checkedLogTool" />Default
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" name="log-tools" value="tool-text" data-bind="checked: checkedLogTool" />Text
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" name="log-tools" value="tool-line" data-bind="checked: checkedLogTool" />Line
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" name="log-tools" value="tool-arrow" data-bind="checked: checkedLogTool" />Arrow
+                </label>
+              </div>
+            </div>
+            <div class="pull-right" style="margin-right: 22px">
+              <button type="button" class="btn btn-xs btn-default" data-bind="click: saveSvgElems, enable: isEnabledSavingSvgElems">
+                <i class="glyphicon glyphicon-floppy-saved"></i> Save
+              </button>
             </div>
           </div>
-          <div class="pull-right" style="margin-right: 22px">
-            <button type="button" class="btn btn-xs btn-default" data-bind="click: saveSvgElems, enable: isEnabledSavingSvgElems">
-              <i class="glyphicon glyphicon-floppy-saved"></i> Save
-            </button>
-          </div>
-        </div>
-        <div style="position: relative; z-index: 1;" data-bind="logLas: { imgSrc: representationUrl, checkedLogTool: checkedLogTool, imgFigures: imgFigures }">
-          <div class="log-las-img-wrap">
-            <img class="log-las-img" src="#" alt="Log representation" />
-          </div>
-          <canvas class="log-las-base" width="624" height="480"></canvas>
-          <div>
-            <canvas class="log-las-draw" width="624" height="480"></canvas>
-            <div class="log-las-text"></div>
+          <div style="position: relative; z-index: 1;" data-bind="logLas: { imgSrc: representationUrl, checkedLogTool: checkedLogTool, imgFigures: imgFigures }">
+            <div class="log-las-img-wrap">
+              <img class="log-las-img" src="#" alt="Log representation" />
+            </div>
+            <canvas class="log-las-base" width="624" height="480"></canvas>
+            <div>
+              <canvas class="log-las-draw" width="624" height="480"></canvas>
+              <div class="log-las-text"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -45,12 +48,12 @@
           <button class="btn btn-default btn-xs" data-bind="click: createLogOfWellFromFileSpec">Create log...</button>
         </div>
         <!-- /ko -->
-      </div>
-      <ul class="list-unstyled wfm-light-list" data-bind="foreach: logsOfWell">
-        <li data-bind="css: {'active' : isSelected}">
+      </div>     
+      <ul class="list-unstyled wfm-light-list" data-bind="foreach: listOfVwmLogOfWell">
+        <li data-bind="css: {'active' : isSlc }">
           <i class="glyphicon glyphicon-picture margin-min-right"></i>
-          <span class="pointer link-view" data-bind="click: $parent.selectLogOfWell">
-            <span data-bind="text: name"></span>
+          <span class="pointer link-view" data-bind="click: $parent.selectVwmLogOfWell">
+            <span data-bind="text: mdlLogOfWell.name"></span>
           </span>
         </li>
       </ul>

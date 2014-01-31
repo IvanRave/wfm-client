@@ -2,13 +2,12 @@
 define(['jquery',
     'knockout',
     'services/datacontext',
-    'helpers/modal-helper',
     'helpers/app-helper',
     'models/file-spec-of-history-of-well',
     'services/file-spec-of-history-of-well',
     'models/wfm-image',
     'services/image-of-history-of-well'],
-    function ($, ko, datacontext, bootstrapModal, appHelper,
+    function ($, ko, datacontext, appHelper,
         FileSpecOfHistoryOfWell, fileSpecOfHistoryOfWellService,
         WfmImage, imageOfHistoryOfWellService) {
         'use strict';
