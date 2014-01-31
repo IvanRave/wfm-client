@@ -30,6 +30,12 @@ define(['knockout'], function (ko) {
         this.icon = data.icon;
 
         /**
+        * Whether tool allow to edit any info
+        * @type {boolean}
+        */
+        this.isPublicTool = data.isPublicTool;
+
+        /**
         * Whether tool is selected
         * @type {boolean}
         */

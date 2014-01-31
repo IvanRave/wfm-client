@@ -1,37 +1,71 @@
 ﻿/** @module */
 define(['knockout',
-    'viewmodels/map-tool'],
+    'viewmodels/map-tool',
+    'viewmodels/well-marker-of-map-of-wield'],
     function (ko,
-        VwmMapTool) {
+        VwmMapTool,
+        VwmWellMarker) {
         'use strict';
 
         var usualMapTools = [
                 {
                     id: 'hand',
                     name: '{{capitalizeFirst lang.mapToolHand}}',
-                    icon: 'glyphicon glyphicon-hand-up'
+                    icon: 'glyphicon glyphicon-hand-up',
+                    isPublicTool: true
                 },
+                ////{
+                ////    id: 'ruler',
+                ////    name: '{{capitalizeFirst lang.mapToolRuler}}',
+                ////    icon: 'glyphicon glyphicon-resize-full',
+                ////    isPublicTool: true
+                ////},
                 {
                     id: 'marker',
                     name: '{{capitalizeFirst lang.mapToolWellMarker}}',
-                    icon: 'glyphicon glyphicon-map-marker'
-                },
-                {
-                    id: 'ruler',
-                    name: '{{capitalizeFirst lang.mapToolRuler}}',
-                    icon: 'glyphicon glyphicon-resize-full'
-                },
-                {
-                    id: 'area',
-                    name: '{{capitalizeFirst lang.mapToolArea}}',
-                    icon: 'glyphicon glyphicon-retweet'
-                },
-                {
-                    id: 'scale',
-                    name: '{{capitalizeFirst lang.mapToolScale}}',
-                    icon: 'glyphicon glyphicon-screenshot'
+                    icon: 'glyphicon glyphicon-map-marker',
+                    isPublicTool: false
                 }
+                ////{
+                ////    id: 'area',
+                ////    name: '{{capitalizeFirst lang.mapToolArea}}',
+                ////    icon: 'glyphicon glyphicon-retweet',
+                ////    isPublicTool: false
+                ////},
+                ////{
+                ////    id: 'scale',
+                ////    name: '{{capitalizeFirst lang.mapToolScale}}',
+                ////    icon: 'glyphicon glyphicon-screenshot',
+                ////    isPublicTool: false
+                ////}
         ];
+
+        /** Calculate svg image size using real size and svg block size */
+        function calcSvgImgSize(realImgSize, svgBlockSize) {
+            var svgImgSize = {};
+            // If height is bigger side, then calculate width
+            // if height = 600svg (400px) then width = Xsvg (300px)
+            // X = (300px * 600svg) / 400px
+            // else if width = 1200svg (300px) then height = Ysvg (400px)
+            // Y = (400px * 1200svg) / 300px
+            if ((realImgSize.height * svgBlockSize.ratio) > realImgSize.width) {
+                svgImgSize.height = svgBlockSize.height;
+                svgImgSize.width = (realImgSize.width * svgBlockSize.height) / realImgSize.height;
+            }
+            else {
+                svgImgSize.width = svgBlockSize.width;
+                svgImgSize.height = (realImgSize.height * svgBlockSize.width) / realImgSize.width;
+            }
+
+            return svgImgSize;
+        }
+
+        function getCoefVgToPx(imgSizeInPx, imgSizeInVg) {
+            return {
+                x: imgSizeInVg.width / imgSizeInPx.width,
+                y: imgSizeInVg.height / imgSizeInPx.height
+            };
+        }
 
         /**
         * View for well field map: contains selected objects, zoom, translate options
@@ -65,14 +99,6 @@ define(['knockout',
                 deferEvaluation: true
             });
 
-            /** Filtered and sorted well markers */
-            this.handledWellMarkers = ko.computed({
-                read: function () {
-                    return ko.unwrap(mdlMapOfWield.wellMarkers);
-                },
-                deferEvaluation: true
-            });
-
             /** Filtered and sorted areas */
             this.handledAreas = ko.computed({
                 read: function () {
@@ -81,11 +107,19 @@ define(['knockout',
                 deferEvaluation: true
             });
 
-            this.mapWrap = {};
+            /**
+            * Size of full svg block (viewbox), in vg
+            */
+            this.svgBlockSize = {
+                width: 1200,
+                height: 600,
+                ratio: 2
+            };
 
-            this.mapWrap.ratio = 1 / 2;
-
-            this.mapWrap.width = ko.observable();
+            this.mapWrap = {
+                ratio: 1 / 2,
+                width: ko.observable()
+            };
 
             // actual height of map wrap and y-axis
             this.mapWrap.height = ko.computed({
@@ -150,14 +184,82 @@ define(['knockout',
             };
 
             /**
+            * List of viewmodels of well markers
+            * @type {Array.<module:viewmodels/well-marker-of-map-of-wield>}
+            */
+            this.listVwmWellMarker = ko.computed({
+                read: function () {
+                    return ko.unwrap(mdlMapOfWield.wellMarkers).map(function (elem) {
+                        return new VwmWellMarker(elem, ths.slcVwmWellMarker);
+                    });
+                },
+                deferEvaluation: true
+            });
+
+            /**
             * Selected well marker
             * @type {<module:models/well-marker-of-map-of-wield>}
             */
-            this.slcWellMarker = ko.observable();
+            this.slcVwmWellMarker = ko.observable();
+
+            /**
+            * Image (map) size in pixels
+            * @type {Object}
+            */
+            this.imgSizePx = ko.computed({
+                read: function () {
+                    var tmpFileSpec = ths.mdlMapOfWield.fileSpec;
+
+                    return {
+                        width: ko.unwrap(tmpFileSpec.imgWidth),
+                        height: ko.unwrap(tmpFileSpec.imgHeight)
+                    };
+                },
+                deferEvaluation: true
+            });
+
+            /////**
+            ////* Amount pixels in vg (svg viewbox units)
+            ////* @type {number}
+            ////*/
+            ////this.coefVgToPx = ko.computed({
+            ////    read: function () {
+            ////        var tmpImgSizePx = ko.unwrap(ths.imgSizePx);
+            ////        var tmpSvgSizeVg = ths.svgBlockSize;
+            ////        var tmpImgSizeVg = calcSvgImgSize(tmpImgSizePx, tmpSvgSizeVg);
+            ////        return getCoefVgToPx(tmpImgSizePx, tmpImgSizeVg);
+            ////    },
+            ////    deferEvaluation: true
+            ////});
 
             /** Select well marker */
-            this.selectWellMarker = function (wellMarkerToSelect) {
-                ths.slcWellMarker(wellMarkerToSelect);
+            this.selectVwmWellMarker = function (vwmWellMarkerToSelect) {
+                ths.slcVwmWellMarker(vwmWellMarkerToSelect);
+                console.log('scale');
+                // Set to the center and scale to 10 * 8 (marker radius) = 80units
+                // Center of svg block
+                var svgCenterCoords = [ths.svgBlockSize.width / 2, ths.svgBlockSize.height / 2];
+                // Svg marker coords = Real marker coords (in pixels) -> Real marker coords (in svg units) + Image margin (in svg units)
+                var wellMarkerCoordsInPx = ko.unwrap(vwmWellMarkerToSelect.mdlWellMarker.coords);
+                // TODO: change null values
+                var tmpImgSizePx = ko.unwrap(ths.imgSizePx);
+                var tmpSvgSizeVg = ths.svgBlockSize;
+                var tmpImgSizeVg = calcSvgImgSize(tmpImgSizePx, tmpSvgSizeVg);
+                var coefVgToPx = getCoefVgToPx(tmpImgSizePx, tmpImgSizeVg);
+
+                var imgStartPos = {
+                    x: (ths.svgBlockSize.width - tmpImgSizeVg.width) / 2,
+                    y: (ths.svgBlockSize.height - tmpImgSizeVg.height) / 2
+                };
+
+                var wellMarkerCoordsInVg = [wellMarkerCoordsInPx[0] * coefVgToPx.x + imgStartPos.x, wellMarkerCoordsInPx[1] * coefVgToPx.y + imgStartPos.y];
+
+                var transformCoords = [svgCenterCoords[0] - wellMarkerCoordsInVg[0], svgCenterCoords[1] - wellMarkerCoordsInVg[1]];
+
+                ths.transformAttr({
+                    scale: 1,
+                    translate: transformCoords
+                });
             };
 
             /**
@@ -187,8 +289,10 @@ define(['knockout',
             };
 
             /** Remove analog for model */
-            this.removeWellMarker = function (wellMarkerToRemove) {
-                mdlMapOfWield.removeWellMarker(wellMarkerToRemove);
+            this.removeVwmWellMarker = function (vwmWellMarkerToRemove) {
+                if (confirm('{{capitalizeFirst lang.confirmToDelete}}?')) {
+                    mdlMapOfWield.removeWellMarker(vwmWellMarkerToRemove.mdlWellMarker);
+                }
             };
 
             /**

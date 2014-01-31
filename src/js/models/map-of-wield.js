@@ -105,11 +105,9 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
 
             /** Remove well marker from this map */
             this.removeWellMarker = function (wellMarkerToRemove) {
-                if (confirm('{{capitalizeFirst lang.confirmToDelete}}?')) {
-                    wellMarkerService.remove(ths.id, wellMarkerToRemove.idOfWell).done(function () {
-                        ths.wellMarkers.remove(wellMarkerToRemove);
-                    });
-                }
+                wellMarkerService.remove(ths.id, wellMarkerToRemove.idOfWell).done(function () {
+                    ths.wellMarkers.remove(wellMarkerToRemove);
+                });
             };
 
             /**

@@ -1,7 +1,7 @@
 ﻿<svg class="wield-map-svg" version="1.1" width="100%" viewbox="0 0 1200 600"
      data-bind="attr: { height: mapWrap.height }, svgResponsive: { koSvgWidth: mapWrap.width, tmpIsVisibleMenu: $root.isVisibleMenu}">
   <rect width="1200" height="600"></rect>
-  <g data-bind="svgMap: {imgUrl: mdlMapOfWield.fileSpec.fileUrl, imgWidth: mdlMapOfWield.fileSpec.imgWidth, imgHeight: mdlMapOfWield.fileSpec.imgHeight, wellMarkers: handledWellMarkers, wellMarkerRadius: 8, svgBlockWidth: 1200, svgBlockHeight: 600, idOfSlcMapTool: idOfSlcVwmMapTool, slcWellMarker: slcWellMarker, transformAttr: transformAttr, wellMarkerDataToAdd: wellMarkerDataToAdd}">
+  <g data-bind="svgMap: {imgUrl: mdlMapOfWield.fileSpec.fileUrl, imgSizePx: imgSizePx, listOfVwmWellMarker: listVwmWellMarker, wellMarkerRadius: 8, svgBlockSize: svgBlockSize, idOfSlcMapTool: idOfSlcVwmMapTool, slcVwmWellMarker: slcVwmWellMarker, transformAttr: transformAttr, wellMarkerDataToAdd: wellMarkerDataToAdd}">
     <g>
       <!--inner group for transforming and scale group of next elements: image, well markers and areas-->
     </g>

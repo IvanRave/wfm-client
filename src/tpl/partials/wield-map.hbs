@@ -11,9 +11,11 @@
           <!-- view: map -->
           <div style="position: absolute">
             <div class="min-top-margin min-left-margin" data-bind="foreach: mapTools">
+              <!-- ko if: $root.isEmployeeInEditMode() || isPublicTool -->
               <button class="btn btn-sm btn-default" data-bind="click: $parent.selectMapTool, css: { 'active': isSlc}">
                 <i data-bind="css: icon, attr: {title: name}"></i>
               </button>
+              <!-- /ko -->
             </div>
           </div>
           {{> wield-map-image }}
@@ -30,7 +32,10 @@
     <div class="col-md-3">
       <div class="clearfix" data-bind="if: $root.isEmployeeInEditMode">
         <h4 class="pull-right">
-          <button class="btn btn-default btn-sm" data-bind="click: createMapFromFile">{{capitalizeFirst lang.createMapOfWieldFromFile}}...</button>
+          <button class="btn btn-default btn-xs" data-bind="click: createMapFromFile">
+            <i class="glyphicon glyphicon-plus"></i>
+            {{capitalizeFirst lang.createMapOfWieldFromFile}}...
+          </button>
         </h4>
       </div>
       <div>
@@ -57,16 +62,17 @@
             </div>
           </div>
           <div data-bind="slideVisible: isSlcVwmMapOfWield">
-            <div data-bind="foreach: handledWellMarkers">
+            <div data-bind="foreach: listVwmWellMarker">
               <div class="min-left-margin">
                 <div class="clearfix">
                   <div class="pull-left">
                     <i class="glyphicon glyphicon-leaf"></i>
-                    <span class="link-view pointer" data-bind="text: wellName, click: $parent.selectWellMarker"></span>
+                    <span class="link-view pointer" data-bind="click: $parent.selectVwmWellMarker">
+                      <span data-bind="text: mdlWellMarker.wellName, css: { 'bld': isSlc }"></span>
+                    </span>
                   </div>
                   <div class="pull-right" data-bind="if: $root.isEmployeeInEditMode">
-                    <!--<i class="glyphicon glyphicon-map-marker link-icon" title="Point on this map" data-bind="click: $parent.pointWellMarker"></i>-->
-                    <i class="glyphicon glyphicon-remove link-icon" data-bind="click: $parent.removeWellMarker"></i>
+                    <i class="glyphicon glyphicon-remove link-icon" data-bind="click: $parent.removeVwmWellMarker"></i>
                   </div>
                 </div>
               </div>

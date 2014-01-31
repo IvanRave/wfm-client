@@ -201,18 +201,11 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
             var imgUrl = ko.unwrap(accessor.imgUrl);
             var koTransformAttr = accessor.transformAttr;
 
-            // Image size doesn't change
-            var realImgSize = {
-                width: ko.unwrap(accessor.imgWidth), // example: 300px
-                height: ko.unwrap(accessor.imgHeight) // example: 400px
-            };
+            // Image size doesn't change, like {width: 300, height: 400}
+            var realImgSize = ko.unwrap(accessor.imgSizePx);
 
             // Block (svg) size without margins (doesn't change)
-            var svgBlockSize = {
-                width: accessor.svgBlockWidth,
-                height: accessor.svgBlockHeight,
-                ratio: accessor.svgBlockWidth / accessor.svgBlockHeight
-            };
+            var svgBlockSize = ko.unwrap(accessor.svgBlockSize);
 
             // Calculate image size in svg viewbox
             var svgImgSize = calcSvgImgSize(realImgSize, svgBlockSize);
@@ -243,8 +236,6 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
                     scale: d3.event.scale,
                     translate: d3.event.translate
                 });
-
-                d3Group.attr('transform', 'translate(' + d3.event.translate.join(',') + ') scale(' + d3.event.scale + ')');
             }
 
             var zoom = d3.behavior.zoom()
@@ -253,10 +244,16 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
                 .scaleExtent([0.5, 15])
                 .on('zoom', zoomed);
 
-            // Default scale and translate
-            var tmpTransformAttr = ko.unwrap(koTransformAttr);
-            zoom.scale(tmpTransformAttr.scale).translate(tmpTransformAttr.translate);
-            d3Group.attr('transform', 'translate(' + tmpTransformAttr.translate.join(',') + ') scale(' + tmpTransformAttr.scale + ')');
+            function applyTransform(tmpTransform) {
+                zoom.scale(tmpTransform.scale).translate(tmpTransform.translate);
+                d3Group.attr('transform', 'translate(' + tmpTransform.translate.join(',') + ') scale(' + tmpTransform.scale + ')');
+            }
+
+            // Scroll -> zoomed method -> changed koTransform -> subscribe event -> apply zoom (again for scroll) -> set attr to group
+            koTransformAttr.subscribe(applyTransform);
+
+            // Default scale and translate: apply first time
+            applyTransform(ko.unwrap(koTransformAttr));
 
             d3GroupWrap.call(zoom);
         },
@@ -264,22 +261,14 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
             // Working with observables values
             var accessor = valueAccessor();
             var idOfSlcMapTool = ko.unwrap(accessor.idOfSlcMapTool);
-            var slcWellMarker = ko.unwrap(accessor.slcWellMarker);
-
+            var slcVwmWellMarker = ko.unwrap(accessor.slcVwmWellMarker);
             var wellMarkerDataToAdd = accessor.wellMarkerDataToAdd;
 
-            // Image size
-            var realImgSize = {
-                width: ko.unwrap(accessor.imgWidth), // example: 300px
-                height: ko.unwrap(accessor.imgHeight) // example: 400px
-            };
+            // Image size, in pixels
+            var realImgSize = ko.unwrap(accessor.imgSizePx);
 
             // Block (svg) size without margins
-            var svgBlockSize = {
-                width: accessor.svgBlockWidth,
-                height: accessor.svgBlockHeight,
-                ratio: accessor.svgBlockWidth / accessor.svgBlockHeight
-            };
+            var svgBlockSize = ko.unwrap(accessor.svgBlockSize);
 
             // Calculate image size in svg viewbox
             var svgImgSize = calcSvgImgSize(realImgSize, svgBlockSize);
@@ -293,7 +282,7 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
                 y: (svgBlockSize.height - svgImgSize.height) / 2
             };
 
-            var wellMarkers = ko.unwrap(accessor.wellMarkers);
+            var listOfVwmWellMarker = ko.unwrap(accessor.listOfVwmWellMarker);
             var wellMarkerRadius = ko.unwrap(accessor.wellMarkerRadius);
             // Draw well markers
             var d3GroupWrap = d3.select(element);
@@ -302,24 +291,12 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 
             var d3Image = d3Group.select('image');
 
-            ////function addWellMarker(cx, cy) {
-            ////    d3Group.append('circle')
-            ////        .attr('cx', cx)
-            ////        .attr('cy', cy)
-            ////        .attr('r', wellMarkerRadius)
-            ////        .on('click', function () {
-            ////            // Show info about well in this point
-            ////            if (d3.event.defaultPrevented) { return; }
-            ////            console.log('circle hoora', cx, cy);
-            ////        })
-            ////        .call(getDragSvgCircle());
-
-
-            ////}
-
             d3Image.on('click', function () {
                 console.log(idOfSlcMapTool);
-                if (idOfSlcMapTool !== 'marker') { console.log('no marker'); return; }
+                if (idOfSlcMapTool !== 'marker') {
+                    console.log('no marker');
+                    return;
+                }
                 // this = d3Image
                 var coords = d3.mouse(this);
 
@@ -374,8 +351,8 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
             }
 
             // Add fresh values
-            wellMarkers.forEach(function (elem) {
-                drawWellMarker(elem, 'black');
+            listOfVwmWellMarker.forEach(function (elem) {
+                drawWellMarker(elem.mdlWellMarker, 'black');
             });
 
             if (ko.unwrap(wellMarkerDataToAdd.coords)) {
@@ -383,26 +360,24 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
                 drawWellMarker(wellMarkerDataToAdd, 'green');
             }
 
-            console.log('markers', wellMarkers);
-
             // Point and scale map to selected well marker
-            if (slcWellMarker) {
-                ////// Set to the center and scale to 10 * 8 (marker radius) = 80units
-                ////// Center of svg block
-                var svgCenterCoords = [svgBlockSize.width / 2, svgBlockSize.height / 2];
-                ////// Svg marker coords = Real marker coords (in pixels) -> Real marker coords (in svg units) + Image margin (in svg units)
-                var wellMarkerCoordsInPx = ko.unwrap(slcWellMarker.coords);
-                // TODO: change null values
+            ////if (slcWellMarker) {
+            ////    ////// Set to the center and scale to 10 * 8 (marker radius) = 80units
+            ////    ////// Center of svg block
+            ////    var svgCenterCoords = [svgBlockSize.width / 2, svgBlockSize.height / 2];
+            ////    ////// Svg marker coords = Real marker coords (in pixels) -> Real marker coords (in svg units) + Image margin (in svg units)
+            ////    var wellMarkerCoordsInPx = ko.unwrap(slcWellMarker.coords);
+            ////    // TODO: change null values
 
-                var wellMarkerCoordsInVg = [wellMarkerCoordsInPx[0] * coefVgToPx.x + imgStartPos.x, wellMarkerCoordsInPx[1] * coefVgToPx.y + imgStartPos.y];
+            ////    var wellMarkerCoordsInVg = [wellMarkerCoordsInPx[0] * coefVgToPx.x + imgStartPos.x, wellMarkerCoordsInPx[1] * coefVgToPx.y + imgStartPos.y];
 
-                var transformCoords = [svgCenterCoords[0] - wellMarkerCoordsInVg[0], svgCenterCoords[1] - wellMarkerCoordsInVg[1]];
+            ////    var transformCoords = [svgCenterCoords[0] - wellMarkerCoordsInVg[0], svgCenterCoords[1] - wellMarkerCoordsInVg[1]];
 
-                d3Group.attr('transform', 'translate(' + transformCoords.join(',') + ')');
-                // scale(' + 1 + ')'
-            }
+            ////    d3Group.attr('transform', 'translate(' + transformCoords.join(',') + ')');
+            ////    // scale(' + 1 + ')'
+            ////}
 
-            console.log('slcWell', slcWellMarker);
+            console.log('slcWell', slcVwmWellMarker);
         }
     };
 
