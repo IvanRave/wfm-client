@@ -1,5 +1,6 @@
 ﻿/** @module */
-define(['jquery', 'knockout',
+define(['jquery',
+    'knockout',
     'services/datacontext',
     'helpers/modal-helper',
     'helpers/app-helper',
@@ -117,87 +118,19 @@ define(['jquery', 'knockout',
             /**
             * Create cropped well history image from file spec
             */
-            this.createImageFromFileSpec = function () {
-                var needSection = ths.getWell().getSectionByPatternId('well-history');
-
-                // Select file section with sketches (load and unselect files)
-                ths.getWell().selectFileSection(needSection);
-
-                var tmpModalFileMgr = ths.getWell().getWellGroup().getWellField().getWellRegion().getCompany().modalFileMgr;
-
-                // Calback for selected file
-                function mgrCallback() {
-                    tmpModalFileMgr.okError('');
-                    // Select file from file manager
-                    var selectedFileSpecs = ko.unwrap(needSection.listOfFileSpec).filter(function (elem) {
-                        return ko.unwrap(elem.isSelected);
-                    });
-
-                    if (selectedFileSpecs.length !== 1) {
-                        tmpModalFileMgr.okError('need to select one file');
-                        return;
-                    }
-
-                    var imageFileSpec = selectedFileSpecs[0];
-
-                    // Close file manager modal window
-                    // And show modal with crop feature
-                    tmpModalFileMgr.hide();
-
-                    // history image src
-                    var innerDiv = document.createElement('div');
-                    var historyImgElem = document.createElement('img');
-                    innerDiv.appendChild(historyImgElem);
-                    // load image before open window and set JCrop
-                    historyImgElem.onload = function () {
-                        // load need libraries for cropping
-                        require(['jquery.Jcrop'], function () {
-
-                            var coords = [0, 0, 0, 0];
-
-                            function jcropSaveCoords(c) {
-                                coords = [c.x, c.y, c.x2, c.y2];
-                            }
-
-                            // The variable jcrop_api will hold a reference to the Jcrop API once Jcrop is instantiated
-                            $(historyImgElem).Jcrop({
-                                onChange: jcropSaveCoords,
-                                onSelect: jcropSaveCoords,
-                                bgOpacity: 0.6
-                            });
-
-                            // submitted by OK button
-                            bootstrapModal.openModalWideWindow(innerDiv, function () {
-                                // TODO: check not null comments = if user can't choose whole images
-                                imageOfHistoryOfWellService.post(ths.id, {
-                                    IdOfFileSpec: imageFileSpec.id,
-                                    X1: coords[0],
-                                    X2: coords[2],
-                                    Y1: coords[1],
-                                    Y2: coords[3],
-                                    CropXUnits: 0,
-                                    CropYUnits: 0
-                                }).done(function (res) {
-                                    ths.WfmImages.push(new WfmImage(res));
-                                    bootstrapModal.closeModalWideWindow();
-                                });
-                            });
-                            // end of require
-                        });
-                    };
-
-                    // start load image
-                    historyImgElem.src = imageFileSpec.fileUrl;
-                }
-
-                // Add to observable
-                tmpModalFileMgr.okCallback(mgrCallback);
-
-                // Notification
-                tmpModalFileMgr.okDescription('Please select a history image to crop');
-
-                // Open file manager
-                tmpModalFileMgr.show();
+            this.postImageOfHistoryOfWell = function (tmpIdOfFileSpec, coords, scsCallback) {
+                imageOfHistoryOfWellService.post(ths.id, {
+                    IdOfFileSpec: tmpIdOfFileSpec,
+                    X1: coords[0],
+                    X2: coords[2],
+                    Y1: coords[1],
+                    Y2: coords[3],
+                    CropXUnits: 0,
+                    CropYUnits: 0
+                }).done(function (res) {
+                    ths.WfmImages.push(new WfmImage(res));
+                    scsCallback();
+                });
             };
 
             if (data.WfmImagesDto) {
