@@ -2,14 +2,7 @@
   <div data-bind="if: vwmWidget.isVisSettingPanel">
     <div class="widget-setting-panel">
       <div data-bind="with: vwmWidget.vwmScopeOfHistoryOfWell">
-        <span>{{capitalizeFirst lang.filterByDate}}:</span>
-        <input class="input-sm" type="text" size="10" data-bind="datepicker: startDate, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }" />
-        <span> - </span>
-        <input class="input-sm" type="text" size="10" data-bind="datepicker: endDate, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }" />
-        <button class="btn btn-default btn-sm" type="button" data-bind="click: changeSortByDateOrder">
-          {{capitalizeFirst lang.sortByDate}} <i class="glyphicon" data-bind="css: sortByDateCss"></i>
-        </button>
-        <select class="input-sm" data-bind="options: jobTypeList, optionsText: 'name', optionsValue: 'id', value: jobTypeId, optionsCaption: '{{capitalizeFirst lang.filterByJobType}}...'"></select>
+        {{> well-history-filter-panel }}
       </div>
     </div>
   </div>
@@ -17,38 +10,40 @@
     <!-- with well -->
     <div data-bind="with: $parents[3].mdlStage">
       <div data-bind="if: isLoadedHistoryList">
-        <div data-bind="if: historyList().length === 0">
-          <small>{{capitalizeFirst lang.noWellHistoryList}}</small>
-        </div>
-        <div data-bind="if: historyList().length > 0">
-          <div data-bind="with: vwmWidget.vwmScopeOfHistoryOfWell">
-            <div data-bind="foreach: sortedHistoryList">
-              <div class="well-history-block">
-                <div class="text-center">
-                  <span class="bld" data-bind="unix: startUnixTime"></span>
-                  <span data-bind="visible: isVisibleEndUnixTime">
-                    - <span class="bld" data-bind="unix: endUnixTime"></span>
-                  </span>
-                </div>
-                <div data-bind="visible: historyText">
-                  <blockquote class="pre-wrap-text" data-bind="text: historyText"></blockquote>
-                </div>
-                <div data-bind="with: jobType">
-                  <blockquote>
-                    <span class="bld">{{capitalizeFirst lang.jobType}}:</span>
-                    <span data-bind="text: name"></span>
-                  </blockquote>
-                </div>
-                <div data-bind="foreach: WfmImages">
-                  <span class="pointer" data-bind="panzoomImg: {src: croppedImageUrl}">
-                    <img class="img-thumbnail elem-shadow" src="" data-bind="attr: { src: croppedImageUrl }" alt="History image" />
-                  </span>
-                </div>
-                <div class="clearfix" data-bind="foreach: WellHistoryFiles">
-                  <div class="img-thumbnail pull-left" data-bind="with: fileSpec">
-                    <span class="link-view pointer">
-                      <span data-bind="text: namePlusExtension, click: download"></span>
+        <div data-bind="with: vwmWidget.vwmScopeOfHistoryOfWell">
+          <div data-bind="if: listOfVwmHistoryOfWell().length === 0">
+            <small>{{capitalizeFirst lang.noWellHistoryList}}</small>
+          </div>
+          <div data-bind="if: listOfVwmHistoryOfWell().length > 0">
+            <div data-bind="foreach: sortedListOfVwmHistoryOfWell">
+              <div data-bind="slideVisible: isVisible">
+                <div class="well-history-block" data-bind="with: mdlHistoryOfWell">
+                  <div class="text-center">
+                    <span class="bld" data-bind="unix: startUnixTime"></span>
+                    <span data-bind="visible: isVisibleEndUnixTime">
+                      - <span class="bld" data-bind="unix: endUnixTime"></span>
                     </span>
+                  </div>
+                  <div data-bind="visible: historyText">
+                    <blockquote class="pre-wrap-text" data-bind="text: historyText"></blockquote>
+                  </div>
+                  <div data-bind="with: jobType">
+                    <blockquote>
+                      <span class="bld">{{capitalizeFirst lang.jobType}}:</span>
+                      <span data-bind="text: name"></span>
+                    </blockquote>
+                  </div>
+                  <div data-bind="foreach: WfmImages">
+                    <span class="pointer" data-bind="panzoomImg: {src: croppedImageUrl}">
+                      <img class="img-thumbnail elem-shadow" src="" data-bind="attr: { src: croppedImageUrl }" alt="History image" />
+                    </span>
+                  </div>
+                  <div class="clearfix" data-bind="foreach: WellHistoryFiles">
+                    <div class="img-thumbnail pull-left" data-bind="with: fileSpec">
+                      <span class="link-view pointer">
+                        <span data-bind="text: namePlusExtension, click: download"></span>
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>

@@ -12,7 +12,6 @@ define(['knockout',
             var ths = this;
 
             this.vwmScopeOfHistoryOfWell = new VwmScopeOfHistoryOfWell(opts, vwmWell);
-            //WellHistoryViewModel(opts, koHistoryList);
 
             this.toStringifyOpts = function () {
                 return JSON.stringify({

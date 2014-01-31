@@ -50,9 +50,21 @@ define(['knockout',
                 read: function () {
                     var tmpMdlList = ko.unwrap(vwmWell.mdlStage.historyList);
                     console.log('recreation of list of history');
-                    var tmpVwmList = tmpMdlList.map(function (elem) {
+                    return tmpMdlList.map(function (elem) {
                         return new VwmHistoryOfWell(elem, vwmWell, ths.startDate, ths.endDate, ths.jobTypeId);
-                    });
+                    });               
+                },
+                deferEvaluation: true
+            });
+
+            /**
+            * Sorted list of history records
+            *    Separated from main list, to prevent recreation of this list
+            * @type {Array.<module:viewmodels/history-of-well>}
+            */
+            this.sortedListOfVwmHistoryOfWell = ko.computed({
+                read: function () {
+                    var tmpVwmList = ko.unwrap(ths.listOfVwmHistoryOfWell);
 
                     var tmpOrder = parseInt(ko.unwrap(ths.sortByDateOrder), 10);
 

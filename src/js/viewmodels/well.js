@@ -127,7 +127,7 @@ define(['knockout',
                 ths.fmgr.show();
             };
             
-            this.vwmScopeOfHistoryOfWell = new VwmScopeOfHistoryOfWell({}, ths);     
+            this.vwmScopeOfHistoryOfWell = new VwmScopeOfHistoryOfWell({}, ths);
         };
 
         return exports;
