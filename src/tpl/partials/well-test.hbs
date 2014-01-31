@@ -1,4 +1,5 @@
-﻿<div>
+﻿<!-- vwmWell -->
+<div data-bind="with: mdlStage">
   <div class="clearfix" data-bind="if: $root.isEmployeeInEditMode">
     <!-- ko with: testScopeNewStartUnixTime -->
     <div class="pull-left">
@@ -23,6 +24,10 @@
       <button type="button" class="btn btn-sm btn-default" data-bind="click: getWellGroup().addWellGroupWfmParameter, enable: getWellGroup().selectedWfmParameterId">Add</button>
     </div>
     <div class="pull-right">
+      <!--<div data-bind="foreach: getWellGroup().c">
+        name: <span data-bind="text: name"></span>
+      </div>-->
+      <!--<span data-bind="text: ko.toJSON(getWellGroup().unselectedWfmParameterList)"></span>-->
       <select class="form-control input-sm" data-bind="options: getWellGroup().unselectedWfmParameterList, optionsValue: 'id', optionsText: 'name', value: getWellGroup().selectedWfmParameterId, optionsCaption: 'Add new parameter...'"></select>
     </div>
   </div>

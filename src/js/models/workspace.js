@@ -44,14 +44,17 @@ define([
                 });
             }, this);
 
-            // Get all parameters from all groups as one dimensional array
+            /** Get all parameters from all groups as one dimensional array */
             this.wfmParameterList = ko.computed({
                 read: function () {
-                    return ko.unwrap(ths.wfmParamSquadList).map(function (sqdElem) {
-                        return ko.unwrap(sqdElem.wfmParameterList).map(function (prmElem) {
-                            return prmElem;
+                    var outArr = [];
+                    var tmpSquadList = ko.unwrap(ths.wfmParamSquadList);
+                    tmpSquadList.forEach(function (sqdElem) {
+                        ko.unwrap(sqdElem.wfmParameterList).forEach(function (prmElem) {
+                            outArr.push(prmElem);
                         });
                     });
+                    return outArr;
                 },
                 deferEvaluation: true
             });

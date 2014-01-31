@@ -11,6 +11,11 @@ define(['knockout', 'viewmodels/map-of-wield'], function (ko, VwmMapOfWield) {
 
         var ths = this;
 
+        var tmpTranslateAttr = {
+            scale: opts['TransformScale'] || 1,
+            translate: opts['TransformTranslate'] || [0, 0]
+        };
+
         /**
         * Selected view map
         */
@@ -18,9 +23,19 @@ define(['knockout', 'viewmodels/map-of-wield'], function (ko, VwmMapOfWield) {
             read: function () {
                 var tmpVid = ko.unwrap(ths.vidOfSlcVwmMapOfWield);
                 if (tmpVid) {
-                    return ko.unwrap(ths.listOfVwmMapOfWield).filter(function (elem) {
+                    var needVwm = ko.unwrap(ths.listOfVwmMapOfWield).filter(function (elem) {
                         return elem.vid === tmpVid;
                     })[0];
+
+                    if (needVwm) {
+                        if (tmpTranslateAttr) {
+                            needVwm.transformAttr(tmpTranslateAttr);
+                            // Remove default value to don't load again after selection new map
+                            tmpTranslateAttr = null;
+                        }
+
+                        return needVwm;
+                    }
                 }
             },
             deferEvaluation: true
@@ -32,7 +47,7 @@ define(['knockout', 'viewmodels/map-of-wield'], function (ko, VwmMapOfWield) {
         this.listOfVwmMapOfWield = ko.computed({
             read: function () {
                 return ko.unwrap(mdlWield.WellFieldMaps).map(function (elem) {
-                    return new VwmMapOfWield(elem, ths.slcVwmMapOfWield);
+                    return new VwmMapOfWield(elem, ths.vidOfSlcVwmMapOfWield);
                 });
             },
             deferEvaluation: true
@@ -49,7 +64,9 @@ define(['knockout', 'viewmodels/map-of-wield'], function (ko, VwmMapOfWield) {
             return JSON.stringify({
                 'IdOfSlcMapOfWield': ko.unwrap(ths.slcVwmMapOfWield).vid,
                 'IsVisName': ko.unwrap(ths.isVisName),
-                'IsVisImg': ko.unwrap(ths.isVisImg)
+                'IsVisImg': ko.unwrap(ths.isVisImg),
+                'TransformScale': ko.unwrap(ko.unwrap(ths.slcVwmMapOfWield).transformAttr).scale,
+                'TransformTranslate': ko.unwrap(ko.unwrap(ths.slcVwmMapOfWield).transformAttr).translate,
             });
         };
     };

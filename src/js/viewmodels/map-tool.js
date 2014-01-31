@@ -3,10 +3,10 @@ define(['knockout'], function (ko) {
     'use strict';
 
     /**
-    * Map tool, like 'marker', 'ruler', 'scale', 'route', etc.
+    * Viewmodel: map tool, like 'marker', 'ruler', 'scale', 'route', etc.
     * @constructor
     */
-    var exports = function (data, koIdOfSlcMapTool) {
+    var exports = function (data, koIdOfSlcVwmMapTool) {
         data = data || {};
 
         var ths = this;
@@ -35,7 +35,7 @@ define(['knockout'], function (ko) {
         */
         this.isSlc = ko.computed({
             read: function () {
-                return ths === ko.unwrap(koIdOfSlcMapTool);
+                return ths.id === ko.unwrap(koIdOfSlcVwmMapTool);
             },
             deferEvaluation: true
         });

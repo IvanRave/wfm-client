@@ -50,17 +50,20 @@ define(['knockout',
             /** List of views of maps of this well field view*/
             this.listOfVwmMapOfWield = ko.computed({
                 read: function () {
-                    var tmpMaps = ko.unwrap(mdlWield.WellFieldMaps);
-
-                    // Sort by name
-                    tmpMaps = tmpMaps.sort(function (a, b) {
-                        return ko.unwrap(a.name) > ko.unwrap(b.name);
-                    });
-
-                    console.log('updated list of views of maps');
-
-                    return tmpMaps.map(function (elem) {
+                    return ko.unwrap(mdlWield.WellFieldMaps).map(function (elem) {
                         return new VwmMapOfWield(elem, ths.slcVwmMapOfWield);
+                    });
+                },
+                deferEvaluation: true
+            });
+
+            /** Sorted list */
+            this.sortedListOfVwmMapOfWield = ko.computed({
+                read: function () {
+                    var tmpMaps = ko.unwrap(ths.listOfVwmMapOfWield);
+                    // Sort by name
+                    return tmpMaps.sort(function (a, b) {
+                        return ko.unwrap(a.mdlMapOfWield.name) > ko.unwrap(b.mdlMapOfWield.name);
                     });
                 },
                 deferEvaluation: true
@@ -83,9 +86,7 @@ define(['knockout',
                     else {
                         var tmpFirstVwm = tmpListOfVwm[0];
                         if (tmpFirstVwm){
-                            // TODO: try to set vid (if no)
-                            ////ths.vidOfSlcVwmMapOfWield(tmpFirstVwm.vid);
-                            ////console.log('asdfsdf');
+                            ths.vidOfSlcVwmMapOfWield(tmpFirstVwm.vid);
                             // Select first map if no selected
                             return tmpFirstVwm;
                         }
@@ -98,39 +99,6 @@ define(['knockout',
             this.selectVwmMapOfWield = function (vwmMapOfWieldToSelect) {
                 ths.vidOfSlcVwmMapOfWield(vwmMapOfWieldToSelect.vid);
             };
-
-            // TODO: remove from widgets and from here
-            /////** Sorted and filtered maps */
-            ////this.handledMapsOfWield = ko.computed({
-            ////    read: function () {
-            ////        return ko.unwrap(mdlWield.WellFieldMaps);
-            ////    },
-            ////    deferEvaluation: true
-            ////});
-
-            /////** Id of selected map for this view: different views can be with different selections */
-            ////this.idOfSlcMapOfWield = ko.observable();
-
-            /////** Selected map */
-            ////this.slcMapOfWield = ko.computed({
-            ////    read: function () {
-            ////        var allMaps = ko.unwrap(ths.handledMapsOfWield);
-            ////        var slcId = ko.unwrap(ths.idOfSlcMapOfWield);
-            ////        var slcMap = allMaps.filter(function (elem) {
-            ////            return elem.id === slcId;
-            ////        })[0];
-
-            ////        if (!slcMap) {
-            ////            // Select by default first element if no ID for all views
-            ////            slcMap = allMaps[0];
-            ////        }
-
-            ////        if (slcMap) {
-            ////            return slcMap;
-            ////        }
-            ////    },
-            ////    deferEvaluation: true
-            ////});
 
             /**
             * Create map from file

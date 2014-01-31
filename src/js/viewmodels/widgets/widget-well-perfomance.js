@@ -16,7 +16,7 @@ define(['knockout'], function (ko) {
             startMonth: opts['StartMonth']
         });
 
-        self.toPlainOpts = function () {
+        self.toStringifyOpts = function () {
             return {
                 'SelectedAttrGroupId': ko.unwrap(self.perfomanceView['selectedAttrGroupId']),
                 'IsVisibleForecastData': ko.unwrap(self.perfomanceView['isVisibleForecastData']),

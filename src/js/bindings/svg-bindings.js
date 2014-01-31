@@ -166,7 +166,7 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
             ////console.log('event', d3.event.x, d3.event.y);
             ////console.log('mouse', d3.mouse(this));
             var xNew = Math.max(Math.min(d3.event.x, imgBounds.right - markerRadius), imgBounds.left + markerRadius),
-                yNew = Math.max(Math.min(d3.event.y, imgBounds.bottom -markerRadius), imgBounds.top + markerRadius);
+                yNew = Math.max(Math.min(d3.event.y, imgBounds.bottom - markerRadius), imgBounds.top + markerRadius);
 
             d3.select(this)
                 .attr('cx', xNew)
@@ -199,6 +199,7 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
             // Only non-observable objects or initial states of objects
             // Image url doesn't change
             var imgUrl = ko.unwrap(accessor.imgUrl);
+            var koTransformAttr = accessor.transformAttr;
 
             // Image size doesn't change
             var realImgSize = {
@@ -238,6 +239,11 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
             var y = d3.scale.linear().range([imgStartPos.y, imgStartPos.y + svgImgSize.height]);
 
             function zoomed() {
+                koTransformAttr({
+                    scale: d3.event.scale,
+                    translate: d3.event.translate
+                });
+
                 d3Group.attr('transform', 'translate(' + d3.event.translate.join(',') + ') scale(' + d3.event.scale + ')');
             }
 
@@ -246,6 +252,11 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
                 .y(y)
                 .scaleExtent([0.5, 15])
                 .on('zoom', zoomed);
+
+            // Default scale and translate
+            var tmpTransformAttr = ko.unwrap(koTransformAttr);
+            zoom.scale(tmpTransformAttr.scale).translate(tmpTransformAttr.translate);
+            d3Group.attr('transform', 'translate(' + tmpTransformAttr.translate.join(',') + ') scale(' + tmpTransformAttr.scale + ')');
 
             d3GroupWrap.call(zoom);
         },
@@ -304,9 +315,11 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 
             d3Image.on('click', function () {
                 console.log(idOfSlcMapTool);
-                if (idOfSlcMapTool !== 'ruler') { console.log('no ruler'); return; }
+                if (idOfSlcMapTool !== 'marker') { console.log('no marker'); return; }
                 // this = d3Image
                 var coords = d3.mouse(this);
+
+                // Add marker and show adding dialog right of the map
 
                 // Calculate coords on map image in pixels
                 // realX / svgX = realWidth / svgWidth
@@ -316,7 +329,7 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
                 };
 
                 // Send to the server in PUT method (change well marker data)
-                console.log(realMarkerPos);
+                console.log('realMarkerPos', realMarkerPos);
                 addWellMarker(coords[0], coords[1]);
             });
 

@@ -100,7 +100,7 @@ define(['jquery',
                 return ko.unwrap(ths.wells).filter(function (elem) {
                     return elem.id === idOfWell;
                 })[0];
-            };            
+            };
 
             /**
             * List of wfm parameters for this group
@@ -115,19 +115,22 @@ define(['jquery',
             this.isLoadWellGroupWfmParameterList = ko.observable(false);
 
             this.getWellGroupWfmParameterList = function () {
-                if (ko.unwrap(ths.isLoadWellGroupWfmParameterList) === false) {
-                    datacontext.getWellGroupWfmParameterList({ wellgroup_id: ths.Id }).done(function (response) {
-                        ths.wellGroupWfmParameterList(importWellGroupWfmParameterDtoList(response));
-                        ths.isLoadWellGroupWfmParameterList(true);
-                    });
+                if (ko.unwrap(ths.isLoadWellGroupWfmParameterList)) {
+                    return;
                 }
+
+                datacontext.getWellGroupWfmParameterList({ wellgroup_id: ths.Id }).done(function (response) {
+                    ths.wellGroupWfmParameterList(importWellGroupWfmParameterDtoList(response));
+                    ths.isLoadWellGroupWfmParameterList(true);
+                });
             };
 
             // wfm parameter from main source which is not in this group
             this.unselectedWfmParameterList = ko.computed({
                 read: function () {
-                    // two arrays
-                    return $.grep(ko.unwrap(ths.getRootMdl().wfmParameterList), function (prmElem) {
+                    // two dimensioanl array
+                    var tmpList = ko.unwrap(ths.getRootMdl().wfmParameterList);
+                    return $.grep(tmpList, function (prmElem) {
                         var isParamExist = false;
                         $.each(ko.unwrap(ths.wellGroupWfmParameterList), function (wlgIndex, wlgElem) {
                             if (wlgElem.wfmParameterId === prmElem.id) {
