@@ -13,18 +13,18 @@ define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-he
 
         /** Hide or show elements with slide animation */
         ko.bindingHandlers.slideVisible = {
-            ////init: function (element, valueAccessor) {
-            ////    var value = ko.unwrap(valueAccessor());
+            init: function (element, valueAccessor) {
+                var value = ko.unwrap(valueAccessor());
 
-            ////    var $element = $(element);
+                var $element = $(element);
 
-            ////    if (value) {
-            ////        $element.show();
-            ////    }
-            ////    else {
-            ////        $element.hide();
-            ////    }
-            ////},
+                if (value) {
+                    $element.show();
+                }
+                else {
+                    $element.hide();
+                }
+            },
             update: function (element, valueAccessor, allBindingsAccessor) {
                 var value = ko.unwrap(valueAccessor());
 
@@ -47,6 +47,11 @@ define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-he
 
         /** Hide element with slide animation */
         ko.bindingHandlers.slideHidden = {
+            init: function(element, valueAccessor){
+                ko.bindingHandlers.slideVisible.init(element, function () {
+                    return !ko.unwrap(valueAccessor());
+                });
+            },
             update: function (element, valueAccessor, allBindingsAccessor) {
                 ko.bindingHandlers.slideVisible.update(element, function () {
                     return !ko.unwrap(valueAccessor());
@@ -107,14 +112,19 @@ define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-he
 
         ko.bindingHandlers.prec = {
             update: function (element, valueAccessor) {
-                var p = ko.unwrap(valueAccessor().value);
+                var accessor = valueAccessor();
+
+                var p = ko.unwrap(accessor.value);
 
                 if ($.isNumeric(p) === false) {
-                    element.innerHTML = "";
+                    element.innerHTML = '';
                     return;
                 }
 
-                p = p * valueAccessor().coef();
+                var tmpCoef = ko.unwrap(accessor.coef);
+                if (tmpCoef) {
+                    p = p * tmpCoef;
+                }
 
                 if (p === 0) {
                     element.innerHTML = 0;

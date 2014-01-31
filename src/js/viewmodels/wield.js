@@ -51,7 +51,7 @@ define(['knockout',
             this.listOfVwmMapOfWield = ko.computed({
                 read: function () {
                     return ko.unwrap(mdlWield.WellFieldMaps).map(function (elem) {
-                        return new VwmMapOfWield(elem, ths.slcVwmMapOfWield);
+                        return new VwmMapOfWield(elem, ths.vidOfSlcVwmMapOfWield);
                     });
                 },
                 deferEvaluation: true
@@ -76,7 +76,7 @@ define(['knockout',
             this.slcVwmMapOfWield = ko.computed({
                 read: function () {
                     var tmpVid = ko.unwrap(ths.vidOfSlcVwmMapOfWield);
-                    var tmpListOfVwm = ko.unwrap(ths.listOfVwmMapOfWield);
+                    var tmpListOfVwm = ko.unwrap(ths.sortedListOfVwmMapOfWield);
                     if (tmpVid) {
                         return tmpListOfVwm.filter(function (elem) {
                             return elem.vid === tmpVid;

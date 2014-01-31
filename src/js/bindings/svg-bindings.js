@@ -266,6 +266,8 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
             var idOfSlcMapTool = ko.unwrap(accessor.idOfSlcMapTool);
             var slcWellMarker = ko.unwrap(accessor.slcWellMarker);
 
+            var wellMarkerDataToAdd = accessor.wellMarkerDataToAdd;
+
             // Image size
             var realImgSize = {
                 width: ko.unwrap(accessor.imgWidth), // example: 300px
@@ -300,18 +302,20 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 
             var d3Image = d3Group.select('image');
 
-            function addWellMarker(cx, cy) {
-                d3Group.append('circle')
-                    .attr('cx', cx)
-                    .attr('cy', cy)
-                    .attr('r', wellMarkerRadius)
-                    .on('click', function () {
-                        // Show info about well in this point
-                        if (d3.event.defaultPrevented) { return; }
-                        console.log('circle hoora', cx, cy);
-                    })
-                    .call(getDragSvgCircle());
-            }
+            ////function addWellMarker(cx, cy) {
+            ////    d3Group.append('circle')
+            ////        .attr('cx', cx)
+            ////        .attr('cy', cy)
+            ////        .attr('r', wellMarkerRadius)
+            ////        .on('click', function () {
+            ////            // Show info about well in this point
+            ////            if (d3.event.defaultPrevented) { return; }
+            ////            console.log('circle hoora', cx, cy);
+            ////        })
+            ////        .call(getDragSvgCircle());
+
+
+            ////}
 
             d3Image.on('click', function () {
                 console.log(idOfSlcMapTool);
@@ -330,15 +334,15 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 
                 // Send to the server in PUT method (change well marker data)
                 console.log('realMarkerPos', realMarkerPos);
-                addWellMarker(coords[0], coords[1]);
+                wellMarkerDataToAdd.coords([realMarkerPos.x, realMarkerPos.y]);
+                //addWellMarker(realMarkerPos.x, realMarkerPos.y);
             });
 
             // Redraw all well markers: user can remove/add/change coords or any actions with markers outside of svg block
             // Clear all values
             d3Group.selectAll('circle').remove();
 
-            // Add fresh values
-            wellMarkers.forEach(function (wellMarkerItem) {
+            function drawWellMarker(wellMarkerItem, fillColor) {
                 // Convert empty coords
                 var wellMarkerCoordsInPx = ko.unwrap(wellMarkerItem.coords);
 
@@ -359,13 +363,25 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
                     .attr('cx', tmpCx)
                     .attr('cy', tmpCy)
                     .attr('r', wellMarkerRadius)
+                    .attr('fill', fillColor)
+                    .attr('stroke', 'white')
                     .on('click', function () {
                         // Show info about well in this point
                         if (d3.event.defaultPrevented) { return; }
                         //console.log('circle hoora', cx, cy);
                     })
                     .call(getDragSvgCircle(wellMarkerItem, coefVgToPx));
+            }
+
+            // Add fresh values
+            wellMarkers.forEach(function (elem) {
+                drawWellMarker(elem, 'black');
             });
+
+            if (ko.unwrap(wellMarkerDataToAdd.coords)) {
+                console.log('wellmarkertoadd', wellMarkerDataToAdd);
+                drawWellMarker(wellMarkerDataToAdd, 'green');
+            }
 
             console.log('markers', wellMarkers);
 

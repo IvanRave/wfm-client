@@ -92,10 +92,12 @@ define(['jquery', 'knockout', 'services/datacontext', 'helpers/modal-helper',
             /**
             * Post well marker
             */
-            this.postWellMarker = function (idOfWell) {
+            this.postWellMarker = function (idOfWell, coords) {
                 wellMarkerService.post(ths.id, {
                     IdOfWell: idOfWell,
-                    IdOfMapOfWield: ths.id
+                    IdOfMapOfWield: ths.id,
+                    CoordX: coords[0],
+                    CoordY: coords[1]
                 }).done(function (r) {
                     ths.wellMarkers.push(new WellOfMapOfWield(r, ths));
                 });

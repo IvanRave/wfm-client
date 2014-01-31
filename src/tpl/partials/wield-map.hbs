@@ -71,15 +71,25 @@
                 </div>
               </div>
             </div>
-            <!-- TODO: replace marker adding -->
-            <!--<div class="min-left-margin" data-bind="if: $root.isEmployeeInEditMode">
-              <div data-bind="if: $parent.outWellsOfWield().length > 0">
-                <div data-bind="with: vwmForWieldSection">
-                  <select class="input-sm" data-bind="options: $parent.outWellsOfWield, optionsText: 'Name', value: wellToAddToMap, optionsCaption: 'select well...'"></select>
-                  <button class="btn btn-sm btn-default" type="button" data-bind="click: addWellMarkerToMap, enable: wellToAddToMap">Add to this map</button>
+            <div data-bind="if: $root.isEmployeeInEditMode">
+              <div data-bind="with: wellMarkerDataToAdd">
+                <div data-bind="slideVisible: coords">
+                  <div class="well min-left-margin">
+                    <div data-bind="with: coords">
+                      x: <span data-bind="prec: { value: $data[0] }"></span>
+                      y: <span data-bind="prec: { value: $data[1] }"></span>
+                    </div>
+                    <div>
+                      <select class="input-sm" data-bind="options: $parent.mdlMapOfWield.outWellsOfWield, optionsText: 'Name', optionsValue: 'id', value: idOfWell, optionsCaption: 'select well...'"></select>
+                    </div>
+                    <div class="min-top-margin">
+                      <button class="btn btn-sm btn-success" data-bind="enable: idOfWell, click: $parent.addWellMarkerToMap">Add</button>
+                      <button class="btn btn-sm btn-default" data-bind="click: $parent.cancelAddingWellMarker">Cancel</button>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>-->
+            </div>
             <div data-bind="foreach: handledAreas">
               <div style="margin-left: 16px">
                 <i class="glyphicon glyphicon-picture"></i>

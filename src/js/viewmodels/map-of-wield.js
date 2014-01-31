@@ -161,20 +161,29 @@ define(['knockout',
             };
 
             /**
-            * Well for adding to this map: selected through select box: different for different views
-            * @type {<module:models/well>}
+            * Well marker to add
+            *    Set point on the map, show adding panel right of the map
+            * @type {Object}
             */
-            this.wellToAddToMap = ko.observable();
+            this.wellMarkerDataToAdd = {
+                coords: ko.observable(),
+                idOfWell: ko.observable()
+            };
 
             /** Add well marker: different methods for different views */
             this.addWellMarkerToMap = function () {
-                var tmpWellToAddToMap = ko.unwrap(ths.wellToAddToMap);
-                if (!tmpWellToAddToMap) { return; }
-
-                mdlMapOfWield.postWellMarker(tmpWellToAddToMap.id);
+                mdlMapOfWield.postWellMarker(ko.unwrap(ths.wellMarkerDataToAdd.idOfWell), ko.unwrap(ths.wellMarkerDataToAdd.coords));
 
                 // Clear selection: if post is unsuccessful - then only show error
-                ths.wellToAddToMap(null);
+                ths.cancelAddingWellMarker();
+            };
+
+            /**
+            * Cancel adding: clear object to adding
+            */
+            this.cancelAddingWellMarker = function () {
+                ths.wellMarkerDataToAdd.coords(null);
+                ths.wellMarkerDataToAdd.idOfWell(null);
             };
 
             /** Remove analog for model */
