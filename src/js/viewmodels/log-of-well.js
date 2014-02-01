@@ -12,7 +12,7 @@ define(['knockout'], function (ko) {
 
         /**
         * Module: log of well
-        * @type {<module:models/log-of-well>}
+        * @type {module:models/log-of-well}
         */
         this.mdlLogOfWell = mdlLogOfWell;
 

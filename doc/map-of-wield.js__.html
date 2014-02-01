@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: viewmodels/map-of-wield.js</title>
+    
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+    
+    <h1 class="page-title">Source: viewmodels/map-of-wield.js</h1>
+    
+    
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source"><code>﻿/** @module */
+define(['knockout',
+    'viewmodels/map-tool',
+    'viewmodels/well-marker-of-map-of-wield'],
+    function (ko,
+        VwmMapTool,
+        VwmWellMarker) {
+        'use strict';
+
+        var usualMapTools = [
+                {
+                    id: 'hand',
+                    name: '{{capitalizeFirst lang.mapToolHand}}',
+                    icon: 'glyphicon glyphicon-hand-up',
+                    isPublicTool: true
+                },
+                ////{
+                ////    id: 'ruler',
+                ////    name: '{{capitalizeFirst lang.mapToolRuler}}',
+                ////    icon: 'glyphicon glyphicon-resize-full',
+                ////    isPublicTool: true
+                ////},
+                {
+                    id: 'marker',
+                    name: '{{capitalizeFirst lang.mapToolWellMarker}}',
+                    icon: 'glyphicon glyphicon-map-marker',
+                    isPublicTool: false
+                }
+                ////{
+                ////    id: 'area',
+                ////    name: '{{capitalizeFirst lang.mapToolArea}}',
+                ////    icon: 'glyphicon glyphicon-retweet',
+                ////    isPublicTool: false
+                ////},
+                ////{
+                ////    id: 'scale',
+                ////    name: '{{capitalizeFirst lang.mapToolScale}}',
+                ////    icon: 'glyphicon glyphicon-screenshot',
+                ////    isPublicTool: false
+                ////}
+        ];
+
+        /** Calculate svg image size using real size and svg block size */
+        function calcSvgImgSize(realImgSize, svgBlockSize) {
+            var svgImgSize = {};
+            // If height is bigger side, then calculate width
+            // if height = 600svg (400px) then width = Xsvg (300px)
+            // X = (300px * 600svg) / 400px
+            // else if width = 1200svg (300px) then height = Ysvg (400px)
+            // Y = (400px * 1200svg) / 300px
+            if ((realImgSize.height * svgBlockSize.ratio) > realImgSize.width) {
+                svgImgSize.height = svgBlockSize.height;
+                svgImgSize.width = (realImgSize.width * svgBlockSize.height) / realImgSize.height;
+            }
+            else {
+                svgImgSize.width = svgBlockSize.width;
+                svgImgSize.height = (realImgSize.height * svgBlockSize.width) / realImgSize.width;
+            }
+
+            return svgImgSize;
+        }
+
+        function getCoefVgToPx(imgSizeInPx, imgSizeInVg) {
+            return {
+                x: imgSizeInVg.width / imgSizeInPx.width,
+                y: imgSizeInVg.height / imgSizeInPx.height
+            };
+        }
+
+        /**
+        * View for well field map: contains selected objects, zoom, translate options
+        * @constructor
+        */
+        var exports = function (mdlMapOfWield, koVidOfSlcVwmMapOfWield) {
+            /** Alternative for this */
+            var ths = this;
+
+            this.mdlMapOfWield = mdlMapOfWield;
+
+            /** View id === model id. CAUTION: few views from one model
+            * @type {number}
+            */
+            this.vid = mdlMapOfWield.id;
+
+            /**
+            * Name link to model: need for options list
+            * @type {string}
+            */
+            this.name = mdlMapOfWield.name;
+
+            /**
+            * Whether view is selected
+            * @type {boolean}
+            */
+            this.isSlcVwmMapOfWield = ko.computed({
+                read: function () {
+                    return ths.vid === ko.unwrap(koVidOfSlcVwmMapOfWield);
+                },
+                deferEvaluation: true
+            });
+
+            /** Filtered and sorted areas */
+            this.handledAreas = ko.computed({
+                read: function () {
+                    return ko.unwrap(mdlMapOfWield.areas);
+                },
+                deferEvaluation: true
+            });
+
+            /**
+            * Size of full svg block (viewbox), in vg
+            */
+            this.svgBlockSize = {
+                width: 1200,
+                height: 600,
+                ratio: 2
+            };
+
+            this.mapWrap = {
+                ratio: 1 / 2,
+                width: ko.observable()
+            };
+
+            // actual height of map wrap and y-axis
+            this.mapWrap.height = ko.computed({
+                read: function () {
+                    var tmpWidth = ko.unwrap(ths.mapWrap.width);
+                    if (tmpWidth) {
+                        return tmpWidth * ths.mapWrap.ratio;
+                    }
+                },
+                deferEvaluation: true
+            });
+
+            /**
+            * Id of selected tool
+            * @type {string}
+            */
+            this.idOfSlcVwmMapTool = ko.observable();
+
+            /**
+            * Selected tool: wellMarker, area, ruler, set scale, etc.
+            * @type {string}
+            */
+            this.slcMapTool = ko.computed({
+                read: function () {
+                    var tmpMapTools = ko.unwrap(ths.mapTools);
+                    if (tmpMapTools.length > 0) {
+                        var tmpId = ko.unwrap(ths.idOfSlcVwmMapTool);
+
+                        if (tmpId) {
+                            return tmpMapTools.filter(function (elem) {
+                                return elem.id === tmpId;
+                            })[0];
+                        }
+                        else {
+                            // If no id - return first tool: by default: hand
+                            // and set to id
+                            ths.idOfSlcVwmMapTool(tmpMapTools[0].id);
+                            return tmpMapTools[0];
+                        }
+                    }
+                },
+                deferEvaluation: true
+            });
+
+            /**
+            * Map tools
+            * @type {Array.&lt;module:models/map-tool>}
+            */
+            this.mapTools = ko.computed({
+                read: function () {
+                    return usualMapTools.map(function (elem) {
+                        return new VwmMapTool(elem, ths.idOfSlcVwmMapTool);
+                    });
+                },
+                deferEvaluation: true
+            });
+
+            /** Select map tool */
+            this.selectMapTool = function (mapToolToSelect) {
+                // Select id -> system automatically sets tool as selected
+                ths.idOfSlcVwmMapTool(mapToolToSelect.id);
+            };
+
+            /**
+            * List of viewmodels of well markers
+            * @type {Array.&lt;module:viewmodels/well-marker-of-map-of-wield>}
+            */
+            this.listVwmWellMarker = ko.computed({
+                read: function () {
+                    return ko.unwrap(mdlMapOfWield.wellMarkers).map(function (elem) {
+                        return new VwmWellMarker(elem, ths.slcVwmWellMarker);
+                    });
+                },
+                deferEvaluation: true
+            });
+
+            /**
+            * Selected well marker
+            * @type {module:models/well-marker-of-map-of-wield}
+            */
+            this.slcVwmWellMarker = ko.observable();
+
+            /**
+            * Image (map) size in pixels
+            * @type {Object}
+            */
+            this.imgSizePx = ko.computed({
+                read: function () {
+                    var tmpFileSpec = ths.mdlMapOfWield.fileSpec;
+
+                    return {
+                        width: ko.unwrap(tmpFileSpec.imgWidth),
+                        height: ko.unwrap(tmpFileSpec.imgHeight)
+                    };
+                },
+                deferEvaluation: true
+            });
+
+            /////**
+            ////* Amount pixels in vg (svg viewbox units)
+            ////* @type {number}
+            ////*/
+            ////this.coefVgToPx = ko.computed({
+            ////    read: function () {
+            ////        var tmpImgSizePx = ko.unwrap(ths.imgSizePx);
+            ////        var tmpSvgSizeVg = ths.svgBlockSize;
+            ////        var tmpImgSizeVg = calcSvgImgSize(tmpImgSizePx, tmpSvgSizeVg);
+            ////        return getCoefVgToPx(tmpImgSizePx, tmpImgSizeVg);
+            ////    },
+            ////    deferEvaluation: true
+            ////});
+
+            /** Select well marker */
+            this.selectVwmWellMarker = function (vwmWellMarkerToSelect) {
+                ths.slcVwmWellMarker(vwmWellMarkerToSelect);
+                console.log('scale');
+                // Set to the center and scale to 10 * 8 (marker radius) = 80units
+                // Center of svg block
+                var svgCenterCoords = [ths.svgBlockSize.width / 2, ths.svgBlockSize.height / 2];
+                // Svg marker coords = Real marker coords (in pixels) -> Real marker coords (in svg units) + Image margin (in svg units)
+                var wellMarkerCoordsInPx = ko.unwrap(vwmWellMarkerToSelect.mdlWellMarker.coords);
+                // TODO: change null values
+                var tmpImgSizePx = ko.unwrap(ths.imgSizePx);
+                var tmpSvgSizeVg = ths.svgBlockSize;
+                var tmpImgSizeVg = calcSvgImgSize(tmpImgSizePx, tmpSvgSizeVg);
+                var coefVgToPx = getCoefVgToPx(tmpImgSizePx, tmpImgSizeVg);
+
+                var imgStartPos = {
+                    x: (ths.svgBlockSize.width - tmpImgSizeVg.width) / 2,
+                    y: (ths.svgBlockSize.height - tmpImgSizeVg.height) / 2
+                };
+
+                var wellMarkerCoordsInVg = [wellMarkerCoordsInPx[0] * coefVgToPx.x + imgStartPos.x, wellMarkerCoordsInPx[1] * coefVgToPx.y + imgStartPos.y];
+
+                var transformCoords = [svgCenterCoords[0] - wellMarkerCoordsInVg[0], svgCenterCoords[1] - wellMarkerCoordsInVg[1]];
+
+                ths.transformAttr({
+                    scale: 1,
+                    translate: transformCoords
+                });
+            };
+
+            /**
+            * Well marker to add
+            *    Set point on the map, show adding panel right of the map
+            * @type {Object}
+            */
+            this.wellMarkerDataToAdd = {
+                coords: ko.observable(),
+                idOfWell: ko.observable()
+            };
+
+            /** Add well marker: different methods for different views */
+            this.addWellMarkerToMap = function () {
+                mdlMapOfWield.postWellMarker(ko.unwrap(ths.wellMarkerDataToAdd.idOfWell), ko.unwrap(ths.wellMarkerDataToAdd.coords));
+
+                // Clear selection: if post is unsuccessful - then only show error
+                ths.cancelAddingWellMarker();
+            };
+
+            /**
+            * Cancel adding: clear object to adding
+            */
+            this.cancelAddingWellMarker = function () {
+                ths.wellMarkerDataToAdd.coords(null);
+                ths.wellMarkerDataToAdd.idOfWell(null);
+            };
+
+            /** Remove analog for model */
+            this.removeVwmWellMarker = function (vwmWellMarkerToRemove) {
+                if (confirm('{{capitalizeFirst lang.confirmToDelete}}?')) {
+                    mdlMapOfWield.removeWellMarker(vwmWellMarkerToRemove.mdlWellMarker);
+                }
+            };
+
+            /**
+            * Zoom and translate for svg map: can be set from server or by user click or by mouse scroll. By default: 1
+            * @type {number}
+            */
+            this.transformAttr = ko.observable({
+                scale: 1,
+                translate: [0, 0]
+            });
+        };
+
+        return exports;
+    });</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="all-bindings.html">bindings/all-bindings</a></li><li><a href="svg-bindings.html">bindings/svg-bindings</a></li><li><a href="stage-constants.html">constants/stage-constants</a></li><li><a href="svg-elem-type-constants.html">constants/svg-elem-type-constants</a></li><li><a href="ajax-request.html">helpers/ajax-request</a></li><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="log-helper.html">helpers/log-helper</a></li><li><a href="area-of-map-of-wield.html">models/area-of-map-of-wield</a></li><li><a href="column-attribute.html">models/column-attribute</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="file-spec-of-history-of-well.html">models/file-spec-of-history-of-well</a></li><li><a href="history-of-well.html">models/history-of-well</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="log-of-well.html">models/log-of-well</a></li><li><a href="map-of-wield.html">models/map-of-wield</a></li><li><a href="prop-spec.html">models/prop-spec</a></li><li><a href="section-of-stage.html">models/section-of-stage</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="sketch-of-well.html">models/sketch-of-well</a></li><li><a href="svg-elem.html">models/svg-elem</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="volume-of-well.html">models/volume-of-well</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-file.html">models/well-file</a></li><li><a href="well-marker-of-map-of-wield.html">models/well-marker-of-map-of-wield</a></li><li><a href="wfm-image.html">models/wfm-image</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="widget.html">models/widget</a></li><li><a href="widgock.html">models/widgock</a></li><li><a href="widgout.html">models/widgout</a></li><li><a href="wield.html">models/wield</a></li><li><a href="workspace.html">models/workspace</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="stage-base.html">models\bases/stage-base</a></li><li><a href="auth.html">services/auth</a></li><li><a href="company_.html">services/company</a></li><li><a href="company-user.html">services/company-user</a></li><li><a href="file-spec_.html">services/file-spec</a></li><li><a href="file-spec-of-history-of-well_.html">services/file-spec-of-history-of-well</a></li><li><a href="image-of-history-of-well.html">services/image-of-history-of-well</a></li><li><a href="log-of-well_.html">services/log-of-well</a></li><li><a href="map-of-wield_.html">services/map-of-wield</a></li><li><a href="register.html">services/register</a></li><li><a href="sketch-of-well_.html">services/sketch-of-well</a></li><li><a href="svg-elem-of-log-of-well.html">services/svg-elem-of-log-of-well</a></li><li><a href="volume-of-well_.html">services/volume-of-well</a></li><li><a href="wegion_.html">services/wegion</a></li><li><a href="well_.html">services/well</a></li><li><a href="well-marker-of-map-of-wield_.html">services/well-marker-of-map-of-wield</a></li><li><a href="widget_.html">services/widget</a></li><li><a href="widgout_.html">services/widgout</a></li><li><a href="wield_.html">services/wield</a></li><li><a href="wroup_.html">services/wroup</a></li><li><a href="company__.html">viewmodels/company</a></li><li><a href="employee_.html">viewmodels/employee</a></li><li><a href="history-of-well_.html">viewmodels/history-of-well</a></li><li><a href="log-of-well__.html">viewmodels/log-of-well</a></li><li><a href="map-of-wield__.html">viewmodels/map-of-wield</a></li><li><a href="map-tool.html">viewmodels/map-tool</a></li><li><a href="scope-of-history-of-well.html">viewmodels/scope-of-history-of-well</a></li><li><a href="section-of-stage_.html">viewmodels/section-of-stage</a></li><li><a href="sketch-of-well__.html">viewmodels/sketch-of-well</a></li><li><a href="user-profile_.html">viewmodels/user-profile</a></li><li><a href="volume-of-well__.html">viewmodels/volume-of-well</a></li><li><a href="wegion__.html">viewmodels/wegion</a></li><li><a href="well__.html">viewmodels/well</a></li><li><a href="well-marker-of-map-of-wield__.html">viewmodels/well-marker-of-map-of-wield</a></li><li><a href="widget__.html">viewmodels/widget</a></li><li><a href="widgock_.html">viewmodels/widgock</a></li><li><a href="widgout__.html">viewmodels/widgout</a></li><li><a href="wield__.html">viewmodels/wield</a></li><li><a href="workspace_.html">viewmodels/workspace</a></li><li><a href="wroup__.html">viewmodels/wroup</a></li><li><a href="stage-base_.html">viewmodels\bases/stage-base</a></li><li><a href="stage-child-base.html">viewmodels\bases/stage-child-base</a></li><li><a href="widget-default-summary.html">viewmodels\widgets/widget-default-summary</a></li><li><a href="widget-well-history.html">viewmodels\widgets/widget-well-history</a></li><li><a href="widget-well-perfomance.html">viewmodels\widgets/widget-well-perfomance</a></li><li><a href="widget-well-sketch.html">viewmodels\widgets/widget-well-sketch</a></li><li><a href="widget-wield-map.html">viewmodels\widgets/widget-wield-map</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Sat Feb 01 2014 12:06:02 GMT+0200 (EET)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

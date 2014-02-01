@@ -1,4 +1,4 @@
-﻿// Well widget perfomance
+﻿/** @module */
 define(['knockout'], function (ko) {
     'use strict';
 

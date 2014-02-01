@@ -26,15 +26,15 @@
     <section>
         <article>
             <pre class="prettyprint source"><code>﻿/** @module */
-define(['jquery', 'knockout',
+define(['jquery',
+    'knockout',
     'services/datacontext',
-    'helpers/modal-helper',
     'helpers/app-helper',
     'models/file-spec-of-history-of-well',
     'services/file-spec-of-history-of-well',
     'models/wfm-image',
     'services/image-of-history-of-well'],
-    function ($, ko, datacontext, bootstrapModal, appHelper,
+    function ($, ko, datacontext, appHelper,
         FileSpecOfHistoryOfWell, fileSpecOfHistoryOfWellService,
         WfmImage, imageOfHistoryOfWellService) {
         'use strict';
@@ -129,139 +129,34 @@ define(['jquery', 'knockout',
             /**
             * Create file spec of history of well from well section
             */
-            this.createFileSpecOfHistoryOfWell = function () {
-                var needSection = ths.getWell().getSectionByPatternId('well-history');
-
-                // Select file section with sketches (load and unselect files)
-                ths.getWell().selectFileSection(needSection);
-
-                var tmpModalFileMgr = ths.getWell().getWellGroup().getWellField().getWellRegion().getCompany().modalFileMgr;
-
-                // Calback for selected file
-                function mgrCallback() {
-                    tmpModalFileMgr.okError('');
-                    // Select file from file manager
-                    var selectedFileSpecs = ko.unwrap(needSection.listOfFileSpec).filter(function (elem) {
-                        return ko.unwrap(elem.isSelected);
-                    });
-
-                    if (selectedFileSpecs.length !== 1) {
-                        tmpModalFileMgr.okError('need to select one file');
-                        return;
-                    }
-
-                    fileSpecOfHistoryOfWellService.post(ths.id, {
-                        idOfFileSpec: selectedFileSpecs[0].id,
-                        idOfHistoryOfWell: ths.id,
-                        description: ''
-                    }).done(function (res) {
-                        ths.WellHistoryFiles.push(new FileSpecOfHistoryOfWell(res));
-                        tmpModalFileMgr.hide();
-                    }).fail(function (jqXHR) {
-                        if (jqXHR.status === 422) {
-                            var resJson = jqXHR.responseJSON;
-                            require(['helpers/lang-helper'], function (langHelper) {
-                                var tmpProcessError = (langHelper.translate(resJson.errId) || '{{lang.unknownError}}');
-                                tmpModalFileMgr.okError(tmpProcessError);
-                            });
-                        }
-                    });
-                }
-
-                // Add to observable
-                tmpModalFileMgr.okCallback(mgrCallback);
-
-                // Notification
-                tmpModalFileMgr.okDescription('Please select a file to attach to this history record');
-
-                // Open file manager
-                tmpModalFileMgr.show();
+            this.postFileSpecOfHistoryOfWell = function (tmpIdOfFileSpec, scsCallback, errCallback) {
+                fileSpecOfHistoryOfWellService.post(ths.id, {
+                    idOfFileSpec: tmpIdOfFileSpec,
+                    idOfHistoryOfWell: ths.id,
+                    description: ''
+                }).done(function (res) {
+                    ths.WellHistoryFiles.push(new FileSpecOfHistoryOfWell(res));
+                    // Hide window
+                    scsCallback();
+                }).fail(errCallback);
             };
 
             /**
             * Create cropped well history image from file spec
             */
-            this.createImageFromFileSpec = function () {
-                var needSection = ths.getWell().getSectionByPatternId('well-history');
-
-                // Select file section with sketches (load and unselect files)
-                ths.getWell().selectFileSection(needSection);
-
-                var tmpModalFileMgr = ths.getWell().getWellGroup().getWellField().getWellRegion().getCompany().modalFileMgr;
-
-                // Calback for selected file
-                function mgrCallback() {
-                    tmpModalFileMgr.okError('');
-                    // Select file from file manager
-                    var selectedFileSpecs = ko.unwrap(needSection.listOfFileSpec).filter(function (elem) {
-                        return ko.unwrap(elem.isSelected);
-                    });
-
-                    if (selectedFileSpecs.length !== 1) {
-                        tmpModalFileMgr.okError('need to select one file');
-                        return;
-                    }
-
-                    var imageFileSpec = selectedFileSpecs[0];
-
-                    // Close file manager modal window
-                    // And show modal with crop feature
-                    tmpModalFileMgr.hide();
-
-                    // history image src
-                    var innerDiv = document.createElement('div');
-                    var historyImgElem = document.createElement('img');
-                    innerDiv.appendChild(historyImgElem);
-                    // load image before open window and set JCrop
-                    historyImgElem.onload = function () {
-                        // load need libraries for cropping
-                        require(['jquery.Jcrop'], function () {
-
-                            var coords = [0, 0, 0, 0];
-
-                            function jcropSaveCoords(c) {
-                                coords = [c.x, c.y, c.x2, c.y2];
-                            }
-
-                            // The variable jcrop_api will hold a reference to the Jcrop API once Jcrop is instantiated
-                            $(historyImgElem).Jcrop({
-                                onChange: jcropSaveCoords,
-                                onSelect: jcropSaveCoords,
-                                bgOpacity: 0.6
-                            });
-
-                            // submitted by OK button
-                            bootstrapModal.openModalWideWindow(innerDiv, function () {
-                                // TODO: check not null comments = if user can't choose whole images
-                                imageOfHistoryOfWellService.post(ths.id, {
-                                    IdOfFileSpec: imageFileSpec.id,
-                                    X1: coords[0],
-                                    X2: coords[2],
-                                    Y1: coords[1],
-                                    Y2: coords[3],
-                                    CropXUnits: 0,
-                                    CropYUnits: 0
-                                }).done(function (res) {
-                                    ths.WfmImages.push(new WfmImage(res));
-                                    bootstrapModal.closeModalWideWindow();
-                                });
-                            });
-                            // end of require
-                        });
-                    };
-
-                    // start load image
-                    historyImgElem.src = imageFileSpec.fileUrl;
-                }
-
-                // Add to observable
-                tmpModalFileMgr.okCallback(mgrCallback);
-
-                // Notification
-                tmpModalFileMgr.okDescription('Please select a history image to crop');
-
-                // Open file manager
-                tmpModalFileMgr.show();
+            this.postImageOfHistoryOfWell = function (tmpIdOfFileSpec, coords, scsCallback) {
+                imageOfHistoryOfWellService.post(ths.id, {
+                    IdOfFileSpec: tmpIdOfFileSpec,
+                    X1: coords[0],
+                    X2: coords[2],
+                    Y1: coords[1],
+                    Y2: coords[3],
+                    CropXUnits: 0,
+                    CropYUnits: 0
+                }).done(function (res) {
+                    ths.WfmImages.push(new WfmImage(res));
+                    scsCallback();
+                });
             };
 
             if (data.WfmImagesDto) {
@@ -285,13 +180,13 @@ define(['jquery', 'knockout',
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="stage-constants.html">constants/stage-constants</a></li><li><a href="svg-elem-type-constants.html">constants/svg-elem-type-constants</a></li><li><a href="bindings.html">filters/bindings</a></li><li><a href="ajax-request.html">helpers/ajax-request</a></li><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="log-helper.html">helpers/log-helper</a></li><li><a href="area-of-map-of-wield.html">models/area-of-map-of-wield</a></li><li><a href="column-attribute.html">models/column-attribute</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="file-spec-of-history-of-well.html">models/file-spec-of-history-of-well</a></li><li><a href="history-of-well.html">models/history-of-well</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="log-of-well.html">models/log-of-well</a></li><li><a href="map-of-wield.html">models/map-of-wield</a></li><li><a href="prop-spec.html">models/prop-spec</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="stage-base.html">models/stage-base</a></li><li><a href="svg-elem.html">models/svg-elem</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="volume-of-well.html">models/volume-of-well</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-file.html">models/well-file</a></li><li><a href="wfm-image.html">models/wfm-image</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="widget.html">models/widget</a></li><li><a href="widgock.html">models/widgock</a></li><li><a href="widgout.html">models/widgout</a></li><li><a href="wield.html">models/wield</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="section-base.html">sections/section-base</a></li><li><a href="section-of-company.html">sections/section-of-company</a></li><li><a href="section-of-wegion.html">sections/section-of-wegion</a></li><li><a href="section-of-well.html">sections/section-of-well</a></li><li><a href="section-of-wield.html">sections/section-of-wield</a></li><li><a href="section-of-wroup.html">sections/section-of-wroup</a></li><li><a href="company_.html">services/company</a></li><li><a href="company-user.html">services/company-user</a></li><li><a href="file-spec_.html">services/file-spec</a></li><li><a href="file-spec-of-history-of-well_.html">services/file-spec-of-history-of-well</a></li><li><a href="image-of-history-of-well.html">services/image-of-history-of-well</a></li><li><a href="log-of-well_.html">services/log-of-well</a></li><li><a href="register.html">services/register</a></li><li><a href="svg-elem-of-log-of-well.html">services/svg-elem-of-log-of-well</a></li><li><a href="volume-of-well_.html">services/volume-of-well</a></li><li><a href="wegion_.html">services/wegion</a></li><li><a href="well_.html">services/well</a></li><li><a href="widget_.html">services/widget</a></li><li><a href="widgout_.html">services/widgout</a></li><li><a href="wield_.html">services/wield</a></li><li><a href="wroup_.html">services/wroup</a></li><li><a href="workspace.html">viewmodels/workspace</a></li><li><a href="sketch.html">well/sketch</a></li><li><a href="widget-summary.html">widgets/widget-summary</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="all-bindings.html">bindings/all-bindings</a></li><li><a href="svg-bindings.html">bindings/svg-bindings</a></li><li><a href="stage-constants.html">constants/stage-constants</a></li><li><a href="svg-elem-type-constants.html">constants/svg-elem-type-constants</a></li><li><a href="ajax-request.html">helpers/ajax-request</a></li><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="log-helper.html">helpers/log-helper</a></li><li><a href="area-of-map-of-wield.html">models/area-of-map-of-wield</a></li><li><a href="column-attribute.html">models/column-attribute</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="file-spec-of-history-of-well.html">models/file-spec-of-history-of-well</a></li><li><a href="history-of-well.html">models/history-of-well</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="log-of-well.html">models/log-of-well</a></li><li><a href="map-of-wield.html">models/map-of-wield</a></li><li><a href="prop-spec.html">models/prop-spec</a></li><li><a href="section-of-stage.html">models/section-of-stage</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="sketch-of-well.html">models/sketch-of-well</a></li><li><a href="svg-elem.html">models/svg-elem</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="volume-of-well.html">models/volume-of-well</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-file.html">models/well-file</a></li><li><a href="well-marker-of-map-of-wield.html">models/well-marker-of-map-of-wield</a></li><li><a href="wfm-image.html">models/wfm-image</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="widget.html">models/widget</a></li><li><a href="widgock.html">models/widgock</a></li><li><a href="widgout.html">models/widgout</a></li><li><a href="wield.html">models/wield</a></li><li><a href="workspace.html">models/workspace</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="stage-base.html">models\bases/stage-base</a></li><li><a href="auth.html">services/auth</a></li><li><a href="company_.html">services/company</a></li><li><a href="company-user.html">services/company-user</a></li><li><a href="file-spec_.html">services/file-spec</a></li><li><a href="file-spec-of-history-of-well_.html">services/file-spec-of-history-of-well</a></li><li><a href="image-of-history-of-well.html">services/image-of-history-of-well</a></li><li><a href="log-of-well_.html">services/log-of-well</a></li><li><a href="map-of-wield_.html">services/map-of-wield</a></li><li><a href="register.html">services/register</a></li><li><a href="sketch-of-well_.html">services/sketch-of-well</a></li><li><a href="svg-elem-of-log-of-well.html">services/svg-elem-of-log-of-well</a></li><li><a href="volume-of-well_.html">services/volume-of-well</a></li><li><a href="wegion_.html">services/wegion</a></li><li><a href="well_.html">services/well</a></li><li><a href="well-marker-of-map-of-wield_.html">services/well-marker-of-map-of-wield</a></li><li><a href="widget_.html">services/widget</a></li><li><a href="widgout_.html">services/widgout</a></li><li><a href="wield_.html">services/wield</a></li><li><a href="wroup_.html">services/wroup</a></li><li><a href="company__.html">viewmodels/company</a></li><li><a href="employee_.html">viewmodels/employee</a></li><li><a href="history-of-well_.html">viewmodels/history-of-well</a></li><li><a href="log-of-well__.html">viewmodels/log-of-well</a></li><li><a href="map-of-wield__.html">viewmodels/map-of-wield</a></li><li><a href="map-tool.html">viewmodels/map-tool</a></li><li><a href="scope-of-history-of-well.html">viewmodels/scope-of-history-of-well</a></li><li><a href="section-of-stage_.html">viewmodels/section-of-stage</a></li><li><a href="sketch-of-well__.html">viewmodels/sketch-of-well</a></li><li><a href="user-profile_.html">viewmodels/user-profile</a></li><li><a href="volume-of-well__.html">viewmodels/volume-of-well</a></li><li><a href="wegion__.html">viewmodels/wegion</a></li><li><a href="well__.html">viewmodels/well</a></li><li><a href="well-marker-of-map-of-wield__.html">viewmodels/well-marker-of-map-of-wield</a></li><li><a href="widget__.html">viewmodels/widget</a></li><li><a href="widgock_.html">viewmodels/widgock</a></li><li><a href="widgout__.html">viewmodels/widgout</a></li><li><a href="wield__.html">viewmodels/wield</a></li><li><a href="workspace_.html">viewmodels/workspace</a></li><li><a href="wroup__.html">viewmodels/wroup</a></li><li><a href="stage-base_.html">viewmodels\bases/stage-base</a></li><li><a href="stage-child-base.html">viewmodels\bases/stage-child-base</a></li><li><a href="widget-default-summary.html">viewmodels\widgets/widget-default-summary</a></li><li><a href="widget-well-history.html">viewmodels\widgets/widget-well-history</a></li><li><a href="widget-well-perfomance.html">viewmodels\widgets/widget-well-perfomance</a></li><li><a href="widget-well-sketch.html">viewmodels\widgets/widget-well-sketch</a></li><li><a href="widget-wield-map.html">viewmodels\widgets/widget-wield-map</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0</a> on Thu Jan 16 2014 20:35:04 GMT+0200 (EET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Sat Feb 01 2014 12:06:02 GMT+0200 (EET)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: viewmodels/bases/stage-child-base.js</title>
+    
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+    
+    <h1 class="page-title">Source: viewmodels/bases/stage-child-base.js</h1>
+    
+    
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source"><code>﻿/** @module */
+define(['knockout',
+    'helpers/history-helper'],
+    function (ko,
+        historyHelper) {
+        'use strict';
+
+        /**
+        * Base view for manage childs of main stages: userProfile, company, wegion, wield, wroup (well has no childrens)
+        *    If stage has children
+        * @constructor
+        */
+        var exports = function (defaultUnqOfSlcVwmChild) {
+            // First need to point: listOfVwmChild (children's viewmodels)
+            var ths = this;
+
+            /** Unique key of viewmodel of selected child */
+            this.unqOfSlcVwmChild = ko.observable(defaultUnqOfSlcVwmChild);
+
+            // Remove default value to not reuse again
+            defaultUnqOfSlcVwmChild = null;
+
+            /** Child viewmodel - current selected employee */
+            this.slcVwmChild = ko.computed({
+                read: function () {
+                    var tmpUnq = ko.unwrap(ths.unqOfSlcVwmChild);
+                    if (tmpUnq) {
+                        return ko.unwrap(ths.listOfVwmChild).filter(function (elem) {
+                            return elem.unq === tmpUnq;
+                        })[0];
+                    }
+                },
+                deferEvaluation: true
+            });
+
+            /**
+            * Activate view of child stage: select all parents
+            *    1. Unselect all children
+            *    2. Select this
+            *    3. Select all parents (For userProfile - employee (company))
+            *    4. Set url fot this stage
+            */
+            this.activateVwmChild = function (vwmChildToActivate) {
+                console.log('activate: ', vwmChildToActivate);
+
+                // Unselect previous child: todo: why?
+                ////ths.unqOfSlcVwmChild(null);
+
+                // Unselect 
+                var navigationArr = [];
+
+                // For company - stage == employee
+                if (vwmChildToActivate.vwmCompany) {
+                    vwmChildToActivate = vwmChildToActivate.vwmCompany;
+                }
+
+                if (typeof (vwmChildToActivate.unqOfSlcVwmChild) !== 'undefined') {
+                    vwmChildToActivate.unqOfSlcVwmChild(null);
+                }
+                
+                vwmChildToActivate.unselectVwmSectionWrk(); 
+
+                navigationArr = historyHelper.getNavigationArr(vwmChildToActivate.mdlStage);
+                historyHelper.pushState('/' + navigationArr.join('/'));
+
+                // Select current child
+                ths.unqOfSlcVwmChild(vwmChildToActivate.unq);
+                
+                // Select all parents of this child
+                if (ths.selectAncestorVwms) {
+                    ths.selectAncestorVwms();
+                }
+
+                // ths - parent (like company)
+                // vwmChild - child (like wegion)
+                // slcVwmChild - selected child (like wegion)
+                // If parent - it is a child of other parent (company, employee -- it is a child of the userprofile)
+                // UserProflie.slcVwmChild(thisEmployee of this company)
+            };
+
+            /** Unselect: show content of parent node, like WFM logo click: unselect choosed company and show company list */
+            this.deactivateVwmChild = function () {
+                ths.unqOfSlcVwmChild(null);
+
+                var navigationArr = historyHelper.getNavigationArr(ths.mdlStage);
+
+                historyHelper.pushState('/' + navigationArr.join('/'));
+            };
+
+            /**
+            * Whether menu item is opened: showed inner object in menu without main content
+            *    Only for sections that have children
+            * @type {boolean}
+            */
+            this.isOpenedItem = ko.observable(false);
+
+            /** Toggle isOpen state */
+            this.toggleItem = function () {
+                ths.isOpenedItem(!ko.unwrap(ths.isOpenedItem));
+            };
+
+            /** Css class for opened item (open or showed) */
+            this.menuItemCss = ko.computed({
+                read: function () {
+                    // { 'glyphicon-circle-arrow-down' : isOpenedItem, 'glyphicon-circle-arrow-right' : !isOpenedItem() }
+                    return ko.unwrap(ths.isOpenedItem) ? 'glyphicon-circle-arrow-down' : 'glyphicon-circle-arrow-right';
+                },
+                deferEvaluation: true
+            });
+
+            /** Open child after selection */
+            this.slcVwmChild.subscribe(function (tmpSlcVwmChild) {
+                if (tmpSlcVwmChild) {
+                    if (typeof (tmpSlcVwmChild.isOpenedItem) !== 'undefined') {
+                        tmpSlcVwmChild.isOpenedItem(true);
+                    }
+                }
+            });
+
+        };
+
+        return exports;
+    });</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="all-bindings.html">bindings/all-bindings</a></li><li><a href="svg-bindings.html">bindings/svg-bindings</a></li><li><a href="stage-constants.html">constants/stage-constants</a></li><li><a href="svg-elem-type-constants.html">constants/svg-elem-type-constants</a></li><li><a href="ajax-request.html">helpers/ajax-request</a></li><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="log-helper.html">helpers/log-helper</a></li><li><a href="area-of-map-of-wield.html">models/area-of-map-of-wield</a></li><li><a href="column-attribute.html">models/column-attribute</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="file-spec-of-history-of-well.html">models/file-spec-of-history-of-well</a></li><li><a href="history-of-well.html">models/history-of-well</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="log-of-well.html">models/log-of-well</a></li><li><a href="map-of-wield.html">models/map-of-wield</a></li><li><a href="prop-spec.html">models/prop-spec</a></li><li><a href="section-of-stage.html">models/section-of-stage</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="sketch-of-well.html">models/sketch-of-well</a></li><li><a href="svg-elem.html">models/svg-elem</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="volume-of-well.html">models/volume-of-well</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-file.html">models/well-file</a></li><li><a href="well-marker-of-map-of-wield.html">models/well-marker-of-map-of-wield</a></li><li><a href="wfm-image.html">models/wfm-image</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="widget.html">models/widget</a></li><li><a href="widgock.html">models/widgock</a></li><li><a href="widgout.html">models/widgout</a></li><li><a href="wield.html">models/wield</a></li><li><a href="workspace.html">models/workspace</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="stage-base.html">models\bases/stage-base</a></li><li><a href="auth.html">services/auth</a></li><li><a href="company_.html">services/company</a></li><li><a href="company-user.html">services/company-user</a></li><li><a href="file-spec_.html">services/file-spec</a></li><li><a href="file-spec-of-history-of-well_.html">services/file-spec-of-history-of-well</a></li><li><a href="image-of-history-of-well.html">services/image-of-history-of-well</a></li><li><a href="log-of-well_.html">services/log-of-well</a></li><li><a href="map-of-wield_.html">services/map-of-wield</a></li><li><a href="register.html">services/register</a></li><li><a href="sketch-of-well_.html">services/sketch-of-well</a></li><li><a href="svg-elem-of-log-of-well.html">services/svg-elem-of-log-of-well</a></li><li><a href="volume-of-well_.html">services/volume-of-well</a></li><li><a href="wegion_.html">services/wegion</a></li><li><a href="well_.html">services/well</a></li><li><a href="well-marker-of-map-of-wield_.html">services/well-marker-of-map-of-wield</a></li><li><a href="widget_.html">services/widget</a></li><li><a href="widgout_.html">services/widgout</a></li><li><a href="wield_.html">services/wield</a></li><li><a href="wroup_.html">services/wroup</a></li><li><a href="company__.html">viewmodels/company</a></li><li><a href="employee_.html">viewmodels/employee</a></li><li><a href="history-of-well_.html">viewmodels/history-of-well</a></li><li><a href="log-of-well__.html">viewmodels/log-of-well</a></li><li><a href="map-of-wield__.html">viewmodels/map-of-wield</a></li><li><a href="map-tool.html">viewmodels/map-tool</a></li><li><a href="scope-of-history-of-well.html">viewmodels/scope-of-history-of-well</a></li><li><a href="section-of-stage_.html">viewmodels/section-of-stage</a></li><li><a href="sketch-of-well__.html">viewmodels/sketch-of-well</a></li><li><a href="user-profile_.html">viewmodels/user-profile</a></li><li><a href="volume-of-well__.html">viewmodels/volume-of-well</a></li><li><a href="wegion__.html">viewmodels/wegion</a></li><li><a href="well__.html">viewmodels/well</a></li><li><a href="well-marker-of-map-of-wield__.html">viewmodels/well-marker-of-map-of-wield</a></li><li><a href="widget__.html">viewmodels/widget</a></li><li><a href="widgock_.html">viewmodels/widgock</a></li><li><a href="widgout__.html">viewmodels/widgout</a></li><li><a href="wield__.html">viewmodels/wield</a></li><li><a href="workspace_.html">viewmodels/workspace</a></li><li><a href="wroup__.html">viewmodels/wroup</a></li><li><a href="stage-base_.html">viewmodels\bases/stage-base</a></li><li><a href="stage-child-base.html">viewmodels\bases/stage-child-base</a></li><li><a href="widget-default-summary.html">viewmodels\widgets/widget-default-summary</a></li><li><a href="widget-well-history.html">viewmodels\widgets/widget-well-history</a></li><li><a href="widget-well-perfomance.html">viewmodels\widgets/widget-well-perfomance</a></li><li><a href="widget-well-sketch.html">viewmodels\widgets/widget-well-sketch</a></li><li><a href="widget-wield-map.html">viewmodels\widgets/widget-wield-map</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Sat Feb 01 2014 12:06:02 GMT+0200 (EET)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

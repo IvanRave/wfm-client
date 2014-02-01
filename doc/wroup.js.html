@@ -32,8 +32,8 @@ define(['jquery',
     'helpers/modal-helper',
     'models/well',
     'models/wfm-parameter-of-wroup',
-    'models/sections/section-of-wroup',
-    'models/stage-base',
+    'models/section-of-stage',
+    'models/bases/stage-base',
     'models/prop-spec',
     'services/wroup',
     'constants/stage-constants'], function ($, ko, datacontext, bootstrapModal, Well, WellGroupWfmParameter,
@@ -46,7 +46,7 @@ define(['jquery',
         }
 
         // 4. Wells (convert data objects into array)
-        function importWellsDto(data, parent) {
+        function importWells(data, parent) {
             return data.map(function (item) { return new Well(item, parent); });
         }
 
@@ -82,8 +82,8 @@ define(['jquery',
             };
 
             /** Get root view model */
-            this.getRootViewModel = function () {
-                return this.getWellField().getRootViewModel();
+            this.getRootMdl = function () {
+                return this.getWellField().getRootMdl();
             };
 
             /**
@@ -117,107 +117,16 @@ define(['jquery',
             * List of well for this group
             * @type {Array.&lt;module:models/well>}
             */
-            this.Wells = ko.observableArray();
-
-            /**
-            * Selected well
-            * @type {module:models/well}
-            */
-            this.selectedWell = ko.observable();
+            this.wells = ko.observableArray();
 
             /**
             * Get well by id
             * @param {number} idOfWell - Id of well
             */
             this.getWellById = function (idOfWell) {
-                var tmpWells = ko.unwrap(ths.Wells);
-                return tmpWells.filter(function (elem) {
+                return ko.unwrap(ths.wells).filter(function (elem) {
                     return elem.id === idOfWell;
                 })[0];
-            };
-
-            /**
-            * Select well (child)
-            * @param {module:models/well} wellToSelect - Well to select
-            */
-            this.selectWell = function (wellToSelect) {
-                /** Initial function for all select stage functions */
-                ths.selectChildStage(wellToSelect);
-
-
-                var tmpInitialUrlData = ko.unwrap(ths.getRootViewModel().initialUrlData);
-
-                if (tmpInitialUrlData.wellSectionId) {
-                    // Select section
-
-                    var tmpSection = wellToSelect.getSectionByPatternId('well-' + tmpInitialUrlData.wellSectionId);
-                    wellToSelect.selectSection(tmpSection);
-
-                    // Remove section id from
-                    delete tmpInitialUrlData.wellSectionId;
-                    ths.getRootViewModel().initialUrlData(tmpInitialUrlData);
-                }
-                else
-                {
-                    // Check previous section
-
-
-                    // By default - no template - show widget page
-                    // Previous - by default - summary ths.sectionList[0].id;
-                    var previousSelectedSection;
-
-                    var prevSlcWellRegion = ko.unwrap(ths.getWellField().getWellRegion().getCompany().selectedWegion);
-
-                    // get previous selected section (if exists)
-                    if (prevSlcWellRegion) {
-                        var prevSlcWellField = ko.unwrap(prevSlcWellRegion.selectedWield);
-                        if (prevSlcWellField) {
-                            var prevSlcWellGroup = ko.unwrap(prevSlcWellField.selectedWroup);
-                            if (prevSlcWellGroup) {
-                                // previous selected well
-                                var prevSlcWell = ko.unwrap(prevSlcWellGroup.selectedWell);
-                                if (prevSlcWell) {
-                                    previousSelectedSection = ko.unwrap(prevSlcWell.selectedSection);
-
-                                    // If selected perfomance section
-                                    var tmpSelectedAttrGroupId = ko.unwrap(prevSlcWell.mainPerfomanceView.selectedAttrGroupId);
-                                    if (tmpSelectedAttrGroupId) {
-                                        wellToSelect.mainPerfomanceView.selectedAttrGroupId(tmpSelectedAttrGroupId);
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    if (previousSelectedSection) {
-                        wellToSelect.selectSection(wellToSelect.getSectionByPatternId(previousSelectedSection.sectionPatternId));
-                    }
-                    else {
-                        wellToSelect.unselectSection();
-                    }
-                }
-                    
-
-
-                // set new selected data (plus region in the end)
-                var slcWellGroup = ths;
-                var slcWellField = ths.getWellField();
-                var slcWellRegion = slcWellField.getWellRegion();
-                var slcCompany = slcWellRegion.getCompany();
-
-                // 2. Well
-                // set selected items in DESC order (can be redraw each time if ASC order)
-                // set selected well
-                slcWellGroup.selectedWell(wellToSelect);
-
-                // 3. Group: set selected well group
-                slcWellField.selectedWroup(slcWellGroup);
-
-                // 4: Field: set selected well field
-                slcWellRegion.selectedWield(slcWellField);
-
-                // 5. Region
-                slcCompany.selectedWegion(slcWellRegion);
             };
 
             /**
@@ -233,19 +142,22 @@ define(['jquery',
             this.isLoadWellGroupWfmParameterList = ko.observable(false);
 
             this.getWellGroupWfmParameterList = function () {
-                if (ko.unwrap(ths.isLoadWellGroupWfmParameterList) === false) {
-                    datacontext.getWellGroupWfmParameterList({ wellgroup_id: ths.Id }).done(function (response) {
-                        ths.wellGroupWfmParameterList(importWellGroupWfmParameterDtoList(response));
-                        ths.isLoadWellGroupWfmParameterList(true);
-                    });
+                if (ko.unwrap(ths.isLoadWellGroupWfmParameterList)) {
+                    return;
                 }
+
+                datacontext.getWellGroupWfmParameterList({ wellgroup_id: ths.Id }).done(function (response) {
+                    ths.wellGroupWfmParameterList(importWellGroupWfmParameterDtoList(response));
+                    ths.isLoadWellGroupWfmParameterList(true);
+                });
             };
 
             // wfm parameter from main source which is not in this group
             this.unselectedWfmParameterList = ko.computed({
                 read: function () {
-                    // two arrays
-                    return $.grep(ko.unwrap(ths.getRootViewModel().wfmParameterList), function (prmElem) {
+                    // two dimensioanl array
+                    var tmpList = ko.unwrap(ths.getRootMdl().wfmParameterList);
+                    return $.grep(tmpList, function (prmElem) {
                         var isParamExist = false;
                         $.each(ko.unwrap(ths.wellGroupWfmParameterList), function (wlgIndex, wlgElem) {
                             if (wlgElem.wfmParameterId === prmElem.id) {
@@ -351,7 +263,7 @@ define(['jquery',
                         Description: '',
                         WellGroupId: ths.Id
                     }).done(function (result) {
-                        ths.Wells.push(new Well(result, ths));
+                        ths.wells.push(new Well(result, ths));
                     });
 
                     bootstrapModal.closeModalWindow();
@@ -363,7 +275,7 @@ define(['jquery',
             this.removeChild = function (wellForDelete) {
                 if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(wellForDelete.Name) + '"?')) {
                     datacontext.deleteWell(wellForDelete).done(function () {
-                        ths.Wells.remove(wellForDelete);
+                        ths.wells.remove(wellForDelete);
                         // Select this wroup
                         ths.getWellField().selectWroup(ths);
                     });
@@ -373,31 +285,6 @@ define(['jquery',
             this.save = function () {
                 wroupService.put(ths.Id, ths.toDto());
             };
-
-            /** Whether item and parent are selected */
-            this.isSelectedItem = ko.computed({
-                read: function () {
-                    var tmpField = ths.getWellField();
-                    if (ko.unwrap(tmpField.isSelectedItem)) {
-                        if (ths === ko.unwrap(tmpField.selectedWroup)) {
-                            return true;
-                        }
-                    }
-                },
-                deferEvaluation: true
-            });
-
-            /** Is item selected and showed on the page */
-            this.isShowedItem = ko.computed({
-                read: function () {
-                    if (ko.unwrap(ths.isSelectedItem)) {
-                        if (!ko.unwrap(ths.selectedWell)) {
-                            return true;
-                        }
-                    }
-                },
-                deferEvaluation: true
-            });
 
             this.toDto = function () {
                 var dtoObj = {
@@ -413,7 +300,7 @@ define(['jquery',
             };
 
             // load wells
-            this.Wells(importWellsDto(data.WellsDto, ths));
+            this.wells(importWells(data.WellsDto, ths));
 
             /** Load sections */
             this.listOfSection(importListOfSectionOfWroupDto(data.ListOfSectionOfWroupDto, ths));
@@ -430,13 +317,13 @@ define(['jquery',
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="stage-constants.html">constants/stage-constants</a></li><li><a href="svg-elem-type-constants.html">constants/svg-elem-type-constants</a></li><li><a href="bindings.html">filters/bindings</a></li><li><a href="ajax-request.html">helpers/ajax-request</a></li><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="log-helper.html">helpers/log-helper</a></li><li><a href="area-of-map-of-wield.html">models/area-of-map-of-wield</a></li><li><a href="column-attribute.html">models/column-attribute</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="file-spec-of-history-of-well.html">models/file-spec-of-history-of-well</a></li><li><a href="history-of-well.html">models/history-of-well</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="log-of-well.html">models/log-of-well</a></li><li><a href="map-of-wield.html">models/map-of-wield</a></li><li><a href="prop-spec.html">models/prop-spec</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="stage-base.html">models/stage-base</a></li><li><a href="svg-elem.html">models/svg-elem</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="volume-of-well.html">models/volume-of-well</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-file.html">models/well-file</a></li><li><a href="wfm-image.html">models/wfm-image</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="widget.html">models/widget</a></li><li><a href="widgock.html">models/widgock</a></li><li><a href="widgout.html">models/widgout</a></li><li><a href="wield.html">models/wield</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="section-base.html">sections/section-base</a></li><li><a href="section-of-company.html">sections/section-of-company</a></li><li><a href="section-of-wegion.html">sections/section-of-wegion</a></li><li><a href="section-of-well.html">sections/section-of-well</a></li><li><a href="section-of-wield.html">sections/section-of-wield</a></li><li><a href="section-of-wroup.html">sections/section-of-wroup</a></li><li><a href="company_.html">services/company</a></li><li><a href="company-user.html">services/company-user</a></li><li><a href="file-spec_.html">services/file-spec</a></li><li><a href="file-spec-of-history-of-well_.html">services/file-spec-of-history-of-well</a></li><li><a href="image-of-history-of-well.html">services/image-of-history-of-well</a></li><li><a href="log-of-well_.html">services/log-of-well</a></li><li><a href="register.html">services/register</a></li><li><a href="svg-elem-of-log-of-well.html">services/svg-elem-of-log-of-well</a></li><li><a href="volume-of-well_.html">services/volume-of-well</a></li><li><a href="wegion_.html">services/wegion</a></li><li><a href="well_.html">services/well</a></li><li><a href="widget_.html">services/widget</a></li><li><a href="widgout_.html">services/widgout</a></li><li><a href="wield_.html">services/wield</a></li><li><a href="wroup_.html">services/wroup</a></li><li><a href="workspace.html">viewmodels/workspace</a></li><li><a href="sketch.html">well/sketch</a></li><li><a href="widget-summary.html">widgets/widget-summary</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="all-bindings.html">bindings/all-bindings</a></li><li><a href="svg-bindings.html">bindings/svg-bindings</a></li><li><a href="stage-constants.html">constants/stage-constants</a></li><li><a href="svg-elem-type-constants.html">constants/svg-elem-type-constants</a></li><li><a href="ajax-request.html">helpers/ajax-request</a></li><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="log-helper.html">helpers/log-helper</a></li><li><a href="area-of-map-of-wield.html">models/area-of-map-of-wield</a></li><li><a href="column-attribute.html">models/column-attribute</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="file-spec-of-history-of-well.html">models/file-spec-of-history-of-well</a></li><li><a href="history-of-well.html">models/history-of-well</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="log-of-well.html">models/log-of-well</a></li><li><a href="map-of-wield.html">models/map-of-wield</a></li><li><a href="prop-spec.html">models/prop-spec</a></li><li><a href="section-of-stage.html">models/section-of-stage</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="sketch-of-well.html">models/sketch-of-well</a></li><li><a href="svg-elem.html">models/svg-elem</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="volume-of-well.html">models/volume-of-well</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-file.html">models/well-file</a></li><li><a href="well-marker-of-map-of-wield.html">models/well-marker-of-map-of-wield</a></li><li><a href="wfm-image.html">models/wfm-image</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="widget.html">models/widget</a></li><li><a href="widgock.html">models/widgock</a></li><li><a href="widgout.html">models/widgout</a></li><li><a href="wield.html">models/wield</a></li><li><a href="workspace.html">models/workspace</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="stage-base.html">models\bases/stage-base</a></li><li><a href="auth.html">services/auth</a></li><li><a href="company_.html">services/company</a></li><li><a href="company-user.html">services/company-user</a></li><li><a href="file-spec_.html">services/file-spec</a></li><li><a href="file-spec-of-history-of-well_.html">services/file-spec-of-history-of-well</a></li><li><a href="image-of-history-of-well.html">services/image-of-history-of-well</a></li><li><a href="log-of-well_.html">services/log-of-well</a></li><li><a href="map-of-wield_.html">services/map-of-wield</a></li><li><a href="register.html">services/register</a></li><li><a href="sketch-of-well_.html">services/sketch-of-well</a></li><li><a href="svg-elem-of-log-of-well.html">services/svg-elem-of-log-of-well</a></li><li><a href="volume-of-well_.html">services/volume-of-well</a></li><li><a href="wegion_.html">services/wegion</a></li><li><a href="well_.html">services/well</a></li><li><a href="well-marker-of-map-of-wield_.html">services/well-marker-of-map-of-wield</a></li><li><a href="widget_.html">services/widget</a></li><li><a href="widgout_.html">services/widgout</a></li><li><a href="wield_.html">services/wield</a></li><li><a href="wroup_.html">services/wroup</a></li><li><a href="company__.html">viewmodels/company</a></li><li><a href="employee_.html">viewmodels/employee</a></li><li><a href="history-of-well_.html">viewmodels/history-of-well</a></li><li><a href="log-of-well__.html">viewmodels/log-of-well</a></li><li><a href="map-of-wield__.html">viewmodels/map-of-wield</a></li><li><a href="map-tool.html">viewmodels/map-tool</a></li><li><a href="scope-of-history-of-well.html">viewmodels/scope-of-history-of-well</a></li><li><a href="section-of-stage_.html">viewmodels/section-of-stage</a></li><li><a href="sketch-of-well__.html">viewmodels/sketch-of-well</a></li><li><a href="user-profile_.html">viewmodels/user-profile</a></li><li><a href="volume-of-well__.html">viewmodels/volume-of-well</a></li><li><a href="wegion__.html">viewmodels/wegion</a></li><li><a href="well__.html">viewmodels/well</a></li><li><a href="well-marker-of-map-of-wield__.html">viewmodels/well-marker-of-map-of-wield</a></li><li><a href="widget__.html">viewmodels/widget</a></li><li><a href="widgock_.html">viewmodels/widgock</a></li><li><a href="widgout__.html">viewmodels/widgout</a></li><li><a href="wield__.html">viewmodels/wield</a></li><li><a href="workspace_.html">viewmodels/workspace</a></li><li><a href="wroup__.html">viewmodels/wroup</a></li><li><a href="stage-base_.html">viewmodels\bases/stage-base</a></li><li><a href="stage-child-base.html">viewmodels\bases/stage-child-base</a></li><li><a href="widget-default-summary.html">viewmodels\widgets/widget-default-summary</a></li><li><a href="widget-well-history.html">viewmodels\widgets/widget-well-history</a></li><li><a href="widget-well-perfomance.html">viewmodels\widgets/widget-well-perfomance</a></li><li><a href="widget-well-sketch.html">viewmodels\widgets/widget-well-sketch</a></li><li><a href="widget-wield-map.html">viewmodels\widgets/widget-wield-map</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0</a> on Thu Jan 16 2014 20:35:04 GMT+0200 (EET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Sat Feb 01 2014 12:06:02 GMT+0200 (EET)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -1,4 +1,5 @@
-﻿define([
+﻿/** @module */
+define([
     'jquery',
     'knockout',
     'helpers/modal-helper'],
@@ -18,7 +19,7 @@
 
             /**
             * Model: history of well
-            * @type {<module:models/history-of-well>}
+            * @type {module:models/history-of-well}
             */
             this.mdlHistoryOfWell = mdlHistoryOfWell;
 

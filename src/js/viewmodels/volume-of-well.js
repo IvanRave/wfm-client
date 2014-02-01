@@ -12,7 +12,7 @@ define(['knockout'], function (ko) {
 
         /**
         * Model: volume
-        * @type {<models/volume-of-well>}
+        * @type {models/volume-of-well}
         */
         this.mdlVolumeOfWell = mdlVolumeOfWell;
 

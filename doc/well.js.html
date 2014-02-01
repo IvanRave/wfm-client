@@ -34,12 +34,11 @@ define([
     'helpers/modal-helper',
     'helpers/app-helper',
     'moment',
-    'models/stage-base',
-    'models/well-partials/perfomance-partial',
-    'models/well-partials/history-view',
-    'models/sections/section-of-well',
+    'models/bases/stage-base',
+    'models/stage-partials/well-perfomance-partial',
+    'models/section-of-stage',
     'models/well-file',
-    'models/well/sketch',
+    'models/sketch-of-well',
     'models/prop-spec',
     'services/well',
     'constants/stage-constants',
@@ -53,19 +52,20 @@ define([
     'models/test-scope',
 ], function ($, ko, datacontext, fileHelper, bootstrapModal,
     appHelper, appMoment, StageBase, wellPerfomancePartial,
-    HistoryView, SectionOfWell, WellFile, SketchOfWell,
-    PropSpec, wellService, stageConstants, VolumeOfWell,
+    SectionOfWell, WellFile, SketchOfWell,
+    PropSpec, wellService,
+    stageConstants, VolumeOfWell,
     volumeOfWellService, HistoryOfWell,
     LogOfWell, logOfWellService,
     fileSpecService, ColumnAttribute) {
     'use strict';
 
-    function importVolumes(data, slcVolume) {
-        return (data || []).map(function (item) { return new VolumeOfWell(item, slcVolume); });
+    function importVolumes(data) {
+        return (data || []).map(function (item) { return new VolumeOfWell(item); });
     }
 
-    function importLogsOfWell(data, slcLogOfWell) {
-        return (data || []).map(function (item) { return new LogOfWell(item, slcLogOfWell); });
+    function importLogsOfWell(data) {
+        return (data || []).map(function (item) { return new LogOfWell(item); });
     }
 
     /** WellFiles (convert data objects into array) */
@@ -88,9 +88,9 @@ define([
     /** Get well map list from well field maps with need well id */
     function getWellMapList(wellFieldMapList, wellId) {
         return $.grep(wellFieldMapList, function (elemValue) {
-            var wellInWellFieldMaps = ko.unwrap(elemValue.WellInWellFieldMaps);
+            var tmpWellMarkers = ko.unwrap(elemValue.wellMarkers);
 
-            var wellIdList = wellInWellFieldMaps.map(function (wfmElem) {
+            var wellIdList = tmpWellMarkers.map(function (wfmElem) {
                 return ko.unwrap(wfmElem.WellId);
             });
 
@@ -132,8 +132,8 @@ define([
         };
 
         /** Get workspace view model */
-        this.getRootViewModel = function () {
-            return this.getWellGroup().getRootViewModel();
+        this.getRootMdl = function () {
+            return this.getWellGroup().getRootMdl();
         };
 
         /**
@@ -268,24 +268,20 @@ define([
                     // find wellfield_id 
                     var wellFieldItem = ths.getWellGroup().getWellField();
 
-                    wellFieldItem.getWellFieldMaps(function () {
-                        var arr = ko.unwrap(wellFieldItem.WellFieldMaps);
-                        // TODO:???
-                        ////arr = $.grep(arr, function (arrElem, arrIndex) {
-                        ////    var cnt = 0;
-                        ////    $.each(arrElem.WellInWellFieldMaps(), function(wwfIndex, wwfElem){
-                        ////        if (wwfElem.Id === ths.Id) {
-                        ////            cnt++;
-                        ////        }
-                        ////    });
+                    wellFieldItem.loadMapsOfWield();
+                    ////function () {
+                    ////var arr = ko.unwrap(wellFieldItem.WellFieldMaps);
+                    // TODO:???
+                    ////arr = $.grep(arr, function (arrElem, arrIndex) {
+                    ////    var cnt = 0;
+                    ////    $.each(arrElem.wellMarkers(), function(wwfIndex, wwfElem){
+                    ////        if (wwfElem.Id === ths.Id) {
+                    ////            cnt++;
+                    ////        }
+                    ////    });
 
-                        ////    return cnt > 0;
-                        ////});
-
-                        if (arr.length > 0) {
-                            arr[0].showWellFieldMap();
-                        }
-                    });
+                    ////    return cnt > 0;
+                    ////});
 
                     break;
                     // no well in new map
@@ -295,7 +291,7 @@ define([
                     // get all maps
                     // get only maps where well_id == ths.Id
                     // get all maps
-                    // in WellInWellFieldMaps
+                    // in wellMarkers
                 }
             }
         };
@@ -331,19 +327,6 @@ define([
             read: function () {
                 if (ko.unwrap(ths.sectionWellFiles)) {
                     return ko.unwrap(ths.sectionWellFiles).length > 0;
-                }
-            },
-            deferEvaluation: true
-        });
-
-        /** Whether item and parent are selected */
-        this.isSelectedItem = ko.computed({
-            read: function () {
-                var tmpGroup = ths.getWellGroup();
-                if (ko.unwrap(tmpGroup.isSelectedItem)) {
-                    if (ths === ko.unwrap(tmpGroup.selectedWell)) {
-                        return true;
-                    }
                 }
             },
             deferEvaluation: true
@@ -466,7 +449,7 @@ define([
 
         // ==================================================================Well test end================================================================
 
-        this.WellInWellFieldMaps = ko.observableArray();
+        this.wellMarkers = ko.observableArray();
 
         // ================================================= Well log start =================================================
 
@@ -487,136 +470,113 @@ define([
             if (ko.unwrap(ths.isLoadedLogsOfWell)) { return; }
 
             logOfWellService.get(ths.id).done(function (res) {
-                ths.logsOfWell(importLogsOfWell(res, ths.slcLogOfWell));
+                ths.logsOfWell(importLogsOfWell(res));
                 ths.isLoadedLogsOfWell(true);
             });
         };
 
         /**
-        * Selected log of well
-        * @type {module:models/log-of-well}
+        * Get columns for log file
         */
-        this.slcLogOfWell = ko.observable();
+        this.getLogColumnAttributes = function(idOfNeedSection, idOfFileSpec, scsCallback){
+            fileSpecService.getColumnAttributes(ths.stageKey, idOfNeedSection, idOfFileSpec).done(function (res) {
+                // ColumnAttributes (convert data objects into array)
+                scsCallback(importColumnAttributes(res));
+            });
+        };
 
         /**
-        * Select log of well: do not set (slcLogOfWell) directly
+        * Create log of well
         */
-        this.selectLogOfWell = function (itemToSelect) {
-            ths.slcLogOfWell(itemToSelect);
-
-            ////logOfWellService.get(ths.idOfWell, itemToSelect.id).done(function () { });
+        this.postLogOfWell = function (tmpIdOfFileSpec, tmpName, selectedArray) {
+            logOfWellService.post(ths.id, {
+                IdOfWell: ths.id,
+                IdOfFileSpec: tmpIdOfFileSpec,
+                Name: tmpName,
+                Description: selectedArray.join(',')
+            }).done(function (createdDataOfLogOfWell) {
+                // Add to the list
+                ths.logsOfWell.push(new LogOfWell(createdDataOfLogOfWell));
+            });
         };
 
-        /** Select file and create log */
-        this.createLogOfWellFromFileSpec = function () {
-            var needSection = ths.getSectionByPatternId('well-log');
+        ////        fileSpecService.getColumnAttributes(ths.stageKey, needSection.id, tmpFileSpec.id).done(function (res) {
+        ////            // ColumnAttributes (convert data objects into array)
+        ////            var columnAttributes = importColumnAttributes(res);
 
-            // Select file section with volumes (load and unselect files)
-            ths.selectFileSection(needSection);
+        ////            // TODO: Style decor for attribute selection
+        ////            var selectDepth = document.createElement('select');
+        ////            $(selectDepth).addClass('pd-parameter');
 
-            var tmpModalFileMgr = ths.getWellGroup().getWellField().getWellRegion().getCompany().modalFileMgr;
+        ////            var selectSP = document.createElement('select');
+        ////            $(selectSP).addClass('pd-parameter');
 
-            // Calback for selected file
-            function mgrCallback() {
-                tmpModalFileMgr.okError('');
-                // Select file from file manager
-                var selectedFileSpecs = ko.unwrap(needSection.listOfFileSpec).filter(function (elem) {
-                    return ko.unwrap(elem.isSelected);
-                });
+        ////            var selectGR = document.createElement('select');
+        ////            $(selectGR).addClass('pd-parameter');
 
-                if (selectedFileSpecs.length !== 1) {
-                    tmpModalFileMgr.okError('need to select one file');
-                    return;
-                }
+        ////            var selectRS = document.createElement('select');
+        ////            $(selectRS).addClass('pd-parameter');
 
-                var tmpFileSpec = selectedFileSpecs[0];
+        ////            for (var caIndex = 0, caMaxIndex = columnAttributes.length; caIndex &lt; caMaxIndex; caIndex++) {
+        ////                var optionColumnAttribute = document.createElement('option');
+        ////                $(optionColumnAttribute)
+        ////                    .val(columnAttributes[caIndex].Id)
+        ////                    .html(columnAttributes[caIndex].Name + (columnAttributes[caIndex].Format() ? (', ' + columnAttributes[caIndex].Format()) : ''));
 
-                // 1. Select file
-                // 2. Show column attributes modal window
+        ////                switch (columnAttributes[caIndex].Name) {
+        ////                    case 'DEPTH': case 'DEPT': selectDepth.appendChild(optionColumnAttribute); break;
+        ////                    case 'SP': case 'SPC': selectSP.appendChild(optionColumnAttribute); break;
+        ////                    case 'GR': case 'HGRT': case 'GRDS': case 'SGR': case 'NGRT': selectGR.appendChild(optionColumnAttribute); break;
+        ////                    case 'RS': case 'RES': case 'RESD': selectRS.appendChild(optionColumnAttribute); break;
+        ////                }
+        ////            }
 
-                fileSpecService.getColumnAttributes(ths.stageKey, needSection.id, tmpFileSpec.id).done(function (res) {
-                    // ColumnAttributes (convert data objects into array)
-                    var columnAttributes = importColumnAttributes(res);
+        ////            var innerDiv = document.createElement('div');
+        ////            $(innerDiv).addClass('form-horizontal').append(
+        ////                bootstrapModal.gnrtDom('Depth', selectDepth),
+        ////                bootstrapModal.gnrtDom('GR', selectGR),
+        ////                bootstrapModal.gnrtDom('SP', selectSP),
+        ////                bootstrapModal.gnrtDom('Resistivity', selectRS)
+        ////            );
 
-                    // TODO: Style decor for attribute selection
-                    var selectDepth = document.createElement('select');
-                    $(selectDepth).addClass('pd-parameter');
+        ////            function submitFunction() {
+        ////                var selectedArray = $(innerDiv).find('.pd-parameter').map(function () {
+        ////                    return $(this).val();
+        ////                }).get();
 
-                    var selectSP = document.createElement('select');
-                    $(selectSP).addClass('pd-parameter');
+        ////                if (selectedArray.length &lt; 4) {
+        ////                    alert('All fields required');
+        ////                    return;
+        ////                }
 
-                    var selectGR = document.createElement('select');
-                    $(selectGR).addClass('pd-parameter');
+        ////                // 3. Select column attributes
+        ////                // 4. Add new log
 
-                    var selectRS = document.createElement('select');
-                    $(selectRS).addClass('pd-parameter');
+        ////                logOfWellService.post(ths.id, {
+        ////                    IdOfWell: ths.id,
+        ////                    IdOfFileSpec: tmpFileSpec.id,
+        ////                    Name: ko.unwrap(tmpFileSpec.name),
+        ////                    Description: selectedArray.join(',')
+        ////                }).done(function (createdDataOfLogOfWell) {
+        ////                    // Add to the list
+        ////                    ths.logsOfWell.push(new LogOfWell(createdDataOfLogOfWell));
+        ////                });
 
-                    for (var caIndex = 0, caMaxIndex = columnAttributes.length; caIndex &lt; caMaxIndex; caIndex++) {
-                        var optionColumnAttribute = document.createElement('option');
-                        $(optionColumnAttribute)
-                            .val(columnAttributes[caIndex].Id)
-                            .html(columnAttributes[caIndex].Name + (columnAttributes[caIndex].Format() ? (', ' + columnAttributes[caIndex].Format()) : ''));
+        ////                bootstrapModal.closeModalWindow();
+        ////            }
 
-                        switch (columnAttributes[caIndex].Name) {
-                            case 'DEPTH': case 'DEPT': selectDepth.appendChild(optionColumnAttribute); break;
-                            case 'SP': case 'SPC': selectSP.appendChild(optionColumnAttribute); break;
-                            case 'GR': case 'HGRT': case 'GRDS': case 'SGR': case 'NGRT': selectGR.appendChild(optionColumnAttribute); break;
-                            case 'RS': case 'RES': case 'RESD': selectRS.appendChild(optionColumnAttribute); break;
-                        }
-                    }
+        ////            tmpModalFileMgr.hide();
 
-                    var innerDiv = document.createElement('div');
-                    $(innerDiv).addClass('form-horizontal').append(
-                        bootstrapModal.gnrtDom('Depth', selectDepth),
-                        bootstrapModal.gnrtDom('GR', selectGR),
-                        bootstrapModal.gnrtDom('SP', selectSP),
-                        bootstrapModal.gnrtDom('Resistivity', selectRS)
-                    );
-
-                    function submitFunction() {
-                        var selectedArray = $(innerDiv).find('.pd-parameter').map(function () {
-                            return $(this).val();
-                        }).get();
-
-                        if (selectedArray.length &lt; 4) {
-                            alert('All fields required');
-                            return;
-                        }
-
-                        // 3. Select column attributes
-                        // 4. Add new log
-
-                        logOfWellService.post(ths.id, {
-                            IdOfWell: ths.id,
-                            IdOfFileSpec: tmpFileSpec.id,
-                            Name: ko.unwrap(tmpFileSpec.name),
-                            Description: selectedArray.join(',')
-                        }).done(function (createdDataOfLogOfWell) {
-                            // Add to the list
-                            ths.logsOfWell.push(new LogOfWell(createdDataOfLogOfWell));
-                        });
-
-                        bootstrapModal.closeModalWindow();
-                    }
-
-                    tmpModalFileMgr.hide();
-
-                    bootstrapModal.openModalWindow('Column match', innerDiv, submitFunction);
-                });
-            }
-
-            // Add to observable
-            tmpModalFileMgr.okCallback(mgrCallback);
-
-            // Notification
-            tmpModalFileMgr.okDescription('Please select a file for a log');
-
-            // Open file manager
-            tmpModalFileMgr.show();
-        };
+        ////            bootstrapModal.openModalWindow('Column match', innerDiv, submitFunction);
+             
+        ////};
 
         // ================================================= Well history section start =======================================
 
+        /**
+        * List of history records
+        * @type {Array.&lt;module:models/history-of-well>}
+        */
         this.historyList = ko.observableArray();
 
         this.isLoadedHistoryList = ko.observable(false);
@@ -630,54 +590,24 @@ define([
             });
         };
 
-        this.wellHistoryNew = {
-            startUnixTime: ko.observable(),
-            endUnixTime: ko.observable(),
-            wellId: ths.Id,
-            historyText: ''
-        };
-
-        this.isEnabledPostWellHistory = ko.computed({
-            read: function () {
-                if (ko.unwrap(ths.wellHistoryNew.startUnixTime)) {
-                    return true;
-                }
-                else {
-                    return false;
-                }
-            },
-            deferEvaluation: true
-        });
-
-        this.postWellHistory = function () {
-            if (ko.unwrap(ths.isEnabledPostWellHistory)) {
-                var wellHistoryNewData = ko.toJS(ths.wellHistoryNew);
-
-                if (wellHistoryNewData.startUnixTime) {
-                    if (!wellHistoryNewData.endUnixTime) {
-                        wellHistoryNewData.endUnixTime = wellHistoryNewData.startUnixTime;
-                    }
-
-                    datacontext.postWellHistory(wellHistoryNewData).done(function (result) {
-                        ths.historyList.push(new HistoryOfWell(result, ths));
-                        // Set to null for psblty creating new well history
-                        ths.wellHistoryNew.startUnixTime(null);
-                        ths.wellHistoryNew.endUnixTime(null);
-                    });
-                }
-            }
+        this.postHistoryOfWell = function (tmpStartUnixTime, tmpEndUnixTime, scsCallback) {
+            datacontext.postWellHistory({
+                wellId: ths.id,
+                historyText: '',
+                startUnixTime: tmpStartUnixTime,
+                endUnixTime: tmpEndUnixTime
+            }).done(function (result) {
+                ths.historyList.push(new HistoryOfWell(result, ths));
+                // Clean view values
+                scsCallback();
+            });
         };
 
         this.deleteWellHistory = function (itemForDelete) {
-            var tmpStartUnixTime = ko.unwrap(itemForDelete.startUnixTime);
-            if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + appMoment(tmpStartUnixTime * 1000).format('YYYY-MM-DD') + '" record?')) {
-                datacontext.deleteWellHistory(itemForDelete.id).done(function () {
-                    ths.historyList.remove(itemForDelete);
-                });
-            }
+            datacontext.deleteWellHistory(itemForDelete.id).done(function () {
+                ths.historyList.remove(itemForDelete);
+            });
         };
-
-        this.historyView = new HistoryView({}, ths.historyList);
 
         // ============================================================= Well history end ===============================================
 
@@ -690,7 +620,7 @@ define([
 
         ////this.checkReportSection = function (checkedReportSection) {
         ////    switch (checkedReportSection.id) {
-        ////        case 'map': ths.getWellGroup().getWellField().getWellFieldMaps(); break;
+        ////        case 'map': ths.getWellGroup().getWellField().loadMapsOfWield(); break;
         ////        case 'history': ths.loadWellHistoryList(); break;
         ////        case 'log': ths.getWellFileList('log', 'work'); break;
         ////        case 'pd': ths.perfomancePartial.getHstProductionDataSet(); break;
@@ -798,7 +728,7 @@ define([
         ////                        }
 
         ////                        if (mapBase64.length > 0) {
-        ////                            pdfHelper.writeMap(doc, mapBase64, 'Map', ths.selectedReportMap().WellInWellFieldMaps(), ths.selectedReportMap().WellFieldMapAreas());
+        ////                            pdfHelper.writeMap(doc, mapBase64, 'Map', ths.selectedReportMap().wellMarkers(), ths.selectedReportMap().WellFieldMapAreas());
         ////                        }
 
         ////                        if ($.inArray('history', ths.reportSectionIdList()) >= 0) {
@@ -1048,79 +978,28 @@ define([
         */
         this.isLoadedVolumes = ko.observable(false);
 
-        /**
-        * Selected volume
-        * @type {module:models/volume-of-well}
-        */
-        this.slcVolume = ko.observable();
-
-        /** Select volume to view */
-        this.selectVolume = function (volumeToSelect) {
-            ths.slcVolume(volumeToSelect);
-        };
-
         /** Load volumes */
         this.loadVolumes = function () {
             if (ko.unwrap(ths.isLoadedVolumes)) { return; }
 
             volumeOfWellService.get(ths.id).done(function (res) {
                 ths.isLoadedVolumes(true);
-                ths.volumes(importVolumes(res, ths.slcVolume));
+                ths.volumes(importVolumes(res));
             });
         };
 
-        /** Create volume from file: select file and create volume */
-        this.createVolumeFromFile = function () {
-            var needSection = ths.getSectionByPatternId('well-volume');
-
-            // Select file section with volumes (load and unselect files)
-            ths.selectFileSection(needSection);
-
-            var tmpModalFileMgr = ths.getWellGroup().getWellField().getWellRegion().getCompany().modalFileMgr;
-
-            // Calback for selected file
-            function mgrCallback() {
-                tmpModalFileMgr.okError('');
-                // Select file from file manager
-                var selectedFileSpecs = ko.unwrap(needSection.listOfFileSpec).filter(function (elem) {
-                    return ko.unwrap(elem.isSelected);
-                });
-
-                if (selectedFileSpecs.length !== 1) {
-                    tmpModalFileMgr.okError('need to select one file');
-                    return;
-                }
-
-                var tmpIdOfFileSpec = selectedFileSpecs[0].id;
-
-                volumeOfWellService.post(ths.id, {
-                    idOfWell: ths.id,
-                    idOfFileSpec: tmpIdOfFileSpec,
-                    name: ko.unwrap(selectedFileSpecs[0].name) || '',
-                    description: ''
-                }).done(function (res) {
-                    // Add to the current array
-                    ths.volumes.push(new VolumeOfWell(res, ths.slcVolume));
-                    tmpModalFileMgr.hide();
-                }).fail(function (jqXHR) {
-                    if (jqXHR.status === 422) {
-                        var resJson = jqXHR.responseJSON;
-                        require(['helpers/lang-helper'], function (langHelper) {
-                            var tmpProcessError = (langHelper.translate(resJson.errId) || '{{lang.unknownError}}');
-                            tmpModalFileMgr.okError(tmpProcessError);
-                        });
-                    }
-                });
-            }
-
-            // Add to observable
-            tmpModalFileMgr.okCallback(mgrCallback);
-
-            // Notification
-            tmpModalFileMgr.okDescription('Please select a file for a volume');
-
-            // Open file manager
-            tmpModalFileMgr.show();
+        /** Send volume to the server */
+        this.postVolumeOfWell = function (tmpIdOfFileSpec, tmpName, scsCallback, errCallback) {
+            volumeOfWellService.post(ths.id, {
+                idOfWell: ths.id,
+                idOfFileSpec: tmpIdOfFileSpec,
+                name: tmpName || '',
+                description: ''
+            }).done(function (res) {
+                // Add to the current array
+                ths.volumes.push(new VolumeOfWell(res));
+                scsCallback();
+            }).fail(errCallback);
         };
 
         //================================================= Edit well ======================================
@@ -1194,7 +1073,7 @@ define([
 
         this.perfomancePartial = wellPerfomancePartial.init(ths);
 
-        // Load column attributes - all loading logic in this file (not separated - not in perfomance-partial file)
+        // Load column attributes - all loading logic in this file (not separated - not in well-perfomance-partial file)
         this.perfomancePartial.prdColumnAttributeList(importColumnAttributes(datacontext.getColumnAttributesLocal()));
 
         this.mainPerfomanceView = ths.perfomancePartial.createPerfomanceView({
@@ -1234,13 +1113,13 @@ define([
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="stage-constants.html">constants/stage-constants</a></li><li><a href="svg-elem-type-constants.html">constants/svg-elem-type-constants</a></li><li><a href="bindings.html">filters/bindings</a></li><li><a href="ajax-request.html">helpers/ajax-request</a></li><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="log-helper.html">helpers/log-helper</a></li><li><a href="area-of-map-of-wield.html">models/area-of-map-of-wield</a></li><li><a href="column-attribute.html">models/column-attribute</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="file-spec-of-history-of-well.html">models/file-spec-of-history-of-well</a></li><li><a href="history-of-well.html">models/history-of-well</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="log-of-well.html">models/log-of-well</a></li><li><a href="map-of-wield.html">models/map-of-wield</a></li><li><a href="prop-spec.html">models/prop-spec</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="stage-base.html">models/stage-base</a></li><li><a href="svg-elem.html">models/svg-elem</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="volume-of-well.html">models/volume-of-well</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-file.html">models/well-file</a></li><li><a href="wfm-image.html">models/wfm-image</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="widget.html">models/widget</a></li><li><a href="widgock.html">models/widgock</a></li><li><a href="widgout.html">models/widgout</a></li><li><a href="wield.html">models/wield</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="section-base.html">sections/section-base</a></li><li><a href="section-of-company.html">sections/section-of-company</a></li><li><a href="section-of-wegion.html">sections/section-of-wegion</a></li><li><a href="section-of-well.html">sections/section-of-well</a></li><li><a href="section-of-wield.html">sections/section-of-wield</a></li><li><a href="section-of-wroup.html">sections/section-of-wroup</a></li><li><a href="company_.html">services/company</a></li><li><a href="company-user.html">services/company-user</a></li><li><a href="file-spec_.html">services/file-spec</a></li><li><a href="file-spec-of-history-of-well_.html">services/file-spec-of-history-of-well</a></li><li><a href="image-of-history-of-well.html">services/image-of-history-of-well</a></li><li><a href="log-of-well_.html">services/log-of-well</a></li><li><a href="register.html">services/register</a></li><li><a href="svg-elem-of-log-of-well.html">services/svg-elem-of-log-of-well</a></li><li><a href="volume-of-well_.html">services/volume-of-well</a></li><li><a href="wegion_.html">services/wegion</a></li><li><a href="well_.html">services/well</a></li><li><a href="widget_.html">services/widget</a></li><li><a href="widgout_.html">services/widgout</a></li><li><a href="wield_.html">services/wield</a></li><li><a href="wroup_.html">services/wroup</a></li><li><a href="workspace.html">viewmodels/workspace</a></li><li><a href="sketch.html">well/sketch</a></li><li><a href="widget-summary.html">widgets/widget-summary</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="all-bindings.html">bindings/all-bindings</a></li><li><a href="svg-bindings.html">bindings/svg-bindings</a></li><li><a href="stage-constants.html">constants/stage-constants</a></li><li><a href="svg-elem-type-constants.html">constants/svg-elem-type-constants</a></li><li><a href="ajax-request.html">helpers/ajax-request</a></li><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="log-helper.html">helpers/log-helper</a></li><li><a href="area-of-map-of-wield.html">models/area-of-map-of-wield</a></li><li><a href="column-attribute.html">models/column-attribute</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="file-spec-of-history-of-well.html">models/file-spec-of-history-of-well</a></li><li><a href="history-of-well.html">models/history-of-well</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="log-of-well.html">models/log-of-well</a></li><li><a href="map-of-wield.html">models/map-of-wield</a></li><li><a href="prop-spec.html">models/prop-spec</a></li><li><a href="section-of-stage.html">models/section-of-stage</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="sketch-of-well.html">models/sketch-of-well</a></li><li><a href="svg-elem.html">models/svg-elem</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="volume-of-well.html">models/volume-of-well</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-file.html">models/well-file</a></li><li><a href="well-marker-of-map-of-wield.html">models/well-marker-of-map-of-wield</a></li><li><a href="wfm-image.html">models/wfm-image</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="widget.html">models/widget</a></li><li><a href="widgock.html">models/widgock</a></li><li><a href="widgout.html">models/widgout</a></li><li><a href="wield.html">models/wield</a></li><li><a href="workspace.html">models/workspace</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="stage-base.html">models\bases/stage-base</a></li><li><a href="auth.html">services/auth</a></li><li><a href="company_.html">services/company</a></li><li><a href="company-user.html">services/company-user</a></li><li><a href="file-spec_.html">services/file-spec</a></li><li><a href="file-spec-of-history-of-well_.html">services/file-spec-of-history-of-well</a></li><li><a href="image-of-history-of-well.html">services/image-of-history-of-well</a></li><li><a href="log-of-well_.html">services/log-of-well</a></li><li><a href="map-of-wield_.html">services/map-of-wield</a></li><li><a href="register.html">services/register</a></li><li><a href="sketch-of-well_.html">services/sketch-of-well</a></li><li><a href="svg-elem-of-log-of-well.html">services/svg-elem-of-log-of-well</a></li><li><a href="volume-of-well_.html">services/volume-of-well</a></li><li><a href="wegion_.html">services/wegion</a></li><li><a href="well_.html">services/well</a></li><li><a href="well-marker-of-map-of-wield_.html">services/well-marker-of-map-of-wield</a></li><li><a href="widget_.html">services/widget</a></li><li><a href="widgout_.html">services/widgout</a></li><li><a href="wield_.html">services/wield</a></li><li><a href="wroup_.html">services/wroup</a></li><li><a href="company__.html">viewmodels/company</a></li><li><a href="employee_.html">viewmodels/employee</a></li><li><a href="history-of-well_.html">viewmodels/history-of-well</a></li><li><a href="log-of-well__.html">viewmodels/log-of-well</a></li><li><a href="map-of-wield__.html">viewmodels/map-of-wield</a></li><li><a href="map-tool.html">viewmodels/map-tool</a></li><li><a href="scope-of-history-of-well.html">viewmodels/scope-of-history-of-well</a></li><li><a href="section-of-stage_.html">viewmodels/section-of-stage</a></li><li><a href="sketch-of-well__.html">viewmodels/sketch-of-well</a></li><li><a href="user-profile_.html">viewmodels/user-profile</a></li><li><a href="volume-of-well__.html">viewmodels/volume-of-well</a></li><li><a href="wegion__.html">viewmodels/wegion</a></li><li><a href="well__.html">viewmodels/well</a></li><li><a href="well-marker-of-map-of-wield__.html">viewmodels/well-marker-of-map-of-wield</a></li><li><a href="widget__.html">viewmodels/widget</a></li><li><a href="widgock_.html">viewmodels/widgock</a></li><li><a href="widgout__.html">viewmodels/widgout</a></li><li><a href="wield__.html">viewmodels/wield</a></li><li><a href="workspace_.html">viewmodels/workspace</a></li><li><a href="wroup__.html">viewmodels/wroup</a></li><li><a href="stage-base_.html">viewmodels\bases/stage-base</a></li><li><a href="stage-child-base.html">viewmodels\bases/stage-child-base</a></li><li><a href="widget-default-summary.html">viewmodels\widgets/widget-default-summary</a></li><li><a href="widget-well-history.html">viewmodels\widgets/widget-well-history</a></li><li><a href="widget-well-perfomance.html">viewmodels\widgets/widget-well-perfomance</a></li><li><a href="widget-well-sketch.html">viewmodels\widgets/widget-well-sketch</a></li><li><a href="widget-wield-map.html">viewmodels\widgets/widget-wield-map</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0</a> on Thu Jan 16 2014 20:35:04 GMT+0200 (EET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Sat Feb 01 2014 12:06:02 GMT+0200 (EET)
 </footer>
 
 <script> prettyPrint(); </script>

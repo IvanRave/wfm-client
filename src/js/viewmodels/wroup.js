@@ -7,6 +7,7 @@ define(['knockout',
         VwmWell,
         VwmStageChildBase,
         VwmStageBase) {
+
         'use strict';
 
         /**
@@ -22,10 +23,6 @@ define(['knockout',
 
             this.fmgr = parentVwmWield.fmgr;
 
-            /**
-            * List of views of wells
-            * @type {Array.<module:viewmodels/well>}
-            */
             this.listOfVwmChild = ko.computed({
                 read: function () {
                     return ko.unwrap(mdlWroup.wells).map(function (elem) {
@@ -40,12 +37,7 @@ define(['knockout',
             // Has sections and widgets
             VwmStageBase.call(this, defaultSlcData.wroupSectionId, parentVwmWield.unqOfSlcVwmChild);
 
-            /**
-            * Select all ancestor's view models
-            */
             this.selectAncestorVwms = function () {
-                // 1. take parent view - company
-                // 2. take parent view of employee - userprofile
                 parentVwmWield.unqOfSlcVwmChild(ths.unq);
                 parentVwmWield.selectAncestorVwms();
             };

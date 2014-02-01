@@ -1,4 +1,5 @@
-﻿define(['knockout',
+﻿/** @module */
+define(['knockout',
     'viewmodels/widgets/widget-default-summary',
     ////'models/widgets/widget-well-perfomance',
     'viewmodels/widgets/widget-well-sketch',
@@ -21,7 +22,7 @@
 
             /**
             * Model: widget
-            * @type {<module:models/widget>}
+            * @type {module:models/widget}
             */
             this.mdlWidget = mdlWidget;
 

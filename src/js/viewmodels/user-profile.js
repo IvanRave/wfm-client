@@ -22,7 +22,7 @@ define(['knockout',
 
             /**
             * Link to user profile data model
-            * @type {<module:models/user-profile>}
+            * @type {module:models/user-profile}
             */
             this.mdlStage = mdlUserProfile;
 

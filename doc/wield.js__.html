@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: viewmodels/wield.js</title>
+    
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+    
+    <h1 class="page-title">Source: viewmodels/wield.js</h1>
+    
+    
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source"><code>﻿/** @module */
+define(['knockout',
+    'viewmodels/wroup',
+    'viewmodels/map-of-wield',
+    'viewmodels/bases/stage-child-base',
+    'viewmodels/bases/stage-base'],
+    function (ko,
+        VwmWroup,
+        VwmMapOfWield,
+        VwmStageChildBase,
+        VwmStageBase) {
+        'use strict';
+
+        /**
+        * View for well field maps: contains filtered maps and selected map
+        * @constructor
+        */
+        var exports = function (mdlWield, parentVwmWegion, defaultSlcData) {
+            ////* @param {object} opts - options for this view, like id of selected map, sort direction, filters etc.
+            ////* @param {Array.&lt;module:models/map-of-wield>} koMapsOfWield - models for maps (knockout wrapped)
+
+            /** Alternative for this */
+            var ths = this;
+
+            this.mdlStage = mdlWield;
+
+            this.unq = mdlWield.id;
+
+            /** Link to company file manager */
+            this.fmgr = parentVwmWegion.fmgr;
+
+            /**
+            * List of views of well wroups
+            * @type {Array.&lt;module:viewmodels/wroup>}
+            */
+            this.listOfVwmChild = ko.computed({
+                read: function () {
+                    return ko.unwrap(mdlWield.wroups).map(function (elem) {
+                        return new VwmWroup(elem, ths, defaultSlcData);
+                    });
+                },
+                deferEvaluation: true
+            });
+
+            // Has a children (wroups)
+            VwmStageChildBase.call(this, defaultSlcData.wroupId);
+            // Has sections and widgets
+            VwmStageBase.call(this, defaultSlcData.wieldSectionId, parentVwmWegion.unqOfSlcVwmChild);
+
+            /**
+            * Select all ancestor's view models
+            */
+            this.selectAncestorVwms = function () {
+                // 1. take parent view - company
+                // 2. take parent view of employee - userprofile
+                parentVwmWegion.unqOfSlcVwmChild(ths.unq);
+                parentVwmWegion.selectAncestorVwms();
+            };
+
+            /** List of views of maps of this well field view*/
+            this.listOfVwmMapOfWield = ko.computed({
+                read: function () {
+                    return ko.unwrap(mdlWield.WellFieldMaps).map(function (elem) {
+                        return new VwmMapOfWield(elem, ths.vidOfSlcVwmMapOfWield);
+                    });
+                },
+                deferEvaluation: true
+            });
+
+            /** Sorted list */
+            this.sortedListOfVwmMapOfWield = ko.computed({
+                read: function () {
+                    var tmpMaps = ko.unwrap(ths.listOfVwmMapOfWield);
+                    // Sort by name
+                    return tmpMaps.sort(function (a, b) {
+                        return ko.unwrap(a.mdlMapOfWield.name) > ko.unwrap(b.mdlMapOfWield.name);
+                    });
+                },
+                deferEvaluation: true
+            });
+
+            /** Id of selected view of map of well field = id of map */
+            this.vidOfSlcVwmMapOfWield = ko.observable();
+
+            /** Selected view of map of well field */
+            this.slcVwmMapOfWield = ko.computed({
+                read: function () {
+                    var tmpVid = ko.unwrap(ths.vidOfSlcVwmMapOfWield);
+                    var tmpListOfVwm = ko.unwrap(ths.sortedListOfVwmMapOfWield);
+                    if (tmpVid) {
+                        return tmpListOfVwm.filter(function (elem) {
+                            return elem.vid === tmpVid;
+                        })[0];
+                        // CAUTION: few viewmodels from one field model
+                    }
+                    else {
+                        var tmpFirstVwm = tmpListOfVwm[0];
+                        if (tmpFirstVwm){
+                            ths.vidOfSlcVwmMapOfWield(tmpFirstVwm.vid);
+                            // Select first map if no selected
+                            return tmpFirstVwm;
+                        }
+                    }
+                },
+                deferEvaluation: true
+            });
+
+            /** Select view */
+            this.selectVwmMapOfWield = function (vwmMapOfWieldToSelect) {
+                ths.vidOfSlcVwmMapOfWield(vwmMapOfWieldToSelect.vid);
+            };
+
+            /**
+            * Create map from file
+            */
+            this.createMapFromFile = function () {
+                ths.unzOfSlcVwmSectionFmg(ths.mdlStage.stageKey + '-map');
+
+                function mgrCallback() {
+                    ths.fmgr.okError('');
+
+                    var tmpSlcVwmSection = ko.unwrap(ths.slcVwmSectionFmg);
+
+                    if (!tmpSlcVwmSection) { throw new Error('No selected section'); }
+
+                    // Select file from file manager
+                    var selectedFileSpecs = ko.unwrap(tmpSlcVwmSection.mdlSection.listOfFileSpec).filter(function (elem) {
+                        return ko.unwrap(elem.isSelected);
+                    });
+
+                    if (selectedFileSpecs.length !== 1) {
+                        ths.fmgr.okError('need to select one file');
+                        return;
+                    }
+
+                    ths.mdlStage.postMapOfWield(selectedFileSpecs[0].id, ko.unwrap(selectedFileSpecs[0].name), function () {
+                        ths.fmgr.hide();
+                    });
+                }
+
+                // Add to observable
+                ths.fmgr.okCallback(mgrCallback);
+
+                // Notification
+                ths.fmgr.okDescription('Please select a file for a map');
+
+                // Open file manager
+                ths.fmgr.show();
+            };
+        };
+
+        return exports;
+    });</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="all-bindings.html">bindings/all-bindings</a></li><li><a href="svg-bindings.html">bindings/svg-bindings</a></li><li><a href="stage-constants.html">constants/stage-constants</a></li><li><a href="svg-elem-type-constants.html">constants/svg-elem-type-constants</a></li><li><a href="ajax-request.html">helpers/ajax-request</a></li><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="log-helper.html">helpers/log-helper</a></li><li><a href="area-of-map-of-wield.html">models/area-of-map-of-wield</a></li><li><a href="column-attribute.html">models/column-attribute</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="file-spec-of-history-of-well.html">models/file-spec-of-history-of-well</a></li><li><a href="history-of-well.html">models/history-of-well</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="log-of-well.html">models/log-of-well</a></li><li><a href="map-of-wield.html">models/map-of-wield</a></li><li><a href="prop-spec.html">models/prop-spec</a></li><li><a href="section-of-stage.html">models/section-of-stage</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="sketch-of-well.html">models/sketch-of-well</a></li><li><a href="svg-elem.html">models/svg-elem</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="volume-of-well.html">models/volume-of-well</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-file.html">models/well-file</a></li><li><a href="well-marker-of-map-of-wield.html">models/well-marker-of-map-of-wield</a></li><li><a href="wfm-image.html">models/wfm-image</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="widget.html">models/widget</a></li><li><a href="widgock.html">models/widgock</a></li><li><a href="widgout.html">models/widgout</a></li><li><a href="wield.html">models/wield</a></li><li><a href="workspace.html">models/workspace</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="stage-base.html">models\bases/stage-base</a></li><li><a href="auth.html">services/auth</a></li><li><a href="company_.html">services/company</a></li><li><a href="company-user.html">services/company-user</a></li><li><a href="file-spec_.html">services/file-spec</a></li><li><a href="file-spec-of-history-of-well_.html">services/file-spec-of-history-of-well</a></li><li><a href="image-of-history-of-well.html">services/image-of-history-of-well</a></li><li><a href="log-of-well_.html">services/log-of-well</a></li><li><a href="map-of-wield_.html">services/map-of-wield</a></li><li><a href="register.html">services/register</a></li><li><a href="sketch-of-well_.html">services/sketch-of-well</a></li><li><a href="svg-elem-of-log-of-well.html">services/svg-elem-of-log-of-well</a></li><li><a href="volume-of-well_.html">services/volume-of-well</a></li><li><a href="wegion_.html">services/wegion</a></li><li><a href="well_.html">services/well</a></li><li><a href="well-marker-of-map-of-wield_.html">services/well-marker-of-map-of-wield</a></li><li><a href="widget_.html">services/widget</a></li><li><a href="widgout_.html">services/widgout</a></li><li><a href="wield_.html">services/wield</a></li><li><a href="wroup_.html">services/wroup</a></li><li><a href="company__.html">viewmodels/company</a></li><li><a href="employee_.html">viewmodels/employee</a></li><li><a href="history-of-well_.html">viewmodels/history-of-well</a></li><li><a href="log-of-well__.html">viewmodels/log-of-well</a></li><li><a href="map-of-wield__.html">viewmodels/map-of-wield</a></li><li><a href="map-tool.html">viewmodels/map-tool</a></li><li><a href="scope-of-history-of-well.html">viewmodels/scope-of-history-of-well</a></li><li><a href="section-of-stage_.html">viewmodels/section-of-stage</a></li><li><a href="sketch-of-well__.html">viewmodels/sketch-of-well</a></li><li><a href="user-profile_.html">viewmodels/user-profile</a></li><li><a href="volume-of-well__.html">viewmodels/volume-of-well</a></li><li><a href="wegion__.html">viewmodels/wegion</a></li><li><a href="well__.html">viewmodels/well</a></li><li><a href="well-marker-of-map-of-wield__.html">viewmodels/well-marker-of-map-of-wield</a></li><li><a href="widget__.html">viewmodels/widget</a></li><li><a href="widgock_.html">viewmodels/widgock</a></li><li><a href="widgout__.html">viewmodels/widgout</a></li><li><a href="wield__.html">viewmodels/wield</a></li><li><a href="workspace_.html">viewmodels/workspace</a></li><li><a href="wroup__.html">viewmodels/wroup</a></li><li><a href="stage-base_.html">viewmodels\bases/stage-base</a></li><li><a href="stage-child-base.html">viewmodels\bases/stage-child-base</a></li><li><a href="widget-default-summary.html">viewmodels\widgets/widget-default-summary</a></li><li><a href="widget-well-history.html">viewmodels\widgets/widget-well-history</a></li><li><a href="widget-well-perfomance.html">viewmodels\widgets/widget-well-perfomance</a></li><li><a href="widget-well-sketch.html">viewmodels\widgets/widget-well-sketch</a></li><li><a href="widget-wield-map.html">viewmodels\widgets/widget-wield-map</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Sat Feb 01 2014 12:06:02 GMT+0200 (EET)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

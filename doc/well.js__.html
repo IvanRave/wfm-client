@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: viewmodels/well.js</title>
+    
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+    
+    <h1 class="page-title">Source: viewmodels/well.js</h1>
+    
+    
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source"><code>﻿/** @module */
+define([
+    'jquery',
+    'knockout',
+    'helpers/modal-helper',
+    'viewmodels/bases/stage-base',
+    'viewmodels/sketch-of-well',
+    'viewmodels/volume-of-well',
+    'viewmodels/scope-of-history-of-well',
+    'viewmodels/log-of-well'],
+    function (
+        $,
+        ko,
+        bootstrapModal,
+        VwmStageBase,
+        VwmSketchOfWell,
+        VwmVolumeOfWell,
+        VwmScopeOfHistoryOfWell,
+        VwmLogOfWell) {
+        'use strict';
+
+        /**
+        * Well view model
+        * @constructor
+        */
+        var exports = function (mdlWell, parentVwmWroup, defaultSlcData) {
+            var ths = this;
+
+            this.mdlStage = mdlWell;
+
+            this.unq = mdlWell.id;
+
+            this.fmgr = parentVwmWroup.fmgr;
+
+            // Has sections and widgets
+            VwmStageBase.call(this, defaultSlcData.wellSectionId, parentVwmWroup.unqOfSlcVwmChild);
+
+            /**
+            * Select all ancestor's view models
+            */
+            this.selectAncestorVwms = function () {
+                parentVwmWroup.unqOfSlcVwmChild(ths.unq);
+                parentVwmWroup.selectAncestorVwms();
+            };
+
+            //mdlSketchOfWell, koWellUnzOfSlcVwmSectionFmg, koSlcVwmSectionFmg,  fmgrLink
+            this.vwmSketchOfWell = new VwmSketchOfWell(ths.mdlStage.sketchOfWell, ths.unzOfSlcVwmSectionFmg, ths.slcVwmSectionFmg, ths.fmgr);
+
+            /**
+            * List of views of volume of well
+            * @type {Array.&lt;viewmodels/volume-of-well>}
+            */
+            this.listOfVwmVolumeOfWell = ko.computed({
+                read: function () {
+                    return ko.unwrap(ths.mdlStage.volumes).map(function (elem) {
+                        return new VwmVolumeOfWell(elem, ths.slcVwmVolumeOfWell);
+                    });
+                },
+                deferEvaluation: true
+            });
+
+            /**
+            * Id of selected view, equals id of file spec (guid)
+            * @type {string}
+            */
+            this.vidOfSlcVwmVolumeOfWell = ko.observable();
+
+            /**
+            * Selected view
+            */
+            this.slcVwmVolumeOfWell = ko.computed({
+                read: function () {
+                    var tmpVid = ko.unwrap(ths.vidOfSlcVwmVolumeOfWell);
+                    console.log('computed: volume', tmpVid);
+                    var tmpList = ko.unwrap(ths.listOfVwmVolumeOfWell);
+                    if (tmpVid) {
+                        return tmpList.filter(function (elem) {
+                            return elem.vid === tmpVid;
+                        })[0];
+                    }
+                    else {
+                        if (tmpList.length > 0) {
+                            // Computed observables doesn't execute from themself
+                            ths.vidOfSlcVwmVolumeOfWell(tmpList[0].vid);
+                            return tmpList[0];
+                        }
+                        // Select first element, if no selected
+                        //   return tmpList[0];
+                    }
+                },
+                deferEvaluation: true
+            });
+
+            /** Select view for volume of well */
+            this.selectVwmVolumeOfWell = function (tmpVwm) {
+                ths.vidOfSlcVwmVolumeOfWell(tmpVwm.vid);
+            };
+
+            /** Create volume from file: select file and create volume */
+            this.createVolumeFromFile = function () {
+                ths.unzOfSlcVwmSectionFmg(ths.mdlStage.stageKey + '-volume');
+
+                // Calback for selected file
+                function mgrCallback() {
+                    ths.fmgr.okError('');
+
+                    var tmpSlcVwmSection = ko.unwrap(ths.slcVwmSectionFmg);
+
+                    if (!tmpSlcVwmSection) { throw new Error('No selected section'); }
+
+                    // Select file from file manager
+                    var selectedFileSpecs = ko.unwrap(tmpSlcVwmSection.mdlSection.listOfFileSpec).filter(function (elem) {
+                        return ko.unwrap(elem.isSelected);
+                    });
+
+                    if (selectedFileSpecs.length !== 1) {
+                        ths.fmgr.okError('need to select one file');
+                        return;
+                    }
+
+                    ths.mdlStage.postVolumeOfWell(selectedFileSpecs[0].id, ko.unwrap(selectedFileSpecs[0].name), function () {
+                        // Success
+                        ths.fmgr.hide();
+                    }, function (jqXhr) {
+                        // Error
+                        if (jqXhr.status === 422) {
+                            var resJson = jqXhr.responseJSON;
+                            require(['helpers/lang-helper'], function (langHelper) {
+                                var tmpProcessError = (langHelper.translate(resJson.errId) || '{{lang.unknownError}}');
+                                ths.fmgr.okError(tmpProcessError);
+                            });
+                        }
+                    });
+                }
+
+                // Add to observable
+                ths.fmgr.okCallback(mgrCallback);
+
+                // Notification
+                ths.fmgr.okDescription('Please select a file for a volume');
+
+                // Open file manager
+                ths.fmgr.show();
+            };
+
+            this.vwmScopeOfHistoryOfWell = new VwmScopeOfHistoryOfWell({}, ths);
+
+            /**
+            * List of viewmodels of log of well
+            * @type {Array.&lt;module:viewmodels/log-of-well>}
+            */
+            this.listOfVwmLogOfWell = ko.computed({
+                read: function () {
+                    return ko.unwrap(mdlWell.logsOfWell).map(function (elem) {
+                        return new VwmLogOfWell(elem, ths.vidOfSlcVwmLogOfWell);
+                    });
+                },
+                deferEvaluation: true
+            });
+
+            /**
+            * View id for log
+            */
+            this.vidOfSlcVwmLogOfWell = ko.observable();
+
+            /**
+            * Selected view for log
+            *    By default: first log
+            * @type {module:viewmodels/log-of-well}
+            */
+            this.slcVwmLogOfWell = ko.computed({
+                read: function () {
+                    var tmpVid = ko.unwrap(ths.vidOfSlcVwmLogOfWell);
+                    var tmpList = ko.unwrap(ths.listOfVwmLogOfWell);
+                    if (tmpVid) {
+                        return tmpList.filter(function (elem) {
+                            return elem.vid === tmpVid;
+                        })[0];
+                    }
+                    else {
+                        var tmpObj = tmpList[0];
+                        if (tmpObj) {
+                            ths.vidOfSlcVwmLogOfWell(tmpObj.vid);
+                            return tmpObj;
+                        }
+                    }
+                },
+                deferEvaluation: true
+            });
+
+            /**
+            * Select viewmodel of log
+            */
+            this.selectVwmLogOfWell = function (vwmLogOfWellToSelect) {
+                ths.vidOfSlcVwmLogOfWell(vwmLogOfWellToSelect.vid);
+            };
+
+            /**
+            * Create log of well
+            */
+            this.createLogOfWellFromFileSpec = function () {
+                ths.unzOfSlcVwmSectionFmg(ths.mdlStage.stageKey + '-log');
+
+                // 1. Select file
+                // 2. Show column attributes modal window
+
+                // Calback for selected file
+                function mgrCallback() {
+                    ths.fmgr.okError('');
+
+                    var tmpSlcVwmSection = ko.unwrap(ths.slcVwmSectionFmg);
+
+                    if (!tmpSlcVwmSection) { throw new Error('No selected section'); }
+
+                    // Select file from file manager
+                    var selectedFileSpecs = ko.unwrap(tmpSlcVwmSection.mdlSection.listOfFileSpec).filter(function (elem) {
+                        return ko.unwrap(elem.isSelected);
+                    });
+
+                    if (selectedFileSpecs.length !== 1) {
+                        ths.fmgr.okError('need to select one file');
+                        return;
+                    }
+
+                    var tmpFileSpec = selectedFileSpecs[0];
+
+                    ths.mdlStage.getLogColumnAttributes(tmpSlcVwmSection.mdlSection.id, tmpFileSpec.id, function (columnAttributes) {
+                        ths.fmgr.hide();
+
+                        // TODO: Style decor for attribute selection
+                        var selectDepth = document.createElement('select');
+                        $(selectDepth).addClass('pd-parameter');
+
+                        var selectSP = document.createElement('select');
+                        $(selectSP).addClass('pd-parameter');
+
+                        var selectGR = document.createElement('select');
+                        $(selectGR).addClass('pd-parameter');
+
+                        var selectRS = document.createElement('select');
+                        $(selectRS).addClass('pd-parameter');
+
+                        for (var caIndex = 0, caMaxIndex = columnAttributes.length; caIndex &lt; caMaxIndex; caIndex++) {
+                            var optionColumnAttribute = document.createElement('option');
+                            $(optionColumnAttribute)
+                                .val(columnAttributes[caIndex].Id)
+                                .html(columnAttributes[caIndex].Name + (columnAttributes[caIndex].Format() ? (', ' + columnAttributes[caIndex].Format()) : ''));
+
+                            switch (columnAttributes[caIndex].Name) {
+                                case 'DEPTH': case 'DEPT': selectDepth.appendChild(optionColumnAttribute); break;
+                                case 'SP': case 'SPC': selectSP.appendChild(optionColumnAttribute); break;
+                                case 'GR': case 'HGRT': case 'GRDS': case 'SGR': case 'NGRT': selectGR.appendChild(optionColumnAttribute); break;
+                                case 'RS': case 'RES': case 'RESD': selectRS.appendChild(optionColumnAttribute); break;
+                            }
+                        }
+
+                        var innerDiv = document.createElement('div');
+                        $(innerDiv).addClass('form-horizontal').append(
+                            bootstrapModal.gnrtDom('Depth', selectDepth),
+                            bootstrapModal.gnrtDom('GR', selectGR),
+                            bootstrapModal.gnrtDom('SP', selectSP),
+                            bootstrapModal.gnrtDom('Resistivity', selectRS)
+                        );
+
+                        function submitFunction() {
+                            var selectedArray = $(innerDiv).find('.pd-parameter').map(function () {
+                                return $(this).val();
+                            }).get();
+
+                            if (selectedArray.length &lt; 4) {
+                                alert('All fields required');
+                                return;
+                            }
+
+                            // 3. Select column attributes
+                            // 4. Add new log
+
+                            mdlWell.postLogOfWell(tmpFileSpec.id, ko.unwrap(tmpFileSpec.name), selectedArray);
+
+                            bootstrapModal.closeModalWindow();
+                        }
+
+                        bootstrapModal.openModalWindow('Column match', innerDiv, submitFunction);
+                    });
+                }
+
+                // Add to observable
+                ths.fmgr.okCallback(mgrCallback);
+
+                // Notification
+                ths.fmgr.okDescription('Please select a file for a log');
+
+                // Open file manager
+                ths.fmgr.show();
+            };
+        };
+
+        return exports;
+    });</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="all-bindings.html">bindings/all-bindings</a></li><li><a href="svg-bindings.html">bindings/svg-bindings</a></li><li><a href="stage-constants.html">constants/stage-constants</a></li><li><a href="svg-elem-type-constants.html">constants/svg-elem-type-constants</a></li><li><a href="ajax-request.html">helpers/ajax-request</a></li><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="log-helper.html">helpers/log-helper</a></li><li><a href="area-of-map-of-wield.html">models/area-of-map-of-wield</a></li><li><a href="column-attribute.html">models/column-attribute</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="file-spec-of-history-of-well.html">models/file-spec-of-history-of-well</a></li><li><a href="history-of-well.html">models/history-of-well</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="log-of-well.html">models/log-of-well</a></li><li><a href="map-of-wield.html">models/map-of-wield</a></li><li><a href="prop-spec.html">models/prop-spec</a></li><li><a href="section-of-stage.html">models/section-of-stage</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="sketch-of-well.html">models/sketch-of-well</a></li><li><a href="svg-elem.html">models/svg-elem</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="volume-of-well.html">models/volume-of-well</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-file.html">models/well-file</a></li><li><a href="well-marker-of-map-of-wield.html">models/well-marker-of-map-of-wield</a></li><li><a href="wfm-image.html">models/wfm-image</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="widget.html">models/widget</a></li><li><a href="widgock.html">models/widgock</a></li><li><a href="widgout.html">models/widgout</a></li><li><a href="wield.html">models/wield</a></li><li><a href="workspace.html">models/workspace</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="stage-base.html">models\bases/stage-base</a></li><li><a href="auth.html">services/auth</a></li><li><a href="company_.html">services/company</a></li><li><a href="company-user.html">services/company-user</a></li><li><a href="file-spec_.html">services/file-spec</a></li><li><a href="file-spec-of-history-of-well_.html">services/file-spec-of-history-of-well</a></li><li><a href="image-of-history-of-well.html">services/image-of-history-of-well</a></li><li><a href="log-of-well_.html">services/log-of-well</a></li><li><a href="map-of-wield_.html">services/map-of-wield</a></li><li><a href="register.html">services/register</a></li><li><a href="sketch-of-well_.html">services/sketch-of-well</a></li><li><a href="svg-elem-of-log-of-well.html">services/svg-elem-of-log-of-well</a></li><li><a href="volume-of-well_.html">services/volume-of-well</a></li><li><a href="wegion_.html">services/wegion</a></li><li><a href="well_.html">services/well</a></li><li><a href="well-marker-of-map-of-wield_.html">services/well-marker-of-map-of-wield</a></li><li><a href="widget_.html">services/widget</a></li><li><a href="widgout_.html">services/widgout</a></li><li><a href="wield_.html">services/wield</a></li><li><a href="wroup_.html">services/wroup</a></li><li><a href="company__.html">viewmodels/company</a></li><li><a href="employee_.html">viewmodels/employee</a></li><li><a href="history-of-well_.html">viewmodels/history-of-well</a></li><li><a href="log-of-well__.html">viewmodels/log-of-well</a></li><li><a href="map-of-wield__.html">viewmodels/map-of-wield</a></li><li><a href="map-tool.html">viewmodels/map-tool</a></li><li><a href="scope-of-history-of-well.html">viewmodels/scope-of-history-of-well</a></li><li><a href="section-of-stage_.html">viewmodels/section-of-stage</a></li><li><a href="sketch-of-well__.html">viewmodels/sketch-of-well</a></li><li><a href="user-profile_.html">viewmodels/user-profile</a></li><li><a href="volume-of-well__.html">viewmodels/volume-of-well</a></li><li><a href="wegion__.html">viewmodels/wegion</a></li><li><a href="well__.html">viewmodels/well</a></li><li><a href="well-marker-of-map-of-wield__.html">viewmodels/well-marker-of-map-of-wield</a></li><li><a href="widget__.html">viewmodels/widget</a></li><li><a href="widgock_.html">viewmodels/widgock</a></li><li><a href="widgout__.html">viewmodels/widgout</a></li><li><a href="wield__.html">viewmodels/wield</a></li><li><a href="workspace_.html">viewmodels/workspace</a></li><li><a href="wroup__.html">viewmodels/wroup</a></li><li><a href="stage-base_.html">viewmodels\bases/stage-base</a></li><li><a href="stage-child-base.html">viewmodels\bases/stage-child-base</a></li><li><a href="widget-default-summary.html">viewmodels\widgets/widget-default-summary</a></li><li><a href="widget-well-history.html">viewmodels\widgets/widget-well-history</a></li><li><a href="widget-well-perfomance.html">viewmodels\widgets/widget-well-perfomance</a></li><li><a href="widget-well-sketch.html">viewmodels\widgets/widget-well-sketch</a></li><li><a href="widget-wield-map.html">viewmodels\widgets/widget-wield-map</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Sat Feb 01 2014 12:06:02 GMT+0200 (EET)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

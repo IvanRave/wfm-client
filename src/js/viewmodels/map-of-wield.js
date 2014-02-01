@@ -198,7 +198,7 @@ define(['knockout',
 
             /**
             * Selected well marker
-            * @type {<module:models/well-marker-of-map-of-wield>}
+            * @type {module:models/well-marker-of-map-of-wield}
             */
             this.slcVwmWellMarker = ko.observable();
 

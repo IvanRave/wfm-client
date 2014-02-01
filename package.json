@@ -32,7 +32,7 @@
     "grunt-contrib-less": "~0.8.3",
     "grunt-contrib-htmlmin": "~0.1.3",
     "grunt-contrib-jshint": "~0.7.2",
-    "grunt-jsdoc": "~0.4.2",
-    "assemble": "~0.4.32"
+    "assemble": "~0.4.32",
+    "grunt-jsdoc": "~0.5.1"
   }
 }

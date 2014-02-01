@@ -73,7 +73,7 @@ define([
 
             /**
             * User profile view model
-            * @type {<module:viewmodels/user-profile>}
+            * @type {module:viewmodels/user-profile}
             */
             this.vwmUserProfile = ko.computed({
                 read: function () {

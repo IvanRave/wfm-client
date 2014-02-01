@@ -16,7 +16,7 @@ define(['knockout',
 
             /**
             * Model widget layout
-            * @type {<module:models/widgout>}
+            * @type {module:models/widgout}
             */
             this.mdlWidgout = mdlWidgout;
 

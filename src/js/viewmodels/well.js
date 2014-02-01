@@ -166,7 +166,7 @@ define([
             /**
             * Selected view for log
             *    By default: first log
-            * @type {<module:viewmodels/log-of-well>}
+            * @type {module:viewmodels/log-of-well}
             */
             this.slcVwmLogOfWell = ko.computed({
                 read: function () {

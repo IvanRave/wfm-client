@@ -28,7 +28,7 @@ define(['knockout',
 
             /**
             * Id of parent stage of section. Duplicated in section.parentId and section.parent.id
-            * @type {number||string}
+            * @type {string}
             */
             this.idOfParentStage = idOfParentStage;
 

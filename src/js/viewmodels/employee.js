@@ -15,13 +15,13 @@ define(['knockout',
 
             /**
             * Data model for employee
-            * @type {<module:models/employee>}
+            * @type {module:models/employee}
             */
             this.mdlEmployee = mdlEmployee;
 
             /**
             * Main view model for company
-            * @type {<module:viewmodels/company>}
+            * @type {module:viewmodels/company}
             */
             this.vwmCompany = new VwmCompany(ths.mdlEmployee.company, koUnqOfSlcVwmStage, defaultSlcData);
 

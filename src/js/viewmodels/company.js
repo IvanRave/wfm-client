@@ -20,7 +20,7 @@ define(['knockout',
 
             /**
             * Company data model
-            * @type {<module:models/company>}
+            * @type {module:models/company}
             */
             this.mdlStage = mdlCompany;
 

@@ -1,4 +1,5 @@
-﻿define(['knockout',
+﻿/** @module */
+define(['knockout',
     'viewmodels/widget'],
     function (ko,
         VwmWidget) {
@@ -13,7 +14,7 @@
 
             /**
             * Model: widget block for this view
-            * @type {<module:models/widgock>}
+            * @type {module:models/widgock}
             */
             this.mdlWidgock = mdlWidgock;
 

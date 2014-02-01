@@ -5,13 +5,13 @@ define(['knockout'], function (ko) {
     /**
     * View model of section of stage (company-sections --- well sections)
     * @constructor
-    * @param {<module:models/section-of-stage>} mdlSection - Section model with data
+    * @param {module:models/section-of-stage} mdlSection - Section model with data
     * @param {object} vwmStage - Stage view, which may have sections (company ... well)
     */
     var exports = function (mdlSection, vwmStage) {
         /**
         * Section data model
-        * @type {<module:models/section-of-stage>}
+        * @type {module:models/section-of-stage}
         */
         this.mdlSection = mdlSection;
 

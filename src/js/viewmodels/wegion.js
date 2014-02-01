@@ -15,7 +15,7 @@ define(['knockout',
 
             /**
             * Model wegion
-            * @type {<module:models/wegion>}
+            * @type {module:models/wegion}
             */
             this.mdlStage = mdlWegion;
 
