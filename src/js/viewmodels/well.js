@@ -23,17 +23,25 @@ define([
         * Well view model
         * @constructor
         */
-        var exports = function (mdlWell, koUnqOfSlcVwmWell, defaultSlcData, fmgrLink) {
+        var exports = function (mdlWell, parentVwmWroup, defaultSlcData) {
             var ths = this;
 
             this.mdlStage = mdlWell;
 
             this.unq = mdlWell.id;
 
-            this.fmgr = fmgrLink;
+            this.fmgr = parentVwmWroup.fmgr;
 
             // Has sections and widgets
-            VwmStageBase.call(this, defaultSlcData.wellSectionId, koUnqOfSlcVwmWell);
+            VwmStageBase.call(this, defaultSlcData.wellSectionId, parentVwmWroup.unqOfSlcVwmChild);
+
+            /**
+            * Select all ancestor's view models
+            */
+            this.selectAncestorVwms = function () {
+                parentVwmWroup.unqOfSlcVwmChild(ths.unq);
+                parentVwmWroup.selectAncestorVwms();
+            };
 
             //mdlSketchOfWell, koWellUnzOfSlcVwmSectionFmg, koSlcVwmSectionFmg,  fmgrLink
             this.vwmSketchOfWell = new VwmSketchOfWell(ths.mdlStage.sketchOfWell, ths.unzOfSlcVwmSectionFmg, ths.slcVwmSectionFmg, ths.fmgr);

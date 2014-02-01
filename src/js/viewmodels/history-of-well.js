@@ -33,6 +33,8 @@
                         end: ko.unwrap(koEndUnixTime)
                     };
 
+                    console.log('tmpFilterUnixTime', tmpFilterUnixTime);
+
                     // Step 1: filter by date
                     if (tmpFilterUnixTime.start || tmpFilterUnixTime.end) {
                         var tmpElemUnixTime = {
@@ -40,11 +42,13 @@
                             end: ko.unwrap(ths.mdlHistoryOfWell.endUnixTime)
                         };
 
-                        if (tmpFilterUnixTime.start && (new Date(tmpFilterUnixTime * 1000) > new Date(tmpElemUnixTime.start * 1000))) {
+                        console.log('tmpElemUnixTime', tmpElemUnixTime);
+
+                        if (tmpFilterUnixTime.start && (tmpFilterUnixTime.start > tmpElemUnixTime.start)) {
                             return false;
                         }
 
-                        if (tmpFilterUnixTime.end && (new Date(tmpFilterUnixTime.end * 1000) < new Date(tmpElemUnixTime.end * 1000))) {
+                        if (tmpFilterUnixTime.end && (tmpFilterUnixTime.end < tmpElemUnixTime.end)) {
                             return false;
                         }
                     }

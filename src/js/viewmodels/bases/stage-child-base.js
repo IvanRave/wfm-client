@@ -65,8 +65,12 @@ define(['knockout',
 
                 // Select current child
                 ths.unqOfSlcVwmChild(vwmChildToActivate.unq);
-
+                
                 // Select all parents of this child
+                if (ths.selectAncestorVwms) {
+                    ths.selectAncestorVwms();
+                }
+
                 // ths - parent (like company)
                 // vwmChild - child (like wegion)
                 // slcVwmChild - selected child (like wegion)

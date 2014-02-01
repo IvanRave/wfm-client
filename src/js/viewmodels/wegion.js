@@ -10,7 +10,7 @@ define(['knockout',
         * Well region view model
         * @constructor
         */
-        var exports = function (mdlWegion, koUnqOfSlcVwmWegion, defaultSlcData, fmgrLink) {
+        var exports = function (mdlWegion, parentVwmCompany, defaultSlcData) {
             var ths = this;
 
             /**
@@ -23,7 +23,7 @@ define(['knockout',
             this.unq = mdlWegion.id;
 
             /** Link to file manager of company */
-            this.fmgr = fmgrLink;
+            this.fmgr = parentVwmCompany.fmgr;
 
             /**
             * List of views of well fields 
@@ -32,14 +32,24 @@ define(['knockout',
             this.listOfVwmChild = ko.computed({
                 read: function () {
                     return ko.unwrap(mdlWegion.wields).map(function (elem) {
-                        return new VwmWield(elem, ths.unqOfSlcVwmChild, defaultSlcData, ths.fmgr);
+                        return new VwmWield(elem, ths, defaultSlcData);
                     });
                 },
                 deferEvaluation: true
             });
 
             VwmStageChildBase.call(this, defaultSlcData.wieldId);
-            VwmStageBase.call(this, defaultSlcData.wegionSectionId, koUnqOfSlcVwmWegion);
+            VwmStageBase.call(this, defaultSlcData.wegionSectionId, parentVwmCompany.unqOfSlcVwmChild);
+
+            /**
+            * Select all ancestor's view models
+            */
+            this.selectAncestorVwms = function () {
+                // 1. take parent view - company
+                // 2. take parent view of employee - userprofile
+                parentVwmCompany.unqOfSlcVwmChild(ths.unq);
+                parentVwmCompany.selectAncestorVwms();
+            };
         };
 
         return exports;

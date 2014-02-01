@@ -1,11 +1,11 @@
 ﻿<!-- curent: vwmScopeOfHistoryOfWell -->
 <div>
-    <span>{{capitalizeFirst lang.filterByDate}}:</span>
-    <input class="input-sm" type="text" size="10" data-bind="datepicker: startDate, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }" />
-    <span> - </span>
-    <input class="input-sm" type="text" size="10" data-bind="datepicker: endDate, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }" />
-    <button class="btn btn-default btn-sm" type="button" data-bind="click: changeSortByDateOrder">
-        {{capitalizeFirst lang.sortByDate}} <i class="glyphicon" data-bind="css: sortByDateCss"></i>
-    </button>
-    <select class="input-sm" data-bind="options: jobTypeList, optionsText: 'name', optionsValue: 'id', value: jobTypeId, optionsCaption: '{{capitalizeFirst lang.filterByJobType}}...'"></select>
+  <span>{{capitalizeFirst lang.filterByDate}}:</span>
+  <input class="input-sm" type="text" size="10" data-bind="datepicker: startDate, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }" />
+  <span> - </span>
+  <input class="input-sm" type="text" size="10" data-bind="datepicker: endDate, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }" />
+  <button class="btn btn-default btn-sm" type="button" data-bind="click: changeSortByDateOrder">
+    {{capitalizeFirst lang.sortByDate}} <i class="glyphicon" data-bind="css: sortByDateCss"></i>
+  </button>
+  <select class="input-sm" data-bind="options: jobTypeList, optionsText: 'name', optionsValue: 'id', value: jobTypeId, optionsCaption: '{{capitalizeFirst lang.filterByJobType}}...'"></select>
 </div>

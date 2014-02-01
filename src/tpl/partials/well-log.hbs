@@ -42,21 +42,28 @@
     </div>
     <div class="pull-right" style="width: 280px">
       <div class="clearfix">
-        <h5 class="pull-left">Logs:</h5>
         <!-- ko if: $root.isEmployeeInEditMode -->
         <div class="pull-right">
           <button class="btn btn-default btn-xs" data-bind="click: createLogOfWellFromFileSpec">Create log...</button>
         </div>
         <!-- /ko -->
-      </div>     
-      <ul class="list-unstyled wfm-light-list" data-bind="foreach: listOfVwmLogOfWell">
-        <li data-bind="css: {'active' : isSlc }">
-          <i class="glyphicon glyphicon-picture margin-min-right"></i>
-          <span class="pointer link-view" data-bind="click: $parent.selectVwmLogOfWell">
-            <span data-bind="text: mdlLogOfWell.name"></span>
-          </span>
-        </li>
-      </ul>
+      </div>
+      <div data-bind="slideVisible: listOfVwmLogOfWell().length === 0">
+        <p class="bg-primary">
+          No logs
+        </p>
+      </div>
+      <div data-bind="slideVisible: listOfVwmLogOfWell().length > 0">
+        <h5>Logs:</h5>
+        <ul class="list-unstyled wfm-light-list" data-bind="foreach: listOfVwmLogOfWell">
+          <li data-bind="css: {'active' : isSlc }">
+            <i class="glyphicon glyphicon-picture margin-min-right"></i>
+            <span class="pointer link-view" data-bind="click: $parent.selectVwmLogOfWell">
+              <span data-bind="text: mdlLogOfWell.name"></span>
+            </span>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 </div>

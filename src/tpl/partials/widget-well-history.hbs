@@ -25,13 +25,11 @@
                     </span>
                   </div>
                   <div data-bind="visible: historyText">
-                    <blockquote class="pre-wrap-text" data-bind="text: historyText"></blockquote>
+                    <div class="well well-sm pre-wrap-text" data-bind="text: historyText"></div>
                   </div>
-                  <div data-bind="with: jobType">
-                    <blockquote>
-                      <span class="bld">{{capitalizeFirst lang.jobType}}:</span>
-                      <span data-bind="text: name"></span>
-                    </blockquote>
+                  <div class="text-right" data-bind="with: jobType">
+                    <span class="bld">{{capitalizeFirst lang.jobType}}:</span>
+                    <span data-bind="text: name"></span>
                   </div>
                   <div data-bind="foreach: WfmImages">
                     <span class="pointer" data-bind="panzoomImg: {src: croppedImageUrl}">

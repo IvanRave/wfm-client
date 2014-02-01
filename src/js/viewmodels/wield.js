@@ -15,7 +15,7 @@ define(['knockout',
         * View for well field maps: contains filtered maps and selected map
         * @constructor
         */
-        var exports = function (mdlWield, koUnqOfSlcVwmWield, defaultSlcData, fmgrLink) {
+        var exports = function (mdlWield, parentVwmWegion, defaultSlcData) {
             ////* @param {object} opts - options for this view, like id of selected map, sort direction, filters etc.
             ////* @param {Array.<module:models/map-of-wield>} koMapsOfWield - models for maps (knockout wrapped)
 
@@ -27,7 +27,7 @@ define(['knockout',
             this.unq = mdlWield.id;
 
             /** Link to company file manager */
-            this.fmgr = fmgrLink;
+            this.fmgr = parentVwmWegion.fmgr;
 
             /**
             * List of views of well wroups
@@ -36,7 +36,7 @@ define(['knockout',
             this.listOfVwmChild = ko.computed({
                 read: function () {
                     return ko.unwrap(mdlWield.wroups).map(function (elem) {
-                        return new VwmWroup(elem, ths.unqOfSlcVwmChild, defaultSlcData, ths.fmgr);
+                        return new VwmWroup(elem, ths, defaultSlcData);
                     });
                 },
                 deferEvaluation: true
@@ -45,7 +45,17 @@ define(['knockout',
             // Has a children (wroups)
             VwmStageChildBase.call(this, defaultSlcData.wroupId);
             // Has sections and widgets
-            VwmStageBase.call(this, defaultSlcData.wieldSectionId, koUnqOfSlcVwmWield);
+            VwmStageBase.call(this, defaultSlcData.wieldSectionId, parentVwmWegion.unqOfSlcVwmChild);
+
+            /**
+            * Select all ancestor's view models
+            */
+            this.selectAncestorVwms = function () {
+                // 1. take parent view - company
+                // 2. take parent view of employee - userprofile
+                parentVwmWegion.unqOfSlcVwmChild(ths.unq);
+                parentVwmWegion.selectAncestorVwms();
+            };
 
             /** List of views of maps of this well field view*/
             this.listOfVwmMapOfWield = ko.computed({
