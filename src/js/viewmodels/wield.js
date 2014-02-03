@@ -1,10 +1,14 @@
 ﻿/** @module */
-define(['knockout',
+define(['jquery',
+    'knockout',
+    'helpers/modal-helper',
     'viewmodels/wroup',
     'viewmodels/map-of-wield',
     'viewmodels/bases/stage-child-base',
     'viewmodels/bases/stage-base'],
-    function (ko,
+    function ($,
+        ko,
+        modalHelper,
         VwmWroup,
         VwmMapOfWield,
         VwmStageChildBase,
@@ -146,6 +150,25 @@ define(['knockout',
 
                 // Open file manager
                 ths.fmgr.show();
+            };
+
+            this.addVwmWroup = function () {
+                var inputName = document.createElement('input');
+                inputName.type = 'text';
+                $(inputName).prop({ 'required': true }).addClass('form-control');
+
+                var innerDiv = document.createElement('div');
+                $(innerDiv).addClass('form-horizontal').append(
+                    modalHelper.gnrtDom('Name', inputName)
+                );
+
+                function submitFunction() {
+                    mdlWield.postWroup($(inputName).val());
+
+                    modalHelper.closeModalWindow();
+                }
+
+                modalHelper.openModalWindow('Well group', innerDiv, submitFunction);
             };
         };
 

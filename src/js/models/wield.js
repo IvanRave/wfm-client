@@ -3,7 +3,6 @@ define(['jquery',
     'knockout',
     'services/datacontext',
     'helpers/file-helper',
-    'helpers/modal-helper',
     'models/bases/stage-base',
     'models/map-of-wield',
     'services/map-of-wield',
@@ -14,7 +13,7 @@ define(['jquery',
     'services/wroup',
     'constants/stage-constants'],
     function ($, ko, datacontext,
-        fileHelper, bootstrapModal, StageBase, MapOfWield, mapOfWieldService, SectionOfWield, WellGroup,
+        fileHelper, StageBase, MapOfWield, mapOfWieldService, SectionOfWield, WellGroup,
         PropSpec, wieldService, wroupService, stageConstants) {
         'use strict';
 
@@ -170,29 +169,15 @@ define(['jquery',
                 ////ths.loadWellHistoryList();
             };
 
-            this.addWellGroup = function () {
-                var inputName = document.createElement('input');
-                inputName.type = 'text';
-                $(inputName).prop({ 'required': true }).addClass('form-control');
-
-                var innerDiv = document.createElement('div');
-                $(innerDiv).addClass('form-horizontal').append(
-                    bootstrapModal.gnrtDom('Name', inputName)
-                );
-
-                function submitFunction() {
-                    wroupService.post({
-                        'Name': $(inputName).val(),
-                        'Description': '',
-                        'WellFieldId': ths.Id
-                    }).done(function (result) {
-                        ths.wroups.push(new WellGroup(result, ths));
-                    });
-
-                    bootstrapModal.closeModalWindow();
-                }
-
-                bootstrapModal.openModalWindow("Well group", innerDiv, submitFunction);
+            /** Post well group */
+            this.postWroup = function (tmpName) {
+                wroupService.post({
+                    'Name': tmpName,
+                    'Description': '',
+                    'WellFieldId': ths.Id
+                }).done(function (result) {
+                    ths.wroups.push(new WellGroup(result, ths));
+                });
             };
 
             this.removeChild = function (wellGroupForDelete) {

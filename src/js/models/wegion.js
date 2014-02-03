@@ -2,14 +2,13 @@
 define(['jquery',
     'knockout',
     'services/datacontext',
-    'helpers/modal-helper',
     'models/wield',
     'models/bases/stage-base',
     'models/section-of-stage',
     'models/prop-spec',
     'services/wegion',
     'services/wield',
-    'constants/stage-constants'], function ($, ko, datacontext, bootstrapModal,
+    'constants/stage-constants'], function ($, ko, datacontext,
         WellField, StageBase, SectionOfWegion, PropSpec, wegionService, wieldService, stageConstants) {
         'use strict';
 
@@ -90,6 +89,17 @@ define(['jquery',
                 wegionService.put(ths.id, ths.toDto());
             };
 
+            /** Post well field */
+            this.postWield = function (tmpName) {
+                wieldService.post({
+                    'Name': tmpName,
+                    'Description': '',
+                    'WellRegionId': ths.id
+                }).done(function (result) {
+                    ths.wields.push(new WellField(result, ths));
+                });
+            };
+
             /// <summary>
             /// Convert model to plain json object without unnecessary properties. Can be used to send requests (with clean object) to the server
             /// </summary>
@@ -116,34 +126,6 @@ define(['jquery',
 
             /** Load sections */
             this.listOfSection(importListOfSectionOfWegionDto(data.ListOfSectionOfWegionDto, ths));
-        };
-
-        exports.prototype.addWellField = function () {
-            var parentItem = this;
-
-            var inputName = document.createElement('input');
-            inputName.type = 'text';
-            $(inputName).prop({ 'required': true }).addClass('form-control');
-
-            var innerDiv = document.createElement('div');
-
-            $(innerDiv).addClass('form-horizontal').append(
-                bootstrapModal.gnrtDom('Name', inputName)
-            );
-
-            function submitFunction() {
-                wieldService.post({
-                    'Name': $(inputName).val(),
-                    'Description': '',
-                    'WellRegionId': parentItem.id
-                }).done(function (result) {
-                    parentItem.wields.push(new WellField(result, parentItem));
-                });
-
-                bootstrapModal.closeModalWindow();
-            }
-
-            bootstrapModal.openModalWindow('Well field', innerDiv, submitFunction);
         };
 
         return exports;

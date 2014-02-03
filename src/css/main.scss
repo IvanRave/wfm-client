@@ -1,18 +1,56 @@
-﻿/*z-index:
-    9999: spinner
-    1030: top and bottom fixed panel, fixed wfm-nav menu
-    1040: modal window has
-    99: workspace sidebar trailer
-    -1: body
-*/
+﻿//-- SASS: $ gem install sass --pre
+
+//== Need tool for automatically convert CSS to SASS using grunt: 
+//== to import css files as plain text instead link, use sass-css-importer 
+//== $ gem install --pre sass-css-importer
+
+//-- Redefine bootstrap properties (with !default)
+$icon-font-path: "../fonts/";
+
+//-- Import section
+
+//== Bootstrap
+@import "bootstrap/bootstrap";
+
+//== File upload
+@import "fileupload/fileupload";
+
+//== Pickadate
+@import "pickadate/default";
+@import "pickadate/default-date";
+@import "pickadate/default-time";
+
+//== JCrop without image
+@import "jcrop/jcrop";
+
+//-- Z-index WFM list
+
+$zindex-spinner: 9999;              // Spinner (loading)
+                                    // 1040: bootstrap modal window
+$zindex-sidebar-toggle: 1031;       // Button to show/hide sidebar
+$zindex-section-panel: 1031;        // Panel with sections (icons and titles)
+$zindex-top-tab-panel: 1031;        // Panel with file manager and dashboard buttons
+$zindex-fixed-panel: 1030;          // Top and bottom fixed panel, fixed wfm-nav menu
+                                    // 99: workspace sidebar trailer
+$zindex-sidebar-wrap-visible: 98;   // Sidebar with scroll (z-index for scroll - 99)
+$zindex-log-las-text-creator: 15;   // Log element to create text (over text block)
+$zindex-log-las-text: 11;           // Log text block (over base)
+$zindex-log-las-draw: 3;            // Log draw canvas (over base)
+$zindex-log-las-base: 2;            // Log base canvas
+$zindex-log-las-img: 1;             // Log image (under base)
+$zindex-log-las-wrap: 1;            // Log wrap (contain upper blocks)
+
+
+//-- Other properties
+
+$wfm-nav-height: 32px;
+
+
+//-- Main css
 
 html, body {
     height: 100%;
     /* The html and body elements cannot have any padding or margin. */
-}
-
-body {
-    z-index: -1;
 }
 
 .wfm-nav {
@@ -20,9 +58,9 @@ body {
     right: 0;
     left: 0;
     padding: 0 10px;
-    z-index: 1030;
-    min-height: 32px;
-    height: 32px;
+    z-index: $zindex-fixed-panel;
+    min-height: $wfm-nav-height;
+    height: $wfm-nav-height;
 }
 
     .wfm-nav div {
@@ -39,7 +77,7 @@ body {
 footer {
     height: 50px;
     padding: 0;
-    z-index: 1030;
+    z-index: $zindex-fixed-panel;
 }
 
     footer .footer-logo-wrap {
@@ -192,7 +230,7 @@ footer {
     padding: 10px;
     margin-left: -50px;
     margin-top: -50px;
-    z-index: 9999;
+    z-index: $zindex-spinner;
     overflow: auto;
     display: none;
     position: fixed;
@@ -419,7 +457,7 @@ footer {
 .sidebar-toggle {
     width: 20px;
     height: 20px;
-    z-index: 1031;
+    z-index: $zindex-sidebar-toggle;
 }
 
     .sidebar-toggle button {
@@ -441,7 +479,7 @@ footer {
     .wfm-top-tab-panel {
         position: fixed;
         top: 0;
-        z-index: 1031;
+        z-index: $zindex-top-tab-panel;
         padding-top: 1px;
     }
 
@@ -480,14 +518,13 @@ footer {
         /*width: 210px;*/
         top: 32px;
         bottom: 50px;
-        z-index: 98;
-        /*z-index for scroll - 99*/
+        z-index: $zindex-sidebar-wrap-visible;
     }
 
-    .wfm-bottom-fix {
+    .wfm-section-panel {
         position: fixed;
         bottom: 0;
-        z-index: 1031;
+        z-index: $zindex-section-panel;
     }
 
     .work-area {
@@ -866,12 +903,17 @@ ul.wfm-light-list {
             font-weight: bold;
         }
 
+.log-las-wrap {
+    position: relative;
+    z-index: $zindex-log-las-wrap;
+}
+
 .log-las-base {
     position: absolute;
     top: 0;
     left: 0;
     border: 2px dashed #ccc;
-    z-index: 2;
+    z-index: $zindex-log-las-base;
 }
 
 .log-las-img-wrap {
@@ -882,7 +924,7 @@ ul.wfm-light-list {
 }
 
     .log-las-img-wrap.log-las-img {
-        z-index: 1;
+        z-index: $zindex-log-las-img;
         width: 624px;
         border: 2px solid #ccc;
     }
@@ -891,7 +933,7 @@ ul.wfm-light-list {
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 3;
+    z-index: $zindex-log-las-draw;
     border: 2px dashed #aaa;
     display: none;
 }
@@ -905,9 +947,21 @@ ul.wfm-light-list {
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 11;
+    z-index: $zindex-log-las-text;
     border: 2px dashed #aaa;
     display: none;
+}
+
+.log-las-text-creator {
+    position: absolute;
+    white-space: nowrap;
+    font-size: 12px;
+    font-family: 'sans-serif';
+    z-index: $zindex-log-las-text-creator;
+}
+
+.log-las-podl {
+    color: #888;
 }
 
 .wield-map-svg {

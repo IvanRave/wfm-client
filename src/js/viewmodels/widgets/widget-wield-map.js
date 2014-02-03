@@ -61,12 +61,14 @@ define(['knockout', 'viewmodels/map-of-wield'], function (ko, VwmMapOfWield) {
 
         /** Convert to plain JSON to send to the server as widget settings */
         this.toStringifyOpts = function () {
+            var tmpSlcVwm = ko.unwrap(ths.slcVwmMapOfWield);
+
             return JSON.stringify({
-                'IdOfSlcMapOfWield': ko.unwrap(ths.slcVwmMapOfWield).vid,
+                'IdOfSlcMapOfWield': tmpSlcVwm ? tmpSlcVwm.vid : null,
                 'IsVisName': ko.unwrap(ths.isVisName),
                 'IsVisImg': ko.unwrap(ths.isVisImg),
-                'TransformScale': ko.unwrap(ko.unwrap(ths.slcVwmMapOfWield).transformAttr).scale,
-                'TransformTranslate': ko.unwrap(ko.unwrap(ths.slcVwmMapOfWield).transformAttr).translate,
+                'TransformScale': tmpSlcVwm ? ko.unwrap(tmpSlcVwm.transformAttr).scale : null,
+                'TransformTranslate': tmpSlcVwm ? ko.unwrap(tmpSlcVwm.transformAttr).translate : null
             });
         };
     };

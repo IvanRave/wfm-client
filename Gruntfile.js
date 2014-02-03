@@ -111,17 +111,25 @@ module.exports = function (grunt) {
                     src: []
                 }]
             },
-            bower_css: {
+            // Ready css files to import to main sass
+            bower_css_sass: {
+                files: {
+                    '<%= trgt %>/css/pickadate/_default.scss': '<%= bowerFolder %>/pickadate/lib/themes/default.css',
+                    '<%= trgt %>/css/pickadate/_default-date.scss': '<%= bowerFolder %>/pickadate/lib/themes/default.date.css',
+                    '<%= trgt %>/css/pickadate/_default-time.scss': '<%= bowerFolder %>/pickadate/lib/themes/default.time.css',
+                    '<%= trgt %>/css/fileupload/_fileupload.scss':  '<%= bowerFolder %>/blueimp-file-upload/css/jquery.fileupload.css',
+                    '<%= trgt %>/css/jcrop/_jcrop.scss':  '<%= bowerFolder %>/jcrop/css/jquery.Jcrop.css',
+                    // Copy as usual image in the css root for jcrop stylesheet
+                    '<%= trgt %>/css/Jcrop.gif':  '<%= bowerFolder %>/jcrop/css/Jcrop.gif'
+                }
+            },
+            bower_bootstrap_sass: {
                 files: [{
                     expand: true,
-                    dot: true,
                     flatten: true,
-                    cwd: '<%= bowerFolder %>/',
-                    dest: '<%= trgt %>/css/',
-                    src: ['bootstrap/dist/css/bootstrap.css', 'bootstrap/dist/css/bootstrap-theme.css',
-                    'pickadate/lib/themes/default.css', 'pickadate/lib/themes/default.date.css', 'pickadate/lib/themes/default.time.css',
-                    'blueimp-file-upload/css/jquery.fileupload.css',
-                    'jcrop/css/jquery.Jcrop.css', 'jcrop/css/Jcrop.gif']
+                    cwd: '<%= bowerFolder %>/bootstrap-sass/vendor/assets/stylesheets/bootstrap/',
+                    src: ['*.scss'], // Redefined variables in project main scss file
+                    dest: '<%= trgt %>/css/bootstrap/'
                 }]
             },
             bower_fonts: {
@@ -185,6 +193,18 @@ module.exports = function (grunt) {
                 }]
             }
         },
+        sass: {
+            options: {
+                sourcemap: true,
+                style: 'compressed'
+                ////require: 'sass-css-importer' // Doesn't work
+            },
+            main: {
+                files: {
+                    '<%= trgt %>/css/main.min.css': '<%= trgt %>/css/main.scss'
+                }
+            }
+        },
         requirejs: {
             main: {
                 options: {
@@ -216,16 +236,6 @@ module.exports = function (grunt) {
                 // // }
             // // }
         },
-        // // less: {
-            // // main: {
-                // // options: {
-                    // // yuicompress: true
-                // // },
-                // // files: {
-                    // // '<%= trgt %>/css/site.min.css': '<%= trgt %>/css/site.less'
-                // // }
-            // // }
-        // // },
         bump: {
           options: {
             files: ['package.json', 'bower.json'],
@@ -276,6 +286,13 @@ module.exports = function (grunt) {
                 },
                 files: ['<%= src %>/js/**/*.js'],
                 tasks: ['assemble:js']
+            },
+            sass_main: {
+                options: {
+                    spawn: false
+                },
+                files: ['<%= src %>/css/main.scss'],
+                tasks: ['sass:main']
             }
 
             // livereload server: http://127.0.0.1:35729/livereload.js
@@ -299,9 +316,11 @@ module.exports = function (grunt) {
       // 3. Copy plain and assembled files
      'copy:main', // Copy main files
      'copy:bower_js', // Copy unchanged files from bower folder: jquery, momentjs...
-     'copy:bower_css',
+     'copy:bower_css_sass', // Copy css files as scss partials (to import to main.scss file)
      'copy:bower_fonts',
      'copy:bower_img',
+     'copy:bower_bootstrap_sass', // Copy bowe scss partials to main.css file may be import these partials
+     'sass:main', // Make main sass file from copied file
      'assemble:js', // After copy all files to destination - replace all {{value}} - rewrite the same files
      'assemble:html' // Copy other files: Assemble and copy templates files
     ];
@@ -352,4 +371,5 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-gh-pages');
     grunt.loadNpmTasks('grunt-jsdoc');
     grunt.loadNpmTasks('grunt-notify');
+    grunt.loadNpmTasks('grunt-contrib-sass');
 };

@@ -1,9 +1,11 @@
 ﻿/** @module */
-define(['knockout',
+define(['jquery',
+    'knockout',
+    'helpers/modal-helper',
     'viewmodels/wield',
     'viewmodels/bases/stage-child-base',
     'viewmodels/bases/stage-base'],
-    function (ko, VwmWield, VwmStageChildBase, VwmStageBase) {
+    function ($, ko, bootstrapModal, VwmWield, VwmStageChildBase, VwmStageBase) {
         'use strict';
 
         /**
@@ -49,6 +51,26 @@ define(['knockout',
                 // 2. take parent view of employee - userprofile
                 parentVwmCompany.unqOfSlcVwmChild(ths.unq);
                 parentVwmCompany.selectAncestorVwms();
+            };
+
+            /** Add new well field model and viewmodel */
+            this.addVwmWield = function () {
+                var inputName = document.createElement('input');
+                inputName.type = 'text';
+                $(inputName).prop({ 'required': true }).addClass('form-control');
+
+                var innerDiv = document.createElement('div');
+
+                $(innerDiv).addClass('form-horizontal').append(
+                    bootstrapModal.gnrtDom('Name', inputName)
+                );
+
+                function submitFunction() {
+                    mdlWegion.postWield($(inputName).val());
+                    bootstrapModal.closeModalWindow();
+                }
+
+                bootstrapModal.openModalWindow('Well field', innerDiv, submitFunction);
             };
         };
 

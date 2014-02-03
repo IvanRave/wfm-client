@@ -396,26 +396,15 @@ define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-he
 
                 require(['helpers/log-helper'], function (logHelper) {
                     var podl = document.createElement('span');
-                    $(podl).css({
-                        'position': 'absolute',
+                    $(podl).addClass('log-las-text-creator log-las-podl').css({
                         'top': (posY - 9),
-                        'left': posX,
-                        'white-space': 'nowrap',
-                        'color': '#888',
-                        'font-size': '12px',
-                        'font-family': 'sans-serif',
-                        'z-index': '15'
+                        'left': posX
                     }).html('enter text...');
 
                     var pTag = document.createElement('span');
-                    $(pTag).prop({ 'contenteditable': true }).css({
-                        'position': 'absolute',
+                    $(pTag).prop({ 'contenteditable': true }).addClass('log-las-text-creator').css({
                         'top': (posY - 9),
-                        'left': posX,
-                        'white-space': 'nowrap',
-                        'font-size': '12px',
-                        'font-family': 'sans-serif',
-                        'z-index': '15'
+                        'left': posX
                     }).on('keypress', function (e) {
                         var code = (e.keyCode ? e.keyCode : e.which);
                         // Enter keycode

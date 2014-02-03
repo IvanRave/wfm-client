@@ -49,7 +49,6 @@ define(['knockout',
             this.listOfVwmHistoryOfWell = ko.computed({
                 read: function () {
                     var tmpMdlList = ko.unwrap(vwmWell.mdlStage.historyList);
-                    console.log('recreation of list of history');
                     return tmpMdlList.map(function (elem) {
                         return new VwmHistoryOfWell(elem, vwmWell, ths.startDate, ths.endDate, ths.jobTypeId);
                     });               
