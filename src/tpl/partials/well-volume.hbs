@@ -16,7 +16,13 @@
     </div>
   </div>
   <div class="col-md-4">
-    <button class="btn btn-xs btn-default" type="button" data-bind="click: createVolumeFromFile">Add volume...</button>
+    <div data-bind="if: $root.isEmployeeInEditMode">
+      <div class="text-right">
+        <button class="btn btn-sm btn-default" type="button" data-bind="click: createVolumeFromFile">
+          <i class="glyphicon glyphicon-plus"></i> Add volume...
+        </button>
+      </div>
+    </div>
     <div class="min-top-margin" data-bind="foreach: listOfVwmVolumeOfWell">
       <div data-bind="css: { 'bld': isSlcVwmVolumeOfWell }">
         <span class="pointer link-view" data-bind="text: mdlVolumeOfWell.name, click: $parent.selectVwmVolumeOfWell"></span>

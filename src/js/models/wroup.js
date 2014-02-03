@@ -246,13 +246,9 @@ define(['jquery',
             };
 
             this.removeChild = function (wellForDelete) {
-                if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(wellForDelete.Name) + '"?')) {
-                    datacontext.deleteWell(wellForDelete).done(function () {
-                        ths.wells.remove(wellForDelete);
-                        // Select this wroup
-                        ths.getWellField().selectWroup(ths);
-                    });
-                }
+                datacontext.deleteWell(wellForDelete).done(function () {
+                    ths.wells.remove(wellForDelete);
+                });
             };
 
             this.save = function () {

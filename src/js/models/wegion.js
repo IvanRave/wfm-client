@@ -75,13 +75,9 @@ define(['jquery',
             };
 
             this.removeChild = function (wellFieldForDelete) {
-                if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(wellFieldForDelete.name) + '"?')) {
-                    wieldService.remove(wellFieldForDelete.Id).done(function () {
-                        ths.wields.remove(wellFieldForDelete);
-                        // Set parent as selected
-                        ths.getCompany().selectWegion(ths);
-                    });
-                }
+                wieldService.remove(wellFieldForDelete.id).done(function () {
+                    ths.wields.remove(wellFieldForDelete);
+                });
             };
 
             /** Save well region */

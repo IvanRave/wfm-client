@@ -181,13 +181,9 @@ define(['jquery',
             };
 
             this.removeChild = function (wellGroupForDelete) {
-                if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(wellGroupForDelete.Name) + '"?')) {
-                    wroupService.remove(wellGroupForDelete.Id).done(function () {
-                        ths.wroups.remove(wellGroupForDelete);
-                        // Set parent as selected item
-                        ths.getWellRegion().selectWield(ths);
-                    });
-                }
+                wroupService.remove(wellGroupForDelete.id).done(function () {
+                    ths.wroups.remove(wellGroupForDelete);
+                });
             };
 
             /** Save non-reference properties, like groups, or region */

@@ -818,12 +818,17 @@ footer {
     font-weight: bold;
 }
 
-.well-history-block {
+.wfm-well-history-wrap {
     margin-top: 4px;
     padding-top: 8px;
     padding-bottom: 8px;
     border-bottom: 1px dashed #ccc;
     border-top: 1px dashed #ccc;
+
+	.wfm-well-history-record {
+		padding: 8px;
+		border-left: 4px solid #eee;
+	}
 }
 
 .graph-zoom-rect {
@@ -973,8 +978,7 @@ ul.wfm-light-list {
         fill: #efefef;
     }
 
-/* Redefine bootstrap alerts: small padding 
-   TODO: redefine using LESS */
+/* Redefine bootstrap alerts: small padding */
 .alert {
     padding: 8px !important;
     margin-bottom: 8px !important;

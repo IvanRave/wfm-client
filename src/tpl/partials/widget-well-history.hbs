@@ -17,7 +17,7 @@
           <div data-bind="if: listOfVwmHistoryOfWell().length > 0">
             <div data-bind="foreach: sortedListOfVwmHistoryOfWell">
               <div data-bind="slideVisible: isVisible">
-                <div class="well-history-block" data-bind="with: mdlHistoryOfWell">
+                <div class="wfm-well-history-wrap" data-bind="with: mdlHistoryOfWell">
                   <div class="text-center">
                     <span class="bld" data-bind="unix: startUnixTime"></span>
                     <span data-bind="visible: isVisibleEndUnixTime">
@@ -25,7 +25,7 @@
                     </span>
                   </div>
                   <div data-bind="visible: historyText">
-                    <div class="well well-sm pre-wrap-text" data-bind="text: historyText"></div>
+                    <p class="wfm-well-history-record pre-wrap-text" data-bind="text: historyText"></p>
                   </div>
                   <div class="text-right" data-bind="with: jobType">
                     <span class="bld">{{capitalizeFirst lang.jobType}}:</span>

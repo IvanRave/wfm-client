@@ -23,7 +23,7 @@
       </div>
       <div data-bind="foreach: sortedListOfVwmHistoryOfWell">
         <div data-bind="slideVisible: isVisible">
-          <div class="row well-history-block">
+          <div class="row wfm-well-history-wrap">
             <div class="col-md-2">
               <div>
                 <div class="bld">{{capitalizeFirst lang.timePeriod}}:</div>
@@ -80,7 +80,7 @@
             <div class="col-md-10" data-bind="with: mdlHistoryOfWell">
               <div data-bind="ifnot: $root.isEmployeeInEditMode">
                 <div data-bind="visible: historyText">
-                  <div class="well well-sm pre-wrap-text" data-bind="text: historyText"></div>
+                  <p class="wfm-well-history-record pre-wrap-text" data-bind="text: historyText"></p>
                 </div>
               </div>
               <div data-bind="if: $root.isEmployeeInEditMode">

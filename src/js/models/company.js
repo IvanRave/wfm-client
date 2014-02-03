@@ -115,12 +115,9 @@ define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/data
 
             /** Delete well region */
             this.removeChild = function (wellRegionForDelete) {
-                if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(wellRegionForDelete.name) + '"?')) {
-                    wegionService.remove(wellRegionForDelete.id).done(function () {
-                        ths.wegions.remove(wellRegionForDelete);
-                        ////window.location.hash = window.location.hash.split('?')[0];
-                    });
-                }
+                wegionService.remove(wellRegionForDelete.id).done(function () {
+                    ths.wegions.remove(wellRegionForDelete);
+                });
             };
 
             /** Create and post new well region */

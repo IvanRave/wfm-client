@@ -28,21 +28,21 @@
     </div>
   </div>
   <div data-bind="if: $root.isEmployeeInEditMode">
-    <div data-bind="with: mdlStage">
-      <div class="clearfix">
-        <div class="pull-right">
-          <button class="btn btn-sm btn-danger" data-bind="click: $parent.mdlStage.removeChild">
-            <i class="glyphicon glyphicon-remove-sign"></i>
-            {{capitalizeFirst lang.toDelete}}
-          </button>
-        </div>
-        <div class="pull-right min-right-margin">
-          <button class="btn btn-sm btn-success" data-bind="click: save">
-            <i class="glyphicon glyphicon-saved"></i>
-            {{capitalizeFirst lang.toSave}}
-          </button>
-        </div>
+    <div class="clearfix">
+      <div class="pull-right">
+        <button class="btn btn-sm btn-danger" data-bind="click: $parent.removeVwmChild">
+          <i class="glyphicon glyphicon-remove-sign"></i>
+          {{capitalizeFirst lang.toDelete}}
+        </button>
       </div>
+      <div class="pull-right min-right-margin">
+        <button class="btn btn-sm btn-success" data-bind="click: mdlStage.save">
+          <i class="glyphicon glyphicon-saved"></i>
+          {{capitalizeFirst lang.toSave}}
+        </button>
+      </div>
+    </div>
+    <div data-bind="with: mdlStage">
       <div data-bind="foreach: propSpecList">
         <!-- Properties without type do not showed in this list: not-editable properties -->
         <div data-bind="if: tpe">
