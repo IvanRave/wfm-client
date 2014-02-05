@@ -892,21 +892,13 @@ footer {
 
 /* Standard wfm list for any items: light */
 ul.wfm-light-list {
-    border: 2px solid #efefef;
+    padding-left: 0;
+    list-style: none;
 }
 
     ul.wfm-light-list > li {
-        padding: 2px;
+        padding: 4px 0 4px 0;
     }
-
-        ul.wfm-light-list > li:hover {
-            background-color: #efefef;
-        }
-
-        ul.wfm-light-list > li.active {
-            background-color: #efefef;
-            font-weight: bold;
-        }
 
 .log-las-wrap {
     position: relative;

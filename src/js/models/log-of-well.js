@@ -4,7 +4,9 @@ define(['jquery', 'knockout',
     'models/svg-elem', 'services/svg-elem-of-log-of-well'], function ($, ko, logOfWellService, ImgFigure, svgElemOfLogOfWellService) {
         'use strict';
 
-        /** Import image figures to the log image */
+        /**
+        * Import image figures to the log image
+        */
         function importImgFigures(data) {
             return (data || []).map(function (item) {
                 return new ImgFigure(item);

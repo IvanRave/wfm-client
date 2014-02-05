@@ -1,13 +1,12 @@
-﻿<div>Under construction</div>
-<div data-bind="if: false">
-  <div data-bind="ifnot: isLoadedIntegrity">
+﻿<div>
+  <div data-bind="ifnot: mdlStage.isLoadedListOfIntegrity">
     {{capitalizeFirst lang.loading}}...
   </div>
-  <div data-bind="if: isLoadedIntegrity">
-    <div data-bind="ifnot: isExistsSectionWellFiles">
-      <small>No files. Please use 'File Manager' to add files.</small>
+  <div data-bind="if: mdlStage.isLoadedListOfIntegrity">
+    <div data-bind="ifnot: listOfVwmIntegrity().length === 0">
+      <small>No files.</small>
     </div>
-    <div data-bind="if: isExistsSectionWellFiles">
+    <div data-bind="if: listOfVwmIntegrity().length > 0">
       <div class="row">
         <div class="col-sm-8">
           <div data-bind="with: selectedWellFileIntegrity" class="text-center">
