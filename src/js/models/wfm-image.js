@@ -33,23 +33,6 @@ define(['models/file-spec'], function (FileSpec) {
         * @type {string}
         */
         this.croppedImageUrl = data.CroppedImageUrl;
-
-        ////this.ImgUrl = ko.computed(function () {
-        ////    // GetCropImage(int well_id, string purpose, string status, string file_name, string crop)
-        ////    var nameArray = ths.Name.split('/');
-        ////    var urlQueryParams = {
-        ////        well_id: nameArray[0],
-        ////        purpose: nameArray[1],
-        ////        status: nameArray[2],
-        ////        file_name: nameArray[3],
-        ////        crop: '(' + [ths.X1, ths.Y1, ths.X2, ths.Y2].join(',') + ')'
-        ////    };
-
-        ////    return datacontext.getWellFileUrl(urlQueryParams);
-        ////    // divide name by slash
-        ////    // add coords
-        ////    // take wellfileurl with urlqueryparams
-        ////});
     };
 
     return exports;

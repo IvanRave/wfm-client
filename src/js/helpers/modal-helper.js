@@ -53,10 +53,6 @@
         $modalWideBlock.modal('show');
     };
 
-    bootstrapModal.closeModalFileManager = function () {
-        $('#modal-file-manager').modal('hide');
-    };
-
     bootstrapModal.openModalPanzoomWindow = function (imgSrc) {
         var $modalBlock = $('#modal-panzoom-block');
         $modalBlock.find('img').attr('src', imgSrc);

@@ -6,7 +6,7 @@ define(['knockout'], function (ko) {
     * Viewmodel: volume of well
     * @constructor
     */
-    var exports = function (mdlVolumeOfWell, koSlcVwmOfVolumeOfWell) {
+    var exports = function (mdlVolumeOfWell, koVidOfSlcVwmOfVolumeOfWell) {
 
         var ths = this;
 
@@ -24,7 +24,7 @@ define(['knockout'], function (ko) {
 
         this.isSlcVwmVolumeOfWell = ko.computed({
             read: function () {
-                return ko.unwrap(koSlcVwmOfVolumeOfWell).vid === ths.vid;
+                return ko.unwrap(koVidOfSlcVwmOfVolumeOfWell) === ths.vid;
             },
             deferEvaluation: true
         });

@@ -59,7 +59,7 @@ define([
 		this.listOfVwmVolumeOfWell = ko.computed({
 				read : function () {
 					return ko.unwrap(ths.mdlStage.volumes).map(function (elem) {
-						return new VwmVolumeOfWell(elem, ths.slcVwmVolumeOfWell);
+						return new VwmVolumeOfWell(elem, ths.vidOfSlcVwmVolumeOfWell);
 					});
 				},
 				deferEvaluation : true
@@ -149,6 +149,15 @@ define([
 			// Open file manager
 			ths.fmgr.show();
 		};
+    
+    /**
+     * Remove viewmodel and model of volume
+     */
+    this.removeVwmVolumeOfWell = function(vwmToRemove){
+      if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(vwmToRemove.mdlVolumeOfWell.name) + '"?')) {
+        ths.mdlStage.removeVolumeOfWell(vwmToRemove.mdlVolumeOfWell);
+      }
+    };
 
     //} #endregion VOLUME
     

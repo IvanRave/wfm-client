@@ -4,9 +4,7 @@
     function wellUrl(uqp) {
         return '{{conf.requrl}}/api/well/' + (uqp ? ('?' + $.param(uqp)) : '');
     }
-    function wellFileUrl(uqp) {
-        return '{{conf.requrl}}/api/wellfile/' + (uqp ? ('?' + $.param(uqp)) : '');
-    }
+
     function wellHistoryUrl(uqp) {
         return '{{conf.requrl}}/api/wellhistory/' + (uqp ? ('?' + $.param(uqp)) : '');
     }
@@ -49,35 +47,6 @@
 
     function deleteWell(item) {
         return ajaxRequest('DELETE', wellUrl({ id: item.Id }));
-    }
-
-    // get list
-    function getWellFiles(urlQueryParams) {
-        return ajaxRequest('GET', wellFileUrl(urlQueryParams));
-    }
-
-    function getWellFileUrl(urlQueryParams) {
-        return wellFileUrl(urlQueryParams);
-    }
-
-    function deleteWellFile(data) {
-        var urlQueryParams = {
-            well_id: data.WellId,
-            purpose: data.Purpose,
-            status: data.Status,
-            file_name: data.Name()
-        };
-
-        return ajaxRequest('DELETE', wellFileUrl(urlQueryParams));
-    }
-
-    function postWellFile(urlQueryParams, data) {
-        return ajaxRequest('POST', wellFileUrl(urlQueryParams), data);
-    }
-
-    function importWellFileToPD(urlQueryParams, columnAttrList) {
-        // public void Get(int well_id, string purpose, string status, string file_name, string headers_match)
-        return ajaxRequest('POST', wellFileUrl(urlQueryParams), columnAttrList);
     }
 
     // 6. Production data
@@ -128,16 +97,6 @@
         ];
 
         return arr;
-    }
-
-    var imageMimeTypes = ["image/jpeg", "image/png", "image/tiff"];
-
-    function getSectionList() {
-        return [
-        { id: 'pd', name: 'Perfomance', formatList: ['text/plain', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel'] },
-        { id: 'integrity', name: 'Integrity', formatList: ['image/jpeg', 'image/png', 'application/pdf'] },
-        { id: 'nodalanalysis', name: 'Nodal analysis', formatList: ['image/jpeg', 'image/png'] }
-        ];
     }
 
     // 8. WellHistory
@@ -266,12 +225,6 @@
         postWell: postWell,
         // delete objects from db
         deleteWell: deleteWell,
-        // WellFile
-        getWellFiles: getWellFiles,
-        getWellFileUrl: getWellFileUrl,
-        deleteWellFile: deleteWellFile,
-        importWellFileToPD: importWellFileToPD,
-        postWellFile: postWellFile,
         // ProductionData
         getProductionData: getProductionData,
         deleteWellProductionData: deleteWellProductionData,
@@ -287,9 +240,6 @@
         saveNewWellFieldMapArea: saveNewWellFieldMapArea,
         saveChangedWellFieldMapArea: saveChangedWellFieldMapArea,
         deleteWellFieldMapArea: deleteWellFieldMapArea,
-        // section list
-        getSectionList: getSectionList,
-        imageMimeTypes: imageMimeTypes,
         // user profile
         createUserProfile: createUserProfile,
         getUserProfile: getUserProfile,

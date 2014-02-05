@@ -1,32 +1,51 @@
 ﻿<!-- current: vwmWell -->
 <div class="row">
-  <div class="col-md-8">
-    <div data-bind="with: slcVwmVolumeOfWell">
-      <!-- ko with: mdlVolumeOfWell -->
-      <span data-bind="with: fileSpec">
-        <span class="pointer" data-bind="panzoomImg: {src: fileUrl}">
-          <img class="img-responsive" src="#" data-bind="attr: {src: fileUrl}"></img>
-        </span>
-      </span>
-      <h6 data-bind="text: description"></h6>
-      <!-- /ko -->
-    </div>
-    <div data-bind="ifnot: slcVwmVolumeOfWell ">
-      No selected volume
-    </div>
+  <div data-bind="ifnot: mdlStage.isLoadedVolumes">
+    <span>{{lang.loading}}...</span>
   </div>
-  <div class="col-md-4">
-    <div data-bind="if: $root.isEmployeeInEditMode">
-      <div class="text-right">
-        <button class="btn btn-sm btn-default" type="button" data-bind="click: createVolumeFromFile">
-          <i class="glyphicon glyphicon-plus"></i> Add volume...
-        </button>
+  <div data-bind="if: mdlStage.isLoadedVolumes">
+    <div class="col-sm-8">
+      <div data-bind="with: slcVwmVolumeOfWell">
+        <!-- ko with: mdlVolumeOfWell -->
+        <span data-bind="with: fileSpec">
+          <span class="pointer" data-bind="panzoomImg: {src: fileUrl}">
+            <img class="img-responsive" src="#" data-bind="attr: {src: fileUrl}"></img>
+          </span>
+        </span>
+        <h6 data-bind="text: description"></h6>
+        <!-- /ko -->
       </div>
     </div>
-    <div class="min-top-margin" data-bind="foreach: listOfVwmVolumeOfWell">
-      <div data-bind="css: { 'bld': isSlcVwmVolumeOfWell }">
-        <span class="pointer link-view" data-bind="text: mdlVolumeOfWell.name, click: $parent.selectVwmVolumeOfWell"></span>
+    <div class="col-sm-4">
+      <div class="clearfix">
+        <div class="pull-left">
+          <h4>Volumes:</h4>
+        </div>
+        <div class="pull-right" data-bind="if: $root.isEmployeeInEditMode">
+          <div class="text-right">
+            <button class="btn btn-sm btn-default" type="button" data-bind="click: createVolumeFromFile">
+              <i class="glyphicon glyphicon-plus"></i> Add volume...
+            </button>
+          </div>
+        </div>
       </div>
+      <div data-bind="ifnot: slcVwmVolumeOfWell">
+        No volumes
+      </div>
+      <ul class="wfm-light-list" data-bind="foreach: listOfVwmVolumeOfWell">
+        <li class="clearfix">
+          <div class="pull-left">
+            <span class="pointer link-view" data-bind="click: $parent.selectVwmVolumeOfWell">
+              <span data-bind="text: mdlVolumeOfWell.name, css: { 'bld': isSlcVwmVolumeOfWell }"></span>
+            </span>
+          </div>
+          <div class="pull-right" data-bind="if: $root.isEmployeeInEditMode">
+            <button class="btn btn-xs btn-default" data-bind="click: $parent.removeVwmVolumeOfWell">
+              <i class="glyphicon glyphicon-remove"></i>
+            </button>
+          </div>
+        </li>
+      </ul>
     </div>
   </div>
 </div>

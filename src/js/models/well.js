@@ -4,13 +4,11 @@ define([
 		'knockout',
 		'services/datacontext',
 		'helpers/file-helper',
-		'helpers/modal-helper',
 		'helpers/app-helper',
 		'moment',
 		'models/bases/stage-base',
 		'models/stage-partials/well-perfomance-partial',
 		'models/section-of-stage',
-		'models/well-file',
 		'models/sketch-of-well',
 		'models/prop-spec',
 		'services/well',
@@ -27,9 +25,9 @@ define([
 		'services/file-spec',
 		'models/column-attribute',
 		'models/test-scope',
-	], function ($, ko, datacontext, fileHelper, bootstrapModal,
+	], function ($, ko, datacontext, fileHelper,
 		appHelper, appMoment, StageBase, wellPerfomancePartial,
-		SectionOfWell, WellFile, SketchOfWell,
+		SectionOfWell, SketchOfWell,
 		PropSpec, wellService,
 		IntegrityOfWell, integrityOfWellService,
 		NodalAnalysisOfWell, nodalAnalysisOfWellService,
@@ -63,13 +61,6 @@ define([
 		});
 	}
 
-	/** WellFiles (convert data objects into array) */
-	function importWellFilesDto(data, parent) {
-		return data.map(function (item) {
-			return new WellFile(item, parent);
-		});
-	}
-
 	/** ColumnAttributes (convert data objects into array) */
 	function importColumnAttributes(data) {
 		return data.map(function (item) {
@@ -92,7 +83,7 @@ define([
 	}
 
 	/** Import all sections of well */
-	function importSectionList(data, wellItem) {
+	function importListOfSection(data, wellItem) {
 		return data.map(function (item) {
 			return new SectionOfWell(item, wellItem);
 		});
@@ -197,12 +188,6 @@ define([
 		this.WellGroupId = data.WellGroupId;
 
 		/**
-		 * Well files
-		 * @type {Array.<WellFile>}
-		 */
-		this.WellFiles = ko.observableArray();
-
-		/**
 		 * Field maps for this well
 		 * @type {Array.<WellFieldMap>}
 		 */
@@ -213,6 +198,9 @@ define([
 				deferEvaluation : true,
 				owner : this
 			});
+      
+    /** Sketch of well: by default - empty */
+		this.sketchOfWell = new SketchOfWell(ths);
 
 		/**
 		 * Load content of the section
@@ -241,30 +229,10 @@ define([
 				}
 			case 'well-nodalanalysis': {
 					ths.loadListOfNodalAnalysis();
-
-					// ths.getWellFileList(function () {
-					// var mainWellFile = null;
-					// if (ths.WellFiles().length > 0) {
-					// mainWellFile = ths.WellFiles()[0];
-					// }
-
-					// ths.selectedWellFileNodal(mainWellFile);
-					// }, 'nodalanalysis', 'work');
-
 					break;
 				}
 			case 'well-integrity': {
 					ths.loadListOfIntegrity();
-
-					// ths.getWellFileList(function () {
-					// var mainWellFile = null;
-					// if (ths.WellFiles().length > 0) {
-					// mainWellFile = ths.WellFiles()[0];
-					// }
-
-					// ths.selectedWellFileIntegrity(mainWellFile);
-					// }, 'integrity', 'work');
-
 					break;
 				}
 			case 'well-log': {
@@ -319,62 +287,12 @@ define([
 
 		/** Save this well main properties */
 		this.save = function () {
-			wellService.put(ths.Id, ths.toDto());
+			wellService.put(ths.id, ths.toDto());
 		};
 
-		/** Every section has files: filter files only for current section */
-		// TODO: Change to new realization
-		this.sectionWellFiles = ko.computed({
-				read : function () {
-					////if (ko.unwrap(ths.selectedSection)) {
-					////    return $.grep(ko.unwrap(ths.WellFiles), function (wellFile) {
-					////        return ko.unwrap(wellFile.Purpose) === ko.unwrap(ths.selectedSectionId);
-					////    });
-					////}
-				},
-				deferEvaluation : true
-			});
-
-		// ======================= file manager section ======================
-		// file manager section: like above section but in file manager view
-		this.selectedFmgSectionId = ko.observable(null);
-
-		this.selectFmgSection = function (item) {
-			ths.selectedFmgSectionId(item.id);
-		};
-
-		this.filteredWellFileList = ko.computed(function () {
-				if (!ths.selectedFmgSectionId()) {
-					return ths.WellFiles();
-				}
-
-				return $.grep(ths.WellFiles(), function (elemValue) {
-					return elemValue.Purpose === ths.selectedFmgSectionId();
-				});
-			});
-
-		this.getWellFileList = function (callback, purpose, status) {
-			var uqp = {
-				well_id : ths.Id
-			};
-
-			if (purpose) {
-				uqp.purpose = purpose;
-			}
-
-			if (status) {
-				uqp.status = status;
-			}
-
-			datacontext.getWellFiles(uqp).done(function (response) {
-				ths.WellFiles(importWellFilesDto(response, ths));
-				if ($.isFunction(callback) === true) {
-					callback();
-				}
-			});
-		};
-
-		// ==================================================================Well test begin================================================================
+    this.wellMarkers = ko.observableArray();
+    
+		//{ #region TEST
 
 		this.testScopeList = ko.observableArray();
 
@@ -453,11 +371,9 @@ define([
 			}
 		};
 
-		// ==================================================================Well test end================================================================
+		//} #endregion TEST
 
-		this.wellMarkers = ko.observableArray();
-
-		// ================================================= Well log start =================================================
+		//{ #region LOG
 
 		/**
 		 * Well logs
@@ -508,6 +424,8 @@ define([
 			});
 		};
 
+    //} #endregion LOG
+    
 		////        fileSpecService.getColumnAttributes(ths.stageKey, needSection.id, tmpFileSpec.id).done(function (res) {
 		////            // ColumnAttributes (convert data objects into array)
 		////            var columnAttributes = importColumnAttributes(res);
@@ -579,7 +497,7 @@ define([
 
 		////};
 
-		// ================================================= Well history section start =======================================
+		//{ #region HISTORY
 
 		/**
 		 * List of history records
@@ -621,23 +539,23 @@ define([
 			});
 		};
 
-		// ============================================================= Well history end ===============================================
+		//} #endregion HISTORY
 
-		this.sectionList = datacontext.getSectionList();
-
-		// =============================================================Well report begin=========================================================
+		//{ #region REPORT
 
 		//// // by default - checked summary tab
 		////this.reportSectionIdList = ko.observableArray(['summary']);
 
-		////this.checkReportSection = function (checkedReportSection) {
+		//// this.checkReportSection = function (checkedReportSection) {
 		////    switch (checkedReportSection.id) {
 		////        case 'map': ths.getWellGroup().getWellField().loadMapsOfWield(); break;
 		////        case 'history': ths.loadWellHistoryList(); break;
-		////        case 'log': ths.getWellFileList('log', 'work'); break;
+		////        case 'log': 
+    ////        // Load list of logs
+    ////        break;
 		////        case 'pd': ths.perfomancePartial.getHstProductionDataSet(); break;
 		////    }
-		////};
+		//// };
 
 		////this.selectedReportMap = ko.observable();
 		////this.selectedReportLog = ko.observable();
@@ -676,12 +594,12 @@ define([
 		////    }
 
 		////    // todo: make check for begin date existence (or end date or together)
-		////    ////if ($.inArray('history', ths.reportSectionIdList()) >= 0) {
+		////    //// if ($.inArray('history', ths.reportSectionIdList()) >= 0) {
 		////    ////    if (typeof ths.reportHistoryBeginDate === 'undefined') {
 		////    ////        alert('No selected maps in the map section');
 		////    ////        return;
 		////    ////    }
-		////    ////}
+		////    //// }
 		////    // get all unknown data for pdf report and creating
 
 		////    var logoUrl = null;
@@ -695,7 +613,7 @@ define([
 		////    require(['helpers/pdf-helper'], function (pdfHelper) {
 
 		////        pdfHelper.getImageFromUrl(logoUrl, function (logoBase64) {
-		////            var sketchUrl = $.inArray('sketch', ths.reportSectionIdList()) >= 0 ? ths.MainSketchUrl() : null;
+		////            var sketchUrl = $.inArray('sketch', ths.reportSectionIdList()) >= 0 ? [sketchUrl] : null;
 		////            pdfHelper.getImageFromUrl(sketchUrl, function (sketchBase64) {
 		////                // coord to nill - load full image (without crop)
 		////                var mapUrl = ($.inArray('map', ths.reportSectionIdList()) >= 0) ? (ths.selectedReportMap().fullImgUrl + '&x1=0&y1=0&x2=0&y2=0') : null;
@@ -775,9 +693,9 @@ define([
 		////            });
 		////        });
 		////    });
-		////};
+		//// };
 
-		// =============================================================Well report end=================================================
+		//} #endregion REPORT
 
 		//{ #region NODALANALYSIS
 
@@ -887,201 +805,7 @@ define([
 
 		//} #endregion INTEGRITY
 
-		// nodal files ======================================
-		this.selectedWellFileNodal = ko.observable();
-
-		this.selectWellFileNodal = function (wellFile) {
-			ths.selectedWellFileNodal(wellFile);
-		};
-
-		// integrity files =======================================
-		this.selectedWellFileIntegrity = ko.observable();
-
-		this.selectWellFileIntegrity = function (wellFile) {
-			ths.selectedWellFileIntegrity(wellFile);
-		};
-
-		// file manager
-		// function(selectedItemFromKnockout, ...)
-		this.showFmg = function (callbackFunction) {
-			var jqrModalFileManager = $('#modal-file-manager');
-
-			$.each(ths.sectionList, function (elemIndex, elemValue) {
-				if (elemValue.formatList.length > 0) {
-					var elemFileUpload = jqrModalFileManager.find('#' + elemValue.id + '_file_upload').get(0);
-
-					fileHelper.initFileUpload(elemFileUpload, datacontext.getWellFileUrl({
-							well_id : ths.Id,
-							purpose : elemValue.id,
-							status : 'work'
-						}), elemValue.formatList, function () {
-						ths.getWellFileList();
-					});
-				}
-			});
-
-			ths.getWellFileList();
-
-			function hideModal() {
-				jqrModalFileManager.modal('hide');
-			}
-
-			function submitFunction() {
-				// get checked (selected) files
-				var checkedWellFiles = $.map(ko.unwrap(ths.WellFiles), function (elemValue) {
-						if (ko.unwrap(elemValue.isChecked) === true) {
-							return elemValue;
-						}
-					});
-
-				if (typeof(callbackFunction) !== 'undefined' && $.isFunction(callbackFunction)) {
-					callbackFunction(checkedWellFiles);
-				} else {
-					hideModal();
-				}
-			}
-
-			jqrModalFileManager.find('.modal-ok').off('click').on('click', submitFunction);
-			jqrModalFileManager.find('.modal-close').off('click').on('click', hideModal);
-
-			jqrModalFileManager.modal('show');
-
-			////var innerDiv = document.createElement('div');
-
-			////$(innerDiv).load(datacontext.getFileManagerUrl(), function () {
-			////    ko.applyBindings(ths, $(innerDiv).get(0));
-
-			////    $.each(ths.sectionList, function (elemIndex, elemValue) {
-			////        if (elemValue.formatList.length > 0) {
-			////            var elemFileUpload = $(innerDiv).find('#' + elemValue.id + '_file_upload').get(0);
-
-			////            fileHelper.initFileUpload(elemFileUpload, datacontext.getWellFileUrl({
-			////                well_id: ths.Id,
-			////                purpose: elemValue.id,
-			////                status: 'work'
-			////            }), elemValue.formatList, function () {
-			////                ths.getWellFileList();
-			////            });
-			////        }
-			////    });
-
-			////    ths.getWellFileList();
-			////    var submitFunction = function () {
-			////        // get checked (selected) files
-			////        var checkedWellFiles = $.map(ths.WellFiles(), function (elemValue) {
-			////            if (elemValue.isChecked() === true) {
-			////                return elemValue;
-			////            }
-			////        });
-
-			////        if (typeof (callbackFunction) !== 'undefined' && $.isFunction(callbackFunction)) {
-			////            callbackFunction(checkedWellFiles);
-			////        }
-			////        else {
-			////            bootstrapModal.closeModalWideWindow();
-			////        }
-			////    };
-
-			////    bootstrapModal.openModalWideWindow(innerDiv, submitFunction);
-			////});
-		};
-
-		/** Sketch of well: by default - empty */
-		this.sketchOfWell = new SketchOfWell(ths);
-
-		this.sketchHashString = ko.observable(new Date().getTime());
-
-		this.putWell = function () {
-			wellService.put(ths.Id, ths.toDto());
-		};
-
-		this.chooseMainFile = function (purpose) {
-			ths.selectedFmgSectionId(purpose);
-			var callbackFunction = function (checkedWellFileList) {
-				if (checkedWellFileList.length !== 1) {
-					alert('Need to select one image');
-					return;
-				}
-
-				var checkedFile = checkedWellFileList[0];
-				if ($.inArray(checkedFile.ContentType, datacontext.imageMimeTypes) === -1) {
-					alert('Need to select image file: ' + datacontext.imageMimeTypes.join(', '));
-					return;
-				}
-
-				bootstrapModal.closeModalFileManager();
-
-				var urlQueryParams = {
-					well_id : ths.Id,
-					purpose : checkedFile.Purpose,
-					status : checkedFile.Status(),
-					file_name : checkedFile.Name(),
-					dest_well_id : ths.Id,
-					dest_purpose : checkedFile.Purpose,
-					dest_status : checkedFile.Status(),
-					dest_file_name : 'main.' + purpose
-				};
-
-				datacontext.getWellFiles(urlQueryParams).done(function () {
-					ths[purpose + 'HashString'](new Date().getTime());
-				});
-			};
-
-			ths.showFmg(callbackFunction);
-		};
-
-		this.editField = function (wellProp) {
-			////console.log(wellProp);
-			var fieldName = wellProp.id,
-			fieldTitle = wellProp.ttl,
-			inputType = wellProp.tpe;
-
-			////fieldName, inputType
-			// draw window with this field
-			var inputField;
-
-			var tmpFieldValue = ko.unwrap(ths[fieldName]);
-
-			if (inputType === 'SingleLine') {
-				inputField = document.createElement('input');
-				inputField.type = 'text';
-				$(inputField).prop({
-					'placeholder' : fieldTitle
-				}).val(tmpFieldValue).addClass('form-control');
-			} else if (inputType === 'MultiLine') {
-				inputField = document.createElement('textarea');
-				$(inputField).prop({
-					"rows" : 5,
-					'placeholder' : fieldTitle
-				}).val(tmpFieldValue).addClass('form-control');
-			}
-
-			var innerDiv = document.createElement('div');
-			$(innerDiv).addClass('form-horizontal').append(
-				bootstrapModal.gnrtDom(fieldTitle, inputField));
-
-			function submitFunction() {
-				ths[fieldName]($(inputField).val());
-				ths.putWell();
-				bootstrapModal.closeModalWindow();
-			}
-
-			bootstrapModal.openModalWindow('{{capitalizeFirst lang.toEdit}}', innerDiv, submitFunction);
-		};
-
-		this.MainSketchUrl = ko.computed({
-				read : function () {
-					return datacontext.getWellFileUrl({
-						well_id : ths.Id,
-						purpose : 'sketch',
-						status : 'work',
-						file_name : 'main.sketch'
-					}) + '&hashstring=' + ths.sketchHashString();
-				},
-				deferEvaluation : true
-			});
-
-		// =========================================== Volume of well ====================================
+		//{ #region VOLUME
 		/**
 		 * Volumes of well
 		 * @type {Array.<module:models/volume-of-well>}
@@ -1119,76 +843,19 @@ define([
 				scsCallback();
 			}).fail(errCallback);
 		};
+    
+    /**
+     * Remove volume from server
+     */
+    this.removeVolumeOfWell = function(mdlToRemove){
+      volumeOfWellService.remove(mdlToRemove.idOfWell, mdlToRemove.idOfFileSpec).done(function(){
+        ths.volumes.remove(mdlToRemove);
+      });
+    };
+    
+    //} #endregion VOLUME
 
-		//================================================= Edit well ======================================
-
-		this.editWell = function () {
-			var inputName = document.createElement('input');
-			inputName.type = 'text';
-			$(inputName).val(ths.Name()).prop({
-				'required' : true
-			});
-
-			var inputDescription = document.createElement('input');
-			inputDescription.type = 'text';
-			$(inputDescription).val(ths.Description());
-
-			var inputProductionHistory = document.createElement('textarea');
-			$(inputProductionHistory).val(ths.ProductionHistory()).prop("rows", 5);
-
-			var innerDiv = document.createElement('div');
-			$(innerDiv).addClass('form-horizontal').append(
-				bootstrapModal.gnrtDom('Name', inputName),
-				bootstrapModal.gnrtDom('Description', inputDescription),
-				bootstrapModal.gnrtDom('Production history', inputProductionHistory));
-
-			function submitFunction() {
-				ths.Name($(inputName).val());
-				ths.Description($(inputDescription).val());
-				ths.ProductionHistory($(inputProductionHistory).val());
-				ths.save();
-				bootstrapModal.closeModalWindow();
-			}
-
-			bootstrapModal.openModalWindow("Well", innerDiv, submitFunction);
-		};
-
-		this.deleteWellFile = function () {
-			var wellFileForDelete = this;
-			if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + wellFileForDelete.Name() + '"?')) {
-				datacontext.deleteWellFile(wellFileForDelete).done(function () {
-					ths.WellFiles.remove(wellFileForDelete);
-				});
-			}
-		};
-
-		// without archive
-		////ths.invertWellFileStatus = function () {
-		////    var invertWellFile = this;
-		////    var urlQueryParams = {
-		////        well_id: ths.Id,
-		////        purpose: invertWellFile.Purpose,
-		////        status: invertWellFile.Status(),
-		////        file_name: invertWellFile.Name(),
-		////        need_action: 'invertstatus' // deprecated
-		////    };
-
-		////    datacontext.getWellFiles(urlQueryParams).done(function () {
-		////        ////if (invertWellFile.Purpose === 'sketch') {
-		////        ////    alert('File: "' + invertWellFile.Name() + '" successfully set as the main well sketch');
-		////        ////}
-		////        ////else
-		////        if (invertWellFile.Purpose === 'pd') {
-		////            // delete old file
-		////            datacontext.deleteWellFile(invertWellFile).done(function () {
-		////                // update list
-		////                ths.getWellFileList();
-		////            });
-		////        }
-		////    });
-		////};
-
-		// ==================================================================== Well perfomance begin ========================================
+		//{ #region PERFOMANCE
 
 		this.perfomancePartial = wellPerfomancePartial.init(ths);
 
@@ -1200,9 +867,9 @@ define([
 			});
 
 		/** Load well sections */
-		this.listOfSection(importSectionList(data.ListOfSectionOfWellDto, ths));
+		this.listOfSection(importListOfSection(data.ListOfSectionOfWellDto, ths));
 
-		// ==================================================================== Well perfomance section end ========================================
+		//} #endregion PERFOMANCE
 
 		this.toDto = function () {
 			var dtoObj = {
