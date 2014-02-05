@@ -50,6 +50,8 @@ define([
 		//mdlSketchOfWell, koWellUnzOfSlcVwmSectionFmg, koSlcVwmSectionFmg,  fmgrLink
 		this.vwmSketchOfWell = new VwmSketchOfWell(ths.mdlStage.sketchOfWell, ths.unzOfSlcVwmSectionFmg, ths.slcVwmSectionFmg, ths.fmgr);
 
+    //{ #region VOLUME
+    
 		/**
 		 * List of views of volume of well
 		 * @type {Array.<viewmodels/volume-of-well>}
@@ -148,7 +150,15 @@ define([
 			ths.fmgr.show();
 		};
 
+    //} #endregion VOLUME
+    
+    //{ #region HISTORY
+    
 		this.vwmScopeOfHistoryOfWell = new VwmScopeOfHistoryOfWell({}, ths);
+
+    //} #endregion HISTORY
+    
+		//{ #region LOG
 
 		/**
 		 * List of viewmodels of log of well
@@ -315,6 +325,10 @@ define([
 			ths.fmgr.show();
 		};
 
+		//} #endregion LOG
+
+		//{ #region NODALANALYSIS
+
 		/**
 		 * List of viewmodels
 		 */
@@ -413,16 +427,18 @@ define([
 			ths.fmgr.show();
 		};
 
-    /**
-     * Remove viewmodel and model
-     */
-    this.removeVwmNodalAnalysis = function(vwmToRemove){
-      if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(vwmToRemove.mdlNodalAnalysis.name) + '"?')) {
-        ths.mdlStage.removeNodalAnalysis(vwmToRemove.mdlNodalAnalysis);
-      }
-    };
-    
-		// ================= INTEGRITY =====================
+		/**
+		 * Remove viewmodel and model
+		 */
+		this.removeVwmNodalAnalysis = function (vwmToRemove) {
+			if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(vwmToRemove.mdlNodalAnalysis.name) + '"?')) {
+				ths.mdlStage.removeNodalAnalysis(vwmToRemove.mdlNodalAnalysis);
+			}
+		};
+
+		//} #endregion NODALANALYSIS
+
+		//{ #region INTEGRITY
 
 		/**
 		 * List of viewmodels
@@ -435,14 +451,6 @@ define([
 				},
 				deferEvaluation : true
 			});
-
-		/**
-		 * Create model and viewmodel of integrity
-		 */
-		this.postVwmIntegrity = function () {
-			// Show file manager
-			// Select file
-		};
 
 		/**
 		 * Id of selected viewmodel
@@ -478,6 +486,68 @@ define([
 		this.selectVwmIntegrity = function (vwmToSelect) {
 			ths.vidOfSlcVwmIntegrity(vwmToSelect.vid);
 		};
+
+		/**
+		 * Create model and viewmodel of integrity
+		 */
+		this.postVwmIntegrity = function () {
+			ths.unzOfSlcVwmSectionFmg(ths.mdlStage.stageKey + '-integrity');
+
+			// Calback for selected file
+			function mgrCallback() {
+				ths.fmgr.okError('');
+
+				var tmpSlcVwmSection = ko.unwrap(ths.slcVwmSectionFmg);
+
+				if (!tmpSlcVwmSection) {
+					throw new Error('No selected section');
+				}
+
+				// Select file from file manager
+				var selectedFileSpecs = ko.unwrap(tmpSlcVwmSection.mdlSection.listOfFileSpec).filter(function (elem) {
+						return ko.unwrap(elem.isSelected);
+					});
+
+				if (selectedFileSpecs.length !== 1) {
+					ths.fmgr.okError('need to select one file');
+					return;
+				}
+
+				ths.mdlStage.postIntegrity(selectedFileSpecs[0].id, ko.unwrap(selectedFileSpecs[0].name), '', function () {
+					// Success
+					ths.fmgr.hide();
+				}, function (jqXhr) {
+					// Error
+					if (jqXhr.status === 422) {
+						var resJson = jqXhr.responseJSON;
+						require(['helpers/lang-helper'], function (langHelper) {
+							var tmpProcessError = (langHelper.translate(resJson.errId) || '{{lang.unknownError}}');
+							ths.fmgr.okError(tmpProcessError);
+						});
+					}
+				});
+			}
+
+			// Add to observable
+			ths.fmgr.okCallback(mgrCallback);
+
+			// Notification
+			ths.fmgr.okDescription('Please select a file for a integrity');
+
+			// Open file manager
+			ths.fmgr.show();
+		};
+
+		/**
+		 * Remove viewmodel and model
+		 */
+		this.removeVwmIntegrity = function (vwmToRemove) {
+			if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(vwmToRemove.mdlIntegrity.name) + '"?')) {
+				ths.mdlStage.removeIntegrity(vwmToRemove.mdlIntegrity);
+			}
+		};
+
+		//} #endregion INTEGRITY
 	};
 
 	return exports;

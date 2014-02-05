@@ -779,6 +779,8 @@ define([
 
 		// =============================================================Well report end=================================================
 
+		//{ #region NODALANALYSIS
+
 		/**
 		 * List of nodal analyzes
 		 * @type {Array.<modul:models/nodal-analysis-of-well>}
@@ -819,15 +821,19 @@ define([
 				scsCallback();
 			}).fail(errCallback);
 		};
-    
-    /**
-     * Remove from server
-     */
-    this.removeNodalAnalysis = function(tmpMdlToRemove){
-      nodalAnalysisOfWellService.remove(tmpMdlToRemove.idOfWell, tmpMdlToRemove.idOfFileSpec).done(function(){
-        ths.listOfNodalAnalysis.remove(tmpMdlToRemove);
-      });
-    };
+
+		/**
+		 * Remove from server
+		 */
+		this.removeNodalAnalysis = function (tmpMdlToRemove) {
+			nodalAnalysisOfWellService.remove(tmpMdlToRemove.idOfWell, tmpMdlToRemove.idOfFileSpec).done(function () {
+				ths.listOfNodalAnalysis.remove(tmpMdlToRemove);
+			});
+		};
+
+		//} #endregion NODALANALYSIS
+
+		//{ #region INTEGRITY
 
 		/**
 		 * List of integrity
@@ -856,9 +862,9 @@ define([
 		};
 
 		/**
-		 * Create nodal analysis
+		 * Create integrity
 		 */
-		this.postIntegrity = function (tmpIdOfFileSpec, tmpName, tmpDescription) {
+		this.postIntegrity = function (tmpIdOfFileSpec, tmpName, tmpDescription, scsCallback, errCallback) {
 			integrityOfWellService.post(ths.id, {
 				IdOfWell : ths.id,
 				IdOfFileSpec : tmpIdOfFileSpec,
@@ -866,8 +872,20 @@ define([
 				Description : tmpDescription
 			}).done(function (response) {
 				ths.listOfIntegrity.push(new IntegrityOfWell(response));
+				scsCallback();
+			}).fail(errCallback);
+		};
+
+		/**
+		 * Remove from server
+		 */
+		this.removeIntegrity = function (tmpMdlToRemove) {
+			integrityOfWellService.remove(tmpMdlToRemove.idOfWell, tmpMdlToRemove.idOfFileSpec).done(function () {
+				ths.listOfIntegrity.remove(tmpMdlToRemove);
 			});
 		};
+
+		//} #endregion INTEGRITY
 
 		// nodal files ======================================
 		this.selectedWellFileNodal = ko.observable();
