@@ -8,7 +8,6 @@ define([
 		'moment',
 		'models/bases/stage-base',
 		'models/perfomance-of-well',
-    'viewmodels/perfomance-of-well',
 		'models/section-of-stage',
 		'models/sketch-of-well',
 		'models/prop-spec',
@@ -29,7 +28,7 @@ define([
 	], function ($, ko, datacontext, fileHelper,
 		appHelper, appMoment, 
     StageBase,
-    PerfomanceOfWell, VwmPerfomanceOfWell,
+    PerfomanceOfWell,
 		SectionOfWell, SketchOfWell,
 		PropSpec, wellService,
 		IntegrityOfWell, integrityOfWellService,
@@ -226,8 +225,8 @@ define([
 				}
 			case 'well-perfomance': {
 					ths.getWellGroup().getWellGroupWfmParameterList();
-					ths.perfomancePartial.forecastEvolution.getDict();
-					ths.perfomancePartial.getHstProductionDataSet();
+					ths.perfomanceOfWell.forecastEvolution.getDict();
+					ths.perfomanceOfWell.getHstProductionDataSet();
 					break;
 				}
 			case 'well-nodalanalysis': {
@@ -283,8 +282,8 @@ define([
 			ths.sketchOfWell.load();
 			// TODO: load data only if there is one or more perfomance widgets (only once) for entire well
 			ths.getWellGroup().getWellGroupWfmParameterList();
-			ths.perfomancePartial.forecastEvolution.getDict();
-			ths.perfomancePartial.getHstProductionDataSet();
+			ths.perfomanceOfWell.forecastEvolution.getDict();
+			ths.perfomanceOfWell.getHstProductionDataSet();
 			ths.loadWellHistoryList();
 		};
 
@@ -556,7 +555,7 @@ define([
 		////        case 'log': 
     ////        // Load list of logs
     ////        break;
-		////        case 'pd': ths.perfomancePartial.getHstProductionDataSet(); break;
+		////        case 'pd': ths.perfomanceOfWell.getHstProductionDataSet(); break;
 		////    }
 		//// };
 
@@ -673,9 +672,9 @@ define([
 		////                        }
 
 		////                        if ($.inArray('pd', ths.reportSectionIdList()) >= 0) {
-		////                            var arrPd = ko.unwrap(ths.perfomancePartial.filteredByDateProductionDataSet);
+		////                            var arrPd = ko.unwrap(ths.perfomanceOfWell.filteredByDateProductionDataSet);
 		////                            $.each(ko.unwrap(ths.selectedWfmParamSquadList), function (elemIndex, elemValue) {
-		////                                var headerList = $.grep(ko.unwrap(ths.perfomancePartial.prdColumnAttributeList), function (pdElem) {
+		////                                var headerList = $.grep(ko.unwrap(ths.perfomanceOfWell.prdColumnAttributeList), function (pdElem) {
 		////                                    return pdElem.Group === elemValue;
 		////                                });
 
@@ -860,14 +859,10 @@ define([
 
 		//{ #region PERFOMANCE
 
-		this.perfomancePartial = new PerfomanceOfWell(ths);
+		this.perfomanceOfWell = new PerfomanceOfWell(ths);
 
 		// Load column attributes - all loading logic in this file (not separated - not in perfomance of well model)
-		this.perfomancePartial.prdColumnAttributeList(importColumnAttributes(datacontext.getColumnAttributesLocal()));
-
-		this.mainPerfomanceView = new VwmPerfomanceOfWell({
-      isVisibleForecastData : false
-    }, ths.perfomancePartial);
+		this.perfomanceOfWell.prdColumnAttributeList(importColumnAttributes(datacontext.getColumnAttributesLocal()));
     
 		//} #endregion PERFOMANCE
     

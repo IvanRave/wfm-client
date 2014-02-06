@@ -6,7 +6,7 @@ define(['knockout',
     'use strict';
 
     // Subtype from Widget
-    var exports = function (opts, widgockItem) {
+    var exports = function (opts, vwmWell) {
         var ths = this;
         opts = opts || {};
         
@@ -17,7 +17,7 @@ define(['knockout',
             startYear: opts['StartYear'],
             endMonth: opts['EndMonth'],
             startMonth: opts['StartMonth']
-        }, widgockItem.getWidgout().getParent().perfomancePartial);
+        }, vwmWell.mdlStage.perfomanceOfWell, vwmWell);
 
         this.toStringifyOpts = function () {
             return {

@@ -9,7 +9,8 @@ define([
 		'viewmodels/scope-of-history-of-well',
 		'viewmodels/log-of-well',
 		'viewmodels/nodal-analysis-of-well',
-		'viewmodels/integrity-of-well'],
+		'viewmodels/integrity-of-well',
+    'viewmodels/perfomance-of-well'],
 	function (
 		$,
 		ko,
@@ -20,7 +21,8 @@ define([
 		VwmScopeOfHistoryOfWell,
 		VwmLogOfWell,
 		VwmNodalAnalysis,
-		VwmIntegrity) {
+		VwmIntegrity,
+    VwmPerfomanceOfWell) {
 	'use strict';
 
 	/**
@@ -557,6 +559,14 @@ define([
 		};
 
 		//} #endregion INTEGRITY
+    
+    //{ #region PERFOMANCE
+    
+    this.mainVwmPerfomanceOfWell = new VwmPerfomanceOfWell({
+      isVisibleForecastData : false
+    }, ths.mdlStage.perfomanceOfWell, ths);
+    
+    //} #endregion PERFOMANCE
 	};
 
 	return exports;

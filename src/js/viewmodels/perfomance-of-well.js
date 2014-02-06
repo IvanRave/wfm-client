@@ -9,7 +9,7 @@ define(['jquery',
 	 * Perfomance of well viewmodel (one well - one perfomance)
 	 * @constructor
 	 */
-	var exports = function (optns, prfPartial) {
+	var exports = function (optns, prfPartial, vwmWell) {
 		var vw = this;
 
 		vw.prfPartial = prfPartial;
@@ -326,9 +326,53 @@ define(['jquery',
 		/**
 		 * Select file and import perfomance data
 		 */
-		vw.importPerfomance = function () {
+		vw.importPerfomanceData = function () {
 			// Open file manager
-      
+			vwmWell.unzOfSlcVwmSectionFmg(vwmWell.mdlStage.stageKey + '-perfomance');
+
+			// Calback for selected file
+			function mgrCallback() {
+				vwmWell.fmgr.okError('');
+
+				var tmpSlcVwmSection = ko.unwrap(vwmWell.slcVwmSectionFmg);
+
+				if (!tmpSlcVwmSection) {
+					throw new Error('No selected section');
+				}
+
+				// Select file from file manager
+				var selectedFileSpecs = ko.unwrap(tmpSlcVwmSection.mdlSection.listOfFileSpec).filter(function (elem) {
+						return ko.unwrap(elem.isSelected);
+					});
+
+				if (selectedFileSpecs.length !== 1) {
+					vwmWell.fmgr.okError('need to select one file');
+					return;
+				}
+
+				// ths.mdlStage.postIntegrity(selectedFileSpecs[0].id, ko.unwrap(selectedFileSpecs[0].name), '', function () {
+				// // Success
+				// ths.fmgr.hide();
+				// }, function (jqXhr) {
+				// // Error
+				// if (jqXhr.status === 422) {
+				// var resJson = jqXhr.responseJSON;
+				// require(['helpers/lang-helper'], function (langHelper) {
+				// var tmpProcessError = (langHelper.translate(resJson.errId) || '{{lang.unknownError}}');
+				// ths.fmgr.okError(tmpProcessError);
+				// });
+				// }
+				// });
+			}
+
+			// Add to observable
+			vwmWell.fmgr.okCallback(mgrCallback);
+
+			// Notification
+			vwmWell.fmgr.okDescription('Please select a file to import');
+
+			// Open file manager
+			vwmWell.fmgr.show();
 		};
 	};
 

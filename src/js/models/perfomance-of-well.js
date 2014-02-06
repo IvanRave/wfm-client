@@ -4,22 +4,28 @@ define(['jquery',
 		'services/datacontext',
 		'helpers/app-helper',
 		'moment',
-		'models/production-data', // Add constructor to datacontext
-		'models/forecast-evolution' // Add constructor to datacontext
-	], function ($, ko, datacontext, appHelper, appMoment) {
+		'models/production-data',
+		'models/forecast-evolution'
+	], function ($,
+		ko,
+		datacontext,
+		appHelper,
+		appMoment,
+    ProductionData,
+    ForecastEvolution) {
 	'use strict';
 
 	// ProductionDataSet (convert data objects into array)
 	function importProductionDataSetDto(data, parent) {
 		return (data || []).map(function (item) {
-			return datacontext.createProductionData(item, parent);
+			return new ProductionData(item, parent);
 		});
 	}
 
-  /**
-   * Perfomance partial (property set)
-   * @constructor
-   */
+	/**
+	 * Perfomance partial (property set)
+	 * @constructor
+	 */
 	var exports = function (wellObj) {
 
 		var prtl = this;
@@ -35,7 +41,7 @@ define(['jquery',
 
 		prtl.prdColumnAttributeList = ko.observableArray();
 
-    prtl.deleteWellProductionData = function () {
+		prtl.deleteWellProductionData = function () {
 			if (confirm('{{capitalizeFirst lang.confirmToDelete}} all production data from well?')) {
 				datacontext.deleteWellProductionData(wellObj.Id).done(function () {
 					prtl.hstProductionDataSet([]);
@@ -43,11 +49,11 @@ define(['jquery',
 				});
 			}
 		};
-    
+
 		//{ #region FORECAST
 
 		// forecast parameters to build graph
-		prtl.forecastEvolution = datacontext.createForecastEvolution({
+		prtl.forecastEvolution = new ForecastEvolution({
 				WellId : wellObj.Id
 			});
 
@@ -253,7 +259,7 @@ define(['jquery',
 
 					// first item in forecast - it's equals last actual production data by main parameters
 
-					return datacontext.createProductionData({
+					return new ProductionData({
 						WellId : +ko.unwrap(wellObj.Id),
 						UnixTime : +ko.unwrap(lastHistoryPD.unixTime),
 						ProdDays : +ko.unwrap(lastHistoryPD.ProdDays),
@@ -397,7 +403,7 @@ define(['jquery',
 
 							// set as last DCA
 							// decline curve analyze unit
-							lastDca = datacontext.createProductionData({
+							lastDca = new ProductionData({
 									UnixTime : k,
 									ProdDays : daysInMonth, // or 30.5 as standart
 									Dict : tmpDict,
@@ -416,7 +422,7 @@ define(['jquery',
 				deferEvaluation : true
 			});
 
-    //} #endregion FORECAST  
+		//} #endregion FORECAST
 	};
 
 	return exports;

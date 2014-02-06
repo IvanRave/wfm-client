@@ -164,8 +164,8 @@ define(['jquery',
                 ////ths.sketchOfWell.load();
                 ////// TODO: load data only if there is one or more perfomance widgets (only once) for entire well
                 ////ths.getWellGroup().getWellGroupWfmParameterList();
-                ////ths.perfomancePartial.forecastEvolution.getDict();
-                ////ths.perfomancePartial.getHstProductionDataSet();
+                ////ths.perfomanceOfWell.forecastEvolution.getDict();
+                ////ths.perfomanceOfWell.getHstProductionDataSet();
                 ////ths.loadWellHistoryList();
             };
 
