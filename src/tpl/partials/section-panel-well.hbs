@@ -24,10 +24,12 @@
           <i class="wfmicon" data-bind="css: 'wfmicon-pd'"></i>
           <span class="caret"></span>
         </div>
-        <ul class="dropdown-menu" data-bind="foreach: $root.wfmParamSquadList">
+        <ul class="dropdown-menu" data-bind="foreach: $root.mdlWorkspace.wfmParamSquadList">
           <li>
-            <!-- TODO: redraw -->
-            <div data-bind="click: function() { $parents[1].selectSection($parents[1].getSectionByPatternId('well-perfomance')); $parents[1].mainPerfomanceView.selectAttrGroupId($data.id); }">
+            <!-- current: squad -->
+            <!-- parent: vwmWellSection -->
+            <!-- parents[1]: vwmWell -->
+            <div data-bind="click: function() { $parents[1].selectVwmSectionWrk($parent); $parents[1].mdlStage.mainPerfomanceView.selectAttrGroupId($data.id); }">
               <span data-bind="text: id"></span>
             </div>
           </li>

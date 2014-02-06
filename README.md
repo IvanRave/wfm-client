@@ -119,6 +119,17 @@ One map can have few map views (in well-map section, in field-map section, in an
 * Selected well marker
 * Selected area
 
+### Perfomance
+* Every well group has few parameters, like 'OilRate', 'WaterCumulative'
+* These parameters divided by groups, like 'Rate', 'Cumulative'
+* Every well contains a graph and a table with these parameters
+* Data (graph and table) builded, using values per day (month, year)
+
+#### Steps to load data
+1. Select a file with production data
+2. Select need columns to import
+3. Import data from this file to a database
+
 ### Well test - Измерение показателей скважины
 * Сперва пользователь определяет необходимые параметры для замера.
 Все возможные параметры можно получить с помощью GET запроса соотвествующего API

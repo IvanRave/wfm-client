@@ -1,29 +1,32 @@
 ﻿/** @module */
-define(['knockout'], function (ko) {
+define(['knockout',
+  'viewmodels/perfomance-of-well'], 
+  function (ko,
+  VwmPerfomanceOfWell) {
     'use strict';
 
     // Subtype from Widget
     var exports = function (opts, widgockItem) {
-        var self = this;
+        var ths = this;
         opts = opts || {};
-
-        self.perfomanceView = widgockItem.getWidgout().getParent().perfomancePartial.createPerfomanceView({
+        
+        this.perfomanceView = new VwmPerfomanceOfWell({
             isVisibleForecastData: opts['IsVisibleForecastData'],
             selectedAttrGroupId: opts['SelectedAttrGroupId'],
             endYear: opts['EndYear'],
             startYear: opts['StartYear'],
             endMonth: opts['EndMonth'],
             startMonth: opts['StartMonth']
-        });
+        }, widgockItem.getWidgout().getParent().perfomancePartial);
 
-        self.toStringifyOpts = function () {
+        this.toStringifyOpts = function () {
             return {
-                'SelectedAttrGroupId': ko.unwrap(self.perfomanceView['selectedAttrGroupId']),
-                'IsVisibleForecastData': ko.unwrap(self.perfomanceView['isVisibleForecastData']),
-                'EndYear': ko.unwrap(self.perfomanceView['WPDDateEndYear']),
-                'StartYear': ko.unwrap(self.perfomanceView['WPDDateStartYear']),
-                'EndMonth': ko.unwrap(self.perfomanceView['WPDDateEndMonth']),
-                'StartMonth': ko.unwrap(self.perfomanceView['WPDDateStartMonth'])
+                'SelectedAttrGroupId': ko.unwrap(ths.perfomanceView['selectedAttrGroupId']),
+                'IsVisibleForecastData': ko.unwrap(ths.perfomanceView['isVisibleForecastData']),
+                'EndYear': ko.unwrap(ths.perfomanceView['WPDDateEndYear']),
+                'StartYear': ko.unwrap(ths.perfomanceView['WPDDateStartYear']),
+                'EndMonth': ko.unwrap(ths.perfomanceView['WPDDateEndMonth']),
+                'StartMonth': ko.unwrap(ths.perfomanceView['WPDDateStartMonth'])
             };
         };
     };

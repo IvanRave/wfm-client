@@ -48,18 +48,6 @@ define(['knockout',
         this.listOfSection = ko.observableArray();
 
         /**
-        * Get section by section pattern id: wrap for selectFileSection function
-        * @param {string} idOfPattern - Id of section pattern, like 'wield-map', 'wield-summary'
-        */
-        this.getSectionByPatternId = function (idOfPattern) {
-            var tmpList = ko.unwrap(ths.listOfSection);
-
-            return tmpList.filter(function (elem) {
-                return elem.sectionPatternId === idOfPattern;
-            })[0];
-        };
-
-        /**
         * List of section patterns for current stage (names, ids, etc.)
         *    Section patterns where idOfStage === stageKey
         * @type {Array.<module:models/section-pattern>}
@@ -152,7 +140,7 @@ define(['knockout',
 
             ////var idOfFileSpec = tmpFileSpecElem.id;
             ////console.log(idOfFileSpec);
-            ////var needSection = ths.getSectionByPatternId('company-summary');
+            ////var needSection = asdf('company-summary');
             ////// Remove from file section + clean FileSpec (delete from logo tables)
             ////needSection.deleteFileSpecById(idOfFileSpec, function () {
             ////ths[fileSpecProp.addtData.nestedClientId](null);

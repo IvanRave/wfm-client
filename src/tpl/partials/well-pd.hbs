@@ -1,8 +1,16 @@
-﻿<div>
+﻿<!-- current: vwmWell -->
+<div data-bind="with: mdlStage">
   <div data-bind="with: mainPerfomanceView">
     <div data-bind="ifnot: prfPartial.isLoadedHstProductionData">{{lang.loading}}...</div>
     <div data-bind="if: prfPartial.isLoadedHstProductionData">
-      <div data-bind="if: prfPartial.hstProductionDataSet().length === 0">No data. Import files from "File manager" to view production data.</div>
+      <div class="clearfix">
+        <div class="pull-left" data-bind="if: prfPartial.hstProductionDataSet().length === 0">No data.</div>
+        <div class="pull-right" data-bind="if: $root.isEmployeeInEditMode">
+          <button class="btn btn-sm btn-default" type="button">
+            <i class="glyphicon glyphicon-plus"></i> Import data
+          </button>
+        </div>
+      </div>
       <div data-bind="if: prfPartial.hstProductionDataSet().length > 0">
         <!-- Settings panel -->
         <div data-bind="with: prfPartial">

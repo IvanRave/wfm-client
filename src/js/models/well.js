@@ -7,7 +7,8 @@ define([
 		'helpers/app-helper',
 		'moment',
 		'models/bases/stage-base',
-		'models/stage-partials/well-perfomance-partial',
+		'models/perfomance-of-well',
+    'viewmodels/perfomance-of-well',
 		'models/section-of-stage',
 		'models/sketch-of-well',
 		'models/prop-spec',
@@ -26,7 +27,9 @@ define([
 		'models/column-attribute',
 		'models/test-scope',
 	], function ($, ko, datacontext, fileHelper,
-		appHelper, appMoment, StageBase, wellPerfomancePartial,
+		appHelper, appMoment, 
+    StageBase,
+    PerfomanceOfWell, VwmPerfomanceOfWell,
 		SectionOfWell, SketchOfWell,
 		PropSpec, wellService,
 		IntegrityOfWell, integrityOfWellService,
@@ -289,7 +292,7 @@ define([
 		this.save = function () {
 			wellService.put(ths.id, ths.toDto());
 		};
-
+    
     this.wellMarkers = ko.observableArray();
     
 		//{ #region TEST
@@ -423,10 +426,8 @@ define([
 				ths.logsOfWell.push(new LogOfWell(createdDataOfLogOfWell));
 			});
 		};
-
-    //} #endregion LOG
     
-		////        fileSpecService.getColumnAttributes(ths.stageKey, needSection.id, tmpFileSpec.id).done(function (res) {
+    ////        fileSpecService.getColumnAttributes(ths.stageKey, needSection.id, tmpFileSpec.id).done(function (res) {
 		////            // ColumnAttributes (convert data objects into array)
 		////            var columnAttributes = importColumnAttributes(res);
 
@@ -495,7 +496,9 @@ define([
 
 		////            bootstrapModal.openModalWindow('Column match', innerDiv, submitFunction);
 
-		////};
+		//// };
+
+    //} #endregion LOG
 
 		//{ #region HISTORY
 
@@ -857,19 +860,19 @@ define([
 
 		//{ #region PERFOMANCE
 
-		this.perfomancePartial = wellPerfomancePartial.init(ths);
+		this.perfomancePartial = new PerfomanceOfWell(ths);
 
-		// Load column attributes - all loading logic in this file (not separated - not in well-perfomance-partial file)
+		// Load column attributes - all loading logic in this file (not separated - not in perfomance of well model)
 		this.perfomancePartial.prdColumnAttributeList(importColumnAttributes(datacontext.getColumnAttributesLocal()));
 
-		this.mainPerfomanceView = ths.perfomancePartial.createPerfomanceView({
-				isVisibleForecastData : false
-			});
-
-		/** Load well sections */
-		this.listOfSection(importListOfSection(data.ListOfSectionOfWellDto, ths));
-
+		this.mainPerfomanceView = new VwmPerfomanceOfWell({
+      isVisibleForecastData : false
+    }, ths.perfomancePartial);
+    
 		//} #endregion PERFOMANCE
+    
+    /** Load well sections */
+		this.listOfSection(importListOfSection(data.ListOfSectionOfWellDto, ths));
 
 		this.toDto = function () {
 			var dtoObj = {
