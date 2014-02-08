@@ -16,7 +16,20 @@ define(['jquery', 'knockout'], function ($, ko) {
         self.Format = ko.observable(data.Format);
 
         self.numeratorList = data.NumeratorList;
+        
+        /*
+        * Copy of num list
+        * @todo: fix remove links from perfomace-of-well and delete #MM!
+        */
+        self.NumeratorList = data.NumeratorList;
+        
         self.denominatorList = data.DenominatorList;
+        
+        /*
+        * Copy of denom list
+        * @todo: fix remove links from perfomace-of-well and delete #MM!
+        */
+        self.DenominatorList = data.DenominatorList;
         // properties
         self.Title = data.Title || '';
 

@@ -1,18 +1,19 @@
 ﻿<!-- current: vwmWell -->
 <div data-bind="with: mainVwmPerfomanceOfWell">
-  <div data-bind="ifnot: prfPartial.isLoadedHstProductionData">{{lang.loading}}...</div>
-  <div data-bind="if: prfPartial.isLoadedHstProductionData">
+  <div data-bind="ifnot: mdlPerfomanceOfWell.isLoadedHstProductionData">{{lang.loading}}...</div>
+  <div data-bind="if: mdlPerfomanceOfWell.isLoadedHstProductionData">
     <div class="clearfix">
-      <div class="pull-left" data-bind="if: prfPartial.hstProductionDataSet().length === 0">No data.</div>
+      <div class="pull-left" data-bind="if: mdlPerfomanceOfWell.hstProductionDataSet().length === 0">No data.</div>
       <div class="pull-right" data-bind="if: $root.isEmployeeInEditMode">
         <button class="btn btn-sm btn-default" type="button" data-bind="click: importPerfomanceData">
+          <!-- TODO: send to lang.json #LL! -->
           <i class="glyphicon glyphicon-plus"></i> Import data
         </button>
       </div>
     </div>
-    <div data-bind="if: prfPartial.hstProductionDataSet().length > 0">
+    <div data-bind="if: mdlPerfomanceOfWell.hstProductionDataSet().length > 0">
       <!-- Settings panel -->
-      <div data-bind="with: prfPartial">
+      <div data-bind="with: mdlPerfomanceOfWell">
         <div data-bind="if: requiredForecastParamListNaNString" class="text-right">
           <small>
             Forecast inaccessible: required parameters:<span data-bind="text: requiredForecastParamListNaNString"></span>
@@ -77,7 +78,7 @@
           </div>
         </div>
       </div>
-      <!-- / with prfPartial  -->
+      <!-- / with mdlPerfomanceOfWell  -->
       <div data-bind="ifnot: selectedAttrGroup">
         Please choose perfomance group
         <!--<ul data-bind="foreach: $root.wfmParamSquadList">
@@ -99,7 +100,7 @@
               <select data-bind="options: joinedYearList, value: WPDDateEndYear" class="input-sm"></select>
               <select data-bind="options: monthList, value: WPDDateEndMonth" class="input-sm"></select>
               <label class="checkbox-inline">
-                <input type="checkbox" data-bind="checked: isVisibleForecastData, enable: prfPartial.isForecastPossible" />Show forecast graph and data
+                <input type="checkbox" data-bind="checked: isVisibleForecastData, enable: mdlPerfomanceOfWell.isForecastPossible" />Show forecast graph and data
               </label>
             </div>
           </div>

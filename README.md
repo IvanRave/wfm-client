@@ -149,6 +149,7 @@ One map can have few map views (in well-map section, in field-map section, in an
 * Cперва добавляется TestScope, получается созданный TestScope.Id и с этим идентификатором добавляются по очереди TestData
 (по возрастанию номера часа: 0, 1, 2.. - лимит технически не задан, но подразумевается либо до 12, либо до 24).
 В TestData в параметре Dict содержится набор значений: {WfmParameter.Id: соответствующее значение замера}.
+* После подтверждения теста, запись добавляется к production data (при отмене подтверждения - данные удаляются из production data).
 
 ### Constants
 #### File purposes (array)
@@ -189,6 +190,23 @@ To check "Whether the user has access to edit (or manage, or view..)?", you may 
 * Generate any language using assemble.io engine
 * Add json object with required language to wfm-dict helper
 * Change settings in Gruntfile.js
+
+### Tasks
+
+* JS: @todo fix: some method #LH!
+* HTML: <!-- TODO: feat: to do something good #AB! -->
+In accordance with 
+* JSDoc documentation (@todo tag)
+* Google styleguide (TODO comment)
+* AngularJS commit style (fix, feat, chore, refactor...) (without target object)
+
+#### Priority
+
+* Format: #[LMH][LMH]! (Low, Medium, High)
+* First letter: level of importance (L - low importance, M, H - high importance)
+* Second letter: level of difficulty (L - low difficulty, M, H - high difficulty)
+Use development order: #HL! #HM! #HH! #ML! #MM! #MH! #LL! #LM! #LH!
+Use search (in all files) to find need priority
 
 ### CORS support
 

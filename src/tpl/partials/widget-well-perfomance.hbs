@@ -17,7 +17,7 @@
                         <select data-bind="options: joinedYearList, value: WPDDateEndYear" class="input-sm"></select>
                         <select data-bind="options: monthList, value: WPDDateEndMonth" class="input-sm"></select>
                         <label class="checkbox-inline">
-                            <input type="checkbox" data-bind="checked: isVisibleForecastData, enable: prfPartial.isForecastPossible" />Show forecast
+                            <input type="checkbox" data-bind="checked: isVisibleForecastData, enable: mdlPerfomanceOfWell.isForecastPossible" />Show forecast
                         </label>
                     </div>
                 </div>
@@ -26,10 +26,10 @@
     </div>
     <div class="widget-content">
         <div data-bind="with: widget.perfomanceView">
-            <div data-bind="ifnot: prfPartial.isLoadedHstProductionData">{{lang.loading}}...</div>
-            <div data-bind="if: prfPartial.isLoadedHstProductionData">
-                <div data-bind="if: prfPartial.hstProductionDataSet().length === 0">No data. Import files from "File manager" to view production data.</div>
-                <div data-bind="if: prfPartial.hstProductionDataSet().length > 0">
+            <div data-bind="ifnot: mdlPerfomanceOfWell.isLoadedHstProductionData">{{lang.loading}}...</div>
+            <div data-bind="if: mdlPerfomanceOfWell.isLoadedHstProductionData">
+                <div data-bind="if: mdlPerfomanceOfWell.hstProductionDataSet().length === 0">No data. Import files from "File manager" to view production data.</div>
+                <div data-bind="if: mdlPerfomanceOfWell.hstProductionDataSet().length > 0">
                     <div data-bind="if: selectedAttrGroup">
                         {{> pd-graph }}
                     </div>

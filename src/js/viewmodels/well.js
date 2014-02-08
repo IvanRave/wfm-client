@@ -1,4 +1,8 @@
-﻿/** @module */
+﻿/**
+ * @module
+ * @todo feat: map widget #MM!
+ *             using only maps with this well
+ */
 define([
 		'jquery',
 		'knockout',
@@ -10,7 +14,7 @@ define([
 		'viewmodels/log-of-well',
 		'viewmodels/nodal-analysis-of-well',
 		'viewmodels/integrity-of-well',
-    'viewmodels/perfomance-of-well'],
+		'viewmodels/perfomance-of-well'],
 	function (
 		$,
 		ko,
@@ -22,7 +26,7 @@ define([
 		VwmLogOfWell,
 		VwmNodalAnalysis,
 		VwmIntegrity,
-    VwmPerfomanceOfWell) {
+		VwmPerfomanceOfWell) {
 	'use strict';
 
 	/**
@@ -52,8 +56,8 @@ define([
 		//mdlSketchOfWell, koWellUnzOfSlcVwmSectionFmg, koSlcVwmSectionFmg,  fmgrLink
 		this.vwmSketchOfWell = new VwmSketchOfWell(ths.mdlStage.sketchOfWell, ths.unzOfSlcVwmSectionFmg, ths.slcVwmSectionFmg, ths.fmgr);
 
-    //{ #region VOLUME
-    
+		//{ #region VOLUME
+
 		/**
 		 * List of views of volume of well
 		 * @type {Array.<viewmodels/volume-of-well>}
@@ -151,24 +155,24 @@ define([
 			// Open file manager
 			ths.fmgr.show();
 		};
-    
-    /**
-     * Remove viewmodel and model of volume
-     */
-    this.removeVwmVolumeOfWell = function(vwmToRemove){
-      if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(vwmToRemove.mdlVolumeOfWell.name) + '"?')) {
-        ths.mdlStage.removeVolumeOfWell(vwmToRemove.mdlVolumeOfWell);
-      }
-    };
 
-    //} #endregion VOLUME
-    
-    //{ #region HISTORY
-    
+		/**
+		 * Remove viewmodel and model of volume
+		 */
+		this.removeVwmVolumeOfWell = function (vwmToRemove) {
+			if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(vwmToRemove.mdlVolumeOfWell.name) + '"?')) {
+				ths.mdlStage.removeVolumeOfWell(vwmToRemove.mdlVolumeOfWell);
+			}
+		};
+
+		//} #endregion VOLUME
+
+		//{ #region HISTORY
+
 		this.vwmScopeOfHistoryOfWell = new VwmScopeOfHistoryOfWell({}, ths);
 
-    //} #endregion HISTORY
-    
+		//} #endregion HISTORY
+
 		//{ #region LOG
 
 		/**
@@ -559,14 +563,14 @@ define([
 		};
 
 		//} #endregion INTEGRITY
-    
-    //{ #region PERFOMANCE
-    
-    this.mainVwmPerfomanceOfWell = new VwmPerfomanceOfWell({
-      isVisibleForecastData : false
-    }, ths.mdlStage.perfomanceOfWell, ths);
-    
-    //} #endregion PERFOMANCE
+
+		//{ #region PERFOMANCE
+
+		this.mainVwmPerfomanceOfWell = new VwmPerfomanceOfWell({
+				isVisibleForecastData : false
+			}, ths.mdlStage.perfomanceOfWell, ths);
+
+		//} #endregion PERFOMANCE
 	};
 
 	return exports;

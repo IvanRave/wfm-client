@@ -19,7 +19,12 @@ define([
 	////self.DZAGOREvolutionF = ko.observable(-406.624470555493);
 	////self.DZAGOREvolutionG = ko.observable(5837.35653403327);
 
-	// Can be load from external resources
+	/**
+	 * Format and description of the forecast evolution
+   *    can be load from external resources
+   * @todo: GOR foreacst evolution -507 - browser not respond (overfill maybe) #LH!
+   *        Try to change without forecast graph
+	 */
 	var libForecastEvolution = {
 		desc : {
 			LiquidEvolutionA : 'Liquid evolution A',

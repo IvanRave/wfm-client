@@ -2,6 +2,7 @@
 define(['jquery',
 		'knockout',
 		'services/datacontext',
+		'services/file-spec',
 		'helpers/app-helper',
 		'moment',
 		'models/production-data',
@@ -9,10 +10,11 @@ define(['jquery',
 	], function ($,
 		ko,
 		datacontext,
+		fileSpecService,
 		appHelper,
 		appMoment,
-    ProductionData,
-    ForecastEvolution) {
+		ProductionData,
+		ForecastEvolution) {
 	'use strict';
 
 	// ProductionDataSet (convert data objects into array)
@@ -49,6 +51,23 @@ define(['jquery',
 				});
 			}
 		};
+
+		/**
+		 * Get fragment (start columns) of production data to match columns
+		 * @todo: fix: get data #HL!
+		 */
+		prtl.getPerfomanceFragment = function (stageKey, idOfSection, idOfFileSpec, indexOfStartRow, countOfRows, scsCallback) {
+			fileSpecService.getPerfomanceFragment(stageKey, idOfSection, idOfFileSpec, indexOfStartRow, countOfRows).done(function (r) {
+				scsCallback(r);
+			});
+		};
+    
+    /**
+    * Import perfomance data from a file to table
+    */
+    prtl.postPerfomanceData = function(stageKey, idOfSection, idOfFileSpec, indexOfStartRow, listOfColumnAttrData, scsCallback){
+      fileSpecService.postPerfomanceData(stageKey, idOfSection, idOfFileSpec, indexOfStartRow, listOfColumnAttrData).done(scsCallback);
+    };
 
 		//{ #region FORECAST
 

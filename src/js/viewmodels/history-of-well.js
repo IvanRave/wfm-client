@@ -171,7 +171,7 @@ define([
                                 mdlHistoryOfWell.postImageOfHistoryOfWell(imageFileSpec.id, coords, function () {
                                     bootstrapModal.closeModalWideWindow();
                                 });
-                            });
+                            }, 'Please select area to crop');
                             // end of require
                         });
                     };
