@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: models/production-data.js</title>
+    
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+    
+    <h1 class="page-title">Source: models/production-data.js</h1>
+    
+    
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source"><code>﻿/** @module */
+define(['jquery',
+		'knockout',
+		'services/datacontext',
+		'moment'], function ($,
+		ko,
+		datacontext,
+		appMoment) {
+	'use strict';
+
+	var calcParamIdList = ['LiquidRate', 'WaterRate', 'OilCum', 'WaterCum', 'LiquidCum', 'GasCum', 'GOR'];
+
+	function getCalcValue(prmId, prfItem) {
+		if (prmId === 'LiquidRate') {
+			var tmpOilRate = ko.unwrap(prfItem['OilRate']);
+			var tmpWaterRate = ko.unwrap(prfItem['WaterRate']);
+
+			if ($.isNumeric(tmpOilRate) === false) {
+				return {
+					error : {
+						msg : 'required as a number',
+						param : 'OilRate',
+						mainParam : 'LiquidRate'
+					}
+				};
+			}
+			if ($.isNumeric(tmpWaterRate) === false) {
+				return {
+					error : {
+						msg : 'required as a number',
+						param : 'WaterRate',
+						mainParam : 'LiquidRate'
+					}
+				};
+			}
+
+			return {
+				response : tmpOilRate + tmpWaterRate
+			};
+		} else if (prmId === 'WaterRate') {
+			var tmpLiquidRate = ko.unwrap(prfItem['LiquidRate']);
+			var tmpWaterCut = ko.unwrap(prfItem['WaterCut']);
+			if ($.isNumeric(tmpLiquidRate) === false) {
+				return {
+					error : {
+						msg : 'required as a number',
+						param : 'LiquidRate',
+						mainParam : 'WaterRate'
+					}
+				};
+			}
+			if ($.isNumeric(tmpWaterCut) === false) {
+				return {
+					error : {
+						msg : 'required as a number',
+						param : 'WaterCut',
+						mainParam : 'WaterRate'
+					}
+				};
+			}
+
+			return {
+				response : tmpLiquidRate * (tmpWaterCut / 100)
+			};
+		} else if (prmId === 'GOR') {
+			var gorGasRate = ko.unwrap(prfItem['GasRate']);
+			var gorOilRate = ko.unwrap(prfItem['OilRate']);
+
+			if ($.isNumeric(gorGasRate) === false) {
+				return {
+					error : {
+						msg : 'required as a number',
+						param : 'GasRate',
+						mainParam : 'GOR'
+					}
+				};
+			}
+			if ($.isNumeric(gorOilRate) === false) {
+				return {
+					error : {
+						msg : 'required as a number',
+						param : 'OilRate',
+						mainParam : 'GOR'
+					}
+				};
+			}
+			if (gorOilRate === 0) {
+				return {
+					error : {
+						msg : 'can not be 0',
+						param : 'OilRate',
+						mainParam : 'GOR'
+					}
+				};
+			}
+
+			return {
+				response : gorGasRate / gorOilRate
+			};
+		} else if (prmId === 'OilCum' || prmId === 'WaterCum' || prmId === 'LiquidCum' || prmId === 'GasCum') {
+			var accordRateId = prmId.replace("Cum", "Rate");
+			var accordRateValue = ko.unwrap(prfItem[accordRateId]);
+			if ($.isNumeric(accordRateValue) === false) {
+				return {
+					error : {
+						msg : 'required as a number',
+						param : accordRateId,
+						mainParam : prmId
+					}
+				};
+			}
+
+			var arr = ko.unwrap(prfItem.getWell().perfomanceOfWell.hstProductionDataSet);
+
+			var cumSum = 0;
+			for (var i = 0, imax = arr.length; i &lt; imax; i += 1) {
+				if (arr[i].unixTime &lt;= prfItem.unixTime) {
+					cumSum += parseInt(arr[i].ProdDays, 10) * parseFloat(ko.unwrap(arr[i][accordRateId]));
+				}
+			}
+
+			return {
+				response : cumSum
+			};
+		}
+	}
+
+	/**
+	 * Production data
+	 * @constructor
+	 */
+	var exports = function (data, well) {
+		var self = this;
+		data = data || {};
+
+		self.getWell = function () {
+			return well;
+		};
+
+		// Unix time, or POSIX time, is a system for describing instances in time,
+		// defined as the number of seconds that have elapsed
+		// since 00:00:00 Coordinated Universal Time (UTC), 1 January 1970,
+		// not counting leap seconds.
+		self.unixTime = data.UnixTime;
+		self.WellId = data.WellId;
+		self.ProdDays = data.ProdDays;
+
+		self.prfYear = new Date(self.unixTime * 1000).getFullYear();
+		self.prfMonthStr = appMoment(self.unixTime * 1000).format('MMM');
+
+		// forecast data have no calculated properties, but you can construct forecast by last calculated row (other than last normal row)
+		self.isForecast = data.IsForecast;
+
+		for (var dictItem in data.Dict) {
+			// if param is not calculated
+			if ($.inArray(calcParamIdList, dictItem) === -1) {
+				if ($.isNumeric(data.Dict[dictItem])) {
+					self[dictItem] = ko.observable(+data.Dict[dictItem]);
+				} else {
+					alert('Production data parameter is not float [' + dictItem + ': ' + data.Dict[dictItem] + ']');
+				}
+			}
+		}
+
+		// calculated props
+		$.each(calcParamIdList, function (prmIdIndex, prmId) {
+			self[prmId] = ko.computed({
+					read : function () {
+						//if (self.isForecast) { return; }
+						// Find from all params:
+						var needGroupParam = $.grep(ko.unwrap(self.getWell().getWellGroup().wellGroupWfmParameterList), function (arrElem) {
+								return arrElem.wfmParameterId === prmId;
+							})[0];
+
+						if (!needGroupParam) {
+							return;
+						}
+
+						if (needGroupParam.isCalc() === false) {
+							if (typeof data.Dict[prmId] !== 'undefined') {
+								if ($.isNumeric(data.Dict[prmId])) {
+									return +data.Dict[prmId];
+								} else {
+									alert('Production data parameter is not float [' + prmId + ': ' + data.Dict[prmId] + ']');
+								}
+							}
+							return;
+						} else {
+							var jpg = getCalcValue(prmId, self);
+
+							if (jpg.error) {
+								needGroupParam.isCalc(false);
+								console.log(needGroupParam.isCalc());
+								alert(jpg.error.mainParam + ' calculation: ' + jpg.error.param + ' ' + jpg.error.msg);
+								return;
+							} else {
+								return jpg.response;
+							}
+						}
+					},
+					deferEvaluation : true
+				});
+		});
+
+		self.toPlainJson = function () {
+			return ko.toJS(self);
+		};
+	};
+
+	return exports;
+});
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="all-bindings.html">bindings/all-bindings</a></li><li><a href="svg-bindings.html">bindings/svg-bindings</a></li><li><a href="stage-constants.html">constants/stage-constants</a></li><li><a href="svg-elem-type-constants.html">constants/svg-elem-type-constants</a></li><li><a href="ajax-request.html">helpers/ajax-request</a></li><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="log-helper.html">helpers/log-helper</a></li><li><a href="area-of-map-of-wield.html">models/area-of-map-of-wield</a></li><li><a href="column-attribute.html">models/column-attribute</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="file-spec-of-history-of-well.html">models/file-spec-of-history-of-well</a></li><li><a href="forecast-evolution.html">models/forecast-evolution</a></li><li><a href="history-of-well.html">models/history-of-well</a></li><li><a href="integrity-of-well.html">models/integrity-of-well</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="log-of-well.html">models/log-of-well</a></li><li><a href="map-of-wield.html">models/map-of-wield</a></li><li><a href="nodal-analysis-of-well.html">models/nodal-analysis-of-well</a></li><li><a href="perfomance-of-well.html">models/perfomance-of-well</a></li><li><a href="production-data.html">models/production-data</a></li><li><a href="prop-spec.html">models/prop-spec</a></li><li><a href="section-of-stage.html">models/section-of-stage</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="sketch-of-well.html">models/sketch-of-well</a></li><li><a href="svg-elem.html">models/svg-elem</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="volume-of-well.html">models/volume-of-well</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-marker-of-map-of-wield.html">models/well-marker-of-map-of-wield</a></li><li><a href="wfm-image.html">models/wfm-image</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="widget.html">models/widget</a></li><li><a href="widgock.html">models/widgock</a></li><li><a href="widgout.html">models/widgout</a></li><li><a href="wield.html">models/wield</a></li><li><a href="workspace.html">models/workspace</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="stage-base.html">models\bases/stage-base</a></li><li><a href="auth.html">services/auth</a></li><li><a href="company_.html">services/company</a></li><li><a href="company-user.html">services/company-user</a></li><li><a href="file-spec_.html">services/file-spec</a></li><li><a href="file-spec-of-history-of-well_.html">services/file-spec-of-history-of-well</a></li><li><a href="image-of-history-of-well.html">services/image-of-history-of-well</a></li><li><a href="integrity-of-well_.html">services/integrity-of-well</a></li><li><a href="log-of-well_.html">services/log-of-well</a></li><li><a href="map-of-wield_.html">services/map-of-wield</a></li><li><a href="nodal-analysis-of-well_.html">services/nodal-analysis-of-well</a></li><li><a href="register.html">services/register</a></li><li><a href="sketch-of-well_.html">services/sketch-of-well</a></li><li><a href="svg-elem-of-log-of-well.html">services/svg-elem-of-log-of-well</a></li><li><a href="volume-of-well_.html">services/volume-of-well</a></li><li><a href="wegion_.html">services/wegion</a></li><li><a href="well_.html">services/well</a></li><li><a href="well-marker-of-map-of-wield_.html">services/well-marker-of-map-of-wield</a></li><li><a href="widget_.html">services/widget</a></li><li><a href="widgout_.html">services/widgout</a></li><li><a href="wield_.html">services/wield</a></li><li><a href="wroup_.html">services/wroup</a></li><li><a href="company__.html">viewmodels/company</a></li><li><a href="employee_.html">viewmodels/employee</a></li><li><a href="history-of-well_.html">viewmodels/history-of-well</a></li><li><a href="integrity-of-well__.html">viewmodels/integrity-of-well</a></li><li><a href="log-of-well__.html">viewmodels/log-of-well</a></li><li><a href="map-of-wield__.html">viewmodels/map-of-wield</a></li><li><a href="map-tool.html">viewmodels/map-tool</a></li><li><a href="nodal-analysis-of-well__.html">viewmodels/nodal-analysis-of-well</a></li><li><a href="perfomance-of-well_.html">viewmodels/perfomance-of-well</a></li><li><a href="scope-of-history-of-well.html">viewmodels/scope-of-history-of-well</a></li><li><a href="section-of-stage_.html">viewmodels/section-of-stage</a></li><li><a href="sketch-of-well__.html">viewmodels/sketch-of-well</a></li><li><a href="user-profile_.html">viewmodels/user-profile</a></li><li><a href="volume-of-well__.html">viewmodels/volume-of-well</a></li><li><a href="wegion__.html">viewmodels/wegion</a></li><li><a href="well__.html">viewmodels/well</a></li><li><a href="well-marker-of-map-of-wield__.html">viewmodels/well-marker-of-map-of-wield</a></li><li><a href="widget__.html">viewmodels/widget</a></li><li><a href="widgock_.html">viewmodels/widgock</a></li><li><a href="widgout__.html">viewmodels/widgout</a></li><li><a href="wield__.html">viewmodels/wield</a></li><li><a href="workspace_.html">viewmodels/workspace</a></li><li><a href="wroup__.html">viewmodels/wroup</a></li><li><a href="stage-base_.html">viewmodels\bases/stage-base</a></li><li><a href="stage-child-base.html">viewmodels\bases/stage-child-base</a></li><li><a href="widget-default-summary.html">viewmodels\widgets/widget-default-summary</a></li><li><a href="widget-well-history.html">viewmodels\widgets/widget-well-history</a></li><li><a href="widget-well-perfomance.html">viewmodels\widgets/widget-well-perfomance</a></li><li><a href="widget-well-sketch.html">viewmodels\widgets/widget-well-sketch</a></li><li><a href="widget-wield-map.html">viewmodels\widgets/widget-wield-map</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Sat Feb 08 2014 01:08:26 GMT+0200 (EET)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
