@@ -591,24 +591,11 @@ define(['jquery',
 							tmpSlcColumnAttrList,
 							function () {
 							// update data after import
-							console.log('successfuly imported');
+							mdlPerfomanceOfWell.isLoadedHstProductionData(false);
+              mdlPerfomanceOfWell.getHstProductionDataSet();
 						});
 					});
 				});
-
-				// ths.mdlStage.postIntegrity(selectedFileSpecs[0].id, ko.unwrap(selectedFileSpecs[0].name), '', function () {
-				// // Success
-				// ths.fmgr.hide();
-				// }, function (jqXhr) {
-				// // Error
-				// if (jqXhr.status === 422) {
-				// var resJson = jqXhr.responseJSON;
-				// require(['helpers/lang-helper'], function (langHelper) {
-				// var tmpProcessError = (langHelper.translate(resJson.errId) || '{{lang.unknownError}}');
-				// ths.fmgr.okError(tmpProcessError);
-				// });
-				// }
-				// });
 			}
 
 			// Add to observable
@@ -619,6 +606,15 @@ define(['jquery',
 
 			// Open file manager
 			vwmWell.fmgr.show();
+		};
+
+    /**
+    * Remove all production data
+    */
+		vw.removeWellProductionData = function () {
+			if (confirm('{{capitalizeFirst lang.confirmToDelete}} all production data from well?')) {
+				mdlPerfomanceOfWell.deleteWellProductionData();
+			}
 		};
 	};
 

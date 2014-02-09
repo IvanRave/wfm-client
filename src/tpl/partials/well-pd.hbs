@@ -5,6 +5,11 @@
     <div class="clearfix">
       <div class="pull-left" data-bind="if: mdlPerfomanceOfWell.hstProductionDataSet().length === 0">No data.</div>
       <div class="pull-right" data-bind="if: $root.isEmployeeInEditMode">
+        <!-- ko if: mdlPerfomanceOfWell.hstProductionDataSet().length > 0 -->
+        <button class="btn btn-default btn-sm" type="button" data-bind="click: removeWellProductionData">
+          <i class="glyphicon glyphicon-remove"></i> Remove production data
+        </button>
+        <!-- /ko -->
         <button class="btn btn-sm btn-default" type="button" data-bind="click: importPerfomanceData">
           <!-- TODO: send to lang.json #LL! -->
           <i class="glyphicon glyphicon-plus"></i> Import data
@@ -13,66 +18,69 @@
     </div>
     <div data-bind="if: mdlPerfomanceOfWell.hstProductionDataSet().length > 0">
       <!-- Settings panel -->
-      <div data-bind="with: mdlPerfomanceOfWell">
-        <div data-bind="if: requiredForecastParamListNaNString" class="text-right">
-          <small>
-            Forecast inaccessible: required parameters:<span data-bind="text: requiredForecastParamListNaNString"></span>
-          </small>
-        </div>
-        <div data-bind="ifnot: requiredForecastParamListNaNString">
-          <div data-bind="with: forecastEvolution">
-            <div data-bind="if: requiredForecastEvoListNaNString" class="text-right">
-              <small>
-                Forecast inaccessible: required evolutions:<span data-bind="text: requiredForecastEvoListNaNString"></span>
-              </small>
-            </div>
+      <div data-bind="if: $root.isEmployeeInEditMode">
+        <div data-bind="with: mdlPerfomanceOfWell">
+          <div data-bind="if: requiredForecastParamListNaNString" class="text-right">
+            <small>
+              Forecast inaccessible: required parameters:<span data-bind="text: requiredForecastParamListNaNString"></span>
+            </small>
           </div>
-          <div class="text-right">
-            <label class="checkbox-inline">
-              <input type="checkbox" data-bind="checked: isVisibleForecastPanel" />Show settings
-            </label>
-          </div>
-          <div data-bind="if: isVisibleForecastPanel" class="text-center">
-            <div class="btn-group">
-              <button type="button" class="btn btn-default btn-sm" data-bind="click: forecastEvolution.save">Save evolution</button>
-              <button type="button" class="btn btn-default btn-sm" data-bind="click: deleteWellProductionData">Delete production data</button>
+          <div data-bind="ifnot: requiredForecastParamListNaNString">
+            <div class="clearfix">
+              <div class="pull-left" data-bind="with: forecastEvolution">
+                <div data-bind="if: requiredForecastEvoListNaNString">
+                    Forecast inaccessible: required evolutions:<span data-bind="text: requiredForecastEvoListNaNString"></span>
+                </div>
+              </div>
+              <div class="pull-right">
+                <label class="checkbox-inline">
+                  <input type="checkbox" data-bind="checked: isVisibleForecastPanel" />Show settings
+                </label>
+              </div>
             </div>
-            <div>
-              <div class="evo-scope-wrap">
-                <span class="evo-wrap" data-bind="with: forecastEvolution.Dict">
-                  <b>Liquid</b> = <input type="text" class="input-narrow" data-bind="value: LiquidEvolutionA" />
-                  * EXP (<input type="text" class="input-narrow" data-bind="value: LiquidEvolutionB" /> * X)
-                </span>
-                <span class="evo-wrap" title="Corrections to last value = Evolution1 * EXP(Evolution2 * LastPd.LiquidCum)">
-                  Diff = <span data-bind="text: DZADiffLiquid"></span>
-                </span>
-                <span class="evo-wrap" title="Corrections to last value = Diff - LastPd.LiquidRate">
-                  Result = <span data-bind="text: DZADiffLiquidResult"></span>
-                </span>
+            <div data-bind="if: isVisibleForecastPanel">
+              <div>
+                <div class="evo-scope-wrap">
+                  <span class="evo-wrap" data-bind="with: forecastEvolution.Dict">
+                    <b>Liquid</b> = <input type="text" class="input-narrow" data-bind="value: LiquidEvolutionA" />
+                    * EXP (<input type="text" class="input-narrow" data-bind="value: LiquidEvolutionB" /> * X)
+                  </span>
+                  <span class="evo-wrap" title="Corrections to last value = Evolution1 * EXP(Evolution2 * LastPd.LiquidCum)">
+                    Diff = <span data-bind="text: DZADiffLiquid"></span>
+                  </span>
+                  <span class="evo-wrap" title="Corrections to last value = Diff - LastPd.LiquidRate">
+                    Result = <span data-bind="text: DZADiffLiquidResult"></span>
+                  </span>
+                </div>
+                <div class="evo-scope-wrap">
+                  <span class="evo-wrap" data-bind="with: forecastEvolution.Dict">
+                    <b>Water cut</b> = <input type="text" class="input-narrow" data-bind="value: WctEvolutionC" />
+                    * Ln(X) - <input type="text" class="input-narrow" data-bind="value: WctEvolutionD" />
+                  </span>
+                  <span class="evo-wrap" title="Corrections to last value = Evolution1 * Ln(LastPd.OilCum) - Evolution2">
+                    Diff = <span data-bind="text: DZADiffWCT"></span>
+                  </span>
+                  <span class="evo-wrap" title="Corrections to last value = Diff - LastPd.WaterCut">
+                    Result = <span data-bind="text: DZADiffWCTResult"></span>
+                  </span>
+                </div>
+                <div class="evo-scope-wrap">
+                  <span class="evo-wrap" data-bind="with: forecastEvolution.Dict">
+                    <b>GOR</b> = <input type="text" class="input-narrow" data-bind="value: GorEvolutionF" />
+                    * Ln(X) + <input type="text" class="input-narrow" data-bind="value: GorEvolutionG" />
+                  </span>
+                  <span class="evo-wrap" title="Corrections to last value = Evolution1 * Ln(LastPd.OilCum) + Evolution2">
+                    Diff = <span data-bind="text: DZADiffGOR"></span>
+                  </span>
+                  <span class="evo-wrap" title="Corrections to last value = Diff - LastPd.GOR">
+                    Result = <span data-bind="text: DZADiffGORResult"></span>
+                  </span>
+                </div>
               </div>
-              <div class="evo-scope-wrap">
-                <span class="evo-wrap" data-bind="with: forecastEvolution.Dict">
-                  <b>Water cut</b> = <input type="text" class="input-narrow" data-bind="value: WctEvolutionC" />
-                  * Ln(X) - <input type="text" class="input-narrow" data-bind="value: WctEvolutionD" />
-                </span>
-                <span class="evo-wrap" title="Corrections to last value = Evolution1 * Ln(LastPd.OilCum) - Evolution2">
-                  Diff = <span data-bind="text: DZADiffWCT"></span>
-                </span>
-                <span class="evo-wrap" title="Corrections to last value = Diff - LastPd.WaterCut">
-                  Result = <span data-bind="text: DZADiffWCTResult"></span>
-                </span>
-              </div>
-              <div class="evo-scope-wrap">
-                <span class="evo-wrap" data-bind="with: forecastEvolution.Dict">
-                  <b>GOR</b> = <input type="text" class="input-narrow" data-bind="value: GorEvolutionF" />
-                  * Ln(X) + <input type="text" class="input-narrow" data-bind="value: GorEvolutionG" />
-                </span>
-                <span class="evo-wrap" title="Corrections to last value = Evolution1 * Ln(LastPd.OilCum) + Evolution2">
-                  Diff = <span data-bind="text: DZADiffGOR"></span>
-                </span>
-                <span class="evo-wrap" title="Corrections to last value = Diff - LastPd.GOR">
-                  Result = <span data-bind="text: DZADiffGORResult"></span>
-                </span>
+              <div class="min-left-margin">
+                <button type="button" class="btn btn-default btn-sm" data-bind="click: forecastEvolution.save">
+                  <i class="glyphicon glyphicon-save"></i> Save evolution
+                </button>
               </div>
             </div>
           </div>
@@ -80,7 +88,7 @@
       </div>
       <!-- / with mdlPerfomanceOfWell  -->
       <div data-bind="ifnot: selectedAttrGroup">
-        Please choose perfomance group
+        Please select a perfomance group from the bottom panel
         <!--<ul data-bind="foreach: $root.wfmParamSquadList">
           <li data-bind="with: id">
             <a href="#" data-bind="click: function(){ $parents[1].selectAttrGroupId($data);}">

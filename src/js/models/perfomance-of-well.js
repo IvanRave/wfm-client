@@ -44,12 +44,9 @@ define(['jquery',
 		prtl.prdColumnAttributeList = ko.observableArray();
 
 		prtl.deleteWellProductionData = function () {
-			if (confirm('{{capitalizeFirst lang.confirmToDelete}} all production data from well?')) {
-				datacontext.deleteWellProductionData(wellObj.Id).done(function () {
-					prtl.hstProductionDataSet([]);
-					prtl.isLoadedHstProductionData(false);
-				});
-			}
+			datacontext.deleteWellProductionData(wellObj.id).done(function () {
+				prtl.hstProductionDataSet([]);
+			});
 		};
 
 		/**
@@ -61,13 +58,13 @@ define(['jquery',
 				scsCallback(r);
 			});
 		};
-    
-    /**
-    * Import perfomance data from a file to table
-    */
-    prtl.postPerfomanceData = function(stageKey, idOfSection, idOfFileSpec, indexOfStartRow, listOfColumnAttrData, scsCallback){
-      fileSpecService.postPerfomanceData(stageKey, idOfSection, idOfFileSpec, indexOfStartRow, listOfColumnAttrData).done(scsCallback);
-    };
+
+		/**
+		 * Import perfomance data from a file to table
+		 */
+		prtl.postPerfomanceData = function (stageKey, idOfSection, idOfFileSpec, indexOfStartRow, listOfColumnAttrData, scsCallback) {
+			fileSpecService.postPerfomanceData(stageKey, idOfSection, idOfFileSpec, indexOfStartRow, listOfColumnAttrData).done(scsCallback);
+		};
 
 		//{ #region FORECAST
 
@@ -358,14 +355,16 @@ define(['jquery',
 		// 1. set ProductionDataSet to []
 		// 2. set isLoaded to false
 		prtl.getHstProductionDataSet = function () {
-			if (!ko.unwrap(prtl.isLoadedHstProductionData)) {
-				datacontext.getProductionData({
-					well_id : wellObj.Id
-				}).done(function (result) {
-					prtl.hstProductionDataSet(importProductionDataSetDto(result, wellObj));
-					prtl.isLoadedHstProductionData(true);
-				});
+			if (ko.unwrap(prtl.isLoadedHstProductionData)) {
+				return;
 			}
+
+			datacontext.getProductionData({
+				well_id : wellObj.Id
+			}).done(function (result) {
+				prtl.hstProductionDataSet(importProductionDataSetDto(result, wellObj));
+				prtl.isLoadedHstProductionData(true);
+			});
 		};
 
 		prtl.isForecastPossible = ko.computed({
