@@ -305,6 +305,30 @@ define([
 				ths.listOfTestScope(importTestScopeDtoList(response, ths));
 			});
 		};
+    
+    /**
+    * Last approved test scope for potential section in well group
+    * @type {module:models/test-scope}
+    */
+    this.lastApprovedTestScope = ko.computed({
+      read: function(){
+        var tmpApprovedList = ko.unwrap(ths.listOfTestScope).filter(function(elem){
+          return ko.unwrap(elem.isApproved) === true;
+        });
+        
+        var lastTestScope = tmpApprovedList[0];
+        
+        // Find last (by time) test scope
+        tmpApprovedList.forEach(function(elem){
+            if (ko.unwrap(elem.startUnixTime) > ko.unwrap(lastTestScope.startUnixTime)){
+              lastTestScope = elem;
+            }
+        });
+        
+        return lastTestScope;
+      },
+      deferEvaluation: true
+    });
 
 		/** Unix time data for creating new test scope */
 		this.testScopeNewStartUnixTime = {

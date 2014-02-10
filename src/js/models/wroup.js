@@ -210,8 +210,14 @@ define(['jquery',
 			switch (idOfSectionPattern) {
 			case 'wroup-unit':
       case 'wroup-potential':
-				// Get all maps from this field
+				// Params (table headers)
 				ths.loadListOfWfmParameterOfWroup();
+        
+        // Test data (table body)
+        ko.unwrap(ths.wells).forEach(function(elem){
+          elem.loadListOfTestScope();
+        });
+        
 				break;
 			}
 		};

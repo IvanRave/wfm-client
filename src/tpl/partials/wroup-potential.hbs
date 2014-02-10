@@ -1,15 +1,17 @@
 ﻿<!-- current: vwmStage (wroup) -->
 <div>
-  <h4>Last test data:</h4>
+  <h4>Monthly potential</h4>
   <table class="table">
     <thead>
       <tr>
-        <th>Name</th>
-        <th>Date</th>
+        <th class="text-center">Well</th>
+        <th class="text-center">Test date</th>
         <!-- ko foreach: listOfVwmWfmParameterOfWroup -->
-        <th data-bind="with: mdlWfmParameterOfWroup.wfmParameter">
-          <span data-bind="text: id"></span>,<br />
-          <span data-bind="text: uom"></span>
+        <th class="text-center" data-bind="with: mdlWfmParameterOfWroup.wfmParameter">
+          <span data-bind="text: id"></span>
+          <span data-bind="visible: uom">
+            <br /><span data-bind="text: uom"></span>
+          </span>
         </th>
         <!-- /ko -->
       </tr>
@@ -17,33 +19,44 @@
     <tbody>
       <!-- ko foreach: {data: listOfVwmChild, as: 'vwmWell'} -->
       <tr>
-        <td>
-          <span data-bind="text: vwmWell.mdlStage.Name"></span>
+        <td class="text-center">
+          <div>
+            <span data-bind="text: vwmWell.mdlStage.Name"></span>
+          </div>
+          <div>
+            <small class="text-success" data-bind="visible: vwmWell.mdlStage.IsActive">Active</small>
+            <small class="text-danger" data-bind="hidden: vwmWell.mdlStage.IsActive">Inactive</small>
+          </div>
         </td>
-        <td>
-          <!-- LastApprovedTestScope -->
-          <!-- <div data-bind="with: vwmWell.mdlStage.lastTestScope">
+        <td class="text-center">
+          <div data-bind="with: vwmWell.mdlStage.lastApprovedTestScope">
             <span data-bind="text: startUnixTimeDateView"></span>
-          </div> -->
+          </div>
         </td>
         <!-- parent: vwmWroup -->
         <!-- ko foreach: { data: $parent.listOfVwmWfmParameterOfWroup, as: 'vwmWfmPrm'} -->
-        <td>
-          <!-- LastApprovedTestScope -->
-          <!-- <div data-bind="with: vwmWell.mdlStage.lastTestScope">
+        <td class="text-center">
+          <div data-bind="with: vwmWell.mdlStage.lastApprovedTestScope">
             <span data-bind="text: testDataTotal()[vwmWfmPrm.mdlWfmParameterOfWroup.wfmParameterId]"></span>
-          </div> -->
+          </div>
         </td>
         <!-- /ko -->
         <!-- /ko -->
       </tr>
       <!-- /ko -->
-      <!-- <tr class="success">
-            <td>
-                Total
-            </td>
-            <td></td>
-        </tr> -->
     </tbody>
+    <tfoot>
+      <tr class="success">
+        <td class="text-center">
+          Total
+        </td>
+        <td>
+        <!-- Date -->
+        </td>
+        <!-- ko foreach: { data: listOfVwmWfmParameterOfWroup, as: 'vwmWfmPrm'} -->
+        <td></td>
+        <!-- /ko -->
+      </tr>
+    </tfoot>
   </table>
 </div>
