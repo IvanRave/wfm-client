@@ -25,6 +25,7 @@ define([
 		'services/file-spec',
 		'models/column-attribute',
 		'models/test-scope',
+    'services/test-scope'
 	], function ($, ko, datacontext, fileHelper,
 		appHelper, appMoment,
 		StageBase,
@@ -36,7 +37,7 @@ define([
 		stageConstants, VolumeOfWell,
 		volumeOfWellService, HistoryOfWell,
 		LogOfWell, logOfWellService,
-		fileSpecService, ColumnAttribute, TestScope) {
+		fileSpecService, ColumnAttribute, TestScope, testScopeService) {
 	'use strict';
 
 	function importVolumes(data) {
@@ -243,7 +244,7 @@ define([
 					break;
 				}
 			case 'well-test': {
-					ths.getTestScopeList();
+					ths.loadTestScopeList();
 					ths.getWellGroup().loadListOfWfmParameterOfWroup();
 					break;
 				}
@@ -311,10 +312,8 @@ define([
 
 		this.lastTestScope = ko.observable();
 
-		this.getTestScopeList = function () {
-			datacontext.getTestScope({
-				well_id : ths.Id
-			}).done(function (response) {
+		this.loadTestScopeList = function () {
+      testScopeService.get(ths.id).done(function (response) {
 				ths.testScopeList(importTestScopeDtoList(response, ths));
 			});
 		};
@@ -356,8 +355,8 @@ define([
 				// Add minutes
 				unixTime += ko.unwrap(ths.testScopeNewStartUnixTime.minute) * 60;
 
-				datacontext.saveNewTestScope({
-					WellId : ths.Id,
+        testScopeService.post({
+					WellId : ths.id,
 					StartUnixTime : unixTime,
 					IsApproved : null,
 					ConductedBy : '',

@@ -2,14 +2,16 @@
 define([
 		'jquery',
 		'knockout',
-		'services/datacontext',
 		'moment',
-		'models/test-data'],
+		'models/test-data',
+		'services/test-data',
+    'services/test-scope'],
 	function ($,
 		ko,
-		datacontext,
 		appMoment,
-    TestData) {
+		TestData,
+		testDataService,
+    testScopeService) {
 	'use strict';
 
 	function importTestDataDtoList(data, testScopeItem) {
@@ -17,12 +19,12 @@ define([
 			return new TestData(item, testScopeItem);
 		});
 	}
-  
-  /**
-   * Model: test scope - parent of test records (test data)
-   * @constructor
-   */
-	var exports = function(data, wellItem) {
+
+	/**
+	 * Model: test scope - parent of test records (test data)
+	 * @constructor
+	 */
+	var exports = function (data, wellItem) {
 		var self = this;
 		data = data || {};
 
@@ -40,7 +42,7 @@ define([
 
 		this.setIsApproved = function (isApprovedVal) {
 			self.isApproved(isApprovedVal);
-			datacontext.saveChangedTestScope(self);
+      testScopeService.put(self.id, self.toPlainJson());
 		};
 
 		this.startUnixTimeDateView = ko.computed({
@@ -53,21 +55,19 @@ define([
 		this.testDataList = ko.observableArray();
 
 		this.addTestData = function () {
-			var testDataItem = new TestData({
-					Comment : '',
-					HourNumber : self.testDataList().length,
-					TestScopeId : self.id,
-					Dict : {}
-				}, self);
-
-			datacontext.saveNewTestData(testDataItem).done(function (response) {
+			testDataService.post({
+				Comment : '',
+				HourNumber : ko.unwrap(self.testDataList).length,
+				TestScopeId : self.id,
+				Dict : {}
+			}).done(function (response) {
 				self.testDataList.push(new TestData(response, self));
 			});
 		};
 
 		this.deleteTestData = function (testDataItem) {
 			if (confirm('{{capitalizeFirst lang.confirmToDelete}}?') === true) {
-				datacontext.deleteTestData(testDataItem).done(function () {
+        testDataService.remove(testDataItem.testScopeId, testDataItem.hourNumber).done(function () {
 					self.testDataList.remove(testDataItem);
 				});
 			}
@@ -121,5 +121,5 @@ define([
 		this.testDataList(importTestDataDtoList(data.TestDataDtoList, self));
 	};
 
-  return exports;
+	return exports;
 });

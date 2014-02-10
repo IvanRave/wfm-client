@@ -19,12 +19,6 @@
     function productionDataUrl(uqp) {
         return '{{conf.requrl}}/api/productiondata/' + (uqp ? ('?' + $.param(uqp)) : '');
     }
-    function testScopeUrl(uqp) {
-        return '{{conf.requrl}}/api/testscope/' + (uqp ? ('?' + $.param(uqp)) : '');
-    }
-    function testDataUrl(uqp) {
-        return '{{conf.requrl}}/api/testdata/' + (uqp ? ('?' + $.param(uqp)) : '');
-    }
     
     function forecastEvolutionUrl(uqp) {
         return '{{conf.requrl}}/api/forecastevolution/' + (uqp ? ('?' + $.param(uqp)) : '');
@@ -132,36 +126,6 @@
         return ajaxRequest('PUT', userProfileUrl({ 'id': data.userId }), data);
     }
 
-    function saveNewTestScope(testScopeItem) {
-        return ajaxRequest('POST', testScopeUrl(), testScopeItem);
-    }
-
-    function saveChangedTestScope(testScopeItem) {
-        return ajaxRequest('PUT', testScopeUrl({ id: testScopeItem.id }), testScopeItem);
-    }
-
-    function getTestScope(uqp) {
-        return ajaxRequest('GET', testScopeUrl(uqp));
-    }
-
-    function saveNewTestData(testDataItem) {
-        return ajaxRequest('POST', testDataUrl(), testDataItem);
-    }
-
-    function saveChangedTestData(testDataItem) {
-        return ajaxRequest('PUT', testDataUrl({
-            testscope_id: testDataItem.testScopeId,
-            hournumber: testDataItem.hourNumber
-        }), testDataItem);
-    }
-
-    function deleteTestData(testDataItem) {
-        return ajaxRequest('DELETE', testDataUrl({
-            testscope_id: testDataItem.testScopeId,
-            hournumber: testDataItem.hourNumber
-        }));
-    }
-
     // ================== forecast evolution
     function getForecastEvolution(wellId) {
         return ajaxRequest('GET', forecastEvolutionUrl({ well_id: wellId }));
@@ -195,15 +159,7 @@
         createUserProfile: createUserProfile,
         getUserProfile: getUserProfile,
         putUserProfile: putUserProfile,
-        // test scope
-        saveNewTestScope: saveNewTestScope,
-        saveChangedTestScope: saveChangedTestScope,
-        getTestScope: getTestScope,
         // ... todo:
-        // test data
-        saveNewTestData: saveNewTestData,
-        saveChangedTestData: saveChangedTestData,
-        deleteTestData: deleteTestData,
         getForecastEvolution: getForecastEvolution,
         postForecastEvolution: postForecastEvolution
     };

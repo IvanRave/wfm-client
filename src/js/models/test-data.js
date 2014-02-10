@@ -6,14 +6,18 @@
  *        when disapprove - remove this data from perfomance table and graph
  * @todo: refactor: last approved well test in well group table #MM!
  */
-define(['jquery', 'knockout', 'services/datacontext'], function ($, ko, datacontext) {
+define([
+		'jquery',
+		'knockout',
+		'services/test-data'],
+	function ($, ko, testDataService) {
 	'use strict';
 
-  /**
-  * Model: test data - test record from test scope
-  * @constructor
-  */
-	var exports = function(data, testScopeItem) {
+	/**
+	 * Model: test data - test record from test scope
+	 * @constructor
+	 */
+	var exports = function (data, testScopeItem) {
 		var self = this;
 		data = data || {};
 
@@ -40,7 +44,7 @@ define(['jquery', 'knockout', 'services/datacontext'], function ($, ko, datacont
 		};
 
 		this.saveTestData = function () {
-			datacontext.saveChangedTestData(self).done(function (response) {
+			testDataService.put(self.testScopeId, self.hourNumber, ko.toJS(self)).done(function (response) {
 				self.getTestScope().testDataListUpdateDate(new Date());
 				self.comment(response.Comment);
 				self.dict = response.Dict;
@@ -53,11 +57,7 @@ define(['jquery', 'knockout', 'services/datacontext'], function ($, ko, datacont
 			self.dict = $.extend({}, cancelData.dict);
 			self.isEdit(false);
 		};
-
-		this.toPlainJson = function () {
-			return ko.toJS(self);
-		};
 	};
 
-  return exports;
+	return exports;
 });
