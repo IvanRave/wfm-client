@@ -204,6 +204,38 @@ define(['jquery',
 		this.save = function () {
 			wroupService.put(ths.Id, ths.toDto());
 		};
+    
+    /**
+    * Sum of totals of test scopes
+    *    for wroup potential
+    */
+    this.totalTestScopeOfWells = ko.computed({
+      read: function(){
+        var result = {};
+        var tmpActiveWells = ko.unwrap(ths.wells).filter(function(elem){
+          return ko.unwrap(elem['IsActive']) === true;
+        });
+        
+        var tmpWroupParams = ko.unwrap(ths.listOfWfmParameterOfWroup);
+        
+        tmpActiveWells.forEach(function(tmpWell){
+          var tmpLastApprovedTestScope = ko.unwrap(tmpWell.lastApprovedTestScope);
+          if (tmpLastApprovedTestScope){
+            var tmpTestDataTotal = ko.unwrap(tmpLastApprovedTestScope.testDataTotal);
+            tmpWroupParams.forEach(function(tmpParam){
+              if (!result[tmpParam.wfmParameterId]){
+                result[tmpParam.wfmParameterId] = 0;
+              }
+              
+              result[tmpParam.wfmParameterId] += +(tmpTestDataTotal[tmpParam.wfmParameterId] || 0);
+            });
+          }
+        });
+        
+        return result;
+      },
+      deferEvaluation: true
+    });
 
 		/** Set this section as selected */
 		this.loadSectionContent = function (idOfSectionPattern) {

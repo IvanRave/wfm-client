@@ -30,14 +30,18 @@
         </td>
         <td class="text-center">
           <div data-bind="with: vwmWell.mdlStage.lastApprovedTestScope">
-            <span data-bind="text: startUnixTimeDateView"></span>
+            <span data-bind="css: {'text-muted': vwmWell.mdlStage.IsActive() === false }">
+              <span data-bind="text: startUnixTimeDateView"></span>
+            </span>
           </div>
         </td>
         <!-- parent: vwmWroup -->
         <!-- ko foreach: { data: $parent.listOfVwmWfmParameterOfWroup, as: 'vwmWfmPrm'} -->
         <td class="text-center">
           <div data-bind="with: vwmWell.mdlStage.lastApprovedTestScope">
-            <span data-bind="text: testDataTotal()[vwmWfmPrm.mdlWfmParameterOfWroup.wfmParameterId]"></span>
+            <span data-bind="css: {'text-muted': vwmWell.mdlStage.IsActive() === false }">
+              <span data-bind="text: testDataTotal()[vwmWfmPrm.mdlWfmParameterOfWroup.wfmParameterId]"></span>
+            </span>
           </div>
         </td>
         <!-- /ko -->
@@ -54,7 +58,9 @@
         <!-- Date -->
         </td>
         <!-- ko foreach: { data: listOfVwmWfmParameterOfWroup, as: 'vwmWfmPrm'} -->
-        <td></td>
+        <td class="text-center">
+          <span data-bind="text: $parent.mdlStage.totalTestScopeOfWells()[vwmWfmPrm.mdlWfmParameterOfWroup.wfmParameterId]"></span>
+        </td>
         <!-- /ko -->
       </tr>
     </tfoot>
