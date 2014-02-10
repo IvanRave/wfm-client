@@ -244,7 +244,7 @@ define([
 					break;
 				}
 			case 'well-test': {
-					ths.loadTestScopeList();
+					ths.loadListOfTestScope();
 					ths.getWellGroup().loadListOfWfmParameterOfWroup();
 					break;
 				}
@@ -298,23 +298,11 @@ define([
 
 		//{ #region TEST
 
-		this.testScopeList = ko.observableArray();
-    
-    /**
-    * List of tests, sorted by time
-    */
-		this.sortedListOfTestScope = ko.computed(function () {
-				return ko.unwrap(ths.testScopeList).sort(function (left, right) {
-					return ko.unwrap(left.startUnixTime) === ko.unwrap(right.startUnixTime) ? 0 :
-					(ko.unwrap(left.startUnixTime) < ko.unwrap(right.startUnixTime) ? 1 : -1);
-				});
-			});
+		this.listOfTestScope = ko.observableArray();
 
-		this.lastTestScope = ko.observable();
-
-		this.loadTestScopeList = function () {
+		this.loadListOfTestScope = function () {
       testScopeService.get(ths.id).done(function (response) {
-				ths.testScopeList(importTestScopeDtoList(response, ths));
+				ths.listOfTestScope(importTestScopeDtoList(response, ths));
 			});
 		};
 
@@ -362,18 +350,8 @@ define([
 					ConductedBy : '',
 					CertifiedBy : ''
 				}).done(function (response) {
-					ths.testScopeList.unshift(new TestScope(response, ths));
+					ths.listOfTestScope.unshift(new TestScope(response, ths));
 				});
-			}
-		};
-
-		this.selectedTestScope = ko.observable();
-
-		this.chooseTestScope = function (testScopeItem) {
-			if (testScopeItem === ths.selectedTestScope()) {
-				ths.selectedTestScope(null);
-			} else {
-				ths.selectedTestScope(testScopeItem);
 			}
 		};
 

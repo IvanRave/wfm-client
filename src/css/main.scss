@@ -344,22 +344,25 @@ footer {
         }
 
 .test-header {
-    padding: 2px 4px;
-    color: #fff;
+    padding: 4px;
     background-color: #777;
 }
-
-    .test-header a {
-        color: #fff;
-        text-decoration: underline;
-    }
-
     .test-header.test-approved {
         background-color: #18c164;
     }
 
     .test-header.test-declined {
         background-color: #ea7353;
+    }
+    
+    .test-header .test-header-prop {
+        padding-top: 2px;
+        color: #fff;
+    }
+    
+    .test-header .test-status {
+        padding-top: 2px;
+        color: #fff;
     }
 
 .modal-wide {

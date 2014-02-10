@@ -5,13 +5,13 @@ define([
 		'moment',
 		'models/test-data',
 		'services/test-data',
-    'services/test-scope'],
+		'services/test-scope'],
 	function ($,
 		ko,
 		appMoment,
 		TestData,
 		testDataService,
-    testScopeService) {
+		testScopeService) {
 	'use strict';
 
 	function importTestDataDtoList(data, testScopeItem) {
@@ -25,7 +25,8 @@ define([
 	 * @constructor
 	 */
 	var exports = function (data, wellItem) {
-		var self = this;
+		var ths = this;
+
 		data = data || {};
 
 		this.getWell = function () {
@@ -40,14 +41,37 @@ define([
 		this.conductedBy = ko.observable(data.ConductedBy);
 		this.certifiedBy = ko.observable(data.CertifiedBy);
 
-		this.setIsApproved = function (isApprovedVal) {
-			self.isApproved(isApprovedVal);
-      testScopeService.put(self.id, self.toPlainJson());
+		this.save = function () {
+			testScopeService.put(ths.id, ths.toPlainJson());
+		};
+
+		/**
+		 * Approve test
+		 */
+		this.setStatusToApproved = function () {
+			ths.isApproved(true);
+			ths.save();
+		};
+
+		/**
+		 * Decline test
+		 */
+		this.setStatusToDeclined = function () {
+			ths.isApproved(false);
+			ths.save();
+		};
+
+		/**
+		 * Clear declined of approved status of this test
+		 */
+		this.setStatusToNull = function () {
+			ths.isApproved(null);
+			ths.save();
 		};
 
 		this.startUnixTimeDateView = ko.computed({
 				read : function () {
-					return appMoment(self.startUnixTime() * 1000).format('YYYY-MM-DD HH:mm');
+					return appMoment(ko.unwrap(ths.startUnixTime) * 1000).format('YYYY-MM-DD HH:mm');
 				},
 				deferEvaluation : true
 			});
@@ -57,18 +81,18 @@ define([
 		this.addTestData = function () {
 			testDataService.post({
 				Comment : '',
-				HourNumber : ko.unwrap(self.testDataList).length,
-				TestScopeId : self.id,
+				HourNumber : ko.unwrap(ths.testDataList).length,
+				TestScopeId : ths.id,
 				Dict : {}
 			}).done(function (response) {
-				self.testDataList.push(new TestData(response, self));
+				ths.testDataList.push(new TestData(response, ths));
 			});
 		};
 
 		this.deleteTestData = function (testDataItem) {
 			if (confirm('{{capitalizeFirst lang.confirmToDelete}}?') === true) {
-        testDataService.remove(testDataItem.testScopeId, testDataItem.hourNumber).done(function () {
-					self.testDataList.remove(testDataItem);
+				testDataService.remove(testDataItem.testScopeId, testDataItem.hourNumber).done(function () {
+					ths.testDataList.remove(testDataItem);
 				});
 			}
 		};
@@ -80,12 +104,12 @@ define([
 		this.testDataTotal = ko.computed({
 				read : function () {
 					var result = {};
-					if (self.testDataList().length > 0) {
+					if (ths.testDataList().length > 0) {
 						// check for release computed value
-						if (self.testDataListUpdateDate()) {
-							$.each(ko.unwrap(self.getWell().getWellGroup().listOfWfmParameterOfWroup), function (paramIndex, paramValue) {
+						if (ths.testDataListUpdateDate()) {
+							$.each(ko.unwrap(ths.getWell().getWellGroup().listOfWfmParameterOfWroup), function (paramIndex, paramValue) {
 								var tempArr = [];
-								$.each(self.testDataList(), function (testDataIndex, testDataValue) {
+								$.each(ths.testDataList(), function (testDataIndex, testDataValue) {
 									if (typeof testDataValue.dict[paramValue.wfmParameterId] !== "undefined" && testDataValue.dict[paramValue.wfmParameterId] !== null) {
 										tempArr.push(parseFloat((testDataValue.dict[paramValue.wfmParameterId])));
 									}
@@ -110,7 +134,7 @@ define([
 			});
 
 		this.toPlainJson = function () {
-			var copy = ko.toJS(self);
+			var copy = ko.toJS(ths);
 			delete copy.startUnixTimeDateView;
 			delete copy.testDataTotal;
 			delete copy.testDataListUpdateDate;
@@ -118,7 +142,7 @@ define([
 		};
 
 		// fill test data list
-		this.testDataList(importTestDataDtoList(data.TestDataDtoList, self));
+		this.testDataList(importTestDataDtoList(data.TestDataDtoList, ths));
 	};
 
 	return exports;

@@ -21,16 +21,18 @@
           <span data-bind="text: vwmWell.mdlStage.Name"></span>
         </td>
         <td>
-          <div data-bind="with: vwmWell.mdlStage.lastTestScope">
+          <!-- LastApprovedTestScope -->
+          <!-- <div data-bind="with: vwmWell.mdlStage.lastTestScope">
             <span data-bind="text: startUnixTimeDateView"></span>
-          </div>
+          </div> -->
         </td>
         <!-- parent: vwmWroup -->
         <!-- ko foreach: { data: $parent.listOfVwmWfmParameterOfWroup, as: 'vwmWfmPrm'} -->
         <td>
-          <div data-bind="with: vwmWell.mdlStage.lastTestScope">
+          <!-- LastApprovedTestScope -->
+          <!-- <div data-bind="with: vwmWell.mdlStage.lastTestScope">
             <span data-bind="text: testDataTotal()[vwmWfmPrm.mdlWfmParameterOfWroup.wfmParameterId]"></span>
-          </div>
+          </div> -->
         </td>
         <!-- /ko -->
         <!-- /ko -->

@@ -14,7 +14,8 @@ define([
 		'viewmodels/log-of-well',
 		'viewmodels/nodal-analysis-of-well',
 		'viewmodels/integrity-of-well',
-		'viewmodels/perfomance-of-well'],
+		'viewmodels/perfomance-of-well',
+		'viewmodels/test-scope'],
 	function (
 		$,
 		ko,
@@ -26,7 +27,8 @@ define([
 		VwmLogOfWell,
 		VwmNodalAnalysis,
 		VwmIntegrity,
-		VwmPerfomanceOfWell) {
+		VwmPerfomanceOfWell,
+		VwmTestScope) {
 	'use strict';
 
 	/**
@@ -578,6 +580,34 @@ define([
 			}, ths.mdlStage.perfomanceOfWell, ths);
 
 		//} #endregion PERFOMANCE
+
+		//{ #region TEST
+
+		this.listOfVwmTestScope = ko.computed({
+				read : function () {
+					return ko.unwrap(ths.mdlStage.listOfTestScope).map(function (elem) {
+						return new VwmTestScope(elem);
+					});
+				},
+				deferEvaluation : true
+			});
+
+		/**
+		 * List of tests, sorted by time
+		 */
+		this.handledListOfVwmTestScope = ko.computed({
+				read : function () {
+					return ko.unwrap(ths.listOfVwmTestScope).sort(function (left, right) {
+						var tmpLeftTime = ko.unwrap(left.mdlTestScope.startUnixTime),
+						tmpRightTime = ko.unwrap(right.mdlTestScope.startUnixTime);
+
+						return tmpLeftTime === tmpRightTime ? 0 : (tmpLeftTime < tmpRightTime ? 1 : -1);
+					});
+				},
+				deferEvaluation : true
+			});    
+
+		//} #endregion TEST
 	};
 
 	return exports;
