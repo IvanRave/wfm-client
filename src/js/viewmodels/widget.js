@@ -60,9 +60,6 @@ define(['knockout',
 			VwmWidgetWellHistory.call(ths, widgetOpts, tmpParentVwmStage);
 			break;
 		case 'wield-map':
-			////require(['viewmodels/wield'], function (asdf) {
-			////    console.log('asdf', asdf);
-			////});
 			VwmWidgetWieldMap.call(ths, widgetOpts, tmpWidgetMdlStage);
 			break;
 		case 'well-sketch':

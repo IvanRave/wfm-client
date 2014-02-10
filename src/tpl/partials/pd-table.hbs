@@ -3,32 +3,32 @@
   <thead>
     <tr>
       <th>Time</th>
-      <!-- ko foreach: {data: selectedWroupWfmParameterList, as: 'groupParam'} -->
+      <!-- ko foreach: {data: listOfSlcVwmWfmParameterOfWroup, as: 'vwmParam'} -->
       <th>
         <div>
           <small>
-            <i class="glyphicon glyphicon-bookmark" data-bind="style: { color: color }"></i>
+            <i class="glyphicon glyphicon-bookmark" data-bind="style: { color: vwmParam.mdlWfmParameterOfWroup.color }"></i>
           </small>
-          <span data-bind="text: groupParam.wfmParameterId"></span>
+          <span data-bind="text: vwmParam.mdlWfmParameterOfWroup.wfmParameterId"></span>
         </div>
         <div>
           <label class="checkbox-inline">
-            <input type="checkbox" title="show/hide" data-bind="checked: isVisible" />Show
+            <input type="checkbox" title="show/hide" data-bind="checked: vwmParam.isVisible" />Show
           </label>
           <label class="checkbox-inline">
-            <input type="checkbox" title="usual/calc" data-bind="checked: isCalc" />Calc
+            <input type="checkbox" title="usual/calc" data-bind="checked: vwmParam.mdlWfmParameterOfWroup.isCalc" />Calc
           </label>
         </div>
-        <div data-bind="foreach: { data: groupParam.wfmParameter().uomMatrix(), as: 'mtrx' }" class="clearfix">
+        <div data-bind="foreach: { data: vwmParam.mdlWfmParameterOfWroup.wfmParameter().uomMatrix, as: 'mtrx' }" class="clearfix">
           <div data-bind="foreach: {data: mtrx, as: 'uomItem' }" class="pull-left">
             <div class="btn-group">
               <button type="button" class="btn btn-default dropdown-toggle btn-sm" data-toggle="dropdown">
                 <span data-bind="text: uomItem"></span>
                 <span class="caret"></span>
               </button>
-              <ul class="dropdown-menu" role="menu" data-bind="foreach: {data: groupParam.wfmParameter().getPossibleUomListForSelectedUom(uomItem), as: 'possibleUom'}">
+              <ul class="dropdown-menu" role="menu" data-bind="foreach: {data: vwmParam.mdlWfmParameterOfWroup.wfmParameter().getPossibleUomListForSelectedUom(uomItem), as: 'possibleUom'}">
                 <li>
-                  <a href="#" data-bind="text: possibleUom, click: function(){ groupParam.wfmParameter().changeSelectedUom(possibleUom, $parentContext.$parentContext.$index(), $parentContext.$index()); }"></a>
+                  <span class="pointer link-view" data-bind="text: possibleUom, click: function(){ vwmParam.mdlWfmParameterOfWroup.wfmParameter().changeSelectedUom(possibleUom, $parentContext.$parentContext.$index(), $parentContext.$index()); }"></span>
                 </li>
               </ul>
             </div>
@@ -45,9 +45,9 @@
       <td>
         (<span title="Production days" data-bind="text: wpd.ProdDays"></span>)&nbsp;<span data-bind="text: wpd.prfYear + '-' + wpd.prfMonthStr"></span>
       </td>
-      <!-- ko foreach: {data: $parent.selectedWroupWfmParameterList, as: 'groupParam'} -->
+      <!-- ko foreach: {data: $parent.listOfSlcVwmWfmParameterOfWroup, as: 'vwmParam'} -->
       <td>
-        <span data-bind="visible: isVisible, prec: {value: wpd[groupParam.wfmParameterId], coef: groupParam.wfmParameter().uomCoef}"></span>
+        <span data-bind="visible: isVisible, prec: {value: wpd[vwmParam.mdlWfmParameterOfWroup.wfmParameterId], coef: vwmParam.mdlWfmParameterOfWroup.wfmParameter().uomCoef}"></span>
       </td>
       <!-- /ko -->
     </tr>

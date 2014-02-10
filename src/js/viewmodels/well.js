@@ -42,6 +42,13 @@ define([
 
 		this.fmgr = parentVwmWroup.fmgr;
 
+		/**
+		 * Get parent viewmodel (wroup)
+		 */
+		this.getParentVwm = function () {
+			return parentVwmWroup;
+		};
+
 		// Has sections and widgets
 		VwmStageBase.call(this, defaultSlcData.wellSectionId, parentVwmWroup.unqOfSlcVwmChild);
 

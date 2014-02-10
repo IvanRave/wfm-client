@@ -276,30 +276,37 @@ define(['jquery',
 				deferEvaluation : true
 			});
 
-		vw.selectAttrGroupId = function (attrGroupId) {
+		/**
+		 * Select id of attribute group
+		 */
+		this.selectAttrGroupId = function (attrGroupId) {
 			vw.selectedAttrGroupId(attrGroupId);
 		};
 
-		// Well group parameters for selected squad
-		vw.selectedWroupWfmParameterList = ko.computed({
+		/**
+		 * List of selected viewmodels of parameters
+		 * @type {Array.<module:viewmodels/wfm-parameter-of-wroup>}
+		 */
+		this.listOfSlcVwmWfmParameterOfWroup = ko.computed({
 				read : function () {
 					var resultArr = [];
+
 					var tmpSelectedAttrGroup = ko.unwrap(vw.selectedAttrGroup);
+
 					if (tmpSelectedAttrGroup) {
-						// list of wg parameters for this well group
-						var tmpWellGroupWfmParameterList = ko.unwrap(mdlPerfomanceOfWell.getWellObj().getWellGroup().wellGroupWfmParameterList);
+						var tmpListGlobal = ko.unwrap(vwmWell.getParentVwm().listOfVwmWfmParameterOfWroup);
 
 						// list of parameter for selected squad
 						var tmpSelectedWfmParameterList = ko.unwrap(tmpSelectedAttrGroup.wfmParameterList);
 
 						// Select only parameter ids
-						var tmpSelectedWfmParameterIdList = $.map(tmpSelectedWfmParameterList, function (ssgElem) {
+						var tmpIdList = tmpSelectedWfmParameterList.map(function (ssgElem) {
 								return ssgElem.id;
 							});
 
 						// return only well group wfm parameters in selected squad
-						resultArr = $.grep(tmpWellGroupWfmParameterList, function (wgpElem) {
-								return $.inArray(wgpElem.wfmParameterId, tmpSelectedWfmParameterIdList) >= 0;
+						resultArr = tmpListGlobal.filter(function (wgpElem) {
+								return $.inArray(wgpElem.mdlWfmParameterOfWroup.wfmParameterId, tmpIdList) >= 0;
 							});
 					}
 
@@ -308,11 +315,11 @@ define(['jquery',
 				deferEvaluation : true
 			});
 
-		vw.filteredByDateProductionDataSet = ko.computed({
+		/**
+		 * Production data, filtered by date
+		 */
+		this.filteredByDateProductionDataSet = ko.computed({
 				read : function () {
-					////if (!ko.unwrap(vw.WPDDateStartYear)) {
-
-					////}
 					var resultArr = [];
 
 					var tmpHstProductionDataSet = ko.unwrap(mdlPerfomanceOfWell.hstProductionDataSet),
@@ -384,15 +391,21 @@ define(['jquery',
 		// Real value border: min and max values of data in selected squad
 		vw.filteredByDateProductionDataSetValueBorder = ko.computed({
 				read : function () {
+					// Params viewmodels
+					var tmpVwmList = ko.unwrap(vw.listOfSlcVwmWfmParameterOfWroup);
+					// Data
+					var tmpDataList = ko.unwrap(vw.filteredByDateProductionDataSet);
+
 					// get max and min value to find coef for graph
 					var minValue,
 					maxValue;
 
-					$.each(ko.unwrap(vw.filteredByDateProductionDataSet), function (prfIndex, prfElem) {
-						$.each(ko.unwrap(vw.selectedWroupWfmParameterList), function (clmIndex, clmElem) {
+					$.each(tmpDataList, function (prfIndex, prfElem) {
+						$.each(tmpVwmList, function (clmIndex, clmElem) {
 							if (ko.unwrap(clmElem.isVisible)) {
-								if ($.isNumeric(ko.unwrap(prfElem[clmElem.wfmParameterId]))) {
-									var tmpValue = ko.unwrap(prfElem[clmElem.wfmParameterId]) * ko.unwrap(clmElem.wfmParameter().uomCoef);
+								var tmpMdl = clmElem.mdlWfmParameterOfWroup;
+								if ($.isNumeric(ko.unwrap(prfElem[tmpMdl.wfmParameterId]))) {
+									var tmpValue = ko.unwrap(prfElem[tmpMdl.wfmParameterId]) * ko.unwrap(tmpMdl.wfmParameter().uomCoef);
 									// init first values
 									if (typeof minValue === 'undefined' || typeof maxValue === 'undefined') {
 										minValue = maxValue = tmpValue;
@@ -519,11 +532,19 @@ define(['jquery',
 
 		// Update perfomance graph data: graph path for selected regions (d3 line objects in one json object)
 		///<return>{'WaterRate': d3Line, ...}</return>
-		vw.productionDataSetSvgPath = ko.computed(function () {
-				return getSvgPath(
-					ko.unwrap(vw.selectedWroupWfmParameterList),
-					ko.unwrap(vw.filteredByDateProductionDataSetTimeBorder),
-					ko.unwrap(vw.filteredByDateProductionDataSetValueBorder));
+		vw.productionDataSetSvgPath = ko.computed({
+				read : function () {
+					// Generate model list from viewmodel list
+					var tmpList = ko.unwrap(vw.listOfSlcVwmWfmParameterOfWroup).map(function (elem) {
+							return elem.mdlWfmParameterOfWroup;
+						});
+
+					return getSvgPath(
+						tmpList,
+						ko.unwrap(vw.filteredByDateProductionDataSetTimeBorder),
+						ko.unwrap(vw.filteredByDateProductionDataSetValueBorder));
+				},
+				deferEvaluation : true
 			});
 
 		vw.joinedYearList = ko.computed({
@@ -592,7 +613,15 @@ define(['jquery',
 							function () {
 							// update data after import
 							mdlPerfomanceOfWell.isLoadedHstProductionData(false);
-              mdlPerfomanceOfWell.getHstProductionDataSet();
+							mdlPerfomanceOfWell.getHstProductionDataSet();
+						}, function (jqXhr) {
+							if (jqXhr.status === 422) {
+								var resJson = jqXhr.responseJSON;
+								require(['helpers/lang-helper'], function (langHelper) {
+									var tmpProcessError = (langHelper.translate(resJson.errId) || resJson.errId);
+									alert(tmpProcessError);
+								});
+							}
 						});
 					});
 				});
@@ -608,9 +637,9 @@ define(['jquery',
 			vwmWell.fmgr.show();
 		};
 
-    /**
-    * Remove all production data
-    */
+		/**
+		 * Remove all production data
+		 */
 		vw.removeWellProductionData = function () {
 			if (confirm('{{capitalizeFirst lang.confirmToDelete}} all production data from well?')) {
 				mdlPerfomanceOfWell.deleteWellProductionData();

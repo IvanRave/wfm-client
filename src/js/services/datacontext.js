@@ -8,9 +8,6 @@
     function wellHistoryUrl(uqp) {
         return '{{conf.requrl}}/api/wellhistory/' + (uqp ? ('?' + $.param(uqp)) : '');
     }
-    function sectionPatternsUrl() {
-        return '{{conf.requrl}}/api/section-patterns';
-    }
 
     function wellFieldMapAreaUrl(uqp) {
         return '{{conf.requrl}}/api/wellfieldmaparea/' + (uqp ? ('?' + $.param(uqp)) : '');
@@ -28,12 +25,7 @@
     function testDataUrl(uqp) {
         return '{{conf.requrl}}/api/testdata/' + (uqp ? ('?' + $.param(uqp)) : '');
     }
-    function wellGroupWfmParameterUrl(uqp) {
-        return '{{conf.requrl}}/api/wellgroupwfmparameter/' + (uqp ? ('?' + $.param(uqp)) : '');
-    }
-    function wfmParamSquadUrl(uqp) {
-        return '{{conf.requrl}}/api/wfmparamsquad/' + (uqp ? ('?' + $.param(uqp)) : '');
-    }
+    
     function forecastEvolutionUrl(uqp) {
         return '{{conf.requrl}}/api/forecastevolution/' + (uqp ? ('?' + $.param(uqp)) : '');
     }
@@ -56,12 +48,6 @@
 
     function deleteWellProductionData(wellId) {
         return ajaxRequest('DELETE', productionDataUrl({ 'well_id': wellId }));
-    }
-
-    function getWfmParamSquadList(uqp) {
-        return ajaxRequest('GET', wfmParamSquadUrl(uqp));
-
-        ////return ['rate', 'cumulative', 'watercut', 'gor'];
     }
 
     function getColumnAttributesLocal() {
@@ -176,41 +162,6 @@
         }));
     }
 
-    // get wellGroup wfmParameter list
-    function getWellGroupWfmParameterList(uqp) {
-        return ajaxRequest('GET', wellGroupWfmParameterUrl(uqp));
-        /// return [{
-        /// WellGroupId: 123,
-        /// WfmParameterId: 'GasRate',
-        /// Color: ...
-        /// }]       
-    }
-
-    // if user create new parameter - before sending need to create wfmParameter in database and get its Id
-    // if user choose from library - we know its Id and we know WellGroupId from well
-    function postWellGroupWfmParameter(wellGroupWfmParameterItem) {
-        return ajaxRequest('POST', wellGroupWfmParameterUrl(), wellGroupWfmParameterItem);
-    }
-
-    // user wants to change color of parameter (in someone wellGroup)
-    function putWellGroupWfmParameter(wellGroupWfmParameterItem) {
-        return ajaxRequest('PUT', wellGroupWfmParameterUrl({
-            wellGroupId: wellGroupWfmParameterItem.wellGroupId,
-            wfmParameterId: wellGroupWfmParameterItem.WfmParameterId
-        }), wellGroupWfmParameterItem);
-    }
-
-    // delete parameter from wellgroup
-    // need to clean all data from TestData (and ProductionData)
-    // if no one used this parameter (no more references to this table) and if parameter is not in the library 
-    // then delete from wfmParameter table
-    function deleteWellGroupWfmParameter(wellGroupWfmParameterItem) {
-        return ajaxRequest('DELETE', wellGroupWfmParameterUrl({
-            wellGroupId: wellGroupWfmParameterItem.wellGroupId,
-            wfmParameterId: wellGroupWfmParameterItem.WfmParameterId
-        }));
-    }
-
     // ================== forecast evolution
     function getForecastEvolution(wellId) {
         return ajaxRequest('GET', forecastEvolutionUrl({ well_id: wellId }));
@@ -253,12 +204,6 @@
         saveNewTestData: saveNewTestData,
         saveChangedTestData: saveChangedTestData,
         deleteTestData: deleteTestData,
-        // well group wfm parameter
-        getWellGroupWfmParameterList: getWellGroupWfmParameterList,
-        postWellGroupWfmParameter: postWellGroupWfmParameter,
-        putWellGroupWfmParameter: putWellGroupWfmParameter,
-        deleteWellGroupWfmParameter: deleteWellGroupWfmParameter,
-        getWfmParamSquadList: getWfmParamSquadList,
         getForecastEvolution: getForecastEvolution,
         postForecastEvolution: postForecastEvolution
     };
@@ -269,10 +214,6 @@
 
     datacontext.postCompanyJobType = function (companyId, jobTypeData) {
         return ajaxRequest('POST', companyJobTypeUrl(companyId), jobTypeData);
-    };
-
-    datacontext.getListOfSectionPattern = function () {
-        return ajaxRequest('GET', sectionPatternsUrl());
     };
 
     return datacontext;

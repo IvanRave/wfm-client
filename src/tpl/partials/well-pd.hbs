@@ -3,7 +3,16 @@
   <div data-bind="ifnot: mdlPerfomanceOfWell.isLoadedHstProductionData">{{lang.loading}}...</div>
   <div data-bind="if: mdlPerfomanceOfWell.isLoadedHstProductionData">
     <div class="clearfix">
-      <div class="pull-left" data-bind="if: mdlPerfomanceOfWell.hstProductionDataSet().length === 0">No data.</div>
+      <div class="pull-left" data-bind="if: mdlPerfomanceOfWell.hstProductionDataSet().length === 0">
+        <div class="alert alert-warning">
+          No data. Use the "Import data" button in edit mode to import data.
+        </div>
+        <div data-bind="if: listOfSlcVwmWfmParameterOfWroup().length === 0">
+          <div class="alert alert-warning">
+            No units. Use the "Units" section in this well group to select need units.
+          </div>
+        </div>
+      </div>
       <div class="pull-right" data-bind="if: $root.isEmployeeInEditMode">
         <!-- ko if: mdlPerfomanceOfWell.hstProductionDataSet().length > 0 -->
         <button class="btn btn-default btn-sm" type="button" data-bind="click: removeWellProductionData">
@@ -89,13 +98,6 @@
       <!-- / with mdlPerfomanceOfWell  -->
       <div data-bind="ifnot: selectedAttrGroup">
         Please select a perfomance group from the bottom panel
-        <!--<ul data-bind="foreach: $root.wfmParamSquadList">
-          <li data-bind="with: id">
-            <a href="#" data-bind="click: function(){ $parents[1].selectAttrGroupId($data);}">
-              <span data-bind="text: $data"></span>
-            </a>
-          </li>
-        </ul>-->
       </div>
       <div data-bind="if: selectedAttrGroup">
         <div>

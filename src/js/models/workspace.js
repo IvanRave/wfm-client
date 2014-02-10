@@ -1,21 +1,28 @@
 ﻿/** @module */
 define([
     'knockout',
-    'services/datacontext',
-    'helpers/modal-helper',
     'helpers/app-helper',
     'models/user-profile',
     'models/section-pattern',
+    'services/section-pattern',
+    'models/wfm-param-squad',
+    'services/wfm-param-squad',
     'services/auth',
     'services/register',
-    'helpers/knockout-lazy',
-    'models/wfm-param-squad'],
-    function (ko, datacontext, bootstrapModal, appHelper, UserProfile, SectionPattern, userProfileService, registerService) {
+    'helpers/knockout-lazy'],
+    function (ko,
+    appHelper,
+    UserProfile,
+    SectionPattern,
+    sectionPatternService,
+    WfmParamSquad,
+    wfmParamSquadService,
+    userProfileService,
+    registerService) {
         'use strict';
 
-        // WfmParamSquadList (convert data objects into array)
         function importWfmParamSquadList(data) {
-            return (data || []).map(function (item) { return datacontext.createWfmParamSquad(item); });
+            return (data || []).map(function (item) { return new WfmParamSquad(item); });
         }
 
         function importListOfSectionPattern(data) {
@@ -32,14 +39,14 @@ define([
 
             // =====================================Wfm parameters begin==========================================================
             this.wfmParamSquadList = ko.lazyObservableArray(function () {
-                datacontext.getWfmParamSquadList({ is_inclusive: true }).done(function (r) {
+                wfmParamSquadService.getInclusive().done(function (r) {
                     ths.wfmParamSquadList(importWfmParamSquadList(r));
                 });
             }, this);
 
             /** Get list of section patterns: lazy loading by first request */
             this.ListOfSectionPatternDto = ko.lazyObservableArray(function () {
-                datacontext.getListOfSectionPattern().done(function (r) {
+                sectionPatternService.get().done(function (r) {
                     ths.ListOfSectionPatternDto(importListOfSectionPattern(r));
                 });
             }, this);

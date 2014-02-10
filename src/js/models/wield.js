@@ -161,12 +161,6 @@ define(['jquery',
 
             this.loadDashboard = function () {
                 ths.loadMapsOfWield();
-                ////ths.sketchOfWell.load();
-                ////// TODO: load data only if there is one or more perfomance widgets (only once) for entire well
-                ////ths.getWellGroup().getWellGroupWfmParameterList();
-                ////ths.perfomanceOfWell.forecastEvolution.getDict();
-                ////ths.perfomanceOfWell.getHstProductionDataSet();
-                ////ths.loadWellHistoryList();
             };
 
             /** Post well group */

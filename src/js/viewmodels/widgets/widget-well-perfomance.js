@@ -10,7 +10,7 @@ define(['knockout',
         var ths = this;
         opts = opts || {};
         
-        this.perfomanceView = new VwmPerfomanceOfWell({
+        this.vwmPerfomanceOfWell = new VwmPerfomanceOfWell({
             isVisibleForecastData: opts['IsVisibleForecastData'],
             selectedAttrGroupId: opts['SelectedAttrGroupId'],
             endYear: opts['EndYear'],
@@ -20,14 +20,14 @@ define(['knockout',
         }, vwmWell.mdlStage.perfomanceOfWell, vwmWell);
 
         this.toStringifyOpts = function () {
-            return {
-                'SelectedAttrGroupId': ko.unwrap(ths.perfomanceView['selectedAttrGroupId']),
-                'IsVisibleForecastData': ko.unwrap(ths.perfomanceView['isVisibleForecastData']),
-                'EndYear': ko.unwrap(ths.perfomanceView['WPDDateEndYear']),
-                'StartYear': ko.unwrap(ths.perfomanceView['WPDDateStartYear']),
-                'EndMonth': ko.unwrap(ths.perfomanceView['WPDDateEndMonth']),
-                'StartMonth': ko.unwrap(ths.perfomanceView['WPDDateStartMonth'])
-            };
+            return JSON.stringify({
+                'SelectedAttrGroupId': ko.unwrap(ths.vwmPerfomanceOfWell['selectedAttrGroupId']),
+                'IsVisibleForecastData': ko.unwrap(ths.vwmPerfomanceOfWell['isVisibleForecastData']),
+                'EndYear': ko.unwrap(ths.vwmPerfomanceOfWell['WPDDateEndYear']),
+                'StartYear': ko.unwrap(ths.vwmPerfomanceOfWell['WPDDateStartYear']),
+                'EndMonth': ko.unwrap(ths.vwmPerfomanceOfWell['WPDDateEndMonth']),
+                'StartMonth': ko.unwrap(ths.vwmPerfomanceOfWell['WPDDateStartMonth'])
+            });
         };
     };
 

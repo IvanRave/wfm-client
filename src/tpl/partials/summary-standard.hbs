@@ -4,23 +4,30 @@
     <div data-bind="with: mdlStage">
       <div data-bind="foreach: propSpecList">
         <div data-bind="if: tpe">
-          <div data-bind="if: $parent[clientId]">
-            <div>
-              <label data-bind="text: ttl"></label>
+          <div class="row">
+            <div class="col-sm-2">
+              <div class="min-top-margin text-right">
+                <label data-bind="text: ttl"></label>
+              </div>
             </div>
-            <div class="well well-sm">
-              <span data-bind="if: tpe === 'SingleLine'">
-                <span data-bind="text: $parent[clientId]"></span>
-              </span>
-              <span data-bind="if: tpe === 'MultiLine'">
-                <span class="pre-wrap-text" data-bind="text: $parent[clientId]"></span>
-              </span>
-              <span data-bind="if: tpe === 'DateLine'">
-                <span data-bind="unix: $parent[clientId]"></span>
-              </span>
-              <span data-bind="if: tpe === 'FileLine'">
-                <img data-bind="attr: {width: addtData.width, src: $parent[clientId]().fileUrl }"></img>
-              </span>
+            <div class="col-sm-9">
+              <div class="well well-sm">
+                <span data-bind="if: tpe === 'SingleLine'">
+                  <span data-bind="text: $parent[clientId]"></span>
+                </span>
+                <span data-bind="if: tpe === 'MultiLine'">
+                  <span class="pre-wrap-text" data-bind="text: $parent[clientId]"></span>
+                </span>
+                <span data-bind="if: tpe === 'DateLine'">
+                  <span data-bind="unix: $parent[clientId]"></span>
+                </span>
+                <span data-bind="if: tpe === 'FileLine'">
+                  <img data-bind="attr: {width: addtData.width, src: $parent[clientId]().fileUrl }"></img>
+                </span>
+                <span data-bind="if: tpe === 'BoolLine'">
+                  <span data-bind="text: $parent[clientId]"></span>
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -42,35 +49,42 @@
         </button>
       </div>
     </div>
-    <div data-bind="with: mdlStage">
+    <div class="min-top-margin" data-bind="with: mdlStage">
       <div data-bind="foreach: propSpecList">
         <!-- Properties without type do not showed in this list: not-editable properties -->
-        <div data-bind="if: tpe">
-          <div>
-            <label data-bind="text: ttl"></label>
+        <div class="row" data-bind="if: tpe">
+          <div class="col-sm-2">
+            <div class="min-top-margin text-right">
+              <label data-bind="text: ttl"></label>
+            </div>
           </div>
-          <div class="well well-sm">
-            <span data-bind="if: tpe === 'SingleLine'">
-              <input class="form-control" type="text" data-bind="value: $parent[clientId], attr: {maxlength: addtData.maxLength}"></input>
-            </span>
-            <span data-bind="if: tpe === 'MultiLine'">
-              <textarea class="form-control" rows="5" data-bind="value: $parent[clientId]"></textarea>
-            </span>
-            <span data-bind="if: tpe === 'DateLine'">
-              <input class="input-sm" type="text" size="10" data-bind="datepicker: $parent[clientId], datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }" />
-            </span>
-            <span data-bind="if: tpe === 'FileLine'">
-              <span data-bind="if: $parent[clientId]">
-                <img data-bind="attr: {width: addtData.width, src: $parent[clientId]().fileUrl }"></img>
+          <div class="col-sm-9">
+            <div class="well well-sm">
+              <span data-bind="if: tpe === 'SingleLine'">
+                <input class="form-control" type="text" data-bind="value: $parent[clientId], attr: {maxlength: addtData.maxLength}"></input>
               </span>
-              <!-- parent: mdlStage (only for stages with image types, like company logo) -->
-              <!-- parents[1]: vwmStage -->
-              <button class="btn btn-default btn-sm" data-bind="click: $parents[1].selectImgFileSpec">Select image...</button>
-              <span data-bind="if: $parent[clientId]">
-                <!-- parent: mdlStage -->
-                <button class="btn btn-default btn-sm" data-bind="click: $parent.deleteImgFileSpec">Delete image</button>
+              <span data-bind="if: tpe === 'MultiLine'">
+                <textarea class="form-control" rows="5" data-bind="value: $parent[clientId]"></textarea>
               </span>
-            </span>
+              <span data-bind="if: tpe === 'DateLine'">
+                <input class="input-sm" type="text" size="10" data-bind="datepicker: $parent[clientId], datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }" />
+              </span>
+              <span data-bind="if: tpe === 'BoolLine'">
+                <input type="checkbox" data-bind="checked: $parent[clientId]"/>
+              </span>
+              <span data-bind="if: tpe === 'FileLine'">
+                <span data-bind="if: $parent[clientId]">
+                  <img data-bind="attr: {width: addtData.width, src: $parent[clientId]().fileUrl }"></img>
+                </span>
+                <!-- parent: mdlStage (only for stages with image types, like company logo) -->
+                <!-- parents[1]: vwmStage -->
+                <button class="btn btn-default btn-sm" data-bind="click: $parents[1].selectImgFileSpec">Select image...</button>
+                <span data-bind="if: $parent[clientId]">
+                  <!-- parent: mdlStage -->
+                  <button class="btn btn-default btn-sm" data-bind="click: $parent.deleteImgFileSpec">Delete image</button>
+                </span>
+              </span>
+            </div>
           </div>
         </div>
       </div>

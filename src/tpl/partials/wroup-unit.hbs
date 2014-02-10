@@ -1,0 +1,64 @@
+﻿<!-- current: vwmStage (wroup) -->
+<div>
+  <div class="clearfix">
+    <div class="pull-left">
+      <h4>Units:</h4>
+    </div>
+    <div class="pull-right" data-bind="if: $root.isEmployeeInEditMode">
+      <button type="button" class="btn btn-sm btn-default" data-bind="click: addWellGroupWfmParameter, enable: selectedWfmParameterId">Add</button>
+    </div>
+    <div class="pull-right" data-bind="if: $root.isEmployeeInEditMode">
+      <select class="form-control input-sm" data-bind="options: unselectedWfmParameterList, optionsValue: 'id', optionsText: 'name', value: selectedWfmParameterId, optionsCaption: 'Add new parameter...'"></select>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-3">
+      <span class="bld">Id - Name</span>
+    </div>
+    <div class="col-sm-3">
+      <span class="bld">Color</span>
+    </div>
+    <div class="col-sm-3">
+      <span class="bld">UoM</span>
+    </div>
+    <div class="col-sm-3">
+      <span class="bld">Is cumulative</span>
+    </div>
+  </div>
+  <div data-bind="foreach: listOfVwmWfmParameterOfWroup">
+    <div class="row min-top-margin">
+      <div class="col-sm-3">
+        <div>
+          <span data-bind="with: mdlWfmParameterOfWroup">
+            <span data-bind="with: wfmParameter">
+              <span data-bind="text: id"></span> - <span data-bind="text: name"></span>
+            </span>
+          </span>
+          <span data-bind="if: $root.isEmployeeInEditMode">
+            <button class="btn btn-default btn-xs" type="button" data-bind="click: $parent.removeVwmWfmParameterOfWroup">
+              <i class="glyphicon glyphicon-remove" ></i>
+            </button>
+          </span>
+        </div>
+      </div>
+      <div class="col-sm-3" data-bind="with: mdlWfmParameterOfWroup">
+        <i class="glyphicon glyphicon-bookmark" data-bind="style: { color: color }"></i>
+        <span data-bind="text: color"></span>
+      </div>      
+      <div class="col-sm-3" data-bind="with: mdlWfmParameterOfWroup">
+        <div data-bind="with: wfmParameter">
+          <span data-bind="text: uom"></span>
+        </div>
+      </div>
+      <div class="col-sm-3" data-bind="with: mdlWfmParameterOfWroup">
+        <div data-bind="with: wfmParameter">
+          <span data-bind="text: isCumulative"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /ko -->
+  <!-- TODO: feat: slide#9 #HM! -->
+  <!-- Plot button: select date range and show graph using table data of selected well (with procent shlafe) -->
+  <!-- Stream data: the same for well tools (separators, flares, etc.) -->
+</div>

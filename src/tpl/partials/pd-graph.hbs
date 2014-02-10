@@ -5,8 +5,8 @@
       <g class="axis x" data-bind="attr: { transform: 'translate(0,' + prfGraph.viewBox.height + ')' }"></g>
       <g class="axis y"></g>
       <g class="svg-prf-graph-g">
-        <!-- ko foreach: {data: selectedWroupWfmParameterList, as: 'groupParam'} -->
-        <path d="M0 0" clip-path="url(#graph-clip)" data-bind="attr: {id: 'grp-'+ groupParam.wfmParameterId, stroke: groupParam.color }, visible: groupParam.isVisible"></path>
+        <!-- ko foreach: {data: listOfSlcVwmWfmParameterOfWroup, as: 'vwmParam'} -->
+        <path d="M0 0" clip-path="url(#graph-clip)" data-bind="attr: {id: 'grp-'+ vwmParam.mdlWfmParameterOfWroup.wfmParameterId, stroke: vwmParam.mdlWfmParameterOfWroup.color }, visible: vwmParam.isVisible"></path>
         <!-- /ko -->
       </g>
       <rect class="graph-zoom-rect" x="0" y="0" data-bind="attr: { width: prfGraph.viewBox.width, height: prfGraph.viewBox.height }"></rect>

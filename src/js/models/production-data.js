@@ -168,7 +168,7 @@ define(['jquery',
 					read : function () {
 						//if (self.isForecast) { return; }
 						// Find from all params:
-						var needGroupParam = $.grep(ko.unwrap(self.getWell().getWellGroup().wellGroupWfmParameterList), function (arrElem) {
+						var needGroupParam = $.grep(ko.unwrap(self.getWell().getWellGroup().listOfWfmParameterOfWroup), function (arrElem) {
 								return arrElem.wfmParameterId === prmId;
 							})[0];
 

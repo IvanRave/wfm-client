@@ -62,8 +62,8 @@ define(['jquery',
 		/**
 		 * Import perfomance data from a file to table
 		 */
-		prtl.postPerfomanceData = function (stageKey, idOfSection, idOfFileSpec, indexOfStartRow, listOfColumnAttrData, scsCallback) {
-			fileSpecService.postPerfomanceData(stageKey, idOfSection, idOfFileSpec, indexOfStartRow, listOfColumnAttrData).done(scsCallback);
+		prtl.postPerfomanceData = function (stageKey, idOfSection, idOfFileSpec, indexOfStartRow, listOfColumnAttrData, scsCallback, errCallback) {
+			fileSpecService.postPerfomanceData(stageKey, idOfSection, idOfFileSpec, indexOfStartRow, listOfColumnAttrData).done(scsCallback).fail(errCallback);
 		};
 
 		//{ #region FORECAST

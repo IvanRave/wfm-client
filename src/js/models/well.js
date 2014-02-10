@@ -110,6 +110,7 @@ define([
 			maxLength : 255
 		}),
 		new PropSpec('Description', 'Description', 'Description', 'MultiLine', {}),
+    new PropSpec('IsActive', 'IsActive', 'Is active', 'BoolLine', {}),
 		new PropSpec('DrillingDate', 'DrillingDate', 'Drilling date', 'DateLine', {}),
 		new PropSpec('ProductionHistory', 'ProductionHistory', 'Production history', 'MultiLine', {}),
 		new PropSpec('CompletionType', 'CompletionType', 'Completion type', 'MultiLine', {}),
@@ -120,7 +121,7 @@ define([
 		new PropSpec('PerforationDepth', 'PerforationDepth', 'Perforation depth', 'MultiLine', {}),
 		new PropSpec('PressureData', 'PressureData', 'Pressure data', 'MultiLine', {}),
 		new PropSpec('Pvt', 'Pvt', 'PVT', 'MultiLine', {}),
-		new PropSpec('ReservoirData', 'ReservoirData', 'Reservoir data', 'MultiLine', {})
+		new PropSpec('ReservoirData', 'ReservoirData', 'Reservoir data', 'MultiLine', {})    
 	];
 
 	/**
@@ -224,7 +225,7 @@ define([
 					break;
 				}
 			case 'well-perfomance': {
-					ths.getWellGroup().getWellGroupWfmParameterList();
+					ths.getWellGroup().loadListOfWfmParameterOfWroup();
 					ths.perfomanceOfWell.forecastEvolution.getDict();
 					ths.perfomanceOfWell.getHstProductionDataSet();
 					break;
@@ -243,7 +244,7 @@ define([
 				}
 			case 'well-test': {
 					ths.getTestScopeList();
-					ths.getWellGroup().getWellGroupWfmParameterList();
+					ths.getWellGroup().loadListOfWfmParameterOfWroup();
 					break;
 				}
 			case 'well-map': {
@@ -281,7 +282,7 @@ define([
 		this.loadDashboard = function () {
 			ths.sketchOfWell.load();
 			// TODO: load data only if there is one or more perfomance widgets (only once) for entire well
-			ths.getWellGroup().getWellGroupWfmParameterList();
+			ths.getWellGroup().loadListOfWfmParameterOfWroup();
 			ths.perfomanceOfWell.forecastEvolution.getDict();
 			ths.perfomanceOfWell.getHstProductionDataSet();
 			ths.loadWellHistoryList();

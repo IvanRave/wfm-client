@@ -69,7 +69,7 @@
                 if (self.testDataList().length > 0) {
                     // check for release computed value
                     if (self.testDataListUpdateDate()) {
-                        $.each(self.getWell().getWellGroup().wellGroupWfmParameterList(), function (paramIndex, paramValue) {
+                        $.each(ko.unwrap(self.getWell().getWellGroup().listOfWfmParameterOfWroup), function (paramIndex, paramValue) {
                             var tempArr = [];
                             $.each(self.testDataList(), function (testDataIndex, testDataValue) {
                                 if (typeof testDataValue.dict[paramValue.wfmParameterId] !== "undefined" && testDataValue.dict[paramValue.wfmParameterId] !== null) {
