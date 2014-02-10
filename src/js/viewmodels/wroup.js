@@ -2,6 +2,7 @@
 define([
 		'jquery',
 		'knockout',
+		'helpers/modal-helper',
 		'viewmodels/well',
 		'viewmodels/bases/stage-child-base',
 		'viewmodels/bases/stage-base',
@@ -9,6 +10,7 @@ define([
 	function (
 		$,
 		ko,
+		modalHelper,
 		VwmWell,
 		VwmStageChildBase,
 		VwmStageBase,
@@ -46,6 +48,30 @@ define([
 		this.selectAncestorVwms = function () {
 			parentVwmWield.unqOfSlcVwmChild(ths.unq);
 			parentVwmWield.selectAncestorVwms();
+		};
+
+		/**
+		 * Create well
+		 */
+		this.postVwmWell = function () {
+			var inputName = document.createElement('input');
+			inputName.type = 'text';
+			$(inputName).prop({
+				'required' : true
+			}).addClass('form-control');
+
+			var innerDiv = document.createElement('div');
+			$(innerDiv).addClass('form-horizontal').append(modalHelper.gnrtDom('Name', inputName));
+
+			function submitFunction() {
+				var tmpName = $(inputName).val();
+        if (tmpName){
+          ths.mdlStage.postWell(tmpName, function () {});
+          modalHelper.closeModalWindow();
+        }
+			}
+
+			modalHelper.openModalWindow('Well', innerDiv, submitFunction);
 		};
 
 		/**
@@ -93,9 +119,9 @@ define([
 				deferEvaluation : true
 			});
 
-    /**
-    * Add selected parameter to the main list
-    */
+		/**
+		 * Add selected parameter to the main list
+		 */
 		this.addWellGroupWfmParameter = function () {
 			var tmpWfmParamId = ko.unwrap(ths.selectedWfmParameterId);
 			if (tmpWfmParamId) {

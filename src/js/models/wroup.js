@@ -2,7 +2,6 @@
 define(['jquery',
 		'knockout',
 		'services/datacontext',
-		'helpers/modal-helper',
 		'models/well',
 		'models/wfm-parameter-of-wroup',
 		'services/wfm-parameter-of-wroup',
@@ -14,7 +13,6 @@ define(['jquery',
 	function ($,
 		ko,
 		datacontext,
-		bootstrapModal,
 		Well,
 		WellGroupWfmParameter,
 		wfmParameterOfWroupService,
@@ -169,30 +167,16 @@ define(['jquery',
 			});
 		};
 
-		this.addWell = function () {
-			var inputName = document.createElement('input');
-			inputName.type = 'text';
-			$(inputName).prop({
-				'required' : true
-			}).addClass('form-control');
-
-			var innerDiv = document.createElement('div');
-			$(innerDiv).addClass('form-horizontal').append(
-				bootstrapModal.gnrtDom('Name', inputName));
-
-			function submitFunction() {
-				datacontext.postWell({
-					Name : $(inputName).val(),
-					Description : '',
-					WellGroupId : ths.Id
-				}).done(function (result) {
-					ths.wells.push(new Well(result, ths));
-				});
-
-				bootstrapModal.closeModalWindow();
-			}
-
-			bootstrapModal.openModalWindow('Well', innerDiv, submitFunction);
+		this.postWell = function (tmpName, scsCallback) {
+			datacontext.postWell({
+				Name : tmpName,
+				Description : '',
+				WellGroupId : ths.id,
+				IsActive : true
+			}).done(function (result) {
+				ths.wells.push(new Well(result, ths));
+				scsCallback();
+			});
 		};
 
 		this.removeChild = function (wellForDelete) {
@@ -204,52 +188,52 @@ define(['jquery',
 		this.save = function () {
 			wroupService.put(ths.Id, ths.toDto());
 		};
-    
-    /**
-    * Sum of totals of test scopes
-    *    for wroup potential
-    */
-    this.totalTestScopeOfWells = ko.computed({
-      read: function(){
-        var result = {};
-        var tmpActiveWells = ko.unwrap(ths.wells).filter(function(elem){
-          return ko.unwrap(elem['IsActive']) === true;
-        });
-        
-        var tmpWroupParams = ko.unwrap(ths.listOfWfmParameterOfWroup);
-        
-        tmpActiveWells.forEach(function(tmpWell){
-          var tmpLastApprovedTestScope = ko.unwrap(tmpWell.lastApprovedTestScope);
-          if (tmpLastApprovedTestScope){
-            var tmpTestDataTotal = ko.unwrap(tmpLastApprovedTestScope.testDataTotal);
-            tmpWroupParams.forEach(function(tmpParam){
-              if (!result[tmpParam.wfmParameterId]){
-                result[tmpParam.wfmParameterId] = 0;
-              }
-              
-              result[tmpParam.wfmParameterId] += +(tmpTestDataTotal[tmpParam.wfmParameterId] || 0);
-            });
-          }
-        });
-        
-        return result;
-      },
-      deferEvaluation: true
-    });
+
+		/**
+		 * Sum of totals of test scopes
+		 *    for wroup potential
+		 */
+		this.totalTestScopeOfWells = ko.computed({
+				read : function () {
+					var result = {};
+					var tmpActiveWells = ko.unwrap(ths.wells).filter(function (elem) {
+							return ko.unwrap(elem['IsActive']) === true;
+						});
+
+					var tmpWroupParams = ko.unwrap(ths.listOfWfmParameterOfWroup);
+
+					tmpActiveWells.forEach(function (tmpWell) {
+						var tmpLastApprovedTestScope = ko.unwrap(tmpWell.lastApprovedTestScope);
+						if (tmpLastApprovedTestScope) {
+							var tmpTestDataTotal = ko.unwrap(tmpLastApprovedTestScope.testDataTotal);
+							tmpWroupParams.forEach(function (tmpParam) {
+								if (!result[tmpParam.wfmParameterId]) {
+									result[tmpParam.wfmParameterId] = 0;
+								}
+
+								result[tmpParam.wfmParameterId] +=  + (tmpTestDataTotal[tmpParam.wfmParameterId] || 0);
+							});
+						}
+					});
+
+					return result;
+				},
+				deferEvaluation : true
+			});
 
 		/** Set this section as selected */
 		this.loadSectionContent = function (idOfSectionPattern) {
 			switch (idOfSectionPattern) {
 			case 'wroup-unit':
-      case 'wroup-potential':
+			case 'wroup-potential':
 				// Params (table headers)
 				ths.loadListOfWfmParameterOfWroup();
-        
-        // Test data (table body)
-        ko.unwrap(ths.wells).forEach(function(elem){
-          elem.loadListOfTestScope();
-        });
-        
+
+				// Test data (table body)
+				ko.unwrap(ths.wells).forEach(function (elem) {
+					elem.loadListOfTestScope();
+				});
+
 				break;
 			}
 		};
