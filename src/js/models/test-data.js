@@ -1,4 +1,5 @@
 ﻿/**
+ * @module
  * @todo: feat: clean approve/decline status to null #ML!
  * @todo: feat: migrate to perfomance #MH!
  *        after approving test data - put this data to the perfomance table and graph
@@ -8,24 +9,28 @@
 define(['jquery', 'knockout', 'services/datacontext'], function ($, ko, datacontext) {
 	'use strict';
 
-	function TestData(data, testScopeItem) {
+  /**
+  * Model: test data - test record from test scope
+  * @constructor
+  */
+	var exports = function(data, testScopeItem) {
 		var self = this;
 		data = data || {};
 
-		self.getTestScope = function () {
+		this.getTestScope = function () {
 			return testScopeItem;
 		};
 
-		self.hourNumber = data.HourNumber;
-		self.testScopeId = data.TestScopeId;
-		self.comment = ko.observable(data.Comment);
+		this.hourNumber = data.HourNumber;
+		this.testScopeId = data.TestScopeId;
+		this.comment = ko.observable(data.Comment);
 
-		self.dict = data.Dict;
+		this.dict = data.Dict;
 
-		self.isEdit = ko.observable(false);
+		this.isEdit = ko.observable(false);
 
 		var cancelData;
-		self.editTestData = function () {
+		this.editTestData = function () {
 			cancelData = {
 				comment : self.comment(),
 				dict : $.extend({}, self.dict)
@@ -34,7 +39,7 @@ define(['jquery', 'knockout', 'services/datacontext'], function ($, ko, datacont
 			self.isEdit(true);
 		};
 
-		self.saveTestData = function () {
+		this.saveTestData = function () {
 			datacontext.saveChangedTestData(self).done(function (response) {
 				self.getTestScope().testDataListUpdateDate(new Date());
 				self.comment(response.Comment);
@@ -43,19 +48,16 @@ define(['jquery', 'knockout', 'services/datacontext'], function ($, ko, datacont
 			});
 		};
 
-		self.cancelEditTestData = function () {
+		this.cancelEditTestData = function () {
 			self.comment(cancelData.comment);
 			self.dict = $.extend({}, cancelData.dict);
 			self.isEdit(false);
 		};
 
-		self.toPlainJson = function () {
+		this.toPlainJson = function () {
 			return ko.toJS(self);
 		};
-	}
-
-	// test data constructor
-	datacontext.createTestData = function (data, testScopeItem) {
-		return new TestData(data, testScopeItem);
 	};
+
+  return exports;
 });

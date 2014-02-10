@@ -21,7 +21,7 @@
       </button>
     </div>
   </div>
-  <div data-bind="foreach: { data: sortedTestScopeList, as: 'testScope' }">
+  <div data-bind="foreach: { data: sortedListOfTestScope, as: 'testScope' }">
     <div style="margin-top: 16px; background-color: #f5f5f5">
       <div class="test-header clearfix" data-bind="css: { 'test-approved': isApproved, 'test-declined': isApproved() === false }">
         <div class="pull-left" style="padding:2px 0">

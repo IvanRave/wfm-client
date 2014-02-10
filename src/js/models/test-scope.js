@@ -1,112 +1,125 @@
-﻿define(['jquery', 'knockout', 'services/datacontext', 'moment', 'models/test-data'], function ($, ko, datacontext, appMoment) {
-    'use strict';
+﻿/** @module */
+define([
+		'jquery',
+		'knockout',
+		'services/datacontext',
+		'moment',
+		'models/test-data'],
+	function ($,
+		ko,
+		datacontext,
+		appMoment,
+    TestData) {
+	'use strict';
 
-    function importTestDataDtoList(data, testScopeItem) {
-        return $.map(data || [],
-            function (item) {
-                return datacontext.createTestData(item, testScopeItem);
-            });
-    }
+	function importTestDataDtoList(data, testScopeItem) {
+		return (data || []).map(function (item) {
+			return new TestData(item, testScopeItem);
+		});
+	}
+  
+  /**
+   * Model: test scope - parent of test records (test data)
+   * @constructor
+   */
+	var exports = function(data, wellItem) {
+		var self = this;
+		data = data || {};
 
-    function TestScope(data, wellItem) {
-        var self = this;
-        data = data || {};
+		this.getWell = function () {
+			return wellItem;
+		};
 
-        self.getWell = function () {
-            return wellItem;
-        };
+		// Guid
+		this.id = data.Id;
+		this.wellId = data.WellId;
+		this.startUnixTime = ko.observable(data.StartUnixTime);
+		this.isApproved = ko.observable(data.IsApproved);
+		this.conductedBy = ko.observable(data.ConductedBy);
+		this.certifiedBy = ko.observable(data.CertifiedBy);
 
-        // Guid
-        self.id = data.Id;
-        self.wellId = data.WellId;
-        self.startUnixTime = ko.observable(data.StartUnixTime);
-        self.isApproved = ko.observable(data.IsApproved);
-        self.conductedBy = ko.observable(data.ConductedBy);
-        self.certifiedBy = ko.observable(data.CertifiedBy);
+		this.setIsApproved = function (isApprovedVal) {
+			self.isApproved(isApprovedVal);
+			datacontext.saveChangedTestScope(self);
+		};
 
-        self.setIsApproved = function (isApprovedVal) {
-            self.isApproved(isApprovedVal);
-            datacontext.saveChangedTestScope(self);
-        };
+		this.startUnixTimeDateView = ko.computed({
+				read : function () {
+					return appMoment(self.startUnixTime() * 1000).format('YYYY-MM-DD HH:mm');
+				},
+				deferEvaluation : true
+			});
 
-        self.startUnixTimeDateView = ko.computed({
-            read: function () {
-                return appMoment(self.startUnixTime() * 1000).format('YYYY-MM-DD HH:mm');
-            },
-            deferEvaluation: true
-        });
+		this.testDataList = ko.observableArray();
 
-        self.testDataList = ko.observableArray();
+		this.addTestData = function () {
+			var testDataItem = new TestData({
+					Comment : '',
+					HourNumber : self.testDataList().length,
+					TestScopeId : self.id,
+					Dict : {}
+				}, self);
 
-        self.addTestData = function () {
-            var testDataItem = datacontext.createTestData({
-                Comment: "",
-                HourNumber: self.testDataList().length,
-                TestScopeId: self.id,
-                Dict: {}
-            }, self);
+			datacontext.saveNewTestData(testDataItem).done(function (response) {
+				self.testDataList.push(new TestData(response, self));
+			});
+		};
 
-            datacontext.saveNewTestData(testDataItem).done(function (response) {
-                self.testDataList.push(datacontext.createTestData(response, self));
-            });
-        };
+		this.deleteTestData = function (testDataItem) {
+			if (confirm('{{capitalizeFirst lang.confirmToDelete}}?') === true) {
+				datacontext.deleteTestData(testDataItem).done(function () {
+					self.testDataList.remove(testDataItem);
+				});
+			}
+		};
 
-        self.deleteTestData = function (testDataItem) {
-            if (confirm('{{capitalizeFirst lang.confirmToDelete}}?') === true) {
-                datacontext.deleteTestData(testDataItem).done(function () {
-                    self.testDataList.remove(testDataItem);
-                });
-            }
-        };
+		this.testDataListUpdateDate = ko.observable(new Date());
 
-        self.testDataListUpdateDate = ko.observable(new Date());
+		// contains total for test data list dictionary properties
+		// total - AVE or SUM (for day)
+		this.testDataTotal = ko.computed({
+				read : function () {
+					var result = {};
+					if (self.testDataList().length > 0) {
+						// check for release computed value
+						if (self.testDataListUpdateDate()) {
+							$.each(ko.unwrap(self.getWell().getWellGroup().listOfWfmParameterOfWroup), function (paramIndex, paramValue) {
+								var tempArr = [];
+								$.each(self.testDataList(), function (testDataIndex, testDataValue) {
+									if (typeof testDataValue.dict[paramValue.wfmParameterId] !== "undefined" && testDataValue.dict[paramValue.wfmParameterId] !== null) {
+										tempArr.push(parseFloat((testDataValue.dict[paramValue.wfmParameterId])));
+									}
+								});
 
-        // contains total for test data list dictionary properties
-        // total - AVE or SUM (for day)
-        self.testDataTotal = ko.computed({
-            read: function () {
-                var result = {};
-                if (self.testDataList().length > 0) {
-                    // check for release computed value
-                    if (self.testDataListUpdateDate()) {
-                        $.each(ko.unwrap(self.getWell().getWellGroup().listOfWfmParameterOfWroup), function (paramIndex, paramValue) {
-                            var tempArr = [];
-                            $.each(self.testDataList(), function (testDataIndex, testDataValue) {
-                                if (typeof testDataValue.dict[paramValue.wfmParameterId] !== "undefined" && testDataValue.dict[paramValue.wfmParameterId] !== null) {
-                                    tempArr.push(parseFloat((testDataValue.dict[paramValue.wfmParameterId])));
-                                }
-                            });
+								if (tempArr.length > 0) {
+									var sum = tempArr.reduce(function (a, b) {
+											return a + b;
+										});
+									result[paramValue.wfmParameterId] = parseFloat(sum / tempArr.length).toFixed(2);
+									if (ko.unwrap(paramValue.wfmParameter().isCumulative) === true) {
+										result[paramValue.wfmParameterId] *= 24;
+									}
+								}
+							});
+						}
+					}
 
-                            if (tempArr.length > 0) {
-                                var sum = tempArr.reduce(function (a, b) { return a + b; });
-                                result[paramValue.wfmParameterId] = parseFloat(sum / tempArr.length).toFixed(2);
-                                if (ko.unwrap(paramValue.wfmParameter().isCumulative) === true) {
-                                    result[paramValue.wfmParameterId] *= 24;
-                                }
-                            }
-                        });
-                    }
-                }
+					return result;
+				},
+				deferEvaluation : true
+			});
 
-                return result;
-            },
-            deferEvaluation: true
-        });
+		this.toPlainJson = function () {
+			var copy = ko.toJS(self);
+			delete copy.startUnixTimeDateView;
+			delete copy.testDataTotal;
+			delete copy.testDataListUpdateDate;
+			return copy;
+		};
 
-        self.toPlainJson = function () {
-            var copy = ko.toJS(self);
-            delete copy.startUnixTimeDateView;
-            delete copy.testDataTotal;
-            delete copy.testDataListUpdateDate;
-            return copy;
-        };
+		// fill test data list
+		this.testDataList(importTestDataDtoList(data.TestDataDtoList, self));
+	};
 
-        // fill test data list
-        self.testDataList(importTestDataDtoList(data.TestDataDtoList, self));
-    }
-
-    // test scope with parent - well
-    datacontext.createTestScope = function (data, wellItem) {
-        return new TestScope(data, wellItem);
-    };
+  return exports;
 });

@@ -26,9 +26,9 @@ define([
 		'models/column-attribute',
 		'models/test-scope',
 	], function ($, ko, datacontext, fileHelper,
-		appHelper, appMoment, 
-    StageBase,
-    PerfomanceOfWell,
+		appHelper, appMoment,
+		StageBase,
+		PerfomanceOfWell,
 		SectionOfWell, SketchOfWell,
 		PropSpec, wellService,
 		IntegrityOfWell, integrityOfWellService,
@@ -36,7 +36,7 @@ define([
 		stageConstants, VolumeOfWell,
 		volumeOfWellService, HistoryOfWell,
 		LogOfWell, logOfWellService,
-		fileSpecService, ColumnAttribute) {
+		fileSpecService, ColumnAttribute, TestScope) {
 	'use strict';
 
 	function importVolumes(data) {
@@ -80,7 +80,7 @@ define([
 	/** Test scope */
 	function importTestScopeDtoList(data, wellItem) {
 		return data.map(function (item) {
-			return datacontext.createTestScope(item, wellItem);
+			return new TestScope(item, wellItem);
 		});
 	}
 
@@ -110,7 +110,7 @@ define([
 			maxLength : 255
 		}),
 		new PropSpec('Description', 'Description', 'Description', 'MultiLine', {}),
-    new PropSpec('IsActive', 'IsActive', 'Is active', 'BoolLine', {}),
+		new PropSpec('IsActive', 'IsActive', 'Is active', 'BoolLine', {}),
 		new PropSpec('DrillingDate', 'DrillingDate', 'Drilling date', 'DateLine', {}),
 		new PropSpec('ProductionHistory', 'ProductionHistory', 'Production history', 'MultiLine', {}),
 		new PropSpec('CompletionType', 'CompletionType', 'Completion type', 'MultiLine', {}),
@@ -121,7 +121,7 @@ define([
 		new PropSpec('PerforationDepth', 'PerforationDepth', 'Perforation depth', 'MultiLine', {}),
 		new PropSpec('PressureData', 'PressureData', 'Pressure data', 'MultiLine', {}),
 		new PropSpec('Pvt', 'Pvt', 'PVT', 'MultiLine', {}),
-		new PropSpec('ReservoirData', 'ReservoirData', 'Reservoir data', 'MultiLine', {})    
+		new PropSpec('ReservoirData', 'ReservoirData', 'Reservoir data', 'MultiLine', {})
 	];
 
 	/**
@@ -201,8 +201,8 @@ define([
 				deferEvaluation : true,
 				owner : this
 			});
-      
-    /** Sketch of well: by default - empty */
+
+		/** Sketch of well: by default - empty */
 		this.sketchOfWell = new SketchOfWell(ths);
 
 		/**
@@ -292,16 +292,20 @@ define([
 		this.save = function () {
 			wellService.put(ths.id, ths.toDto());
 		};
-    
-    this.wellMarkers = ko.observableArray();
-    
+
+		this.wellMarkers = ko.observableArray();
+
 		//{ #region TEST
 
 		this.testScopeList = ko.observableArray();
-
-		this.sortedTestScopeList = ko.computed(function () {
-				return ths.testScopeList().sort(function (left, right) {
-					return left.startUnixTime() === right.startUnixTime() ? 0 : (left.startUnixTime() < right.startUnixTime() ? 1 : -1);
+    
+    /**
+    * List of tests, sorted by time
+    */
+		this.sortedListOfTestScope = ko.computed(function () {
+				return ko.unwrap(ths.testScopeList).sort(function (left, right) {
+					return ko.unwrap(left.startUnixTime) === ko.unwrap(right.startUnixTime) ? 0 :
+					(ko.unwrap(left.startUnixTime) < ko.unwrap(right.startUnixTime) ? 1 : -1);
 				});
 			});
 
@@ -359,7 +363,7 @@ define([
 					ConductedBy : '',
 					CertifiedBy : ''
 				}).done(function (response) {
-					ths.testScopeList.unshift(datacontext.createTestScope(response, ths));
+					ths.testScopeList.unshift(new TestScope(response, ths));
 				});
 			}
 		};
@@ -426,8 +430,8 @@ define([
 				ths.logsOfWell.push(new LogOfWell(createdDataOfLogOfWell));
 			});
 		};
-    
-    ////        fileSpecService.getColumnAttributes(ths.stageKey, needSection.id, tmpFileSpec.id).done(function (res) {
+
+		////        fileSpecService.getColumnAttributes(ths.stageKey, needSection.id, tmpFileSpec.id).done(function (res) {
 		////            // ColumnAttributes (convert data objects into array)
 		////            var columnAttributes = importColumnAttributes(res);
 
@@ -498,7 +502,7 @@ define([
 
 		//// };
 
-    //} #endregion LOG
+		//} #endregion LOG
 
 		//{ #region HISTORY
 
@@ -553,9 +557,9 @@ define([
 		////    switch (checkedReportSection.id) {
 		////        case 'map': ths.getWellGroup().getWellField().loadMapsOfWield(); break;
 		////        case 'history': ths.loadWellHistoryList(); break;
-		////        case 'log': 
-    ////        // Load list of logs
-    ////        break;
+		////        case 'log':
+		////        // Load list of logs
+		////        break;
 		////        case 'pd': ths.perfomanceOfWell.getHstProductionDataSet(); break;
 		////    }
 		//// };
@@ -846,17 +850,17 @@ define([
 				scsCallback();
 			}).fail(errCallback);
 		};
-    
-    /**
-     * Remove volume from server
-     */
-    this.removeVolumeOfWell = function(mdlToRemove){
-      volumeOfWellService.remove(mdlToRemove.idOfWell, mdlToRemove.idOfFileSpec).done(function(){
-        ths.volumes.remove(mdlToRemove);
-      });
-    };
-    
-    //} #endregion VOLUME
+
+		/**
+		 * Remove volume from server
+		 */
+		this.removeVolumeOfWell = function (mdlToRemove) {
+			volumeOfWellService.remove(mdlToRemove.idOfWell, mdlToRemove.idOfFileSpec).done(function () {
+				ths.volumes.remove(mdlToRemove);
+			});
+		};
+
+		//} #endregion VOLUME
 
 		//{ #region PERFOMANCE
 
@@ -864,10 +868,10 @@ define([
 
 		// Load column attributes - all loading logic in this file (not separated - not in perfomance of well model)
 		this.perfomanceOfWell.prdColumnAttributeList(importColumnAttributes(datacontext.getColumnAttributesLocal()));
-    
+
 		//} #endregion PERFOMANCE
-    
-    /** Load well sections */
+
+		/** Load well sections */
 		this.listOfSection(importListOfSection(data.ListOfSectionOfWellDto, ths));
 
 		this.toDto = function () {
