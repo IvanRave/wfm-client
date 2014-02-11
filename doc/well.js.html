@@ -52,10 +52,11 @@ define([
 		'services/file-spec',
 		'models/column-attribute',
 		'models/test-scope',
+    'services/test-scope'
 	], function ($, ko, datacontext, fileHelper,
-		appHelper, appMoment, 
-    StageBase,
-    PerfomanceOfWell,
+		appHelper, appMoment,
+		StageBase,
+		PerfomanceOfWell,
 		SectionOfWell, SketchOfWell,
 		PropSpec, wellService,
 		IntegrityOfWell, integrityOfWellService,
@@ -63,7 +64,7 @@ define([
 		stageConstants, VolumeOfWell,
 		volumeOfWellService, HistoryOfWell,
 		LogOfWell, logOfWellService,
-		fileSpecService, ColumnAttribute) {
+		fileSpecService, ColumnAttribute, TestScope, testScopeService) {
 	'use strict';
 
 	function importVolumes(data) {
@@ -107,7 +108,7 @@ define([
 	/** Test scope */
 	function importTestScopeDtoList(data, wellItem) {
 		return data.map(function (item) {
-			return datacontext.createTestScope(item, wellItem);
+			return new TestScope(item, wellItem);
 		});
 	}
 
@@ -137,6 +138,7 @@ define([
 			maxLength : 255
 		}),
 		new PropSpec('Description', 'Description', 'Description', 'MultiLine', {}),
+		new PropSpec('IsActive', 'IsActive', 'Is active', 'BoolLine', {}),
 		new PropSpec('DrillingDate', 'DrillingDate', 'Drilling date', 'DateLine', {}),
 		new PropSpec('ProductionHistory', 'ProductionHistory', 'Production history', 'MultiLine', {}),
 		new PropSpec('CompletionType', 'CompletionType', 'Completion type', 'MultiLine', {}),
@@ -227,8 +229,8 @@ define([
 				deferEvaluation : true,
 				owner : this
 			});
-      
-    /** Sketch of well: by default - empty */
+
+		/** Sketch of well: by default - empty */
 		this.sketchOfWell = new SketchOfWell(ths);
 
 		/**
@@ -251,7 +253,7 @@ define([
 					break;
 				}
 			case 'well-perfomance': {
-					ths.getWellGroup().getWellGroupWfmParameterList();
+					ths.getWellGroup().loadListOfWfmParameterOfWroup();
 					ths.perfomanceOfWell.forecastEvolution.getDict();
 					ths.perfomanceOfWell.getHstProductionDataSet();
 					break;
@@ -269,8 +271,8 @@ define([
 					break;
 				}
 			case 'well-test': {
-					ths.getTestScopeList();
-					ths.getWellGroup().getWellGroupWfmParameterList();
+					ths.loadListOfTestScope();
+					ths.getWellGroup().loadListOfWfmParameterOfWroup();
 					break;
 				}
 			case 'well-map': {
@@ -308,7 +310,7 @@ define([
 		this.loadDashboard = function () {
 			ths.sketchOfWell.load();
 			// TODO: load data only if there is one or more perfomance widgets (only once) for entire well
-			ths.getWellGroup().getWellGroupWfmParameterList();
+			ths.getWellGroup().loadListOfWfmParameterOfWroup();
 			ths.perfomanceOfWell.forecastEvolution.getDict();
 			ths.perfomanceOfWell.getHstProductionDataSet();
 			ths.loadWellHistoryList();
@@ -318,28 +320,42 @@ define([
 		this.save = function () {
 			wellService.put(ths.id, ths.toDto());
 		};
-    
-    this.wellMarkers = ko.observableArray();
-    
+
+		this.wellMarkers = ko.observableArray();
+
 		//{ #region TEST
 
-		this.testScopeList = ko.observableArray();
+		this.listOfTestScope = ko.observableArray();
 
-		this.sortedTestScopeList = ko.computed(function () {
-				return ths.testScopeList().sort(function (left, right) {
-					return left.startUnixTime() === right.startUnixTime() ? 0 : (left.startUnixTime() &lt; right.startUnixTime() ? 1 : -1);
-				});
-			});
-
-		this.lastTestScope = ko.observable();
-
-		this.getTestScopeList = function () {
-			datacontext.getTestScope({
-				well_id : ths.Id
-			}).done(function (response) {
-				ths.testScopeList(importTestScopeDtoList(response, ths));
+		this.loadListOfTestScope = function () {
+      testScopeService.get(ths.id).done(function (response) {
+				ths.listOfTestScope(importTestScopeDtoList(response, ths));
 			});
 		};
+    
+    /**
+    * Last approved test scope for potential section in well group
+    * @type {module:models/test-scope}
+    */
+    this.lastApprovedTestScope = ko.computed({
+      read: function(){
+        var tmpApprovedList = ko.unwrap(ths.listOfTestScope).filter(function(elem){
+          return ko.unwrap(elem.isApproved) === true;
+        });
+        
+        var lastTestScope = tmpApprovedList[0];
+        
+        // Find last (by time) test scope
+        tmpApprovedList.forEach(function(elem){
+            if (ko.unwrap(elem.startUnixTime) > ko.unwrap(lastTestScope.startUnixTime)){
+              lastTestScope = elem;
+            }
+        });
+        
+        return lastTestScope;
+      },
+      deferEvaluation: true
+    });
 
 		/** Unix time data for creating new test scope */
 		this.testScopeNewStartUnixTime = {
@@ -378,25 +394,15 @@ define([
 				// Add minutes
 				unixTime += ko.unwrap(ths.testScopeNewStartUnixTime.minute) * 60;
 
-				datacontext.saveNewTestScope({
-					WellId : ths.Id,
+        testScopeService.post({
+					WellId : ths.id,
 					StartUnixTime : unixTime,
 					IsApproved : null,
 					ConductedBy : '',
 					CertifiedBy : ''
 				}).done(function (response) {
-					ths.testScopeList.unshift(datacontext.createTestScope(response, ths));
+					ths.listOfTestScope.unshift(new TestScope(response, ths));
 				});
-			}
-		};
-
-		this.selectedTestScope = ko.observable();
-
-		this.chooseTestScope = function (testScopeItem) {
-			if (testScopeItem === ths.selectedTestScope()) {
-				ths.selectedTestScope(null);
-			} else {
-				ths.selectedTestScope(testScopeItem);
 			}
 		};
 
@@ -452,8 +458,8 @@ define([
 				ths.logsOfWell.push(new LogOfWell(createdDataOfLogOfWell));
 			});
 		};
-    
-    ////        fileSpecService.getColumnAttributes(ths.stageKey, needSection.id, tmpFileSpec.id).done(function (res) {
+
+		////        fileSpecService.getColumnAttributes(ths.stageKey, needSection.id, tmpFileSpec.id).done(function (res) {
 		////            // ColumnAttributes (convert data objects into array)
 		////            var columnAttributes = importColumnAttributes(res);
 
@@ -524,7 +530,7 @@ define([
 
 		//// };
 
-    //} #endregion LOG
+		//} #endregion LOG
 
 		//{ #region HISTORY
 
@@ -579,9 +585,9 @@ define([
 		////    switch (checkedReportSection.id) {
 		////        case 'map': ths.getWellGroup().getWellField().loadMapsOfWield(); break;
 		////        case 'history': ths.loadWellHistoryList(); break;
-		////        case 'log': 
-    ////        // Load list of logs
-    ////        break;
+		////        case 'log':
+		////        // Load list of logs
+		////        break;
 		////        case 'pd': ths.perfomanceOfWell.getHstProductionDataSet(); break;
 		////    }
 		//// };
@@ -872,17 +878,17 @@ define([
 				scsCallback();
 			}).fail(errCallback);
 		};
-    
-    /**
-     * Remove volume from server
-     */
-    this.removeVolumeOfWell = function(mdlToRemove){
-      volumeOfWellService.remove(mdlToRemove.idOfWell, mdlToRemove.idOfFileSpec).done(function(){
-        ths.volumes.remove(mdlToRemove);
-      });
-    };
-    
-    //} #endregion VOLUME
+
+		/**
+		 * Remove volume from server
+		 */
+		this.removeVolumeOfWell = function (mdlToRemove) {
+			volumeOfWellService.remove(mdlToRemove.idOfWell, mdlToRemove.idOfFileSpec).done(function () {
+				ths.volumes.remove(mdlToRemove);
+			});
+		};
+
+		//} #endregion VOLUME
 
 		//{ #region PERFOMANCE
 
@@ -890,10 +896,10 @@ define([
 
 		// Load column attributes - all loading logic in this file (not separated - not in perfomance of well model)
 		this.perfomanceOfWell.prdColumnAttributeList(importColumnAttributes(datacontext.getColumnAttributesLocal()));
-    
+
 		//} #endregion PERFOMANCE
-    
-    /** Load well sections */
+
+		/** Load well sections */
 		this.listOfSection(importListOfSection(data.ListOfSectionOfWellDto, ths));
 
 		this.toDto = function () {
@@ -914,7 +920,8 @@ define([
 	};
 
 	return exports;
-});</code></pre>
+});
+</code></pre>
         </article>
     </section>
 
@@ -924,13 +931,13 @@ define([
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="all-bindings.html">bindings/all-bindings</a></li><li><a href="svg-bindings.html">bindings/svg-bindings</a></li><li><a href="stage-constants.html">constants/stage-constants</a></li><li><a href="svg-elem-type-constants.html">constants/svg-elem-type-constants</a></li><li><a href="ajax-request.html">helpers/ajax-request</a></li><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="log-helper.html">helpers/log-helper</a></li><li><a href="area-of-map-of-wield.html">models/area-of-map-of-wield</a></li><li><a href="column-attribute.html">models/column-attribute</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="file-spec-of-history-of-well.html">models/file-spec-of-history-of-well</a></li><li><a href="forecast-evolution.html">models/forecast-evolution</a></li><li><a href="history-of-well.html">models/history-of-well</a></li><li><a href="integrity-of-well.html">models/integrity-of-well</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="log-of-well.html">models/log-of-well</a></li><li><a href="map-of-wield.html">models/map-of-wield</a></li><li><a href="nodal-analysis-of-well.html">models/nodal-analysis-of-well</a></li><li><a href="perfomance-of-well.html">models/perfomance-of-well</a></li><li><a href="production-data.html">models/production-data</a></li><li><a href="prop-spec.html">models/prop-spec</a></li><li><a href="section-of-stage.html">models/section-of-stage</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="sketch-of-well.html">models/sketch-of-well</a></li><li><a href="svg-elem.html">models/svg-elem</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="volume-of-well.html">models/volume-of-well</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-marker-of-map-of-wield.html">models/well-marker-of-map-of-wield</a></li><li><a href="wfm-image.html">models/wfm-image</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="widget.html">models/widget</a></li><li><a href="widgock.html">models/widgock</a></li><li><a href="widgout.html">models/widgout</a></li><li><a href="wield.html">models/wield</a></li><li><a href="workspace.html">models/workspace</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="stage-base.html">models\bases/stage-base</a></li><li><a href="auth.html">services/auth</a></li><li><a href="company_.html">services/company</a></li><li><a href="company-user.html">services/company-user</a></li><li><a href="file-spec_.html">services/file-spec</a></li><li><a href="file-spec-of-history-of-well_.html">services/file-spec-of-history-of-well</a></li><li><a href="image-of-history-of-well.html">services/image-of-history-of-well</a></li><li><a href="integrity-of-well_.html">services/integrity-of-well</a></li><li><a href="log-of-well_.html">services/log-of-well</a></li><li><a href="map-of-wield_.html">services/map-of-wield</a></li><li><a href="nodal-analysis-of-well_.html">services/nodal-analysis-of-well</a></li><li><a href="register.html">services/register</a></li><li><a href="sketch-of-well_.html">services/sketch-of-well</a></li><li><a href="svg-elem-of-log-of-well.html">services/svg-elem-of-log-of-well</a></li><li><a href="volume-of-well_.html">services/volume-of-well</a></li><li><a href="wegion_.html">services/wegion</a></li><li><a href="well_.html">services/well</a></li><li><a href="well-marker-of-map-of-wield_.html">services/well-marker-of-map-of-wield</a></li><li><a href="widget_.html">services/widget</a></li><li><a href="widgout_.html">services/widgout</a></li><li><a href="wield_.html">services/wield</a></li><li><a href="wroup_.html">services/wroup</a></li><li><a href="company__.html">viewmodels/company</a></li><li><a href="employee_.html">viewmodels/employee</a></li><li><a href="history-of-well_.html">viewmodels/history-of-well</a></li><li><a href="integrity-of-well__.html">viewmodels/integrity-of-well</a></li><li><a href="log-of-well__.html">viewmodels/log-of-well</a></li><li><a href="map-of-wield__.html">viewmodels/map-of-wield</a></li><li><a href="map-tool.html">viewmodels/map-tool</a></li><li><a href="nodal-analysis-of-well__.html">viewmodels/nodal-analysis-of-well</a></li><li><a href="perfomance-of-well_.html">viewmodels/perfomance-of-well</a></li><li><a href="scope-of-history-of-well.html">viewmodels/scope-of-history-of-well</a></li><li><a href="section-of-stage_.html">viewmodels/section-of-stage</a></li><li><a href="sketch-of-well__.html">viewmodels/sketch-of-well</a></li><li><a href="user-profile_.html">viewmodels/user-profile</a></li><li><a href="volume-of-well__.html">viewmodels/volume-of-well</a></li><li><a href="wegion__.html">viewmodels/wegion</a></li><li><a href="well__.html">viewmodels/well</a></li><li><a href="well-marker-of-map-of-wield__.html">viewmodels/well-marker-of-map-of-wield</a></li><li><a href="widget__.html">viewmodels/widget</a></li><li><a href="widgock_.html">viewmodels/widgock</a></li><li><a href="widgout__.html">viewmodels/widgout</a></li><li><a href="wield__.html">viewmodels/wield</a></li><li><a href="workspace_.html">viewmodels/workspace</a></li><li><a href="wroup__.html">viewmodels/wroup</a></li><li><a href="stage-base_.html">viewmodels\bases/stage-base</a></li><li><a href="stage-child-base.html">viewmodels\bases/stage-child-base</a></li><li><a href="widget-default-summary.html">viewmodels\widgets/widget-default-summary</a></li><li><a href="widget-well-history.html">viewmodels\widgets/widget-well-history</a></li><li><a href="widget-well-perfomance.html">viewmodels\widgets/widget-well-perfomance</a></li><li><a href="widget-well-sketch.html">viewmodels\widgets/widget-well-sketch</a></li><li><a href="widget-wield-map.html">viewmodels\widgets/widget-wield-map</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="all-bindings.html">bindings/all-bindings</a></li><li><a href="svg-bindings.html">bindings/svg-bindings</a></li><li><a href="stage-constants.html">constants/stage-constants</a></li><li><a href="svg-elem-type-constants.html">constants/svg-elem-type-constants</a></li><li><a href="ajax-request.html">helpers/ajax-request</a></li><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="log-helper.html">helpers/log-helper</a></li><li><a href="area-of-map-of-wield.html">models/area-of-map-of-wield</a></li><li><a href="column-attribute.html">models/column-attribute</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="file-spec-of-history-of-well.html">models/file-spec-of-history-of-well</a></li><li><a href="forecast-evolution.html">models/forecast-evolution</a></li><li><a href="history-of-well.html">models/history-of-well</a></li><li><a href="integrity-of-well.html">models/integrity-of-well</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="log-of-well.html">models/log-of-well</a></li><li><a href="map-of-wield.html">models/map-of-wield</a></li><li><a href="nodal-analysis-of-well.html">models/nodal-analysis-of-well</a></li><li><a href="perfomance-of-well.html">models/perfomance-of-well</a></li><li><a href="production-data.html">models/production-data</a></li><li><a href="prop-spec.html">models/prop-spec</a></li><li><a href="section-of-stage.html">models/section-of-stage</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="sketch-of-well.html">models/sketch-of-well</a></li><li><a href="svg-elem.html">models/svg-elem</a></li><li><a href="test-data.html">models/test-data</a></li><li><a href="test-scope.html">models/test-scope</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="volume-of-well.html">models/volume-of-well</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-marker-of-map-of-wield.html">models/well-marker-of-map-of-wield</a></li><li><a href="wfm-image.html">models/wfm-image</a></li><li><a href="wfm-param-squad.html">models/wfm-param-squad</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="widget.html">models/widget</a></li><li><a href="widgock.html">models/widgock</a></li><li><a href="widgout.html">models/widgout</a></li><li><a href="wield.html">models/wield</a></li><li><a href="workspace.html">models/workspace</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="stage-base.html">models\bases/stage-base</a></li><li><a href="auth.html">services/auth</a></li><li><a href="company_.html">services/company</a></li><li><a href="company-user.html">services/company-user</a></li><li><a href="file-spec_.html">services/file-spec</a></li><li><a href="file-spec-of-history-of-well_.html">services/file-spec-of-history-of-well</a></li><li><a href="image-of-history-of-well.html">services/image-of-history-of-well</a></li><li><a href="integrity-of-well_.html">services/integrity-of-well</a></li><li><a href="log-of-well_.html">services/log-of-well</a></li><li><a href="map-of-wield_.html">services/map-of-wield</a></li><li><a href="nodal-analysis-of-well_.html">services/nodal-analysis-of-well</a></li><li><a href="register.html">services/register</a></li><li><a href="section-pattern_.html">services/section-pattern</a></li><li><a href="sketch-of-well_.html">services/sketch-of-well</a></li><li><a href="svg-elem-of-log-of-well.html">services/svg-elem-of-log-of-well</a></li><li><a href="test-data_.html">services/test-data</a></li><li><a href="test-scope_.html">services/test-scope</a></li><li><a href="volume-of-well_.html">services/volume-of-well</a></li><li><a href="wegion_.html">services/wegion</a></li><li><a href="well_.html">services/well</a></li><li><a href="well-marker-of-map-of-wield_.html">services/well-marker-of-map-of-wield</a></li><li><a href="wfm-param-squad_.html">services/wfm-param-squad</a></li><li><a href="wfm-parameter-of-wroup_.html">services/wfm-parameter-of-wroup</a></li><li><a href="widget_.html">services/widget</a></li><li><a href="widgout_.html">services/widgout</a></li><li><a href="wield_.html">services/wield</a></li><li><a href="wroup_.html">services/wroup</a></li><li><a href="company__.html">viewmodels/company</a></li><li><a href="employee_.html">viewmodels/employee</a></li><li><a href="history-of-well_.html">viewmodels/history-of-well</a></li><li><a href="integrity-of-well__.html">viewmodels/integrity-of-well</a></li><li><a href="log-of-well__.html">viewmodels/log-of-well</a></li><li><a href="map-of-wield__.html">viewmodels/map-of-wield</a></li><li><a href="map-tool.html">viewmodels/map-tool</a></li><li><a href="nodal-analysis-of-well__.html">viewmodels/nodal-analysis-of-well</a></li><li><a href="perfomance-of-well_.html">viewmodels/perfomance-of-well</a></li><li><a href="scope-of-history-of-well.html">viewmodels/scope-of-history-of-well</a></li><li><a href="section-of-stage_.html">viewmodels/section-of-stage</a></li><li><a href="sketch-of-well__.html">viewmodels/sketch-of-well</a></li><li><a href="test-scope__.html">viewmodels/test-scope</a></li><li><a href="user-profile_.html">viewmodels/user-profile</a></li><li><a href="volume-of-well__.html">viewmodels/volume-of-well</a></li><li><a href="wegion__.html">viewmodels/wegion</a></li><li><a href="well__.html">viewmodels/well</a></li><li><a href="well-marker-of-map-of-wield__.html">viewmodels/well-marker-of-map-of-wield</a></li><li><a href="wfm-parameter-of-wroup__.html">viewmodels/wfm-parameter-of-wroup</a></li><li><a href="widget__.html">viewmodels/widget</a></li><li><a href="widgock_.html">viewmodels/widgock</a></li><li><a href="widgout__.html">viewmodels/widgout</a></li><li><a href="wield__.html">viewmodels/wield</a></li><li><a href="workspace_.html">viewmodels/workspace</a></li><li><a href="wroup__.html">viewmodels/wroup</a></li><li><a href="stage-base_.html">viewmodels\bases/stage-base</a></li><li><a href="stage-child-base.html">viewmodels\bases/stage-child-base</a></li><li><a href="widget-default-summary.html">viewmodels\widgets/widget-default-summary</a></li><li><a href="widget-well-history.html">viewmodels\widgets/widget-well-history</a></li><li><a href="widget-well-perfomance.html">viewmodels\widgets/widget-well-perfomance</a></li><li><a href="widget-well-sketch.html">viewmodels\widgets/widget-well-sketch</a></li><li><a href="widget-wield-map.html">viewmodels\widgets/widget-wield-map</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Sat Feb 08 2014 01:08:26 GMT+0200 (EET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Tue Feb 11 2014 16:53:34 GMT+0200 (EET)
 </footer>
 
 <script> prettyPrint(); </script>

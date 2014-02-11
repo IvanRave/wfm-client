@@ -27,182 +27,211 @@
         <article>
             <pre class="prettyprint source"><code>﻿/** @module */
 define(['knockout'], function (ko) {
-    'use strict';
+	'use strict';
 
-    var uomCoefDict = {
-        time: {
-            sec: 1,
-            min: 60,
-            hr: 3600,
-            d: 86400
-        },
-        volume: {
-            m3: 1,
-            bbl: 0.159159637116027, //? approximately
-            Mbbl: 159.159637116027, // 1 000 barrels
-            MMbbl: 159159.637116027, // 1 000 000 barrels
-            scf: 0.028316846592, // Math.Pow(0.3048, 3);
-            Mcf: 28.316846592, // Math.Pow(0.3048, 3) * 1000
-            MMcf: 28316.846592, // Math.Pow(0.3048, 3) * 1000000
-            in3: 0.000016387064, // Math.Pow(0.3048 / 12, 3);
-            L: 0.001,
-            galUS: 0.003785411784, // 231 * Math.Pow(0.3048 / 12, 3);// 231 * cui
-            galUK: 0.00454609 // (4.54609 / 1000);//// official in litres
-        },
-        temperature: {
-            '°F': 1
-        }
-    };
+	var uomCoefDict = {
+		time : {
+			sec : 1,
+			min : 60,
+			hr : 3600,
+			d : 86400
+		},
+		volume : {
+			m3 : 1,
+			bbl : 0.159159637116027, //? approximately
+			Mbbl : 159.159637116027, // 1 000 barrels
+			MMbbl : 159159.637116027, // 1 000 000 barrels
+			scf : 0.028316846592, // Math.Pow(0.3048, 3);
+			Mcf : 28.316846592, // Math.Pow(0.3048, 3) * 1000
+			MMcf : 28316.846592, // Math.Pow(0.3048, 3) * 1000000
+			in3 : 0.000016387064, // Math.Pow(0.3048 / 12, 3);
+			L : 0.001,
+			galUS : 0.003785411784, // 231 * Math.Pow(0.3048 / 12, 3);// 231 * cui
+			galUK : 0.00454609 // (4.54609 / 1000);//// official in litres
+		},
+		temperature : {
+			'°F' : 1
+		}
+	};
 
-    function getUomCoefFromDict(needUom, needCoefDict) {
-        var result;
-        for (var coefGroup in needCoefDict) {
-            for (var coefItem in needCoefDict[coefGroup]) {
-                if (needUom === coefItem) {
-                    result = needCoefDict[coefGroup][coefItem];
-                }
-            }
-        }
+	function getUomCoefFromDict(needUom, needCoefDict) {
+		var result;
+		for (var coefGroup in needCoefDict) {
+			for (var coefItem in needCoefDict[coefGroup]) {
+				if (needUom === coefItem) {
+					result = needCoefDict[coefGroup][coefItem];
+				}
+			}
+		}
 
-        return result;
-    }
+		return result;
+	}
 
-    // [['bbl'],['d']] -> bbl/d
-    // [['kg','m'], ['s']] -> kg*m/s
-    function convertMatrixToStr(uomMatrix) {
-        // [['kg','m'], ['s']] -> ['kg*m','s']
-        var groupArr = [];
-        for (var i = 0; i &lt; uomMatrix.length; i += 1) {
-            groupArr.push(uomMatrix[i].join('*'));
-        }
+	// [['bbl'],['d']] -> bbl/d
+	// [['kg','m'], ['s']] -> kg*m/s
+	function convertMatrixToStr(uomMatrix) {
+		// [['kg','m'], ['s']] -> ['kg*m','s']
+		var groupArr = [];
+		for (var i = 0; i &lt; uomMatrix.length; i += 1) {
+			groupArr.push(uomMatrix[i].join('*'));
+		}
 
-        // ['kg*m','s'] -> kg*m/s
-        return groupArr.join('/');
-    }
+		// ['kg*m','s'] -> kg*m/s
+		return groupArr.join('/');
+	}
 
-    // bbl/d -> [['bbl'],['d']]
-    // kg*m/s -> [['kg','m'], ['s']]
-    function convertStrToMatrix(uomStr) {
-        // divide by numerator and denominator
-        var tmpList = uomStr.split('/');
+	// bbl/d -> [['bbl'],['d']]
+	// kg*m/s -> [['kg','m'], ['s']]
+	function convertStrToMatrix(uomStr) {
+		// divide by numerator and denominator
+		var tmpList = uomStr.split('/');
 
-        var readyMatrix = [];
-        for (var i = 0; i &lt; tmpList.length; i += 1) {
-            readyMatrix.push(tmpList[i].split('*'));
-        }
+		var readyMatrix = [];
+		for (var i = 0; i &lt; tmpList.length; i += 1) {
+			readyMatrix.push(tmpList[i].split('*'));
+		}
 
-        return readyMatrix;
-    }
+		return readyMatrix;
+	}
+
+	/**
+	 * Parameter, like OilRate, WaterRate etc.
+	 * @constructor
+	 * @param {object} data - Parameter data
+	 */
+	var exports = function (data) {
+		data = data || {};
+
+		var self = this;
+
+		/**
+		 * Parameter id (OilRate, WaterRate, etc.)
+		 * @type {string}
+		 */
+		this.id = data.Id;
+
+		/**
+		 * Parameter name (Oil rate, water rate, etc.)
+     * @todo feat: redefine in wroup parameters #MM!
+		 * @type {string}
+		 */
+		this.name = ko.observable(data.Name);
+
+		/**
+		 * Unit of measurement (scf, barrels, etc.)
+     * @todo feat: redefine in wroup parameters #MM!
+		 * @type {string}
+		 */
+		this.uom = ko.observable(data.Uom);
+
+		// Todo: need to store in db as this array
+		// For Newton: [[kg,m],[s,s]]
+		// For Speed: [[m],[s,s]]
+		// For Gas: [[f, f, f]] or [[scf]] - standard cubic feet
+		this.sourceUomMatrix = convertStrToMatrix(data.Uom);
+    
+		this.uomMatrix = ko.computed({
+				read : function () {
+					return convertStrToMatrix(ko.unwrap(self.uom));
+				},
+        deferEvaluation: true
+			});
 
     /**
-    * Parameter, like OilRate, WaterRate etc.
-    * @constructor
-    * @param {object} data - Parameter data
+    * Default hex color of this parameter: can be redefined in the wroup parameter
+    * @type {string}
     */
-    var exports = function (data) {
-        data = data || {};
+		this.defaultColor = ko.observable(data.DefaultColor);
+    
+    /**
+    * Whether this parameter is cumulative
+    * @todo feat: redefine in wroup parameters #MM!
+    *       during change need to change squad (for example from Rate to Cumulative)
+    * @type {bool}
+    */
+		this.isCumulative = ko.observable(data.IsCumulative);
+    
+    /**
+    * Whether this parameter is system: used in program logic and can't be deleted
+    * @type {bool}
+    */
+		this.isSystem = ko.observable(data.IsSystem);
 
-        /**
-        * Parameter id (OilRate, WaterRate, etc.)
-        * @type {string}
-        */
-        this.id = data.Id;
+		/**
+    * Id of the squad of parameters ('rate', 'cumulative'...)
+    * @type {string}
+    */
+		this.wfmParamSquadId = ko.observable(data.WfmParamSquadId);
 
-        /**
-        * Parameter name (Oil rate, water rate, etc.)
-        * @type {string}
-        */
-        this.name = ko.observable(data.Name);
+		// List of possible units of measurements (for choosed uom)
+		this.getPossibleUomListForSelectedUom = function (selectedUom) {
+			// choose group for need unit of measurement
+			var needGroup;
+			for (var uomCoefGroup in uomCoefDict) {
+				for (var uomCoefItem in uomCoefDict[uomCoefGroup]) {
+					if (uomCoefItem === selectedUom) {
+						needGroup = uomCoefDict[uomCoefGroup];
+					}
+				}
+			}
 
-        /**
-        * Unit of measurement (scf, barrels, etc.)
-        * @type {string}
-        */
-        this.uom = ko.observable(data.Uom);
+			var resultList = [];
+			// convert group to array (exclude need uom)
+			if (needGroup) {
+				for (var uomCoefMain in needGroup) {
+					if (uomCoefMain !== selectedUom) {
+						resultList.push(uomCoefMain);
+					}
+				}
+			}
 
-        var self = this;
+			return resultList;
+		};
 
-        // Todo: need to store in db as this array
-        // For Newton: [[kg,m],[s,s]]
-        // For Speed: [[m],[s,s]]
-        // For Gas: [[f, f, f]] or [[scf]] - standard cubic feet
-        self.sourceUomMatrix = convertStrToMatrix(data.Uom);
-        self.uomMatrix = ko.computed(function () { return convertStrToMatrix(self.uom()); });
+		this.changeSelectedUom = function (selectedUom, selectedUomSquadPosition, selectedUomPosition) {
+			////var prevSelectedUom = self.uomMatrix()[selectedUomSquadPosition][selectedUomPosition];
+			var uomMatrixNew = self.uomMatrix().slice();
+			uomMatrixNew[selectedUomSquadPosition][selectedUomPosition] = selectedUom;
+			self.uom(convertMatrixToStr(uomMatrixNew));
+		};
 
-        self.defaultColor = ko.observable(data.DefaultColor);
-        self.isCumulative = ko.observable(data.IsCumulative);
-        self.isSystem = ko.observable(data.IsSystem);
+		// If user wants to remember coef state than use cookies and change after initialization
+		this.uomCoef = ko.computed({
+				read : function () {
+					var coef = 1;
 
-        // well file manager parameter group id
-        self.wfmParamSquadId = ko.observable(data.WfmParamSquadId);
+					var currentUomMatrix = self.uomMatrix();
+					for (var i = 0; i &lt; self.sourceUomMatrix.length; i += 1) {
+						for (var j = 0; j &lt; self.sourceUomMatrix[i].length; j += 1) {
+							var curItem = currentUomMatrix[i][j];
+							var srcItem = self.sourceUomMatrix[i][j];
 
-        // List of possible units of measurements (for choosed uom)
-        self.getPossibleUomListForSelectedUom = function (selectedUom) {
-            // choose group for need unit of measurement
-            var needGroup;
-            for (var uomCoefGroup in uomCoefDict) {
-                for (var uomCoefItem in uomCoefDict[uomCoefGroup]) {
-                    if (uomCoefItem === selectedUom) {
-                        needGroup = uomCoefDict[uomCoefGroup];
-                    }
-                }
-            }
+							if (curItem !== srcItem) {
+								// get coef (only for changed values)
+								if (i === 0) {
+									// If numerator (first value in array)
+									coef *= getUomCoefFromDict(srcItem, uomCoefDict) / getUomCoefFromDict(curItem, uomCoefDict);
+								} else if (i === 1) {
+									// If denominator (second value in array)
+									coef /= getUomCoefFromDict(srcItem, uomCoefDict) / getUomCoefFromDict(curItem, uomCoefDict);
+								}
+							}
+						}
+					}
 
-            var resultList = [];
-            // convert group to array (exclude need uom)
-            if (needGroup) {
-                for (var uomCoefMain in needGroup) {
-                    if (uomCoefMain !== selectedUom) {
-                        resultList.push(uomCoefMain);
-                    }
-                }
-            }
+					return coef;
+				},
+				deferEvaluation : true
+			});
 
-            return resultList;
-        };
+		this.toPlainJson = function () {
+			return ko.toJS(this);
+		};
+	};
 
-        self.changeSelectedUom = function (selectedUom, selectedUomSquadPosition, selectedUomPosition) {
-            ////var prevSelectedUom = self.uomMatrix()[selectedUomSquadPosition][selectedUomPosition];
-            var uomMatrixNew = self.uomMatrix().slice();
-            uomMatrixNew[selectedUomSquadPosition][selectedUomPosition] = selectedUom;
-            self.uom(convertMatrixToStr(uomMatrixNew));
-        };
-
-        // If user wants to remember coef state than use cookies and change after initialization
-        self.uomCoef = ko.computed({
-            read: function () {
-                var coef = 1;
-
-                var currentUomMatrix = self.uomMatrix();
-                for (var i = 0; i &lt; self.sourceUomMatrix.length; i += 1) {
-                    for (var j = 0; j &lt; self.sourceUomMatrix[i].length; j += 1) {
-                        var curItem = currentUomMatrix[i][j];
-                        var srcItem = self.sourceUomMatrix[i][j];
-
-                        if (curItem !== srcItem) {
-                            // get coef (only for changed values)
-                            if (i === 0) {
-                                // If numerator (first value in array)
-                                coef *= getUomCoefFromDict(srcItem, uomCoefDict) / getUomCoefFromDict(curItem, uomCoefDict);
-                            }
-                            else if (i === 1) {
-                                // If denominator (second value in array)
-                                coef /= getUomCoefFromDict(srcItem, uomCoefDict) / getUomCoefFromDict(curItem, uomCoefDict);
-                            }
-                        }
-                    }
-                }
-
-                return coef;
-            },
-            deferEvaluation: true
-        });
-
-        self.toPlainJson = function () { return ko.toJS(this); };
-    };
-
-    return exports;
-});</code></pre>
+	return exports;
+});
+</code></pre>
         </article>
     </section>
 
@@ -212,13 +241,13 @@ define(['knockout'], function (ko) {
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="all-bindings.html">bindings/all-bindings</a></li><li><a href="svg-bindings.html">bindings/svg-bindings</a></li><li><a href="stage-constants.html">constants/stage-constants</a></li><li><a href="svg-elem-type-constants.html">constants/svg-elem-type-constants</a></li><li><a href="ajax-request.html">helpers/ajax-request</a></li><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="log-helper.html">helpers/log-helper</a></li><li><a href="area-of-map-of-wield.html">models/area-of-map-of-wield</a></li><li><a href="column-attribute.html">models/column-attribute</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="file-spec-of-history-of-well.html">models/file-spec-of-history-of-well</a></li><li><a href="forecast-evolution.html">models/forecast-evolution</a></li><li><a href="history-of-well.html">models/history-of-well</a></li><li><a href="integrity-of-well.html">models/integrity-of-well</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="log-of-well.html">models/log-of-well</a></li><li><a href="map-of-wield.html">models/map-of-wield</a></li><li><a href="nodal-analysis-of-well.html">models/nodal-analysis-of-well</a></li><li><a href="perfomance-of-well.html">models/perfomance-of-well</a></li><li><a href="production-data.html">models/production-data</a></li><li><a href="prop-spec.html">models/prop-spec</a></li><li><a href="section-of-stage.html">models/section-of-stage</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="sketch-of-well.html">models/sketch-of-well</a></li><li><a href="svg-elem.html">models/svg-elem</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="volume-of-well.html">models/volume-of-well</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-marker-of-map-of-wield.html">models/well-marker-of-map-of-wield</a></li><li><a href="wfm-image.html">models/wfm-image</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="widget.html">models/widget</a></li><li><a href="widgock.html">models/widgock</a></li><li><a href="widgout.html">models/widgout</a></li><li><a href="wield.html">models/wield</a></li><li><a href="workspace.html">models/workspace</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="stage-base.html">models\bases/stage-base</a></li><li><a href="auth.html">services/auth</a></li><li><a href="company_.html">services/company</a></li><li><a href="company-user.html">services/company-user</a></li><li><a href="file-spec_.html">services/file-spec</a></li><li><a href="file-spec-of-history-of-well_.html">services/file-spec-of-history-of-well</a></li><li><a href="image-of-history-of-well.html">services/image-of-history-of-well</a></li><li><a href="integrity-of-well_.html">services/integrity-of-well</a></li><li><a href="log-of-well_.html">services/log-of-well</a></li><li><a href="map-of-wield_.html">services/map-of-wield</a></li><li><a href="nodal-analysis-of-well_.html">services/nodal-analysis-of-well</a></li><li><a href="register.html">services/register</a></li><li><a href="sketch-of-well_.html">services/sketch-of-well</a></li><li><a href="svg-elem-of-log-of-well.html">services/svg-elem-of-log-of-well</a></li><li><a href="volume-of-well_.html">services/volume-of-well</a></li><li><a href="wegion_.html">services/wegion</a></li><li><a href="well_.html">services/well</a></li><li><a href="well-marker-of-map-of-wield_.html">services/well-marker-of-map-of-wield</a></li><li><a href="widget_.html">services/widget</a></li><li><a href="widgout_.html">services/widgout</a></li><li><a href="wield_.html">services/wield</a></li><li><a href="wroup_.html">services/wroup</a></li><li><a href="company__.html">viewmodels/company</a></li><li><a href="employee_.html">viewmodels/employee</a></li><li><a href="history-of-well_.html">viewmodels/history-of-well</a></li><li><a href="integrity-of-well__.html">viewmodels/integrity-of-well</a></li><li><a href="log-of-well__.html">viewmodels/log-of-well</a></li><li><a href="map-of-wield__.html">viewmodels/map-of-wield</a></li><li><a href="map-tool.html">viewmodels/map-tool</a></li><li><a href="nodal-analysis-of-well__.html">viewmodels/nodal-analysis-of-well</a></li><li><a href="perfomance-of-well_.html">viewmodels/perfomance-of-well</a></li><li><a href="scope-of-history-of-well.html">viewmodels/scope-of-history-of-well</a></li><li><a href="section-of-stage_.html">viewmodels/section-of-stage</a></li><li><a href="sketch-of-well__.html">viewmodels/sketch-of-well</a></li><li><a href="user-profile_.html">viewmodels/user-profile</a></li><li><a href="volume-of-well__.html">viewmodels/volume-of-well</a></li><li><a href="wegion__.html">viewmodels/wegion</a></li><li><a href="well__.html">viewmodels/well</a></li><li><a href="well-marker-of-map-of-wield__.html">viewmodels/well-marker-of-map-of-wield</a></li><li><a href="widget__.html">viewmodels/widget</a></li><li><a href="widgock_.html">viewmodels/widgock</a></li><li><a href="widgout__.html">viewmodels/widgout</a></li><li><a href="wield__.html">viewmodels/wield</a></li><li><a href="workspace_.html">viewmodels/workspace</a></li><li><a href="wroup__.html">viewmodels/wroup</a></li><li><a href="stage-base_.html">viewmodels\bases/stage-base</a></li><li><a href="stage-child-base.html">viewmodels\bases/stage-child-base</a></li><li><a href="widget-default-summary.html">viewmodels\widgets/widget-default-summary</a></li><li><a href="widget-well-history.html">viewmodels\widgets/widget-well-history</a></li><li><a href="widget-well-perfomance.html">viewmodels\widgets/widget-well-perfomance</a></li><li><a href="widget-well-sketch.html">viewmodels\widgets/widget-well-sketch</a></li><li><a href="widget-wield-map.html">viewmodels\widgets/widget-wield-map</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="all-bindings.html">bindings/all-bindings</a></li><li><a href="svg-bindings.html">bindings/svg-bindings</a></li><li><a href="stage-constants.html">constants/stage-constants</a></li><li><a href="svg-elem-type-constants.html">constants/svg-elem-type-constants</a></li><li><a href="ajax-request.html">helpers/ajax-request</a></li><li><a href="history-helper.html">helpers/history-helper</a></li><li><a href="log-helper.html">helpers/log-helper</a></li><li><a href="area-of-map-of-wield.html">models/area-of-map-of-wield</a></li><li><a href="column-attribute.html">models/column-attribute</a></li><li><a href="company.html">models/company</a></li><li><a href="employee.html">models/employee</a></li><li><a href="file-spec.html">models/file-spec</a></li><li><a href="file-spec-of-history-of-well.html">models/file-spec-of-history-of-well</a></li><li><a href="forecast-evolution.html">models/forecast-evolution</a></li><li><a href="history-of-well.html">models/history-of-well</a></li><li><a href="integrity-of-well.html">models/integrity-of-well</a></li><li><a href="job-type.html">models/job-type</a></li><li><a href="log-of-well.html">models/log-of-well</a></li><li><a href="map-of-wield.html">models/map-of-wield</a></li><li><a href="nodal-analysis-of-well.html">models/nodal-analysis-of-well</a></li><li><a href="perfomance-of-well.html">models/perfomance-of-well</a></li><li><a href="production-data.html">models/production-data</a></li><li><a href="prop-spec.html">models/prop-spec</a></li><li><a href="section-of-stage.html">models/section-of-stage</a></li><li><a href="section-pattern.html">models/section-pattern</a></li><li><a href="sketch-of-well.html">models/sketch-of-well</a></li><li><a href="svg-elem.html">models/svg-elem</a></li><li><a href="test-data.html">models/test-data</a></li><li><a href="test-scope.html">models/test-scope</a></li><li><a href="user-profile.html">models/user-profile</a></li><li><a href="volume-of-well.html">models/volume-of-well</a></li><li><a href="wegion.html">models/wegion</a></li><li><a href="well.html">models/well</a></li><li><a href="well-marker-of-map-of-wield.html">models/well-marker-of-map-of-wield</a></li><li><a href="wfm-image.html">models/wfm-image</a></li><li><a href="wfm-param-squad.html">models/wfm-param-squad</a></li><li><a href="wfm-parameter.html">models/wfm-parameter</a></li><li><a href="wfm-parameter-of-wroup.html">models/wfm-parameter-of-wroup</a></li><li><a href="widget.html">models/widget</a></li><li><a href="widgock.html">models/widgock</a></li><li><a href="widgout.html">models/widgout</a></li><li><a href="wield.html">models/wield</a></li><li><a href="workspace.html">models/workspace</a></li><li><a href="wroup.html">models/wroup</a></li><li><a href="stage-base.html">models\bases/stage-base</a></li><li><a href="auth.html">services/auth</a></li><li><a href="company_.html">services/company</a></li><li><a href="company-user.html">services/company-user</a></li><li><a href="file-spec_.html">services/file-spec</a></li><li><a href="file-spec-of-history-of-well_.html">services/file-spec-of-history-of-well</a></li><li><a href="image-of-history-of-well.html">services/image-of-history-of-well</a></li><li><a href="integrity-of-well_.html">services/integrity-of-well</a></li><li><a href="log-of-well_.html">services/log-of-well</a></li><li><a href="map-of-wield_.html">services/map-of-wield</a></li><li><a href="nodal-analysis-of-well_.html">services/nodal-analysis-of-well</a></li><li><a href="register.html">services/register</a></li><li><a href="section-pattern_.html">services/section-pattern</a></li><li><a href="sketch-of-well_.html">services/sketch-of-well</a></li><li><a href="svg-elem-of-log-of-well.html">services/svg-elem-of-log-of-well</a></li><li><a href="test-data_.html">services/test-data</a></li><li><a href="test-scope_.html">services/test-scope</a></li><li><a href="volume-of-well_.html">services/volume-of-well</a></li><li><a href="wegion_.html">services/wegion</a></li><li><a href="well_.html">services/well</a></li><li><a href="well-marker-of-map-of-wield_.html">services/well-marker-of-map-of-wield</a></li><li><a href="wfm-param-squad_.html">services/wfm-param-squad</a></li><li><a href="wfm-parameter-of-wroup_.html">services/wfm-parameter-of-wroup</a></li><li><a href="widget_.html">services/widget</a></li><li><a href="widgout_.html">services/widgout</a></li><li><a href="wield_.html">services/wield</a></li><li><a href="wroup_.html">services/wroup</a></li><li><a href="company__.html">viewmodels/company</a></li><li><a href="employee_.html">viewmodels/employee</a></li><li><a href="history-of-well_.html">viewmodels/history-of-well</a></li><li><a href="integrity-of-well__.html">viewmodels/integrity-of-well</a></li><li><a href="log-of-well__.html">viewmodels/log-of-well</a></li><li><a href="map-of-wield__.html">viewmodels/map-of-wield</a></li><li><a href="map-tool.html">viewmodels/map-tool</a></li><li><a href="nodal-analysis-of-well__.html">viewmodels/nodal-analysis-of-well</a></li><li><a href="perfomance-of-well_.html">viewmodels/perfomance-of-well</a></li><li><a href="scope-of-history-of-well.html">viewmodels/scope-of-history-of-well</a></li><li><a href="section-of-stage_.html">viewmodels/section-of-stage</a></li><li><a href="sketch-of-well__.html">viewmodels/sketch-of-well</a></li><li><a href="test-scope__.html">viewmodels/test-scope</a></li><li><a href="user-profile_.html">viewmodels/user-profile</a></li><li><a href="volume-of-well__.html">viewmodels/volume-of-well</a></li><li><a href="wegion__.html">viewmodels/wegion</a></li><li><a href="well__.html">viewmodels/well</a></li><li><a href="well-marker-of-map-of-wield__.html">viewmodels/well-marker-of-map-of-wield</a></li><li><a href="wfm-parameter-of-wroup__.html">viewmodels/wfm-parameter-of-wroup</a></li><li><a href="widget__.html">viewmodels/widget</a></li><li><a href="widgock_.html">viewmodels/widgock</a></li><li><a href="widgout__.html">viewmodels/widgout</a></li><li><a href="wield__.html">viewmodels/wield</a></li><li><a href="workspace_.html">viewmodels/workspace</a></li><li><a href="wroup__.html">viewmodels/wroup</a></li><li><a href="stage-base_.html">viewmodels\bases/stage-base</a></li><li><a href="stage-child-base.html">viewmodels\bases/stage-child-base</a></li><li><a href="widget-default-summary.html">viewmodels\widgets/widget-default-summary</a></li><li><a href="widget-well-history.html">viewmodels\widgets/widget-well-history</a></li><li><a href="widget-well-perfomance.html">viewmodels\widgets/widget-well-perfomance</a></li><li><a href="widget-well-sketch.html">viewmodels\widgets/widget-well-sketch</a></li><li><a href="widget-wield-map.html">viewmodels\widgets/widget-wield-map</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Sat Feb 08 2014 01:08:26 GMT+0200 (EET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Tue Feb 11 2014 16:53:34 GMT+0200 (EET)
 </footer>
 
 <script> prettyPrint(); </script>
