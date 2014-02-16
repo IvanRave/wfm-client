@@ -1,30 +1,42 @@
 ﻿/**
  * @module
  */
-define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/datacontext',
-		'helpers/modal-helper', 'helpers/history-helper', 'models/bases/stage-base', 'models/section-of-stage',
-		'models/prop-spec', 'services/company', 'models/file-spec', 'services/wegion', 'constants/stage-constants',
-		'helpers/knockout-lazy'], function ($, ko, Wegion, JobType, appDatacontext, modalHelper, historyHelper,
+define(['jquery',
+		'knockout',
+		'models/wegion',
+		'models/job-type',
+		'services/datacontext',
+		'helpers/modal-helper',
+		'helpers/history-helper',
+		'models/bases/stage-base',
+		'models/section-of-stage',
+		'models/prop-spec',
+		'services/company',
+		'models/file-spec',
+		'services/wegion',
+		'constants/stage-constants',
+		'helpers/knockout-lazy'],
+	function ($, ko, Wegion, JobType, appDatacontext, modalHelper, historyHelper,
 		StageBase, SectionOfCompany, PropSpec, companyService, FileSpec, wegionService, stageConstants) {
 	'use strict';
 
 	/** Import well regions for company */
 	function importWegions(data, companyParent) {
-		return data.map(function (item) {
+		return (data || []).map(function (item) {
 			return new Wegion(item, companyParent);
 		});
 	}
 
 	/** Import job types for this company (joined with global types) */
 	function importJobTypeList(data) {
-		return data.map(function (item) {
+		return (data || []).map(function (item) {
 			return new JobType(item);
 		});
 	}
 
 	/** Import company sections */
 	function importListOfSectionOfCompanyDto(data, parent) {
-		return data.map(function (item) {
+		return (data || []).map(function (item) {
 			return new SectionOfCompany(item, parent, item.CompanyId);
 		});
 		// item.CompanyId === parent.id

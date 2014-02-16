@@ -12,8 +12,6 @@
     "tests"
   ],
   "devDependencies": {
-    "moment": "~2.4.0",
-    "requirejs": "~2.1.9",
     "knockout": "https://github.com/bowerjs/knockout.git#~3.0.0",
     "es5-shim": "~2.1.0",
     "console-shim": "*",
@@ -26,7 +24,8 @@
     "jquery": "~2.1.0",
     "pickadate": "~3.3.2",
     "blueimp-file-upload": "~9.5.4",
-    "bootstrap": "~3.1.0",
-    "bootstrap-sass": "https://github.com/twbs/bootstrap-sass.git#~3.1.0"
+    "bootstrap-sass": "https://github.com/twbs/bootstrap-sass.git#~3.1.1",
+    "moment": "~2.5.1",
+    "requirejs": "~2.1.10"
   }
 }

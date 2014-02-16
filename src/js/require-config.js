@@ -2,7 +2,9 @@
     requirejs.config({
         //baseUrl: '.',
         paths: {
-            'jquery.bootstrap': 'bootstrap',
+            // // 'bootstrap-modal': 'bootstrap/modal',
+            // // 'bootstrap-dropdown': 'bootstrap/dropdown',
+            // // 'bootstrap-transition': 'bootstrap/transition'
             ////'leaflet': '../libs/leaflet/leaflet',
             ////'yandex-map': '//api-maps.yandex.ru/2.0/?load=package.full&lang=en-US'
             ////'blob-js': 'blobjs/Blob.min',
@@ -23,7 +25,9 @@
             // Shim config does not work after optimization builds with CDN resources.
             // Need only for 3-rd side libraries when no AMD
             // Bootstrap - set module define in it's file
-            'jquery.bootstrap': { deps: ['jquery'] },
+            'bootstrap/transition': { deps: ['jquery'] },
+            'bootstrap/modal': { deps: ['jquery', 'bootstrap/transition'] },
+            'bootstrap/dropdown': { deps: ['jquery', 'bootstrap/transition'] },
             'jquery.slimscroll': { deps: ['jquery'] },
             'jquery.Jcrop': { deps: ['jquery'] },
             'd3': { exports: 'd3' }

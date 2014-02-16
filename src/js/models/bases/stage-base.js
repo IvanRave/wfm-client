@@ -23,9 +23,9 @@ define(['knockout',
         /** Props values: all observables */
         this.propSpecList.forEach(function (prop) {
             if (prop.tpe === 'FileLine') {
-                // Create new observable file specification
+                // Create a new observable file specification
                 ths[prop.clientId] = ko.observable();
-                // If file exists - create object
+                // If the file exists - create its object
                 if (data[prop.serverId]) {
                     ths[prop.clientId](new FileSpec(data[prop.serverId]));
                 }
@@ -35,7 +35,7 @@ define(['knockout',
             }
         });
 
-        /** Get need property from array */
+        /** Get a need property from array */
         this.getPropSpecByClientId = function (clientId) {
             var filteredProps = ths.propSpecList.filter(function (elem) {
                 return elem.clientId === clientId;

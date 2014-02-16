@@ -90,7 +90,7 @@ module.exports = function (grunt) {
                     flatten: true,
                     cwd: '<%= bowerFolder %>/',
                     dest: '<%= trgt %>/js/',
-                    src: ['jquery/jquery.js', 'moment/moment.js', 'bootstrap/dist/js/bootstrap.js',
+                    src: ['jquery/jquery.js', 'moment/moment.js',
                         'requirejs/require.js', 'knockout/knockout.js', 
                         'console-shim/console-shim.js', 'es5-shim/es5-shim.js',
                         'pickadate/lib/picker.js', 'pickadate/lib/picker.date.js', 'pickadate/lib/picker.time.js',
@@ -99,6 +99,16 @@ module.exports = function (grunt) {
                         'blueimp-canvas-to-blob/js/canvas-to-blob.js',
                         'blueimp-load-image/js/load-image.js', 'blueimp-load-image/js/load-image-*.js',
                         'd3/d3.js', 'jquery.panzoom/dist/jquery.panzoom.js', 'jcrop/js/jquery.Jcrop.js']
+                }]
+            },
+            bower_bootstrap_js: {
+              files: [{
+                    expand: true,
+                    dot: true,
+                    flatten: true,
+                    cwd: '<%= bowerFolder %>/bootstrap-sass/vendor/assets/javascripts/bootstrap/',
+                    dest: '<%= trgt %>/js/bootstrap/',
+                    src: ['modal.js', 'dropdown.js', 'transition.js']
                 }]
             },
             bower_img: {
@@ -139,7 +149,7 @@ module.exports = function (grunt) {
                     flatten: true,
                     cwd: '<%= bowerFolder %>/',
                     dest: '<%= trgt %>/fonts/',
-                    src: ['bootstrap/dist/fonts/*', 'wfm-fonts/fonts/*']
+                    src: ['bootstrap-sass/vendor/assets/fonts/bootstrap/*', 'wfm-fonts/fonts/*']
                 }]
             }
         },
@@ -219,9 +229,31 @@ module.exports = function (grunt) {
                     ////useSourceUrl: true,
                     //  wrap: true, // wrap in closure
                     // jQuery automatically excluded if it's loaded from CDN
-                    include: ['es5-shim', 'console-shim', 'jquery', 'jquery.bootstrap', 'jquery.panzoom', 
+                    include: ['es5-shim', 'console-shim', 'jquery', 
+                    'bootstrap/transition', 'bootstrap/modal', 'bootstrap/dropdown',
+                    'jquery.panzoom', 
                     'bindings/all-bindings', 'bindings/svg-bindings',
-                    'knockout', 'helpers/knockout-lazy', 'viewmodels/workspace', 'services/datacontext']
+                    'knockout', 'helpers/knockout-lazy', 
+                    // Services (alphabetically sorted)
+                    'services/auth', 
+                    'services/company-user',
+                    'services/datacontext',
+                    'services/register',
+                    'services/section-pattern',
+                    'services/widgout',
+                    // Viewmodels
+                    'viewmodels/workspace',
+                    // Models
+                    'models/bases/stage-base',
+                    'models/employee',
+                    'models/file-spec',
+                    'models/job-type',
+                    'models/prop-spec',
+                    'models/section-pattern',
+                    'models/user-profile', 
+                    'models/wegion',
+                    'models/wfm-parameter',
+                    'models/workspace']
                 }
             }
             // // ,workspace: {
@@ -319,6 +351,7 @@ module.exports = function (grunt) {
      'copy:bower_css_sass', // Copy css files as scss partials (to import to main.scss file)
      'copy:bower_fonts',
      'copy:bower_img',
+     'copy:bower_bootstrap_js', // Copy unchanged files from bootstrap-sass
      'copy:bower_bootstrap_sass', // Copy bowe scss partials to main.css file may be import these partials
      'sass:main', // Make main sass file from copied file
      'assemble:js', // After copy all files to destination - replace all {{value}} - rewrite the same files

@@ -1,6 +1,6 @@
 ﻿/** @module */
 define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-helper',
-    'jquery.slimscroll', 'jquery.bootstrap', 'picker.date'], function ($, ko, appMoment, bootstrapModal, fileHelper) {
+    'jquery.slimscroll', 'bootstrap/modal', 'bootstrap/dropdown', 'picker.date'], function ($, ko, appMoment, bootstrapModal, fileHelper) {
         'use strict';
 
         ko.bindingHandlers.hidden = {

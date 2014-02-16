@@ -1,4 +1,5 @@
-﻿define(['jquery', 'jquery.bootstrap'], function ($) {
+﻿/** @module */
+define(['jquery', 'bootstrap/modal'], function ($) {
     'use strict';
 
     var bootstrapModal = {};

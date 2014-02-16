@@ -22,7 +22,9 @@
                   <span data-bind="unix: $parent[clientId]"></span>
                 </span>
                 <span data-bind="if: tpe === 'FileLine'">
-                  <img data-bind="attr: {width: addtData.width, src: $parent[clientId]().fileUrl }"></img>
+                  <span data-bind="if: $parent[clientId]">
+                    <img data-bind="attr: {width: addtData.width, src: $parent[clientId]().fileUrl }"></img>
+                  </span>
                 </span>
                 <span data-bind="if: tpe === 'BoolLine'">
                   <span data-bind="text: $parent[clientId]"></span>
