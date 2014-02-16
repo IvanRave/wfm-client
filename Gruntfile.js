@@ -7,7 +7,7 @@ module.exports = function (grunt) {
         lang = grunt.option('lang') || 'en';
         
     // API url (prod and dev)
-    var requrl = isProd ? 'http://wfm-client.azurewebsites.net' : 'http://localhost:17171';
+    var requrl = isProd ? '//wfm-client.azurewebsites.net' : 'http://localhost:17171';
     
     // Target - destination folder plus config, for example: 
     // dev (development)

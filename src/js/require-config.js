@@ -4,7 +4,7 @@
         paths: {
             'jquery.bootstrap': 'bootstrap',
             ////'leaflet': '../libs/leaflet/leaflet',
-            ////'yandex-map': 'http://api-maps.yandex.ru/2.0/?load=package.full&lang=en-US'
+            ////'yandex-map': '//api-maps.yandex.ru/2.0/?load=package.full&lang=en-US'
             ////'blob-js': 'blobjs/Blob.min',
             ////'blob-builder': 'blobjs/BlobBuilder.min',
             ////'filesaver': 'filesaverjs/filesaver.min',
