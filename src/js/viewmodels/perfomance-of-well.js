@@ -451,7 +451,20 @@ define(['jquery',
 			},
 			axisSize : 10
 		};
+    
+    /**
+    * An attribute for a group of the graph
+    *    The group with data lines
+    * @type {string}
+    */
+    vw.graphTransform = 'translate(' + vw.prfGraph.viewBox.margin.left + ', ' + vw.prfGraph.viewBox.margin.top + ')';
 
+    /**
+    * An attribute for the X axis
+    * @type {string}
+    */
+    vw.graphAxisXTransform = 'translate(0,' + vw.prfGraph.viewBox.height + ')';
+    
 		// actual width of graph and x-axis
 		// real size of svg
 		vw.prfGraph.width = ko.observable();
