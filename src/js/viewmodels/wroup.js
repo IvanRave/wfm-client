@@ -65,10 +65,10 @@ define([
 
 			function submitFunction() {
 				var tmpName = $(inputName).val();
-        if (tmpName){
-          ths.mdlStage.postWell(tmpName, function () {});
-          modalHelper.closeModalWindow();
-        }
+				if (tmpName) {
+					ths.mdlStage.postWell(tmpName, function () {});
+					modalHelper.closeModalWindow();
+				}
 			}
 
 			modalHelper.openModalWindow('Well', innerDiv, submitFunction);
@@ -128,16 +128,59 @@ define([
 				ths.mdlStage.postWfmParameterOfWroup(tmpWfmParamId);
 			}
 		};
+
+		//{ #region MONITORING
+
+		/**
+		 * A selected date for the monitoring section
+		 *    By default: current date in unix time
+		 * @type {string}
+		 */
+		this.monitoringUnixTime = ko.observable(Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate()) / 1000);
+
+		/**
+		 * Open well and select monitoring section
+		 */
+		this.goToMonitoringOfWell = function (tmpVwmWell) {
+			// Select monitoring section
+			tmpVwmWell.unzOfSlcVwmSectionWrk('well-monitoring');
+
+			// Activate well view
+			ths.activateVwmChild(tmpVwmWell);
+		};
+
+		/**
+		 * Open this wroup and select monitoring section
+		 */
+		this.goToMonitoringOfWroup = function () {
+			// Select monitoring section
+			ths.unzOfSlcVwmSectionWrk('wroup-monitoring');
+
+			// Activate this wroup
+			parentVwmWield.activateVwmChild(ths);
+		};
+
+		/**
+		 * Whether a current view (table) show montly procents
+		 * @type {boolean}
+		 */
+		this.isMonthlyProcentView = ko.observable(false);
     
     /**
-    * A selected date for the monitoring section
-    *    By default: current date in unix time
-    * @type {string}
+    * Toggle between a values view and a montly procent view
     */
-    this.monitoringUnixTime = ko.observable(Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate())/1000);
+    this.turnOnMonthlyProcentView = function(){
+        this.isMonthlyProcentView(true);
+    };
+
+    /**
+    * Toggle between a values view and a montly procent view
+    */
+    this.turnOffMonthlyProcentView = function(){
+        this.isMonthlyProcentView(false);
+    };
     
-    
-    
+		//} #endregion MONITORING
 	};
 
 	return exports;

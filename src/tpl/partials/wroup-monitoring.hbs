@@ -1,20 +1,29 @@
 ﻿<!-- current: vwmStage (wroup) -->
 <div>
-  <h4>
-    Well monitoring
-    <span data-bind="ifnot: $root.isEmployeeInEditMode">
-      <span data-bind="unix: monitoringUnixTime"></span>
-    </span>
-    <span data-bind="if: $root.isEmployeeInEditMode">
-      <input class="input-sm" data-bind="datepicker: monitoringUnixTime, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }" />
-    </span>
-  </h4>
+  <div class="clearfix">
+    <h4 class="pull-left">
+      Platform monitoring
+    </h4>
+    <h4 class="pull-left min-left-margin">
+      <span data-bind="ifnot: $root.isEmployeeInEditMode">
+        <span data-bind="unix: monitoringUnixTime"></span>
+      </span>
+      <span data-bind="if: $root.isEmployeeInEditMode">
+        <input class="input-sm" data-bind="datepicker: monitoringUnixTime, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }" />
+      </span>
+    </h4>
+    <div class="pull-right">
+      <div class="btn-group">
+        <button class="btn btn-default btn-sm" type="button" data-bind="css: { 'active': !isMonthlyProcentView() }, click: turnOffMonthlyProcentView">Well values</button>
+        <button class="btn btn-default btn-sm" type="button" data-bind="css: { 'active': isMonthlyProcentView }, click: turnOnMonthlyProcentView">Monthly % of change</button>
+      </div>
+    </div>
+  </div>
   <div class="table-responsive">
     <table class="table table-condensed table-hover">
       <thead>
         <tr>
           <th class="text-center">Well</th>
-          <th class="text-center">Test date</th>
           <!-- ko foreach: listOfVwmWfmParameterOfWroup -->
           <th class="text-center" data-bind="with: mdlWfmParameterOfWroup.wfmParameter">
             <span data-bind="text: id"></span>
@@ -25,6 +34,44 @@
           <!-- /ko -->
         </tr>
       </thead>
+      <tbody>
+        <!-- ko foreach: {data: listOfVwmChild, as: 'vwmWell'} -->
+        <tr>
+          <td class="text-center">
+            <div>
+              <span data-bind="text: vwmWell.mdlStage.Name"></span>
+            </div>
+            <div>
+              <small class="text-success" data-bind="visible: vwmWell.mdlStage.IsActive">Active</small>
+              <small class="text-danger" data-bind="hidden: vwmWell.mdlStage.IsActive">Inactive</small>
+              <button class="btn btn-xs btn-default" type="button" data-bind="click: $parent.goToMonitoringOfWell">
+                <i class="glyphicon glyphicon-random"></i> Plot
+              </button>
+            </div>
+          </td>
+          <!-- ko foreach: $parent.listOfVwmWfmParameterOfWroup -->
+          <td class="text-center">
+            <div data-bind="if: $root.isEmployeeInEditMode">
+              <div data-bind="hidden: $parents[1].isMonthlyProcentView">
+                <input class="input-sm" size="8"/>
+              </div>
+              <div data-bind="visible: $parents[1].isMonthlyProcentView">
+                <input class="input-sm" size="3"/>%
+              </div>
+            </div>
+            <div data-bind="ifnot: $root.isEmployeeInEditMode">
+              <div data-bind="hidden: $parents[1].isMonthlyProcentView">
+                <span>12334</span>
+              </div>
+              <div data-bind="visible: $parents[1].isMonthlyProcentView">
+                <small>10%</small>
+              </div>
+            </div>
+          </td>
+          <!-- /ko -->
+        </tr>
+        <!-- /ko -->
+      </tbody>
     </table>
   </div>
   <!-- TODO: feat: slide#9 #HM! -->

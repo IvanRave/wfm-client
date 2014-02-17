@@ -608,6 +608,19 @@ define([
 			});    
 
 		//} #endregion TEST
+    
+    //{ #region MONITORING (MNTR)
+    
+    /**
+    * A date border to filter monitoring data
+    * @type {object}
+    */
+    this.mntrUnixTimeBorder = {
+      start: ko.observable(),
+      end: ko.observable()
+    };
+    
+    //{
 	};
 
 	return exports;

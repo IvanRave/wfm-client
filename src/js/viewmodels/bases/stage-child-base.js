@@ -41,8 +41,6 @@ define(['knockout',
             *    4. Set url fot this stage
             */
             this.activateVwmChild = function (vwmChildToActivate) {
-                console.log('activate: ', vwmChildToActivate);
-
                 // Unselect previous child: todo: why?
                 ////ths.unqOfSlcVwmChild(null);
 
@@ -54,11 +52,15 @@ define(['knockout',
                     vwmChildToActivate = vwmChildToActivate.vwmCompany;
                 }
 
+                // If a stage has children, then unselect all children
                 if (typeof (vwmChildToActivate.unqOfSlcVwmChild) !== 'undefined') {
                     vwmChildToActivate.unqOfSlcVwmChild(null);
                 }
                 
-                vwmChildToActivate.unselectVwmSectionWrk(); 
+                // If not a selected section - show dashboard
+                if (!ko.unwrap(vwmChildToActivate.unzOfSlcVwmSectionWrk)){
+                  vwmChildToActivate.unselectVwmSectionWrk();
+                }
 
                 navigationArr = historyHelper.getNavigationArr(vwmChildToActivate.mdlStage);
                 historyHelper.pushState('/' + navigationArr.join('/'));

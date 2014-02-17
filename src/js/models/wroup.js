@@ -161,7 +161,8 @@ define(['jquery',
 				Color : '',
 				SerialNumber : 1,
 				WellGroupId : ths.id,
-				WfmParameterId : tmpWfmParamId
+				WfmParameterId : tmpWfmParamId,
+        IsMonitored: false
 			}).done(function (response) {
 				ths.listOfWfmParameterOfWroup.push(new WellGroupWfmParameter(response, ths));
 			});

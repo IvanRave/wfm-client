@@ -1,0 +1,41 @@
+﻿<!-- current: vwmStage (well) -->
+<div>
+  <div class="clearfix">
+    <h4 class="pull-left">
+      Well monitoring
+    </h4>
+    <div class="pull-left min-left-margin">
+      <input class="input-sm" size="10" data-bind="datepicker: mntrUnixTimeBorder.start, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }"/>
+      -
+      <input class="input-sm" size="10" data-bind="datepicker: mntrUnixTimeBorder.end, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }"/>
+    </div>
+    <div class="pull-right">
+      <!-- parent: vwmWroup -->
+      <button class="btn btn-link btn-sm" type="button" data-bind="click: $parent.goToMonitoringOfWroup">
+        Go to the platform monitoring
+      </button>
+    </div>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-condensed table-hover">
+      <thead>
+        <tr>
+          <th class="text-center">Date</th>
+          <!-- ko foreach: getParentVwm().listOfVwmWfmParameterOfWroup -->
+          <th class="text-center" data-bind="with: mdlWfmParameterOfWroup.wfmParameter">
+            <span data-bind="text: id"></span>
+            <span data-bind="visible: uom">
+              <br /><span data-bind="text: uom"></span>
+            </span>
+          </th>
+          <!-- /ko -->
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Some date</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
