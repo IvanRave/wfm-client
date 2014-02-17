@@ -130,6 +130,21 @@ One map can have few map views (in well-map section, in field-map section, in an
 2. Select need columns to import
 3. Import data from this file to a database
 
+### Monitoring
+* There is a scope of monitoring parameters in a well group (platform)
+* Every day a company moderator can point the values for these parameters (a scope of values per well)
+* Every parameter includes a procent of change (need to compare with average 30 days data)
+* A company moderator can point these procents
+* One platform - few parameters
+* One well - one procent value per platform parameter
+* One parameter - few values (a value per day)
+* Every well contains the table and the graph with these values (for some period of time)
+* A monitoring table includes a scope of data per well (for current date or some date, selected by user)
+* A warning (red) value - is a value, that is out of procent borders, for example:
+an average value per month = 40bbl; 
+a border procent = 5% (2bbl); 
+a current value = 30bbl (40bbl - 30bbl > 2bbl) -> a current value is a warning value
+
 ### Well test - Измерение показателей скважины
 * Сперва пользователь определяет необходимые параметры для замера.
 Все возможные параметры можно получить с помощью GET запроса соотвествующего API
