@@ -1,5 +1,32 @@
 ﻿<!-- current: vwmStage (wroup) -->
 <div>
+  <h4>
+    Well monitoring
+    <span data-bind="ifnot: $root.isEmployeeInEditMode">
+      <span data-bind="unix: monitoringUnixTime"></span>
+    </span>
+    <span data-bind="if: $root.isEmployeeInEditMode">
+      <input class="input-sm" data-bind="datepicker: monitoringUnixTime, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }" />
+    </span>
+  </h4>
+  <div class="table-responsive">
+    <table class="table table-condensed table-hover">
+      <thead>
+        <tr>
+          <th class="text-center">Well</th>
+          <th class="text-center">Test date</th>
+          <!-- ko foreach: listOfVwmWfmParameterOfWroup -->
+          <th class="text-center" data-bind="with: mdlWfmParameterOfWroup.wfmParameter">
+            <span data-bind="text: id"></span>
+            <span data-bind="visible: uom">
+              <br /><span data-bind="text: uom"></span>
+            </span>
+          </th>
+          <!-- /ko -->
+        </tr>
+      </thead>
+    </table>
+  </div>
   <!-- TODO: feat: slide#9 #HM! -->
   <!-- Plot button: select date range and show graph using table data of selected well (with procent shlafe) -->
   <!-- Stream data: the same for well tools (separators, flares, etc.) -->

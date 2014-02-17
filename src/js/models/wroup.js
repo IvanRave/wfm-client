@@ -225,6 +225,9 @@ define(['jquery',
 		this.loadSectionContent = function (idOfSectionPattern) {
 			switch (idOfSectionPattern) {
 			case 'wroup-unit':
+				// Params (table headers)
+				ths.loadListOfWfmParameterOfWroup();
+				break;
 			case 'wroup-potential':
 				// Params (table headers)
 				ths.loadListOfWfmParameterOfWroup();
@@ -233,6 +236,13 @@ define(['jquery',
 				ko.unwrap(ths.wells).forEach(function (elem) {
 					elem.loadListOfTestScope();
 				});
+
+				break;
+			case 'wroup-monitoring':
+				// Params (table headers)
+				ths.loadListOfWfmParameterOfWroup();
+
+				// TODO: Load monitoring values #HM!
 
 				break;
 			}

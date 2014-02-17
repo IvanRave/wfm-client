@@ -128,6 +128,16 @@ define([
 				ths.mdlStage.postWfmParameterOfWroup(tmpWfmParamId);
 			}
 		};
+    
+    /**
+    * A selected date for the monitoring section
+    *    By default: current date in unix time
+    * @type {string}
+    */
+    this.monitoringUnixTime = ko.observable(Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate())/1000);
+    
+    
+    
 	};
 
 	return exports;
