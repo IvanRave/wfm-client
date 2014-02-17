@@ -25,7 +25,7 @@ define([
 		'services/file-spec',
 		'models/column-attribute',
 		'models/test-scope',
-    'services/test-scope'
+		'services/test-scope'
 	], function ($, ko, datacontext, fileHelper,
 		appHelper, appMoment,
 		StageBase,
@@ -248,6 +248,10 @@ define([
 					ths.getWellGroup().loadListOfWfmParameterOfWroup();
 					break;
 				}
+			case 'well-monitoring': {
+					ths.getWellGroup().loadListOfWfmParameterOfWroup();
+					break;
+				}
 			case 'well-map': {
 					// find wellfield_id
 					var wellFieldItem = ths.getWellGroup().getWellField();
@@ -301,34 +305,34 @@ define([
 		this.listOfTestScope = ko.observableArray();
 
 		this.loadListOfTestScope = function () {
-      testScopeService.get(ths.id).done(function (response) {
+			testScopeService.get(ths.id).done(function (response) {
 				ths.listOfTestScope(importTestScopeDtoList(response, ths));
 			});
 		};
-    
-    /**
-    * Last approved test scope for potential section in well group
-    * @type {module:models/test-scope}
-    */
-    this.lastApprovedTestScope = ko.computed({
-      read: function(){
-        var tmpApprovedList = ko.unwrap(ths.listOfTestScope).filter(function(elem){
-          return ko.unwrap(elem.isApproved) === true;
-        });
-        
-        var lastTestScope = tmpApprovedList[0];
-        
-        // Find last (by time) test scope
-        tmpApprovedList.forEach(function(elem){
-            if (ko.unwrap(elem.startUnixTime) > ko.unwrap(lastTestScope.startUnixTime)){
-              lastTestScope = elem;
-            }
-        });
-        
-        return lastTestScope;
-      },
-      deferEvaluation: true
-    });
+
+		/**
+		 * Last approved test scope for potential section in well group
+		 * @type {module:models/test-scope}
+		 */
+		this.lastApprovedTestScope = ko.computed({
+				read : function () {
+					var tmpApprovedList = ko.unwrap(ths.listOfTestScope).filter(function (elem) {
+							return ko.unwrap(elem.isApproved) === true;
+						});
+
+					var lastTestScope = tmpApprovedList[0];
+
+					// Find last (by time) test scope
+					tmpApprovedList.forEach(function (elem) {
+						if (ko.unwrap(elem.startUnixTime) > ko.unwrap(lastTestScope.startUnixTime)) {
+							lastTestScope = elem;
+						}
+					});
+
+					return lastTestScope;
+				},
+				deferEvaluation : true
+			});
 
 		/** Unix time data for creating new test scope */
 		this.testScopeNewStartUnixTime = {
@@ -367,7 +371,7 @@ define([
 				// Add minutes
 				unixTime += ko.unwrap(ths.testScopeNewStartUnixTime.minute) * 60;
 
-        testScopeService.post({
+				testScopeService.post({
 					WellId : ths.id,
 					StartUnixTime : unixTime,
 					IsApproved : null,
@@ -871,6 +875,12 @@ define([
 		this.perfomanceOfWell.prdColumnAttributeList(importColumnAttributes(datacontext.getColumnAttributesLocal()));
 
 		//} #endregion PERFOMANCE
+
+		//{ #region MONITORING (for well group)
+
+		////this.monitoringData
+
+		//} #endregion
 
 		/** Load well sections */
 		this.listOfSection(importListOfSection(data.ListOfSectionOfWellDto, ths));

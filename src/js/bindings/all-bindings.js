@@ -204,6 +204,9 @@ define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-he
             }
         };
 
+        /**
+        * Datepicker from unixtime (in seconds from Unix epoch)
+        */
         ko.bindingHandlers.datepicker = {
             init: function (element, valueAccessor, allBindings) {
                 // Initialize datepicker with some optional options

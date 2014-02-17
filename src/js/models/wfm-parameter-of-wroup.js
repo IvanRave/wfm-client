@@ -45,12 +45,11 @@ define(['knockout', 'models/wfm-parameter'], function (ko, WfmParameter) {
 		 */
 		this.color = ko.observable(data.Color);
 
-		// Moved to viewmodel (different for diff views)
-		// /**
-		// * Whether parameter is visible on the test or the perfomance page
-		// * @type {boolean}
-		// */
-		// this.isVisible = ko.observable(true);
+    /**
+    * Whether this parameter is monitored (well or platform monitoring)
+    * @type {boolean}
+    */
+    this.isMonitored = ko.observable(data.IsMonitored);
 
 		/**
 		 * Whether parameter can be calculated from other parameters
