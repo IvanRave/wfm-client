@@ -49,24 +49,45 @@
               </button>
             </div>
           </td>
-          <!-- ko foreach: $parent.listOfVwmWfmParameterOfWroup -->
+          <!-- current: vwmWell -->
+          <!-- ko foreach: { data: $parent.listOfVwmWfmParameterOfWroup, as: 'vwmPrm' } -->
           <td class="text-center">
-            <div data-bind="if: $root.isEmployeeInEditMode">
-              <div data-bind="hidden: $parents[1].isMonthlyProcentView">
-                <input class="input-sm" size="8"/>
+            <div data-bind="hidden: $parents[1].isMonthlyProcentView">
+              <div data-bind="ifnot: $root.isEmployeeInEditMode">
+                12334
               </div>
-              <div data-bind="visible: $parents[1].isMonthlyProcentView">
-                <input class="input-sm" size="3"/>%
-              </div>
-            </div>
-            <div data-bind="ifnot: $root.isEmployeeInEditMode">
-              <div data-bind="hidden: $parents[1].isMonthlyProcentView">
-                <span>12334</span>
-              </div>
-              <div data-bind="visible: $parents[1].isMonthlyProcentView">
-                <small>10%</small>
+              <div data-bind="if: $root.isEmployeeInEditMode">
+                <div data-bind="hidden: $parents[1].isMonthlyProcentView">
+                  <input class="input-sm" size="8"/>
+                </div>
               </div>
             </div>
+            <div data-bind="visible: $parents[1].isMonthlyProcentView">
+              <span data-bind="ifnot: $root.isEmployeeInEditMode">
+                <span data-bind="with: vwmWell.mdlStage.objProcentBorders">
+                  <span data-bind="with: $data[vwmPrm.mdlWfmParameterOfWroup.wfmParameterId]">
+                    <span data-bind="text: procent"></span>
+                  </span>
+                </span>
+              </span>
+              <span data-bind="if: $root.isEmployeeInEditMode">
+                <span data-bind="with: vwmWell.mdlStage.objProcentBorders">
+                  <span data-bind="with: $data[vwmPrm.mdlWfmParameterOfWroup.wfmParameterId]">
+                    <input class="input-sm" type="text" size="10" data-bind="value: procent"/>%
+                  </span>
+                </span>
+              </span>
+              <!-- <span data-bind="foreach: vwmWell.mdlStage.procentBorders">
+                <span data-bind="if: idOfWfmParameter === vwmPrm.mdlWfmParameterOfWroup.wfmParameterId">
+                  <span data-bind="ifnot: $root.isEmployeeInEditMode">
+                    <span data-bind="text: procent"></span>%
+                  </span>
+                  <span data-bind="if: $root.isEmployeeInEditMode">
+                    <input class="input-sm" type="text" size="10" data-bind="value: procent"/>%
+                  </span>
+                </span>
+              </span> -->
+            </div>            
           </td>
           <!-- /ko -->
         </tr>

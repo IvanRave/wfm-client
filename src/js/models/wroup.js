@@ -9,7 +9,8 @@ define(['jquery',
 		'models/bases/stage-base',
 		'models/prop-spec',
 		'services/wroup',
-		'constants/stage-constants'],
+		'constants/stage-constants',
+		'services/procent-border'],
 	function ($,
 		ko,
 		datacontext,
@@ -20,7 +21,8 @@ define(['jquery',
 		StageBase,
 		PropSpec,
 		wroupService,
-		stageConstants) {
+		stageConstants,
+		procentBorderService) {
 	'use strict';
 
 	// 18. WellGroupWfmParameter
@@ -162,7 +164,7 @@ define(['jquery',
 				SerialNumber : 1,
 				WellGroupId : ths.id,
 				WfmParameterId : tmpWfmParamId,
-        IsMonitored: false
+				IsMonitored : false
 			}).done(function (response) {
 				ths.listOfWfmParameterOfWroup.push(new WellGroupWfmParameter(response, ths));
 			});
@@ -243,11 +245,49 @@ define(['jquery',
 				// Params (table headers)
 				ths.loadListOfWfmParameterOfWroup();
 
+        // Load procent borders
+        ths.loadProcentBordersForAllWells();
+        
 				// TODO: Load monitoring values #HM!
 
 				break;
 			}
 		};
+
+		//{ #region MONITORING
+
+    /**
+    * Whether procent borders are loaded
+    * @type {boolean}
+    */
+		this.isLoadedProcentBordersForAllWells = ko.observable(false);
+
+		/**
+		 * Load procent borders for all wells
+		 */
+		this.loadProcentBordersForAllWells = function () {
+			if (ko.unwrap(ths.isLoadedProcentBordersForAllWells)) {
+				return;
+			}
+
+			procentBorderService.getForAllWells(ths.id).done(function (tmpScope) {
+        ths.isLoadedProcentBordersForAllWells(true);
+        console.log(tmpScope);
+        var tmpWells = ko.unwrap(ths.wells);
+        
+        // Import data to each well
+        tmpWells.forEach(function(tmpWell){
+          // Get array of procent borders for need well
+          var tmpProcentBordersForWell = tmpScope.filter(function(scopeItem){
+            return scopeItem.IdOfWell === tmpWell.id;
+          })[0].ArrayOfProcentBorder;
+          
+          tmpWell.importProcentBorders(tmpProcentBordersForWell);
+        });
+			});
+		};
+
+		//} #endregion MONITORING
 
 		this.toDto = function () {
 			var dtoObj = {
@@ -262,7 +302,7 @@ define(['jquery',
 			return dtoObj;
 		};
 
-		// load wells
+		/** Load wells */
 		this.wells(importWells(data.WellsDto, ths));
 
 		/** Load sections */

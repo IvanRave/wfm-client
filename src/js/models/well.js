@@ -25,7 +25,8 @@ define([
 		'services/file-spec',
 		'models/column-attribute',
 		'models/test-scope',
-		'services/test-scope'
+		'services/test-scope',
+		'models/procent-border'
 	], function ($, ko, datacontext, fileHelper,
 		appHelper, appMoment,
 		StageBase,
@@ -37,7 +38,7 @@ define([
 		stageConstants, VolumeOfWell,
 		volumeOfWellService, HistoryOfWell,
 		LogOfWell, logOfWellService,
-		fileSpecService, ColumnAttribute, TestScope, testScopeService) {
+		fileSpecService, ColumnAttribute, TestScope, testScopeService, ProcentBorder) {
 	'use strict';
 
 	function importVolumes(data) {
@@ -250,6 +251,12 @@ define([
 				}
 			case 'well-monitoring': {
 					ths.getWellGroup().loadListOfWfmParameterOfWroup();
+
+					// Load procent borders for all wells
+					// No perfomance when load this data separately (for every well), because
+					//      a company user opens a well group monitoring section frequently than a well monitoring section
+					ths.getWellGroup().loadProcentBordersForAllWells();
+
 					break;
 				}
 			case 'well-map': {
@@ -876,9 +883,63 @@ define([
 
 		//} #endregion PERFOMANCE
 
-		//{ #region MONITORING (for well group)
+		//{ #region MONITORING (for a well group monitoring section and a well monitoring section)
 
-		////this.monitoringData
+		/**
+		 * Procent borders
+		 * @type {Array.<module:models/procent-border>}
+		 */
+		this.procentBorders = ko.observableArray();
+
+		/**
+		 * Procent borders as a JSON object
+     *    with empty object for non-exist properties
+		 * @type {object}
+		 */
+		this.objProcentBorders = ko.computed({
+				read : function () {
+          // List of all params
+          var tmpListOfWfmParamOfWroup = ko.unwrap(ths.getWellGroup().listOfWfmParameterOfWroup);
+        
+          // List of existing procent borders
+					var tmpPbs = ko.unwrap(ths.procentBorders);
+          
+          // Result object
+					var result = {};
+          
+          tmpListOfWfmParamOfWroup.forEach(function(tmpPrm){
+            var tmpProcentBorder = tmpPbs.filter(function(pbItem){
+              return pbItem.idOfWfmParameter === tmpPrm.wfmParameterId;
+            })[0];
+            
+            if (tmpProcentBorder){
+              result[tmpPrm.wfmParameterId] = tmpProcentBorder;
+            }
+            else{
+              result[tmpPrm.wfmParameterId] = new ProcentBorder({
+                IdOfWell: ths.id,
+                IdOfWfmParameter: tmpPrm.wfmParameterId
+                // Without procent - null by default
+              });
+            }
+          });
+          
+					return result;
+				},
+				deferEvaluation : true
+			});
+
+		/**
+		 * Import server data to procent borders
+		 *    procent borders loaded through the wroup loadProcentBordersForAllWells method
+		 */
+		this.importProcentBorders = function (tmpProcentBorders) {
+			ths.procentBorders(tmpProcentBorders.map(function (pbItem) {
+					return new ProcentBorder(pbItem);
+				}));
+
+			console.log('Well: ' + ths.id + ': ', ko.unwrap(ths.procentBorders));
+		};
 
 		//} #endregion
 
