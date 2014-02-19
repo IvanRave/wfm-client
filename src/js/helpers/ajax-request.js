@@ -3,15 +3,15 @@ define(['jquery'], function ($) {
     'use strict';
 
     function toggleLoadingState(isOn) {
-        var $spinner = $('.spinner');
+        var jqrLoaderMain = $('.loader-main');
         if (isOn) {
-            if ($spinner.is(':visible') === false) {
-                $spinner.show();
+            if (jqrLoaderMain.is(':visible') === false) {
+                jqrLoaderMain.show();
             }
         }
         else {
-            if ($spinner.is(':visible') === true) {
-                $spinner.hide();
+            if (jqrLoaderMain.is(':visible') === true) {
+                jqrLoaderMain.hide();
             }
         }
     }
