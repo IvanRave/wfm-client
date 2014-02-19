@@ -26,7 +26,8 @@ define([
 		'models/column-attribute',
 		'models/test-scope',
 		'services/test-scope',
-		'models/procent-border'
+		'models/procent-border',
+		'services/procent-border'
 	], function ($, ko, datacontext, fileHelper,
 		appHelper, appMoment,
 		StageBase,
@@ -38,7 +39,8 @@ define([
 		stageConstants, VolumeOfWell,
 		volumeOfWellService, HistoryOfWell,
 		LogOfWell, logOfWellService,
-		fileSpecService, ColumnAttribute, TestScope, testScopeService, ProcentBorder) {
+		fileSpecService, ColumnAttribute, TestScope, testScopeService,
+		ProcentBorder, procentBorderService) {
 	'use strict';
 
 	function importVolumes(data) {
@@ -893,37 +895,36 @@ define([
 
 		/**
 		 * Procent borders as a JSON object
-     *    with empty object for non-exist properties
+		 *    with empty object for non-exist properties
 		 * @type {object}
 		 */
 		this.objProcentBorders = ko.computed({
 				read : function () {
-          // List of all params
-          var tmpListOfWfmParamOfWroup = ko.unwrap(ths.getWellGroup().listOfWfmParameterOfWroup);
-        
-          // List of existing procent borders
+					// List of all params
+					var tmpListOfWfmParamOfWroup = ko.unwrap(ths.getWellGroup().listOfWfmParameterOfWroup);
+
+					// List of existing procent borders
 					var tmpPbs = ko.unwrap(ths.procentBorders);
-          
-          // Result object
+
+					// Result object
 					var result = {};
-          
-          tmpListOfWfmParamOfWroup.forEach(function(tmpPrm){
-            var tmpProcentBorder = tmpPbs.filter(function(pbItem){
-              return pbItem.idOfWfmParameter === tmpPrm.wfmParameterId;
-            })[0];
-            
-            if (tmpProcentBorder){
-              result[tmpPrm.wfmParameterId] = tmpProcentBorder;
-            }
-            else{
-              result[tmpPrm.wfmParameterId] = new ProcentBorder({
-                IdOfWell: ths.id,
-                IdOfWfmParameter: tmpPrm.wfmParameterId
-                // Without procent - null by default
-              });
-            }
-          });
-          
+
+					tmpListOfWfmParamOfWroup.forEach(function (tmpPrm) {
+						var tmpProcentBorder = tmpPbs.filter(function (pbItem) {
+								return pbItem.idOfWfmParameter === tmpPrm.wfmParameterId;
+							})[0];
+
+						if (tmpProcentBorder) {
+							result[tmpPrm.wfmParameterId] = tmpProcentBorder;
+						} else {
+							result[tmpPrm.wfmParameterId] = new ProcentBorder({
+									IdOfWell : ths.id,
+									IdOfWfmParameter : tmpPrm.wfmParameterId
+									// Without procent - null by default
+								}, ths);
+						}
+					});
+
 					return result;
 				},
 				deferEvaluation : true
@@ -935,10 +936,19 @@ define([
 		 */
 		this.importProcentBorders = function (tmpProcentBorders) {
 			ths.procentBorders(tmpProcentBorders.map(function (pbItem) {
-					return new ProcentBorder(pbItem);
+					return new ProcentBorder(pbItem, ths);
 				}));
 
 			console.log('Well: ' + ths.id + ': ', ko.unwrap(ths.procentBorders));
+		};
+
+		/**
+		 * Remove (clear) a procent border
+		 */
+		this.removeProcentBorder = function (itemToRemove) {
+			procentBorderService.remove(itemToRemove.idOfWell, itemToRemove.idOfWfmParameter).done(function () {
+				ths.procentBorders.remove(itemToRemove);
+			});
 		};
 
 		//} #endregion

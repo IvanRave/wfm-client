@@ -11,7 +11,7 @@ define(['jquery',
 	 * Model: procent border for a WFM parameter in every well
 	 * @constructor
 	 */
-	var exports = function (data) {
+	var exports = function (data, wellItem) {
     data = data || {};
     
     /** Alternative */
@@ -35,6 +35,10 @@ define(['jquery',
     */
     this.procent = ko.observable(data.Procent);
     
+    /**
+    * Whether saving is in progress
+    * @type {bool}
+    */
     this.isSaveProgress = ko.observable(false);
     
     /**
@@ -56,8 +60,9 @@ define(['jquery',
     */
     this.procent.subscribe(function(newValue){
       if ($.isNumeric(newValue) === false || +newValue < 0 || +newValue > 100){
-        ths.procent('');
-        console.log('trigger delete method');
+        wellItem.removeProcentBorder(ths);
+        // Clear the input
+        ths.procent(null);
         return;
       }
       else {
