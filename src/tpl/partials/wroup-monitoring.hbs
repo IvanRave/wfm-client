@@ -54,7 +54,9 @@
           <td class="text-center">
             <div data-bind="hidden: $parents[1].isMonthlyProcentView">
               <div data-bind="ifnot: $root.isEmployeeInEditMode">
-                12334
+                <span data-bind="with: vwmWell.monitoringRecordForWroup">
+                  <span data-bind="text: unixTime"></span>
+                </span>
               </div>
               <div data-bind="if: $root.isEmployeeInEditMode">
                 <div data-bind="hidden: $parents[1].isMonthlyProcentView">

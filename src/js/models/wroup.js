@@ -10,7 +10,8 @@ define(['jquery',
 		'models/prop-spec',
 		'services/wroup',
 		'constants/stage-constants',
-		'services/procent-border'],
+		'services/procent-border',
+		'services/monitoring-record'],
 	function ($,
 		ko,
 		datacontext,
@@ -22,7 +23,8 @@ define(['jquery',
 		PropSpec,
 		wroupService,
 		stageConstants,
-		procentBorderService) {
+		procentBorderService,
+		monitoringRecordService) {
 	'use strict';
 
 	// 18. WellGroupWfmParameter
@@ -224,42 +226,36 @@ define(['jquery',
 				deferEvaluation : true
 			});
 
-		/** Set this section as selected */
-		this.loadSectionContent = function (idOfSectionPattern) {
-			switch (idOfSectionPattern) {
-			case 'wroup-unit':
-				// Params (table headers)
-				ths.loadListOfWfmParameterOfWroup();
-				break;
-			case 'wroup-potential':
-				// Params (table headers)
-				ths.loadListOfWfmParameterOfWroup();
-
-				// Test data (table body)
-				ko.unwrap(ths.wells).forEach(function (elem) {
-					elem.loadListOfTestScope();
-				});
-
-				break;
-			case 'wroup-monitoring':
-				// Params (table headers)
-				ths.loadListOfWfmParameterOfWroup();
-
-        // Load procent borders
-        ths.loadProcentBordersForAllWells();
-        
-				// TODO: Load monitoring values #HM!
-
-				break;
-			}
-		};
-
 		//{ #region MONITORING
 
-    /**
-    * Whether procent borders are loaded
-    * @type {boolean}
-    */
+		/**
+		 * Load data for all wells and for need date
+		 */
+		this.loadListOfScopeOfMonitoring = function (tmpUnixTime) {
+			// TODO: if there are data for this date - no need to load #LH!
+			monitoringRecordService.getListOfScope(ths.id, tmpUnixTime).done(function (tmpListOfScope) {
+				console.log('m d', tmpListOfScope);
+				var tmpWells = ko.unwrap(ths.wells);
+
+				// Import data to each well
+				tmpWells.forEach(function (tmpWell) {
+					// Get array of data for need well
+					var needScope = tmpListOfScope.filter(function (scopeItem) {
+							return scopeItem.IdOfWell === tmpWell.id;
+						})[0];
+
+					if (needScope) {
+            // Import data to the well
+						tmpWell.importMonitoringRecords(needScope.ListOfMonitoringRecord);
+					}
+				});
+			});
+		};
+
+		/**
+		 * Whether procent borders are loaded
+		 * @type {boolean}
+		 */
 		this.isLoadedProcentBordersForAllWells = ko.observable(false);
 
 		/**
@@ -271,19 +267,19 @@ define(['jquery',
 			}
 
 			procentBorderService.getForAllWells(ths.id).done(function (tmpScope) {
-        ths.isLoadedProcentBordersForAllWells(true);
-        console.log(tmpScope);
-        var tmpWells = ko.unwrap(ths.wells);
-        
-        // Import data to each well
-        tmpWells.forEach(function(tmpWell){
-          // Get array of procent borders for need well
-          var tmpProcentBordersForWell = tmpScope.filter(function(scopeItem){
-            return scopeItem.IdOfWell === tmpWell.id;
-          })[0].ArrayOfProcentBorder;
-          
-          tmpWell.importProcentBorders(tmpProcentBordersForWell);
-        });
+				ths.isLoadedProcentBordersForAllWells(true);
+				console.log(tmpScope);
+				var tmpWells = ko.unwrap(ths.wells);
+
+				// Import data to each well
+				tmpWells.forEach(function (tmpWell) {
+					// Get array of procent borders for need well
+					var tmpProcentBordersForWell = tmpScope.filter(function (scopeItem) {
+							return scopeItem.IdOfWell === tmpWell.id;
+						})[0].ArrayOfProcentBorder;
+
+					tmpWell.importProcentBorders(tmpProcentBordersForWell);
+				});
 			});
 		};
 

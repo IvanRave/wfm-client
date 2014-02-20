@@ -170,6 +170,16 @@ define(['jquery',
 
                 modalHelper.openModalWindow('Well group', innerDiv, submitFunction);
             };
+            
+            /** Set this section as selected */
+            this.loadSectionContent = function (idOfSectionPattern) {
+                switch (idOfSectionPattern) {
+                    case 'wield-map':
+                        // Get all maps from this field
+                        ths.mdlStage.loadMapsOfWield();
+                        break;
+                }
+            };
         };
 
         return exports;

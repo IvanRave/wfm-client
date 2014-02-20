@@ -27,7 +27,8 @@ define([
 		'models/test-scope',
 		'services/test-scope',
 		'models/procent-border',
-		'services/procent-border'
+		'services/procent-border',
+    'models/monitoring-record'
 	], function ($, ko, datacontext, fileHelper,
 		appHelper, appMoment,
 		StageBase,
@@ -40,7 +41,8 @@ define([
 		volumeOfWellService, HistoryOfWell,
 		LogOfWell, logOfWellService,
 		fileSpecService, ColumnAttribute, TestScope, testScopeService,
-		ProcentBorder, procentBorderService) {
+		ProcentBorder, procentBorderService,
+    MonitoringRecord) {
 	'use strict';
 
 	function importVolumes(data) {
@@ -208,90 +210,6 @@ define([
 
 		/** Sketch of well: by default - empty */
 		this.sketchOfWell = new SketchOfWell(ths);
-
-		/**
-		 * Load content of the section
-		 * @param {object} section - Section
-		 */
-		this.loadSectionContent = function (idOfSectionPattern) {
-			switch (idOfSectionPattern) {
-				// Dashboard: from undefined to null
-			case 'well-history': {
-					ths.loadWellHistoryList();
-					break;
-				}
-			case 'well-sketch': {
-					ths.sketchOfWell.load();
-					break;
-				}
-			case 'well-volume': {
-					ths.loadVolumes();
-					break;
-				}
-			case 'well-perfomance': {
-					ths.getWellGroup().loadListOfWfmParameterOfWroup();
-					ths.perfomanceOfWell.forecastEvolution.getDict();
-					ths.perfomanceOfWell.getHstProductionDataSet();
-					break;
-				}
-			case 'well-nodalanalysis': {
-					ths.loadListOfNodalAnalysis();
-					break;
-				}
-			case 'well-integrity': {
-					ths.loadListOfIntegrity();
-					break;
-				}
-			case 'well-log': {
-					ths.loadLogsOfWell();
-					break;
-				}
-			case 'well-test': {
-					ths.loadListOfTestScope();
-					ths.getWellGroup().loadListOfWfmParameterOfWroup();
-					break;
-				}
-			case 'well-monitoring': {
-					ths.getWellGroup().loadListOfWfmParameterOfWroup();
-
-					// Load procent borders for all wells
-					// No perfomance when load this data separately (for every well), because
-					//      a company user opens a well group monitoring section frequently than a well monitoring section
-					ths.getWellGroup().loadProcentBordersForAllWells();
-
-					break;
-				}
-			case 'well-map': {
-					// find wellfield_id
-					var wellFieldItem = ths.getWellGroup().getWellField();
-
-					wellFieldItem.loadMapsOfWield();
-					////function () {
-					////var arr = ko.unwrap(wellFieldItem.WellFieldMaps);
-					// TODO:???
-					////arr = $.grep(arr, function (arrElem, arrIndex) {
-					////    var cnt = 0;
-					////    $.each(arrElem.wellMarkers(), function(wwfIndex, wwfElem){
-					////        if (wwfElem.Id === ths.Id) {
-					////            cnt++;
-					////        }
-					////    });
-
-					////    return cnt > 0;
-					////});
-
-					break;
-					// no well in new map
-					////wellFieldParent.initMapFileUpload();
-					// find wellfieldmap from wellfield where id =
-					// get all WellInWellFieldMap where wellid = ths.wellId
-					// get all maps
-					// get only maps where well_id == ths.Id
-					// get all maps
-					// in wellMarkers
-				}
-			}
-		};
 
 		this.loadDashboard = function () {
 			ths.sketchOfWell.load();
@@ -929,6 +847,24 @@ define([
 				},
 				deferEvaluation : true
 			});
+
+		/**
+		 * List of monitoring records
+		 * @type {Array.<models/monitoring-record>}
+		 */
+		this.listOfMonitoringRecord = ko.observableArray();
+
+		/**
+		 * Import monitoring records
+		 */
+		this.importMonitoringRecords = function (tmpData) {
+			var objArr = tmpData.map(function (tmpItem) {
+					return new MonitoringRecord(tmpItem);
+				});
+
+			ths.listOfMonitoringRecord(objArr);
+      console.log('list of mntr records', ths.listOfMonitoringRecord());
+		};
 
 		/**
 		 * Import server data to procent borders

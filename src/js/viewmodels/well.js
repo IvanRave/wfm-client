@@ -605,22 +605,129 @@ define([
 					});
 				},
 				deferEvaluation : true
-			});    
+			});
 
 		//} #endregion TEST
-    
-    //{ #region MONITORING (MNTR)
-    
-    /**
-    * A date border to filter monitoring data
-    * @type {object}
-    */
-    this.mntrUnixTimeBorder = {
-      start: ko.observable(),
-      end: ko.observable()
-    };
-    
-    //{
+
+		//{ #region MONITORING (MNTR)
+
+		/**
+		 * A date border to filter monitoring data
+		 * @type {object}
+		 */
+		this.mntrUnixTimeBorder = {
+			start : ko.observable(),
+			end : ko.observable()
+		};
+
+		/**
+		 * A monitoring record, according to the selected unix time in the wroup
+		 * @type {<module:models/monitoring-record>}
+		 */
+		this.monitoringRecordForWroup = ko.computed({
+				read : function () {
+					var currentUnixTimeInWroup = ko.unwrap(parentVwmWroup.monitoringUnixTime);
+
+					if (!currentUnixTimeInWroup) {
+						return;
+					}
+
+					var allRecs = ko.unwrap(ths.mdlStage.listOfMonitoringRecord);
+
+          var needRec = allRecs.filter(function(recItem){
+            return ko.unwrap(recItem.unixTime) === currentUnixTimeInWroup;
+          })[0];
+          
+          return needRec;
+				},
+				deferEvaluation : true
+			});
+
+		//{
+
+		/**
+		 * Load content of the section
+		 * @param {object} section - Section
+		 */
+		this.loadSectionContent = function (idOfSectionPattern) {
+			switch (idOfSectionPattern) {
+				// Dashboard: from undefined to null
+			case 'well-history': {
+					ths.mdlStage.loadWellHistoryList();
+					break;
+				}
+			case 'well-sketch': {
+					ths.mdlStage.sketchOfWell.load();
+					break;
+				}
+			case 'well-volume': {
+					ths.mdlStage.loadVolumes();
+					break;
+				}
+			case 'well-perfomance': {
+					ths.mdlStage.getWellGroup().loadListOfWfmParameterOfWroup();
+					ths.mdlStage.perfomanceOfWell.forecastEvolution.getDict();
+					ths.mdlStage.perfomanceOfWell.getHstProductionDataSet();
+					break;
+				}
+			case 'well-nodalanalysis': {
+					ths.mdlStage.loadListOfNodalAnalysis();
+					break;
+				}
+			case 'well-integrity': {
+					ths.mdlStage.loadListOfIntegrity();
+					break;
+				}
+			case 'well-log': {
+					ths.mdlStage.loadLogsOfWell();
+					break;
+				}
+			case 'well-test': {
+					ths.mdlStage.loadListOfTestScope();
+					ths.mdlStage.getWellGroup().loadListOfWfmParameterOfWroup();
+					break;
+				}
+			case 'well-monitoring': {
+					ths.mdlStage.getWellGroup().loadListOfWfmParameterOfWroup();
+
+					// Load procent borders for all wells
+					// No perfomance when load this data separately (for every well), because
+					//      a company user opens a well group monitoring section frequently than a well monitoring section
+					ths.mdlStage.getWellGroup().loadProcentBordersForAllWells();
+
+					break;
+				}
+			case 'well-map': {
+					// find wellfield_id
+					var wellFieldItem = ths.mdlStage.getWellGroup().getWellField();
+
+					wellFieldItem.loadMapsOfWield();
+					////function () {
+					////var arr = ko.unwrap(wellFieldItem.WellFieldMaps);
+					// TODO:???
+					////arr = $.grep(arr, function (arrElem, arrIndex) {
+					////    var cnt = 0;
+					////    $.each(arrElem.wellMarkers(), function(wwfIndex, wwfElem){
+					////        if (wwfElem.Id === ths.Id) {
+					////            cnt++;
+					////        }
+					////    });
+
+					////    return cnt > 0;
+					////});
+
+					break;
+					// no well in new map
+					////wellFieldParent.initMapFileUpload();
+					// find wellfieldmap from wellfield where id =
+					// get all WellInWellFieldMap where wellid = ths.wellId
+					// get all maps
+					// get only maps where well_id == ths.Id
+					// get all maps
+					// in wellMarkers
+				}
+			}
+		};
 	};
 
 	return exports;

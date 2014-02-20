@@ -133,10 +133,17 @@ define([
 
 		/**
 		 * A selected date for the monitoring section
-		 *    By default: current date in unix time
+		 *    By default: current date in unix time (set when the section is loaded)
 		 * @type {string}
 		 */
-		this.monitoringUnixTime = ko.observable(Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate()) / 1000);
+		this.monitoringUnixTime = ko.observable();
+
+		/**
+		 * Load monitoring data when the user select some date
+		 */
+		this.monitoringUnixTime.subscribe(function (tmpUnixTime) {
+			ths.mdlStage.loadListOfScopeOfMonitoring(tmpUnixTime);
+		});
 
 		/**
 		 * Open well and select monitoring section
@@ -165,22 +172,55 @@ define([
 		 * @type {boolean}
 		 */
 		this.isMonthlyProcentView = ko.observable(false);
-    
-    /**
-    * Toggle between a values view and a montly procent view
-    */
-    this.turnOnMonthlyProcentView = function(){
-        this.isMonthlyProcentView(true);
-    };
 
-    /**
-    * Toggle between a values view and a montly procent view
-    */
-    this.turnOffMonthlyProcentView = function(){
-        this.isMonthlyProcentView(false);
-    };
-    
+		/**
+		 * Toggle between a values view and a montly procent view
+		 */
+		this.turnOnMonthlyProcentView = function () {
+			this.isMonthlyProcentView(true);
+		};
+
+		/**
+		 * Toggle between a values view and a montly procent view
+		 */
+		this.turnOffMonthlyProcentView = function () {
+			this.isMonthlyProcentView(false);
+		};
+
 		//} #endregion MONITORING
+    
+    /** Set this section as selected */
+		this.loadSectionContent = function (idOfSectionPattern) {
+			switch (idOfSectionPattern) {
+			case 'wroup-unit':
+				// Params (table headers)
+				ths.mdlStage.loadListOfWfmParameterOfWroup();
+				break;
+			case 'wroup-potential':
+				// Params (table headers)
+				ths.mdlStage.loadListOfWfmParameterOfWroup();
+
+				// Test data (table body)
+				ko.unwrap(ths.mdlStage.wells).forEach(function (elem) {
+					elem.loadListOfTestScope();
+				});
+
+				break;
+			case 'wroup-monitoring':
+				// Params (table headers)
+				ths.mdlStage.loadListOfWfmParameterOfWroup();
+
+				// Load procent borders
+				ths.mdlStage.loadProcentBordersForAllWells();
+
+        var curDate = new Date();
+        var curUnixTime = Date.UTC(curDate.getUTCFullYear(), curDate.getUTCMonth(), curDate.getUTCDate()) / 1000;
+        // Set the current date and automatically load monitoring values for this date
+        ths.monitoringUnixTime(curUnixTime);
+        
+				break;
+			}
+		};
 	};
 
 	return exports;
