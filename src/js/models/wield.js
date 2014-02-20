@@ -108,16 +108,6 @@ define(['jquery',
             */
             this.WellFieldMaps = ko.observableArray();
 
-            /** Set this section as selected */
-            this.loadSectionContent = function (idOfSectionPattern) {
-                switch (idOfSectionPattern) {
-                    case 'wield-map':
-                        // Get all maps from this field
-                        ths.loadMapsOfWield();
-                        break;
-                }
-            };
-
             /** Remove map from field */
             this.removeMapOfWield = function (itemToDelete) {
                 if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(itemToDelete.name) + '"?')) {

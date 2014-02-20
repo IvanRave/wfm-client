@@ -129,8 +129,8 @@ define(['knockout',
                 var navigationArr = historyHelper.getNavigationArr(ths.mdlStage);
 
                 if (vwmSectionItem) {
-                    if (ths.mdlStage.loadSectionContent) {
-                        ths.mdlStage.loadSectionContent(vwmSectionItem.mdlSection.sectionPatternId);
+                    if (ths.loadSectionContent) {
+                        ths.loadSectionContent(vwmSectionItem.mdlSection.sectionPatternId);
                     }
 
                     // Add data to the url
