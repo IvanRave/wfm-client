@@ -643,6 +643,17 @@ define([
 				deferEvaluation : true
 			});
 
+    /**
+      * Create a monitoring record for selected time in well group
+      */
+    this.createMonitoringRecord = function(){
+      // Time, selected in the well group of this well
+      var currentUnixTimeInWroup = ko.unwrap(parentVwmWroup.monitoringUnixTime);
+      if (currentUnixTimeInWroup){
+        ths.mdlStage.postMonitoringRecord(currentUnixTimeInWroup);
+      }
+    };
+      
 		//{
 
 		/**

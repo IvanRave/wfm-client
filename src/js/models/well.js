@@ -28,7 +28,8 @@ define([
 		'services/test-scope',
 		'models/procent-border',
 		'services/procent-border',
-    'models/monitoring-record'
+		'models/monitoring-record',
+		'services/monitoring-record'
 	], function ($, ko, datacontext, fileHelper,
 		appHelper, appMoment,
 		StageBase,
@@ -42,7 +43,7 @@ define([
 		LogOfWell, logOfWellService,
 		fileSpecService, ColumnAttribute, TestScope, testScopeService,
 		ProcentBorder, procentBorderService,
-    MonitoringRecord) {
+		MonitoringRecord, monitoringRecordService) {
 	'use strict';
 
 	function importVolumes(data) {
@@ -863,7 +864,22 @@ define([
 				});
 
 			ths.listOfMonitoringRecord(objArr);
-      console.log('list of mntr records', ths.listOfMonitoringRecord());
+			console.log('list of mntr records', ths.listOfMonitoringRecord());
+		};
+
+		/**
+		 * Post the monitoring record to the server
+		 *    with an empty dictionary of parameters
+		 */
+		this.postMonitoringRecord = function (tmpUnixTime) {
+			monitoringRecordService.upsert(ths.id, tmpUnixTime, {
+				IdOfWell : ths.id,
+				UnixTime : tmpUnixTime,
+				Dict : {}
+			}).done(function (response) {
+				// Add to the list
+				ths.listOfMonitoringRecord.push(new MonitoringRecord(response));
+			});
 		};
 
 		/**

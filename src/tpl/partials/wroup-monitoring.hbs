@@ -20,7 +20,7 @@
     </div>
   </div>
   <div class="table-responsive">
-    <table class="table table-condensed table-hover">
+    <table class="table table-condensed">
       <thead>
         <tr>
           <th class="text-center">Well</th>
@@ -39,59 +39,65 @@
         <tr>
           <td class="text-center">
             <div>
-              <span data-bind="text: vwmWell.mdlStage.Name"></span>
+              <button class="btn btn-xs btn-link" type="button" data-bind="click: $parent.goToMonitoringOfWell">
+                <span class="bld" data-bind="text: vwmWell.mdlStage.Name"></span>  
+              </button>
             </div>
             <div>
               <small class="text-success" data-bind="visible: vwmWell.mdlStage.IsActive">Active</small>
               <small class="text-danger" data-bind="hidden: vwmWell.mdlStage.IsActive">Inactive</small>
-              <button class="btn btn-xs btn-default" type="button" data-bind="click: $parent.goToMonitoringOfWell">
-                <i class="glyphicon glyphicon-random"></i> Plot
-              </button>
             </div>
           </td>
-          <!-- current: vwmWell -->
-          <!-- ko foreach: { data: $parent.listOfVwmWfmParameterOfWroup, as: 'vwmPrm' } -->
-          <td class="text-center">
-            <div data-bind="hidden: $parents[1].isMonthlyProcentView">
-              <div data-bind="ifnot: $root.isEmployeeInEditMode">
-                <span data-bind="with: vwmWell.monitoringRecordForWroup">
-                  <span data-bind="text: unixTime"></span>
+          <!-- current: vwmWell; parent: vwmWroup --> 
+          <!-- ko ifnot: $parent.isMonthlyProcentView -->
+            <!-- Create record if it's not exists -->
+            <!-- ko ifnot: vwmWell.monitoringRecordForWroup -->
+              <td colspan="100">
+                <span data-bind="if: $root.isEmployeeInEditMode">
+                   <button class="btn btn-sm btn-default" data-bind="click: vwmWell.createMonitoringRecord">Create record</button>
                 </span>
-              </div>
-              <div data-bind="if: $root.isEmployeeInEditMode">
-                <div data-bind="hidden: $parents[1].isMonthlyProcentView">
-                  <input class="input-sm" size="8"/>
-                </div>
-              </div>
-            </div>
-            <div data-bind="visible: $parents[1].isMonthlyProcentView">
-              <span data-bind="ifnot: $root.isEmployeeInEditMode">
-                <span data-bind="with: vwmWell.mdlStage.objProcentBorders">
-                  <span data-bind="with: $data[vwmPrm.mdlWfmParameterOfWroup.wfmParameterId]">
-                    <span data-bind="text: procent"></span>
-                  </span>
-                </span>
-              </span>
-              <span data-bind="if: $root.isEmployeeInEditMode">
-                <span data-bind="with: vwmWell.mdlStage.objProcentBorders">
-                  <span data-bind="with: $data[vwmPrm.mdlWfmParameterOfWroup.wfmParameterId]">
-                    %<input class="input-sm input-width-md" type="text" size="10" data-bind="value: procent"/>
-                    <span class="loader-line-small" data-bind="visible: isSaveProgress" style="position: absolute"></span>
-                  </span>
-                </span>
-              </span>
-              <!-- <span data-bind="foreach: vwmWell.mdlStage.procentBorders">
-                <span data-bind="if: idOfWfmParameter === vwmPrm.mdlWfmParameterOfWroup.wfmParameterId">
+              </td>
+            <!-- /ko -->
+            <!-- ko if: vwmWell.monitoringRecordForWroup -->
+              <!-- ko foreach: { data: $parent.listOfVwmWfmParameterOfWroup, as: 'vwmPrm' } -->
+                <td class="text-center">
+                  <div data-bind="ifnot: $root.isEmployeeInEditMode">
+                    <span data-bind="with: vwmWell.monitoringRecordForWroup">
+                      <span data-bind="text: dict[vwmPrm.mdlWfmParameterOfWroup.wfmParameterId]"></span>
+                    </span>
+                  </div>
+                  <div data-bind="if: $root.isEmployeeInEditMode">
+                    <span data-bind="with: vwmWell.monitoringRecordForWroup">
+                      <input class="input-sm input-width-md input-narrow" type="text" size="10" data-bind="value: dict[vwmPrm.mdlWfmParameterOfWroup.wfmParameterId]" />
+                      <!-- <span class="loader-line-small" data-bind="visible: isSaveProgress" style="position: absolute"></span> -->
+                    </span>
+                  </div>
+                </td>
+              <!-- /ko -->
+            <!-- /ko -->
+          <!-- /ko -->
+          <!-- ko if: $parent.isMonthlyProcentView -->
+            <!-- ko foreach: { data: $parent.listOfVwmWfmParameterOfWroup, as: 'vwmPrm' } -->
+              <td class="text-center">
+                <div>
                   <span data-bind="ifnot: $root.isEmployeeInEditMode">
-                    <span data-bind="text: procent"></span>%
+                    <span data-bind="with: vwmWell.mdlStage.objProcentBorders">
+                      <span data-bind="with: $data[vwmPrm.mdlWfmParameterOfWroup.wfmParameterId]">
+                        <span data-bind="text: procent"></span>
+                      </span>
+                    </span>
                   </span>
                   <span data-bind="if: $root.isEmployeeInEditMode">
-                    <input class="input-sm" type="text" size="10" data-bind="value: procent"/>%
+                    <span data-bind="with: vwmWell.mdlStage.objProcentBorders">
+                      <span data-bind="with: $data[vwmPrm.mdlWfmParameterOfWroup.wfmParameterId]">
+                        %<input class="input-sm input-width-md" type="text" size="10" data-bind="value: procent"/>
+                        <span class="loader-line-small" data-bind="visible: isSaveProgress" style="position: absolute"></span>
+                      </span>
+                    </span>
                   </span>
-                </span>
-              </span> -->
-            </div>            
-          </td>
+                </div>            
+              </td>
+            <!-- /ko -->  
           <!-- /ko -->
         </tr>
         <!-- /ko -->

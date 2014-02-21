@@ -34,7 +34,7 @@ define(['helpers/ajax-request'], function (ajaxRequest) {
     getFilteredData: function(idOfWell, startUnixTime, endUnixTime){
       return ajaxRequest('GET', urlForFilteredData(idOfWell, startUnixTime, endUnixTime));
     },
-		insertOrUpdate : function (idOfWell, unixTime, mdlData) {
+		upsert : function (idOfWell, unixTime, mdlData) {
 			return ajaxRequest('POST', url(idOfWell, unixTime), mdlData);
 		},
 		remove : function (idOfWell, unixTime) {
