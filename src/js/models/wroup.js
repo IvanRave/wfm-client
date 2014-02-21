@@ -227,7 +227,7 @@ define(['jquery',
 			});
 
 		//{ #region MONITORING
-
+    
 		/**
 		 * Load data for all wells and for need date
 		 */

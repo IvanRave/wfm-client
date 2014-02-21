@@ -131,6 +131,21 @@ define([
 
 		//{ #region MONITORING
 
+    /**
+    * List of monitoring params (params of wroup)
+    * @type {Array.<module:viewmodels/wfm-parameter-of-wroup>}
+    */
+    this.listOfMonitoredVwmParams = ko.computed({
+      read: function(){
+        var tmpList = ko.unwrap(ths.listOfVwmWfmParameterOfWroup);
+        
+        return tmpList.filter(function(elem){
+          return ko.unwrap(elem.mdlWfmParameterOfWroup.isMonitored);
+        });
+      },
+      deferEvaluation: true
+    });
+    
 		/**
 		 * A selected date for the monitoring section
 		 *    By default: current date in unix time (set when the section is loaded)
