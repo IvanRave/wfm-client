@@ -1,5 +1,10 @@
 ﻿/** @module */
-define(['knockout', 'models/wfm-parameter'], function (ko, WfmParameter) {
+define(['knockout',
+		'models/wfm-parameter',
+		'services/wfm-parameter-of-wroup'],
+	function (ko,
+		WfmParameter,
+		wfmParameterOfWroupService) {
 	'use strict';
 
 	/**
@@ -29,7 +34,7 @@ define(['knockout', 'models/wfm-parameter'], function (ko, WfmParameter) {
 
 		/**
 		 * Wfm parameter id
-     * @type {string}
+		 * @type {string}
 		 */
 		this.wfmParameterId = data.WfmParameterId;
 
@@ -45,11 +50,11 @@ define(['knockout', 'models/wfm-parameter'], function (ko, WfmParameter) {
 		 */
 		this.color = ko.observable(data.Color);
 
-    /**
-    * Whether this parameter is monitored (well or platform monitoring)
-    * @type {boolean}
-    */
-    this.isMonitored = ko.observable(data.IsMonitored);
+		/**
+		 * Whether this parameter is monitored (well or platform monitoring)
+		 * @type {boolean}
+		 */
+		this.isMonitored = ko.observable(data.IsMonitored);
 
 		/**
 		 * Whether parameter can be calculated from other parameters
@@ -63,6 +68,10 @@ define(['knockout', 'models/wfm-parameter'], function (ko, WfmParameter) {
 		 */
 		this.wfmParameter = ko.observable();
 
+    if (!data.WfmParameterDto) {
+      console.log('TODO: remove');
+    }
+    
 		// When create temp parameter for POST request - this data is not exists
 		if (data.WfmParameterDto) {
 			this.wfmParameter(new WfmParameter(data.WfmParameterDto));
@@ -72,6 +81,24 @@ define(['knockout', 'models/wfm-parameter'], function (ko, WfmParameter) {
 				this.color(ko.unwrap(ko.unwrap(ths.wfmParameter).defaultColor));
 			}
 		}
+    
+    /**
+		 * Save the wfm parameter
+		 */
+		this.save = function () {
+			wfmParameterOfWroupService.put(ths.wellGroupId, ths.wfmParameterId, {
+				WellGroupId : ths.wellGroupId,
+				WfmParameterId : ths.wfmParameterId,
+				IsMonitored : ko.unwrap(ths.isMonitored),
+				Color : ko.unwrap(ths.color),
+				SerialNumber : ko.unwrap(ths.serialNumber)
+			});
+		};
+
+    // Subscribe events (only after function and props initialization)
+    
+		this.isMonitored.subscribe(ths.save);
+    this.color.subscribe(ths.save);
 
 		this.toPlainJson = function () {
 			return ko.toJS(ths);

@@ -25,10 +25,13 @@ define(['helpers/ajax-request'], function (ajaxRequest) {
 		post : function (idOfWroup, mdlData) {
 			return ajaxRequest('POST', url(idOfWroup), mdlData);
 		},
-    // delete parameter from wellgroup
-    // need to clean all data from TestData (and ProductionData)
-    // if no one used this parameter (no more references to this table) and if parameter is not in the library 
-    // then delete from wfmParameter table
+		put : function (idOfWroup, idOfWfmParameter, mdlData) {
+			return ajaxRequest('PUT', url(idOfWroup, idOfWfmParameter), mdlData);
+		},
+		// delete parameter from wellgroup
+		// need to clean all data from TestData (and ProductionData)
+		// if no one used this parameter (no more references to this table) and if parameter is not in the library
+		// then delete from wfmParameter table
 		remove : function (idOfWroup, idOfWfmParameter) {
 			return ajaxRequest('DELETE', url(idOfWroup, idOfWfmParameter));
 		}

@@ -12,22 +12,25 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-sm-3">
+    <div class="col-sm-4">
       <span class="bld">Id - Name</span>
     </div>
-    <div class="col-sm-3">
+    <div class="col-sm-2">
       <span class="bld">Color</span>
     </div>
-    <div class="col-sm-3">
+    <div class="col-sm-2">
       <span class="bld">UoM</span>
     </div>
-    <div class="col-sm-3">
+    <div class="col-sm-2">
       <span class="bld">Is cumulative</span>
+    </div>
+    <div class="col-sm-2">
+      <span class="bld">Is monitored</span>
     </div>
   </div>
   <div data-bind="foreach: listOfVwmWfmParameterOfWroup">
     <div class="row min-top-margin">
-      <div class="col-sm-3">
+      <div class="col-sm-4">
         <div>
           <span data-bind="with: mdlWfmParameterOfWroup">
             <span data-bind="with: wfmParameter">
@@ -41,19 +44,22 @@
           </span>
         </div>
       </div>
-      <div class="col-sm-3" data-bind="with: mdlWfmParameterOfWroup">
+      <div class="col-sm-2" data-bind="with: mdlWfmParameterOfWroup">
         <i class="glyphicon glyphicon-bookmark" data-bind="style: { color: color }"></i>
         <span data-bind="text: color"></span>
       </div>      
-      <div class="col-sm-3" data-bind="with: mdlWfmParameterOfWroup">
+      <div class="col-sm-2" data-bind="with: mdlWfmParameterOfWroup">
         <div data-bind="with: wfmParameter">
           <span data-bind="text: uom"></span>
         </div>
       </div>
-      <div class="col-sm-3" data-bind="with: mdlWfmParameterOfWroup">
+      <div class="col-sm-2" data-bind="with: mdlWfmParameterOfWroup">
         <div data-bind="with: wfmParameter">
-          <span data-bind="text: isCumulative"></span>
+          <input type="checkbox" data-bind="checked: isCumulative" disabled />
         </div>
+      </div>
+      <div class="col-sm-2" data-bind="with: mdlWfmParameterOfWroup">
+        <input type="checkbox" data-bind="checked: isMonitored, enable: $root.isEmployeeInEditMode"/>
       </div>
     </div>
   </div>
