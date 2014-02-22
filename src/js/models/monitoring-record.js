@@ -8,7 +8,7 @@ define(['knockout',
 	 * Model: a monitoring record (for a well and well field monitoring section)
 	 * @constructor
 	 */
-	var exports = function (data) {
+	var exports = function (data, mntrParams) {
 		data = data || {};
 
 		var ths = this;
@@ -53,10 +53,17 @@ define(['knockout',
 
 		this.dict = {}; //data.Dict;
 
-		for (var dictKey in data.Dict) {
-			ths.dict[dictKey] = ko.observable(data.Dict[dictKey]);
-			ths.dict[dictKey].subscribe(ths.upsert);
-		}
+    mntrParams.forEach(function(elem){
+      ths.dict[elem.wfmParameterId] = ko.observable(data.Dict[elem.wfmParameterId]);
+      ths.dict[elem.wfmParameterId].subscribe(ths.upsert);
+    });
+    
+		// // for (var dictKey in data.Dict) {
+			// // ths.dict[dictKey] = ko.observable(data.Dict[dictKey]);
+			// // ths.dict[dictKey].subscribe(ths.upsert);
+		// // }
+    
+    console.log('mntrParams', mntrParams);
 	};
 
 	return exports;

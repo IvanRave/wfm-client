@@ -24,89 +24,97 @@
       </div>
     </div>
   </div>
-  <div class="table-responsive">
-    <table class="table table-condensed">
-      <thead>
-        <tr>
-          <th class="text-center">Well</th>
-          <!-- ko foreach: listOfMonitoredVwmParams -->
-          <th class="text-center" data-bind="with: mdlWfmParameterOfWroup.wfmParameter">
-            <span data-bind="text: id"></span>
-            <span data-bind="visible: uom">
-              <br /><span data-bind="text: uom"></span>
-            </span>
-          </th>
-          <!-- /ko -->
-        </tr>
-      </thead>
-      <tbody>
-        <!-- ko foreach: {data: listOfVwmChild, as: 'vwmWell'} -->
-        <tr>
-          <td class="text-center">
-            <div>
-              <button class="btn btn-xs btn-link" type="button" data-bind="click: $parent.goToMonitoringOfWell">
-                <span class="bld" data-bind="text: vwmWell.mdlStage.Name"></span>  
-              </button>
-            </div>
-            <div>
-              <small class="text-success" data-bind="visible: vwmWell.mdlStage.IsActive">Active</small>
-              <small class="text-danger" data-bind="hidden: vwmWell.mdlStage.IsActive">Inactive</small>
-            </div>
-          </td>
-          <!-- current: vwmWell; parent: vwmWroup --> 
-          <!-- ko ifnot: $parent.isMonthlyProcentView -->
-            <!-- Create record if it's not exists -->
-            <!-- ko ifnot: vwmWell.monitoringRecordForWroup -->
-              <td colspan="100">
-                <span data-bind="if: $root.isEmployeeInEditMode">
-                   <button class="btn btn-sm btn-default" data-bind="click: vwmWell.createMonitoringRecord">Create record</button>
-                </span>
-              </td>
+  <div data-bind="ifnot: mdlStage.isLoadedListOfWfmParameterOfWroup">
+    <span class="loader-line-medium"></span>
+  </div>
+  <div data-bind="if: mdlStage.isLoadedListOfWfmParameterOfWroup">
+    <div data-bind="if: listOfMonitoredVwmParams().length === 0">
+      No monitored parameters. Please select parameters in the Units section of this well group.
+    </div>
+    <div class="table-responsive" data-bind="if: listOfMonitoredVwmParams().length > 0">
+      <table class="table table-condensed">
+        <thead>
+          <tr>
+            <th class="text-center">Well</th>
+            <!-- ko foreach: listOfMonitoredVwmParams -->
+            <th class="text-center" data-bind="with: mdlWfmParameterOfWroup.wfmParameter">
+              <span data-bind="text: id"></span>
+              <span data-bind="visible: uom">
+                <br /><span data-bind="text: uom"></span>
+              </span>
+            </th>
             <!-- /ko -->
-            <!-- ko if: vwmWell.monitoringRecordForWroup -->
-              <!-- ko foreach: { data: $parent.listOfMonitoredVwmParams, as: 'vwmPrm' } -->
-                <td class="text-center">
-                  <div data-bind="ifnot: $root.isEmployeeInEditMode">
-                    <span data-bind="with: vwmWell.monitoringRecordForWroup">
-                      <span data-bind="text: dict[vwmPrm.mdlWfmParameterOfWroup.wfmParameterId]"></span>
-                    </span>
-                  </div>
-                  <div data-bind="if: $root.isEmployeeInEditMode">
-                    <span data-bind="with: vwmWell.monitoringRecordForWroup">
-                      <input class="input-sm input-width-md input-narrow" type="text" size="10" data-bind="value: dict[vwmPrm.mdlWfmParameterOfWroup.wfmParameterId]" />
-                    </span>
-                  </div>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- ko foreach: {data: listOfVwmChild, as: 'vwmWell'} -->
+          <tr>
+            <td class="text-center">
+              <div>
+                <button class="btn btn-xs btn-link" type="button" data-bind="click: $parent.goToMonitoringOfWell">
+                  <span class="bld" data-bind="text: vwmWell.mdlStage.Name"></span>  
+                </button>
+              </div>
+              <div>
+                <small class="text-success" data-bind="visible: vwmWell.mdlStage.IsActive">Active</small>
+                <small class="text-danger" data-bind="hidden: vwmWell.mdlStage.IsActive">Inactive</small>
+              </div>
+            </td>
+            <!-- current: vwmWell; parent: vwmWroup --> 
+            <!-- ko ifnot: $parent.isMonthlyProcentView -->
+              <!-- Create record if it's not exists -->
+              <!-- ko ifnot: vwmWell.monitoringRecordForWroup -->
+                <td colspan="100">
+                  <span data-bind="if: $root.isEmployeeInEditMode">
+                     <button class="btn btn-sm btn-default" data-bind="click: vwmWell.createMonitoringRecord">Create record</button>
+                  </span>
                 </td>
               <!-- /ko -->
+              <!-- ko if: vwmWell.monitoringRecordForWroup -->
+                <!-- ko foreach: { data: $parent.listOfMonitoredVwmParams, as: 'vwmPrm' } -->
+                  <td class="text-center">
+                    <div data-bind="ifnot: $root.isEmployeeInEditMode">
+                      <span data-bind="with: vwmWell.monitoringRecordForWroup">
+                        <span data-bind="text: dict[vwmPrm.mdlWfmParameterOfWroup.wfmParameterId]"></span>
+                      </span>
+                    </div>
+                    <div data-bind="if: $root.isEmployeeInEditMode">
+                      <span data-bind="with: vwmWell.monitoringRecordForWroup">
+                        <input class="input-sm input-width-md input-narrow" type="text" size="10" data-bind="value: dict[vwmPrm.mdlWfmParameterOfWroup.wfmParameterId]" />
+                      </span>
+                    </div>
+                  </td>
+                <!-- /ko -->
+              <!-- /ko -->
             <!-- /ko -->
-          <!-- /ko -->
-          <!-- ko if: $parent.isMonthlyProcentView -->
-            <!-- ko foreach: { data: $parent.listOfMonitoredVwmParams, as: 'vwmPrm' } -->
-              <td class="text-center">
-                <div>
-                  <span data-bind="ifnot: $root.isEmployeeInEditMode">
-                    <span data-bind="with: vwmWell.mdlStage.objProcentBorders">
-                      <span data-bind="with: $data[vwmPrm.mdlWfmParameterOfWroup.wfmParameterId]">
-                        <span data-bind="text: procent"></span>
+            <!-- ko if: $parent.isMonthlyProcentView -->
+              <!-- ko foreach: { data: $parent.listOfMonitoredVwmParams, as: 'vwmPrm' } -->
+                <td class="text-center">
+                  <div>
+                    <span data-bind="ifnot: $root.isEmployeeInEditMode">
+                      <span data-bind="with: vwmWell.mdlStage.objProcentBorders">
+                        <span data-bind="with: $data[vwmPrm.mdlWfmParameterOfWroup.wfmParameterId]">
+                          <span data-bind="text: procent"></span>
+                        </span>
                       </span>
                     </span>
-                  </span>
-                  <span data-bind="if: $root.isEmployeeInEditMode">
-                    <span data-bind="with: vwmWell.mdlStage.objProcentBorders">
-                      <span data-bind="with: $data[vwmPrm.mdlWfmParameterOfWroup.wfmParameterId]">
-                        %<input class="input-sm input-width-md" type="text" size="10" data-bind="value: procent"/>
-                        <span class="loader-line-small" data-bind="visible: isSaveProgress" style="position: absolute"></span>
+                    <span data-bind="if: $root.isEmployeeInEditMode">
+                      <span data-bind="with: vwmWell.mdlStage.objProcentBorders">
+                        <span data-bind="with: $data[vwmPrm.mdlWfmParameterOfWroup.wfmParameterId]">
+                          %<input class="input-sm input-width-md" type="text" size="10" data-bind="value: procent"/>
+                          <span class="loader-line-small" data-bind="visible: isSaveProgress" style="position: absolute"></span>
+                        </span>
                       </span>
                     </span>
-                  </span>
-                </div>            
-              </td>
-            <!-- /ko -->  
+                  </div>            
+                </td>
+              <!-- /ko -->  
+            <!-- /ko -->
+          </tr>
           <!-- /ko -->
-        </tr>
-        <!-- /ko -->
-      </tbody>
-    </table>
+        </tbody>
+      </table>
+    </div>
   </div>
   <!-- TODO: feat: slide#9 #HM! -->
   <!-- Plot button: select date range and show graph using table data of selected well (with procent shlafe) -->

@@ -858,9 +858,9 @@ define([
 		/**
 		 * Import monitoring records
 		 */
-		this.importMonitoringRecords = function (tmpData) {
+		this.importMonitoringRecords = function (tmpData, tmpMntrParams) {
 			var objArr = tmpData.map(function (tmpItem) {
-					return new MonitoringRecord(tmpItem);
+					return new MonitoringRecord(tmpItem, tmpMntrParams);
 				});
 
 			ths.listOfMonitoringRecord(objArr);
@@ -877,8 +877,9 @@ define([
 				UnixTime : tmpUnixTime,
 				Dict : {}
 			}).done(function (response) {
+        var tmpMntrParams = ko.unwrap(ths.getWellGroup().listOfMonitoredParams);
 				// Add to the list
-				ths.listOfMonitoringRecord.push(new MonitoringRecord(response));
+				ths.listOfMonitoringRecord.push(new MonitoringRecord(response, tmpMntrParams));
 			});
 		};
 

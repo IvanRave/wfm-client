@@ -154,13 +154,6 @@ define([
 		this.monitoringUnixTime = ko.observable();
 
 		/**
-		 * Load monitoring data when the user select some date
-		 */
-		this.monitoringUnixTime.subscribe(function (tmpUnixTime) {
-			ths.mdlStage.loadListOfScopeOfMonitoring(tmpUnixTime);
-		});
-
-		/**
 		 * Open well and select monitoring section
 		 */
 		this.goToMonitoringOfWell = function (tmpVwmWell) {
@@ -202,6 +195,29 @@ define([
 			this.isMonthlyProcentView(false);
 		};
 
+    function reloadMonitoringRecords(){
+      var tmpUnixTime = ko.unwrap(ths.monitoringUnixTime);
+      if (tmpUnixTime){
+        var tmpListOfParams = ko.unwrap(ths.listOfMonitoredVwmParams).map(function(elem){
+          return elem.mdlWfmParameterOfWroup;
+        });
+        
+        if (tmpListOfParams.length > 0) {
+          ths.mdlStage.loadListOfScopeOfMonitoring(tmpUnixTime, tmpListOfParams);
+        }
+      }
+    }
+    
+    /**
+		 * Load monitoring data when the user select some date
+		 */
+		this.monitoringUnixTime.subscribe(reloadMonitoringRecords);
+    
+    /**
+     * Reload monitoring records when the user change monitoring parameters
+     */
+    this.listOfMonitoredVwmParams.subscribe(reloadMonitoringRecords);
+    
 		//} #endregion MONITORING
     
     /** Set this section as selected */
@@ -224,13 +240,18 @@ define([
 			case 'wroup-monitoring':
 				// Params (table headers)
 				ths.mdlStage.loadListOfWfmParameterOfWroup();
+        // - load list
+        // - automatically creates list of monitoring parameters
+        // - automatically loaded monitoring data (only for this well group)
 
 				// Load procent borders
 				ths.mdlStage.loadProcentBordersForAllWells();
 
         var curDate = new Date();
-        var curUnixTime = Date.UTC(curDate.getUTCFullYear(), curDate.getUTCMonth(), curDate.getUTCDate()) / 1000;
-        // Set the current date and automatically load monitoring values for this date
+        
+        var curUnixTime = Date.UTC(curDate.getFullYear(), curDate.getMonth(), curDate.getDate()) / 1000;
+        // Set the current date and 
+        //     automatically loaded monitoring values for this date
         ths.monitoringUnixTime(curUnixTime);
         
 				break;
