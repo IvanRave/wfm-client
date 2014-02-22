@@ -1,3 +1,53 @@
+<a name="0.9.1"></a>
+### 0.9.1 (2014-02-22)
+
+
+#### Bug Fixes
+
+* **dataUrls:** define protocol automatically ([3dd3f664](https://github.com/IvanRave/wfm-client/commit/3dd3f664899bc7c6a221fd8cfd0a2327d79cd6e1))
+* **fieldMap:** change map engine ([6115061b](https://github.com/IvanRave/wfm-client/commit/6115061b1495c04c011c036be0d5e4fe06e79726))
+* **loader:** fix images, styles for loaders ([b1c2463e](https://github.com/IvanRave/wfm-client/commit/b1c2463e5ae2d8ba96bf2a3caa2bba2b90953617))
+* **mapWidget:** fix views for map widget in field ([a717f9c7](https://github.com/IvanRave/wfm-client/commit/a717f9c72a65a49d57336ac4ca94730f01173751))
+* **perfGraph:** initial redraw ([3d795cd5](https://github.com/IvanRave/wfm-client/commit/3d795cd514b35afdd6e7c7f254d14e3e56528fd6))
+* **perfomance:** move to new file system ([c5bd91ec](https://github.com/IvanRave/wfm-client/commit/c5bd91ec4b0799a4d902afe46d27f93f90c78ca4))
+* **project:** bugs ([c0167c36](https://github.com/IvanRave/wfm-client/commit/c0167c3622df9a985c53232409082e8743976bf9))
+* **stageView:** fix well and group views ([bb8ecf31](https://github.com/IvanRave/wfm-client/commit/bb8ecf31de0d184df601b0bb52973b0ffaff2f62))
+* **wellPerfomance:** reload data after importing ([e9d19093](https://github.com/IvanRave/wfm-client/commit/e9d19093fbda3878e75f9ed097ef4c03bd2efb64))
+* **workspaceMenu:** fix logic of item selection ([0b8d6fe9](https://github.com/IvanRave/wfm-client/commit/0b8d6fe9fa1be1ceb3430b72d32035fffe9fb3a9))
+* **wroupPotential:**
+  * total only for active wells ([78da47c5](https://github.com/IvanRave/wfm-client/commit/78da47c5c1ca294be20230323ac5c41c75ae80eb))
+  * restore last approved tests ([bbe497cd](https://github.com/IvanRave/wfm-client/commit/bbe497cd130886dbd77d3c93087eccc58dbbf084))
+
+
+#### Features
+
+* **fieldMap:**
+  * add view for widgets ([1c0727dc](https://github.com/IvanRave/wfm-client/commit/1c0727dcc6a56de243ece24c5799d2b1844a5437))
+  * add svg circles for wells ([da11e039](https://github.com/IvanRave/wfm-client/commit/da11e0392367e1d705b80af86560d4cf78d85391))
+* **fieldMapWidget:** save scale and translate ([9e144ec5](https://github.com/IvanRave/wfm-client/commit/9e144ec5c3b31554173b1b96eddc403e54bcd151))
+* **groupMonitoring:** a layout and time ([38fdb150](https://github.com/IvanRave/wfm-client/commit/38fdb150f592927b1afd973adc4bdd9b106fc5a7))
+* **groupUnit:** add an isMonitoring flag ([ee3f294a](https://github.com/IvanRave/wfm-client/commit/ee3f294a1f0e3d7d8d11fd4ca9e5745b967abc96))
+* **mapWell:**
+  * point on the map ([2e4915ba](https://github.com/IvanRave/wfm-client/commit/2e4915ba1666f8c2f2f59dc6db94a90a7b852773))
+  * add well to the map through panel ([a268e587](https://github.com/IvanRave/wfm-client/commit/a268e587835bf7bc8e8e4aab2dbdceb11f04a18d))
+* **monitoring:**
+  * show only monitored params ([3eec55e4](https://github.com/IvanRave/wfm-client/commit/3eec55e4c47eced4d284299eb01812c3f391cf01))
+  * redirection and new props ([dcf64a17](https://github.com/IvanRave/wfm-client/commit/dcf64a173a7bd5c52d1a15ae4865c9ecba880fdc))
+* **monitoringRecords:**
+  * edit, save values ([569bd331](https://github.com/IvanRave/wfm-client/commit/569bd331c970556452872eed01760eabe1a5cb6b))
+  * add a dictionary of prms ([53e674ef](https://github.com/IvanRave/wfm-client/commit/53e674ef294ea878c6cc3637498c495a6f11d48c))
+  * methods and props ([8f8acbd2](https://github.com/IvanRave/wfm-client/commit/8f8acbd2e737cab594643f2fb8c80b403e56b8c2))
+* **procentBorder:**
+  * a remove method with loader ([07d4b038](https://github.com/IvanRave/wfm-client/commit/07d4b0388ed325f249831bffea5982ffbe9a080a))
+  * load; update or insert value ([e1e744b4](https://github.com/IvanRave/wfm-client/commit/e1e744b41577d23bcbf80e2645c31c9bcf8cfb1f))
+  * model and data service ([c4d5b933](https://github.com/IvanRave/wfm-client/commit/c4d5b933a5331520cad0de548e74a9294af76639))
+* **wellGroupUnits:** add section with units ([139a7a2c](https://github.com/IvanRave/wfm-client/commit/139a7a2c8655836e212959cf22004b3d5bf3266c))
+* **wellMarkers:**
+  * dragging, saving, map tools ([4e76867a](https://github.com/IvanRave/wfm-client/commit/4e76867a924013e61a12bca4b1a974e08d99f76c))
+  * add record to the field map ([c311ca46](https://github.com/IvanRave/wfm-client/commit/c311ca4690f0ea1ef92892339bb4a0e2349ef017))
+* **wellTest:** clearing status feature; style ([9d34d8f5](https://github.com/IvanRave/wfm-client/commit/9d34d8f5e6b43c8afbb0f42ac5f85db00615dffe))
+
+
 <a name="v0.8.8"></a>
 ### v0.8.8 (2014-02-01)
 

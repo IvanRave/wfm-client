@@ -1,6 +1,6 @@
 {
   "name": "WFM",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "Well file manager",
   "author": {
     "name": "Petrohelp"
@@ -22,7 +22,6 @@
     "grunt-requirejs": "~0.4.0",
     "bower": "~1.2.8",
     "grunt-bower-task": "~0.3.4",
-    "grunt-conventional-changelog": "~1.0.0",
     "grunt-gh-pages": "~0.9.0",
     "grunt-notify": "~0.2.16",
     "grunt-contrib-connect": "~0.5.0",
@@ -32,6 +31,7 @@
     "grunt-contrib-jshint": "~0.7.2",
     "assemble": "~0.4.32",
     "grunt-jsdoc": "~0.5.1",
-    "grunt-contrib-sass": "~0.7.2"
+    "grunt-contrib-sass": "~0.7.2",
+    "grunt-conventional-changelog": "~1.1.0"
   }
 }

@@ -50,6 +50,11 @@ module.exports = function (grunt) {
           },
           src: '**/*'
         },
+        changelog: {
+          options: {
+            ////from: 'v0.8.8'
+          }
+        },
         jshint: {
             gruntfile: {
                 options: {
