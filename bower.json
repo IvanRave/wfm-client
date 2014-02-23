@@ -22,10 +22,10 @@
     "jcrop": "~0.9.12",
     "d3": "~3.4.1",
     "jquery": "~2.1.0",
-    "pickadate": "~3.3.2",
     "blueimp-file-upload": "~9.5.4",
     "bootstrap-sass": "https://github.com/twbs/bootstrap-sass.git#~3.1.1",
     "moment": "~2.5.1",
-    "requirejs": "~2.1.10"
+    "requirejs": "~2.1.10",
+    "pickadate": "~3.4.0"
   }
 }
