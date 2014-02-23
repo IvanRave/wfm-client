@@ -228,19 +228,20 @@ define(['jquery',
 
 		//{ #region MONITORING
     
-    /**
-    * List of monitored params
-    * @type {Array.<module:models/wfm-parameter-of-well-group>}
-    */
-    this.listOfMonitoredParams = ko.computed({
-      read: function() {
-        var tmpList = ko.unwrap(ths.listOfWfmParameterOfWroup);
-        return tmpList.filter(function(elem){
-          return ko.unwrap(elem.isMonitored);
-        });
-      },
-      deferEvaluation: true
-    });
+    // This list is not required, because all operations go through the viewmodel
+    // /**
+    // * List of monitored params
+    // * @type {Array.<module:models/wfm-parameter-of-well-group>}
+    // */
+    // this.listOfMonitoredParams = ko.computed({
+      // read: function() {
+        // var tmpList = ko.unwrap(ths.listOfWfmParameterOfWroup);
+        // return tmpList.filter(function(elem){
+          // return ko.unwrap(elem.isMonitored);
+        // });
+      // },
+      // deferEvaluation: true
+    // });
     
 		/**
 		 * Load data for all wells and for need date
@@ -248,7 +249,6 @@ define(['jquery',
 		this.loadListOfScopeOfMonitoring = function (tmpUnixTime, tmpMntrParams) {
 			// TODO: if there are data for this date - no need to load #LH!
 			monitoringRecordService.getListOfScope(ths.id, tmpUnixTime).done(function (tmpListOfScope) {
-				console.log('m d', tmpListOfScope);
 				var tmpWells = ko.unwrap(ths.wells);
 
 				// Import data to each well

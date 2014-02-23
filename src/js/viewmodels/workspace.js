@@ -8,6 +8,15 @@ define([
         'use strict';
 
         /**
+        * Demo auth data
+        * @type {object}
+        */
+        var demoAuth = {
+          'email': 'wfm@example.com',
+          'password': '123321'
+        };
+        
+        /**
         * Workspace view model: root for knockout
         * @constructor
         */
@@ -98,12 +107,25 @@ define([
 
             /** Demo logon */
             this.demoLogOn = function () {
-                mdlWorkspace.sendLogOn({
-                    'email': 'wfm@example.com',
-                    'password': '123321'
-                });
+                mdlWorkspace.sendLogOn(demoAuth);
             };
 
+            /**
+            * Whether the user in the demo mode
+            * @type {boolean}
+            */
+            this.isUserInDemoMode = ko.computed({
+              read: function(){
+                  var tmpUserProfile = ko.unwrap(mdlWorkspace.userProfile);
+                  
+                  if (!tmpUserProfile){ return false;}
+                  console.log('user profile', ko.unwrap(tmpUserProfile.email));
+                  console.log('user profile', demoAuth.email);
+                  return (ko.unwrap(tmpUserProfile.email) === demoAuth.email);
+              },
+              deferEvaluation: true
+            });
+            
             this.objToRealLogOn = {
                 email: ko.observable(''),
                 /**
@@ -209,6 +231,9 @@ define([
                     }
                 });
             };
+            
+            /** After initialization: try to load user */
+            this.mdlWorkspace.tryToLoadUserProfile();
 
             /** Back, forward, re   fresh browser navigation */
             // TODO: back

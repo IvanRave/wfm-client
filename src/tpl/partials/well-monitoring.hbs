@@ -38,4 +38,9 @@
       </tbody>
     </table>
   </div>
+  <div class="text-right" data-bind="if: $root.isEmployeeInEditMode">
+    <button class="btn btn-xs btn-warning" data-bind="click: removeAllMonitoringRecords">
+      <i class="glyphicon glyphicon-remove"></i> Remove all records
+    </button>
+  </div>
 </div>

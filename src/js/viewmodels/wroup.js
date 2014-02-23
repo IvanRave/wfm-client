@@ -195,7 +195,13 @@ define([
 			this.isMonthlyProcentView(false);
 		};
 
-    function reloadMonitoringRecords(){
+    /**
+    * Get monitoring records 
+    *    after changing unix time 
+    *    or count of wfm properties
+    *    or by generating new records from well
+    */
+    this.reloadMonitoringRecords = function(){
       var tmpUnixTime = ko.unwrap(ths.monitoringUnixTime);
       if (tmpUnixTime){
         var tmpListOfParams = ko.unwrap(ths.listOfMonitoredVwmParams).map(function(elem){
@@ -206,17 +212,17 @@ define([
           ths.mdlStage.loadListOfScopeOfMonitoring(tmpUnixTime, tmpListOfParams);
         }
       }
-    }
+    };
     
     /**
 		 * Load monitoring data when the user select some date
 		 */
-		this.monitoringUnixTime.subscribe(reloadMonitoringRecords);
+		this.monitoringUnixTime.subscribe(ths.reloadMonitoringRecords);
     
     /**
      * Reload monitoring records when the user change monitoring parameters
      */
-    this.listOfMonitoredVwmParams.subscribe(reloadMonitoringRecords);
+    this.listOfMonitoredVwmParams.subscribe(ths.reloadMonitoringRecords);
     
 		//} #endregion MONITORING
     

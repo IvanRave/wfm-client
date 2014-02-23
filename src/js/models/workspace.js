@@ -82,8 +82,7 @@ define([
             /**
             * Try to get user profile: Email, Roles, IsLogged
             */
-            this.tryToLoadUserProfile = function () {
-                console.log('tried to load user profile');
+            this.tryToLoadUserProfile = function () {                
                 // Send auth cookies to the server
                 userProfileService.getUserProfile().done(function (r) {
                     ths.userProfile(new UserProfile(r, ths));
@@ -115,9 +114,6 @@ define([
                     // automatically cleaned all child companies, wegions etc. 
                 });
             };
-
-            /** After initialization: try to load user */
-            this.tryToLoadUserProfile();
         };
 
         return exports;

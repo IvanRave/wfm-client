@@ -17,6 +17,7 @@
             <nav class="wfm-nav clearfix navbar-inverse" data-bind="with: vwmUserProfile">
                 <div class="pull-left">
                     <span class="link-view-inverse" data-bind="click: deactivateVwmChild">{{lang.wfm}}</span>
+                    <span class="min-left-margin link-view-inverse" data-bind="if: $root.isUserInDemoMode">demo cabinet</span>
                 </div>
                 <div class="pull-right">
                     <button type="button" class="btn btn-xs btn-inverse" data-bind="click: $parent.mdlWorkspace.logOff">

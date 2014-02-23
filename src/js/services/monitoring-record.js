@@ -37,6 +37,9 @@ define(['helpers/ajax-request'], function (ajaxRequest) {
 		upsert : function (idOfWell, unixTime, mdlData) {
 			return ajaxRequest('POST', url(idOfWell, unixTime), mdlData);
 		},
+    removeAll : function(idOfWell){
+      return ajaxRequest('DELETE', url(idOfWell));
+    },
 		remove : function (idOfWell, unixTime) {
 			return ajaxRequest('DELETE', url(idOfWell, unixTime));
 		}

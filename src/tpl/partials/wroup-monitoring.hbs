@@ -4,19 +4,14 @@
     <h4 class="pull-left">
       Platform monitoring:
     </h4>
-    <h4 class="pull-left min-left-margin">
+    <div class="pull-left min-left-margin">
       <div data-bind="hidden: isMonthlyProcentView">        
-          <span data-bind="ifnot: $root.isEmployeeInEditMode">
-            <span data-bind="unix: monitoringUnixTime"></span>
-          </span>
-          <span data-bind="if: $root.isEmployeeInEditMode">
-            <input class="input-sm" data-bind="datepicker: monitoringUnixTime, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }" />
-          </span>
+        <input class="input-sm" size="10" data-bind="datepicker: monitoringUnixTime, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }" />
       </div>
-      <div data-bind="visible: isMonthlyProcentView">
+      <h4 data-bind="visible: isMonthlyProcentView">
         <span>monthly % of change</span>
-      </div>
-    </h4>
+      </h4>
+    </div>
     <div class="pull-right">
       <div class="btn-group">
         <button class="btn btn-default btn-sm" type="button" data-bind="css: { 'active': !isMonthlyProcentView() }, click: turnOffMonthlyProcentView">Well values</button>
@@ -67,23 +62,26 @@
                 <td colspan="100">
                   <span data-bind="if: $root.isEmployeeInEditMode">
                      <button class="btn btn-sm btn-default" data-bind="click: vwmWell.createMonitoringRecord">Create record</button>
+                     <span data-bind="if: $root.isUserInDemoMode">
+                      <button class="btn btn-sm btn-default" data-bind="click: vwmWell.createDemoMonitoringRecords">Generate records for last month</button>
+                     </span>
                   </span>
                 </td>
               <!-- /ko -->
               <!-- ko if: vwmWell.monitoringRecordForWroup -->
                 <!-- ko foreach: { data: $parent.listOfMonitoredVwmParams, as: 'vwmPrm' } -->
-                  <td class="text-center">
-                    <div data-bind="ifnot: $root.isEmployeeInEditMode">
-                      <span data-bind="with: vwmWell.monitoringRecordForWroup">
-                        <span data-bind="text: dict[vwmPrm.mdlWfmParameterOfWroup.wfmParameterId]"></span>
-                      </span>
-                    </div>
-                    <div data-bind="if: $root.isEmployeeInEditMode">
-                      <span data-bind="with: vwmWell.monitoringRecordForWroup">
-                        <input class="input-sm input-width-md input-narrow" type="text" size="10" data-bind="value: dict[vwmPrm.mdlWfmParameterOfWroup.wfmParameterId]" />
-                      </span>
-                    </div>
-                  </td>
+                  <!-- ko with: vwmWell.monitoringRecordForWroup -->
+                    <td class="text-center" data-bind="css: diffClassDict[vwmPrm.mdlWfmParameterOfWroup.wfmParameterId]">
+                      <div data-bind="attr: { title: 'Month average: ' + aveDict[vwmPrm.mdlWfmParameterOfWroup.wfmParameterId]() }">
+                        <div data-bind="ifnot: $root.isEmployeeInEditMode">
+                          <span data-bind="text: dict[vwmPrm.mdlWfmParameterOfWroup.wfmParameterId]"></span>
+                        </div>
+                        <div data-bind="if: $root.isEmployeeInEditMode">
+                          <input class="input-sm input-narrow" type="text" size="10" data-bind="value: dict[vwmPrm.mdlWfmParameterOfWroup.wfmParameterId]" />
+                        </div>
+                      </div>
+                    </td>
+                  <!-- /ko -->
                 <!-- /ko -->
               <!-- /ko -->
             <!-- /ko -->

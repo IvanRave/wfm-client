@@ -860,7 +860,9 @@ define([
 		 */
 		this.importMonitoringRecords = function (tmpData, tmpMntrParams) {
 			var objArr = tmpData.map(function (tmpItem) {
-					return new MonitoringRecord(tmpItem, tmpMntrParams);
+          // objProcentBorders to make computed properties: 
+          //         difference between the aveDict and the dict with some procent border
+					return new MonitoringRecord(tmpItem, tmpMntrParams, ths.objProcentBorders);
 				});
 
 			ths.listOfMonitoringRecord(objArr);
@@ -869,20 +871,32 @@ define([
 
 		/**
 		 * Post the monitoring record to the server
-		 *    with an empty dictionary of parameters
+		 * @param {object} tmpDict - Dictionary of parameters (for new records - empty)
 		 */
-		this.postMonitoringRecord = function (tmpUnixTime) {
+		this.postMonitoringRecord = function (tmpUnixTime, tmpMntrParams, tmpDict, scsCallback) {
 			monitoringRecordService.upsert(ths.id, tmpUnixTime, {
 				IdOfWell : ths.id,
 				UnixTime : tmpUnixTime,
-				Dict : {}
+				Dict : tmpDict
 			}).done(function (response) {
-        var tmpMntrParams = ko.unwrap(ths.getWellGroup().listOfMonitoredParams);
 				// Add to the list
-				ths.listOfMonitoringRecord.push(new MonitoringRecord(response, tmpMntrParams));
+				ths.listOfMonitoringRecord.push(new MonitoringRecord(response, tmpMntrParams, ths.objProcentBorders));
+        if (scsCallback){
+          scsCallback();
+        }
 			});
 		};
 
+    /**
+    * Remove all records for this well
+    */
+    this.removeAllMonitoringRecords = function(){
+      monitoringRecordService.removeAll(ths.id).done(function(){
+        // Clean list
+        ths.listOfMonitoringRecord([]);
+      });
+    };
+    
 		/**
 		 * Import server data to procent borders
 		 *    procent borders loaded through the wroup loadProcentBordersForAllWells method

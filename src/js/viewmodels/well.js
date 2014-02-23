@@ -32,6 +32,26 @@ define([
 	'use strict';
 
 	/**
+	 * Returns a random number between min and max
+	 */
+	function getRandomArbitary(min, max) {
+		return Math.random() * (max - min) + min;
+	}
+
+	/**
+	 * Generate dictionary with random numbers
+	 */
+	function generateDict(tmpMntrParams) {
+		var genDict = {};
+
+		tmpMntrParams.forEach(function (tmpPrm) {
+			genDict[tmpPrm.wfmParameterId] = getRandomArbitary(10, 1000);
+		});
+
+		return genDict;
+	}
+
+	/**
 	 * Well view model
 	 * @constructor
 	 */
@@ -634,26 +654,61 @@ define([
 
 					var allRecs = ko.unwrap(ths.mdlStage.listOfMonitoringRecord);
 
-          var needRec = allRecs.filter(function(recItem){
-            return ko.unwrap(recItem.unixTime) === currentUnixTimeInWroup;
-          })[0];
-          
-          return needRec;
+					var needRec = allRecs.filter(function (recItem) {
+							return ko.unwrap(recItem.unixTime) === currentUnixTimeInWroup;
+						})[0];
+
+					return needRec;
 				},
 				deferEvaluation : true
 			});
 
+		/**
+		 * Create a monitoring record for selected time in well group
+		 */
+		this.createMonitoringRecord = function () {
+			// Time, selected in the well group of this well
+			var currentUnixTimeInWroup = ko.unwrap(parentVwmWroup.monitoringUnixTime);
+			if (currentUnixTimeInWroup) {
+
+				var tmpMntrParams = ko.unwrap(ths.getParentVwm().listOfMonitoredVwmParams).map(function (elem) {
+						return elem.mdlWfmParameterOfWroup;
+					});
+
+				// Create record with empty dictionary
+				// Last parameter - function to reload table (to get average params for the new record)
+				ths.mdlStage.postMonitoringRecord(currentUnixTimeInWroup, tmpMntrParams, {}, parentVwmWroup.reloadMonitoringRecords);
+			}
+		};
+
     /**
-      * Create a monitoring record for selected time in well group
-      */
-    this.createMonitoringRecord = function(){
-      // Time, selected in the well group of this well
-      var currentUnixTimeInWroup = ko.unwrap(parentVwmWroup.monitoringUnixTime);
-      if (currentUnixTimeInWroup){
-        ths.mdlStage.postMonitoringRecord(currentUnixTimeInWroup);
-      }
-    };
-      
+    * Remove all records: ovveride the model method with a confirmation and checking
+    */
+		this.removeAllMonitoringRecords = function () {
+			if (confirm('{{capitalizeFirst lang.confirmToDelete}} all records for this well for all time?')) {
+				ths.mdlStage.removeAllMonitoringRecords();
+			}
+		};
+
+		/**
+		 * Create demo records for the monitoring section
+		 */
+		this.createDemoMonitoringRecords = function () {
+			var curDate = new Date();
+			var curUnixTime = Date.UTC(curDate.getFullYear(), curDate.getMonth(), curDate.getDate()) / 1000;
+			var secondsInDay = 24 * 60 * 60;
+			var startUnixTime = curUnixTime - secondsInDay * 35; // minus 50 days
+
+			var tmpMntrParams = ko.unwrap(ths.getParentVwm().listOfMonitoredVwmParams).map(function (elem) {
+					return elem.mdlWfmParameterOfWroup;
+				});
+
+			for (var unt = startUnixTime; unt <= curUnixTime; unt += secondsInDay) {
+				// Last function for current time: reload table to get average values for the created record
+				ths.mdlStage.postMonitoringRecord(unt, tmpMntrParams, generateDict(tmpMntrParams), unt === curUnixTime ? parentVwmWroup.reloadMonitoringRecords : null);
+			}
+		};
+
 		//{
 
 		/**

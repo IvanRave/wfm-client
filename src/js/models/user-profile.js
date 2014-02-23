@@ -36,7 +36,7 @@ define(['knockout',
         ];
 
         /**
-        * User profile (can be as a guest - without logon)
+        * User profile
         * @constructor
         * @param {object} data - User profile data
         */
@@ -63,7 +63,7 @@ define(['knockout',
             this.id = data.Id;
 
             /** Base for all stages: no server data in user profile */
-            StageBase.call(this, {});
+            StageBase.call(ths, data);
             
             /**
             * User can be in many companies with access level for each company
