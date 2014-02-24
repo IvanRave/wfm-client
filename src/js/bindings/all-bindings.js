@@ -254,6 +254,10 @@ define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-he
                                 // Do not set to null because of pickadate set undefined when choose year or month from select
                                 curValue(null);
                             }
+                        },
+                        close: function(){
+                          console.log('Pickadate is closed');
+                          $input.blur();
                         }
                     });
 
