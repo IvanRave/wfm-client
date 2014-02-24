@@ -46,11 +46,29 @@ define([
 		 * Insert or update the record
 		 */
 		this.upsert = function () {
+			// Check dict to numbers
+			// And convert to numbers from string
+      
+      var tmpDict = ko.toJS(ths.dict);
+      
+			for (var tmpKey in tmpDict) {
+        if ($.isNumeric(tmpDict[tmpKey])){
+          tmpDict[tmpKey] = +tmpDict[tmpKey];
+        }
+        else if (!tmpDict[tmpKey]) { // check all exclude zero (zero - is number)
+					tmpDict[tmpKey] = null; // set to null when empty
+				}
+        else {
+					alert('Only numbers for ' + tmpKey + ": " + tmpDict[tmpKey]);
+					return;
+				}
+			}
+      
 			ths.isSaveProgress(true);
 			monitoringRecordService.upsert(ths.idOfWell, ko.unwrap(ths.unixTime), {
 				IdOfWell : ths.idOfWell,
 				UnixTime : ko.unwrap(ths.unixTime),
-				Dict : ko.toJS(ths.dict)
+				Dict : tmpDict
 			}).done(function () {
 				ths.isSaveProgress(false);
 			});
@@ -111,17 +129,17 @@ define([
 										// Convert to number
 										tmpAveVal = +tmpAveVal;
 										var absoluteProcent = tmpAveVal * (tmpProcentValue / 100); // result = number
-                    
-                    console.log('procent for elem ', elem.wfmParameterId, tmpProcentValue, absoluteProcent);
-                    
+
+										console.log('procent for elem ', elem.wfmParameterId, tmpProcentValue, absoluteProcent);
+
 										if (tmpUsualVal > (tmpAveVal + absoluteProcent)) {
-                      // is out of the top border
+											// is out of the top border
 											return true;
 										} else if (tmpUsualVal < (tmpAveVal - absoluteProcent)) {
-                      // is out of the bottom border
+											// is out of the bottom border
 											return true;
 										} else {
-                      // is in borders (false - no warning)
+											// is in borders (false - no warning)
 											return false;
 										}
 									}
