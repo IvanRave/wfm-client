@@ -144,6 +144,18 @@ define([
         });
       },
       deferEvaluation: true
+    }).trackHasItems();
+    
+    /**
+    * Whether list is full - with one or more records
+    *    need for views to show warnings
+    * @type {boolean}
+    */
+    this.isFullListOfMonitoredVwmParams = ko.computed({
+      read: function(){
+        return ko.unwrap(ths.listOfMonitoredVwmParams).length > 0;
+      },
+      deferEvaluation: true
     });
     
 		/**
@@ -159,6 +171,8 @@ define([
 		this.goToMonitoringOfWell = function (tmpVwmWell) {
 			// Select monitoring section
 			tmpVwmWell.unzOfSlcVwmSectionWrk('well-monitoring');
+      // Load content (this event is triggered when an user click to the section)
+      tmpVwmWell.loadSectionContent('well-monitoring');
 
 			// Activate well view
 			ths.activateVwmChild(tmpVwmWell);
@@ -170,7 +184,10 @@ define([
 		this.goToMonitoringOfWroup = function () {
 			// Select monitoring section
 			ths.unzOfSlcVwmSectionWrk('wroup-monitoring');
-
+      
+      // Load content (this event is triggered when an user click to the section)
+      ths.loadSectionContent('wroup-monitoring');
+      
 			// Activate this wroup
 			parentVwmWield.activateVwmChild(ths);
 		};
@@ -252,13 +269,22 @@ define([
 
 				// Load procent borders
 				ths.mdlStage.loadProcentBordersForAllWells();
-
-        var curDate = new Date();
         
-        var curUnixTime = Date.UTC(curDate.getFullYear(), curDate.getMonth(), curDate.getDate()) / 1000;
+        var prevUnixTime = ko.unwrap(ths.monitoringUnixTime);
+        
+        if (!prevUnixTime){
+          var curDate = new Date();
+          var curUnixTime = Date.UTC(curDate.getFullYear(), curDate.getMonth(), curDate.getDate()) / 1000;
+          
+          prevUnixTime = curUnixTime;
+        }
+        
+        // Reload data (set to null - then set to previous date (or current date if no previous date))
+        ths.monitoringUnixTime(null);
+        
         // Set the current date and 
         //     automatically loaded monitoring values for this date
-        ths.monitoringUnixTime(curUnixTime);
+        ths.monitoringUnixTime(prevUnixTime);
         
 				break;
 			}

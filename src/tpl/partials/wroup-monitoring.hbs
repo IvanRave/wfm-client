@@ -19,12 +19,9 @@
       </div>
     </div>
   </div>
-  <div data-bind="ifnot: mdlStage.isLoadedListOfWfmParameterOfWroup">
-    <span class="loader-line-medium"></span>
-  </div>
   <div data-bind="if: mdlStage.isLoadedListOfWfmParameterOfWroup">
-    <div data-bind="if: listOfMonitoredVwmParams().length === 0">
-      No monitored parameters. Please select parameters in the Units section of this well group.
+    <div data-bind="ifnot: listOfMonitoredVwmParams.hasItems">
+      No monitored parameters. Please select parameters in the Units section of the well group.
     </div>
     <div class="table-responsive" data-bind="if: listOfMonitoredVwmParams().length > 0">
       <table class="table table-condensed">

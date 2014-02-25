@@ -639,6 +639,29 @@ define([
 			start : ko.observable(),
 			end : ko.observable()
 		};
+    
+    /**
+    * Load the list, using filtered dates (if both exists)
+    */
+    this.loadFilteredListOfMonitoringRecord = function(){
+      var startUnixTime = ko.unwrap(ths.mntrUnixTimeBorder.start);
+      if (startUnixTime){
+        var endUnixTime = ko.unwrap(ths.mntrUnixTimeBorder.end);
+        if (endUnixTime){
+          var tmpListOfParams = ko.unwrap(parentVwmWroup.listOfMonitoredVwmParams).map(function(elem){
+            return elem.mdlWfmParameterOfWroup;
+          });
+          // Loading is no required if no parameters
+          if (tmpListOfParams.length > 0){
+            ths.mdlStage.loadListOfMonitoringRecord(startUnixTime, endUnixTime, tmpListOfParams);
+          }
+        }
+      }
+    };
+    
+    // When a user changes filtered dates - reload monitoring records
+    this.mntrUnixTimeBorder.start.subscribe(ths.loadFilteredListOfMonitoringRecord);
+    this.mntrUnixTimeBorder.end.subscribe(ths.loadFilteredListOfMonitoringRecord);
 
 		/**
 		 * A monitoring record, according to the selected unix time in the wroup
@@ -760,7 +783,11 @@ define([
 					// No perfomance when load this data separately (for every well), because
 					//      a company user opens a well group monitoring section frequently than a well monitoring section
 					ths.mdlStage.getWellGroup().loadProcentBordersForAllWells();
-
+          
+          // Load monitoring records
+          // There is another loader: load records for all wells, but in this case - need to reload data
+          ths.loadFilteredListOfMonitoringRecord();
+          
 					break;
 				}
 			case 'well-map': {

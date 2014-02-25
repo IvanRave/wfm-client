@@ -855,6 +855,24 @@ define([
 		 */
 		this.listOfMonitoringRecord = ko.observableArray();
 
+    /**
+    * Whether data is loaded
+    * @type {boolean}
+    */
+    this.isLoadedListOfMonitoringRecord = ko.observable(false);
+    
+    /**
+    * Load the filtered list of monitoring records
+    */
+    this.loadListOfMonitoringRecord = function(startUnixTime, endUnixTime, tmpMntrParams){
+      // Reload every time: other users can change data in their cabinets
+      ths.isLoadedListOfMonitoringRecord(false);
+      monitoringRecordService.getFilteredData(ths.id, startUnixTime, endUnixTime).done(function(res){
+        ths.isLoadedListOfMonitoringRecord(true);
+        ths.importMonitoringRecords(res, tmpMntrParams);
+      });
+    };
+    
 		/**
 		 * Import monitoring records
 		 */
@@ -866,7 +884,7 @@ define([
 				});
 
 			ths.listOfMonitoringRecord(objArr);
-			console.log('list of mntr records', ths.listOfMonitoringRecord());
+      console.log('monitored parameter records: ', ko.unwrap(ths.listOfMonitoringRecord));
 		};
 
 		/**
@@ -878,9 +896,10 @@ define([
 				IdOfWell : ths.id,
 				UnixTime : tmpUnixTime,
 				Dict : tmpDict
-			}).done(function (response) {
-				// Add to the list
-				ths.listOfMonitoringRecord.push(new MonitoringRecord(response, tmpMntrParams, ths.objProcentBorders));
+			}).done(function () {
+				// Add to the list: not required - this method used only in a group section, 
+        //       where all data will be reload after posting (to get average values)
+				////ths.listOfMonitoringRecord.push(new MonitoringRecord(response, tmpMntrParams, ths.objProcentBorders));
         if (scsCallback){
           scsCallback();
         }
