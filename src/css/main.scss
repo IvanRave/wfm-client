@@ -769,7 +769,9 @@ input.input-width-md {
 
 .svg-graph-g path {
     fill: none;
-    stroke-width: 2px;
+    stroke-width: 1.5px;
+    // During scaling - doesn't change stroke width
+    vector-effect: non-scaling-stroke;
 }
 
 .input-narrow {

@@ -3,9 +3,20 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 	'use strict';
 
   /**
+  * Redraw axis on the graph
+  */
+  function redrawGraphAxis(tmpGraphWrap, tmpAxis){
+    // Redraw x axis
+		tmpGraphWrap.select('.axis.x').call(tmpAxis.x);
+
+		// Redraw y axis
+		tmpGraphWrap.select('.axis.y').call(tmpAxis.y);
+  }
+  
+  /**
   * Redraw graph
   */
-	function redrawGraph(tmpSvgPath, tmpAxis, tmpGraphWrap, tmpDataSet, tmpParams) {
+	function redrawGraphData(tmpGraphWrap, tmpSvgPath, tmpDataSet, tmpParams) {
 		// Redraw each curve (JSON obj)
     var d3GroupOfGraphWrap = tmpGraphWrap.select('.svg-graph-g');
    
@@ -19,16 +30,9 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
           d3GroupOfGraphWrap.append('path')
             .attr('d', tmpPath(tmpDataSet))
             .attr('stroke', ko.unwrap(vwmParam.mdlWfmParameterOfWroup.color))
-            .attr('clip-path', 'url(#graph-clip)')
             .attr('visible', ko.unwrap(vwmParam.isVisible));
         }
     });
-
-		// Redraw x axis
-		tmpGraphWrap.select('.axis.x').call(tmpAxis.x);
-
-		// Redraw y axis
-		tmpGraphWrap.select('.axis.y').call(tmpAxis.y);
 	}
 
 	ko.bindingHandlers.svgZoomGraph = {
@@ -48,49 +52,30 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 				axis : ko.unwrap(acc.axisLines),
 				zoom : ko.unwrap(acc.zoomBehavior),
 				vboxSize : ko.unwrap(acc.vboxSize),
-				svgPath : ko.unwrap(acc.productionDataSetSvgPath)
+				svgPath : ko.unwrap(acc.productionDataSetSvgPath),
+        koZoomTransform: acc.zoomTransform
 			};
-
-			// Zoom coefficient for plus/minus buttons
-			var scaleCoef = 1.1;
-			var diffX = (graph.vboxSize.width / 2) * (scaleCoef - 1),
-			diffY = (graph.vboxSize.height / 2) * (scaleCoef - 1);
 
 			var graphWrap = d3.select(element);
 
 			// When zooming redraw graph
 			graph.zoom.on('zoom', function(){
-        redrawGraph(graph.svgPath, graph.axis, graphWrap, dataSet, tmpParams);
+        // Set new zoom values to the block with data lines
+        graph.koZoomTransform({
+          scale: d3.event.scale,
+          translate: d3.event.translate
+        });
+        //redrawGraphData(graphWrap, graph.svgPath, dataSet, tmpParams);
+        redrawGraphAxis(graphWrap, graph.axis);
       });
 
 			// Apply zoom to whole graph (axis + lines)
+      // The graph zoom rect element need only for changing  zoom values
 			graphWrap.select('.graph-zoom-rect').call(graph.zoom);
 
-			graphWrap.select('.zoom-in').on('click', function () {
-				graph.zoom.scale(graph.zoom.scale() * scaleCoef);
-
-				var tmpTr = graph.zoom.translate();
-				tmpTr[0] -= diffX;
-				tmpTr[1] -= diffY;
-				graph.zoom.translate(tmpTr);
-
-				redrawGraph(graph.svgPath, graph.axis, graphWrap, dataSet, tmpParams);
-			});
-
-			graphWrap.select('.zoom-out').on('click', function () {
-				////if (tmpSc > 1) {
-				graph.zoom.scale(graph.zoom.scale() / scaleCoef);
-
-				var tmpTr = graph.zoom.translate();
-				tmpTr[0] += diffX;
-				tmpTr[1] += diffY;
-				graph.zoom.translate(tmpTr);
-
-				redrawGraph(graph.svgPath, graph.axis, graphWrap, dataSet, tmpParams);
-			});
-
 			// Redraw graph once like initial zoom event
-			redrawGraph(graph.svgPath, graph.axis, graphWrap, dataSet, tmpParams);
+			redrawGraphData(graphWrap, graph.svgPath, dataSet, tmpParams);
+      redrawGraphAxis(graphWrap, graph.axis);
 		}
 	};
 
