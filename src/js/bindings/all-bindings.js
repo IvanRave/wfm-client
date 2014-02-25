@@ -256,7 +256,7 @@ define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-he
                             }
                         },
                         close: function(){
-                          console.log('Pickadate is closed');
+                          // https://github.com/amsul/pickadate.js/issues/160
                           $input.blur();
                         }
                     });
@@ -289,9 +289,6 @@ define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-he
                 ////    var picker = $(element).pickadate('picker');
 
                 ////    var curVal = ko.unwrap(valueAccessor());
-
-                ////    console.log('picker', picker);
-                ////    console.log(curVal);
 
                 ////    ////if (curVal) {
                 ////    ////    // Convert to unit time miliseconds

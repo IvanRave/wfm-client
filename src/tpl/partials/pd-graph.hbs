@@ -1,27 +1,25 @@
-﻿<div class="pd-graph-wrap">
-  <!-- viewbox = prfGraph.viewBox.size + all margins -->
-  <svg version="1.1" width="100%" data-bind="attr: { height: prfGraph.height }, svgResponsive: { koSvgWidth: prfGraph.width, tmpIsVisibleMenu: $root.isVisibleMenu }" viewbox="0 0 1200 400">
-    <g data-bind="attr: { transform: graphTransform }, svgZoomGraph: { prfGraphViewBox: prfGraph.viewBox, productionDataSetSvgPath: productionDataSetSvgPath, filteredByDateProductionDataSet: filteredByDateProductionDataSet, prfGraphZoom: prfGraph.zoom, prfGraphAxis: prfGraph.axis, listOfSlcVwmWfmParameterOfWroup: listOfSlcVwmWfmParameterOfWroup }">
-      <g class="axis x" data-bind="attr: { transform: graphAxisXTransform }"></g>
-      <g class="axis y"></g>
-      <g class="svg-prf-graph-g">
-        <!-- here are data lines -->
-      </g>
-      <rect class="graph-zoom-rect" x="0" y="0" data-bind="attr: { width: prfGraph.viewBox.width, height: prfGraph.viewBox.height }"></rect>
-      <g class="graph-zoom-controls">
-        <g transform="translate(1050,10)">
-          <path  transform="scale(0.1)" d="M363.68,288.439h-76.24v76.238h-58.877v-76.238h-76.24v-58.877h76.24v-76.24h58.877v76.24h76.24V288.439z
+﻿<!-- viewbox = prfGraph.viewBox.size + all margins -->
+<svg version="1.1" width="100%" data-bind="attr: { height: prfGraph.height }, svgResponsive: { koSvgWidth: prfGraph.width, tmpIsVisibleMenu: $root.isVisibleMenu }" viewbox="0 0 1200 400">
+  <g data-bind="attr: { transform: graphTransform }, svgZoomGraph: { prfGraphViewBox: prfGraph.viewBox, productionDataSetSvgPath: productionDataSetSvgPath, filteredByDateProductionDataSet: filteredByDateProductionDataSet, prfGraphZoom: prfGraph.zoom, prfGraphAxis: prfGraph.axis, listOfSlcVwmWfmParameterOfWroup: listOfSlcVwmWfmParameterOfWroup }">
+    <g class="axis x" data-bind="attr: { transform: graphAxisXTransform }"></g>
+    <g class="axis y"></g>
+    <g class="svg-prf-graph-g">
+      <!-- here are data lines -->
+    </g>
+    <rect class="graph-zoom-rect" x="0" y="0" data-bind="attr: { width: prfGraph.viewBox.width, height: prfGraph.viewBox.height }"></rect>
+    <g class="graph-zoom-controls">
+      <g transform="translate(1050,10)">
+        <path  transform="scale(0.1)" d="M363.68,288.439h-76.24v76.238h-58.877v-76.238h-76.24v-58.877h76.24v-76.24h58.877v76.24h76.24V288.439z
 M462,256c0,113.771-92.229,206-206,206S50,369.771,50,256S142.229,50,256,50S462,142.229,462,256z M422,256
 c0-91.755-74.258-166-166-166c-91.755,0-166,74.259-166,166c0,91.755,74.258,166,166,166C347.755,422,422,347.741,422,256z"></path>
-          <circle class="zoom-in" cx="256" cy="256" r="256" transform="scale(0.1)"></circle>
-        </g>
-        <g transform="translate(1050,60)">
-          <path transform="scale(0.1)" d="M363.68,288.439H152.322v-58.877H363.68V288.439z M462,256c0,113.771-92.229,206-206,206
+        <circle class="zoom-in" cx="256" cy="256" r="256" transform="scale(0.1)"></circle>
+      </g>
+      <g transform="translate(1050,60)">
+        <path transform="scale(0.1)" d="M363.68,288.439H152.322v-58.877H363.68V288.439z M462,256c0,113.771-92.229,206-206,206
 S50,369.771,50,256S142.229,50,256,50S462,142.229,462,256z M422,256c0-91.755-74.258-166-166-166c-91.755,0-166,74.259-166,166
 c0,91.755,74.258,166,166,166C347.755,422,422,347.741,422,256z"></path>
-          <circle class="zoom-out" cx="256" cy="256" r="256" transform="scale(0.1)"></circle>
-        </g>
+        <circle class="zoom-out" cx="256" cy="256" r="256" transform="scale(0.1)"></circle>
       </g>
     </g>
-  </svg>
-</div>
+  </g>
+</svg>
