@@ -805,7 +805,7 @@ define([
 		//} #endregion PERFOMANCE
 
 		//{ #region MONITORING (for a well group monitoring section and a well monitoring section)
-
+    
 		/**
 		 * Procent borders
 		 * @type {Array.<module:models/procent-border>}
@@ -864,11 +864,15 @@ define([
     /**
     * Load the filtered list of monitoring records
     */
-    this.loadListOfMonitoringRecord = function(startUnixTime, endUnixTime, tmpMntrParams){
+    this.loadListOfMonitoringRecord = function(startUnixTime, endUnixTime){
+    
       // Reload every time: other users can change data in their cabinets
       ths.isLoadedListOfMonitoringRecord(false);
       monitoringRecordService.getFilteredData(ths.id, startUnixTime, endUnixTime).done(function(res){
         ths.isLoadedListOfMonitoringRecord(true);
+        
+        var tmpMntrParams = ko.unwrap(ths.getWellGroup().listOfMonitoredParams);
+        
         ths.importMonitoringRecords(res, tmpMntrParams);
       });
     };

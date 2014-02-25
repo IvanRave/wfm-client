@@ -229,19 +229,19 @@ define(['jquery',
 		//{ #region MONITORING
     
     // This list is not required, because all operations go through the viewmodel
-    // /**
-    // * List of monitored params
-    // * @type {Array.<module:models/wfm-parameter-of-well-group>}
-    // */
-    // this.listOfMonitoredParams = ko.computed({
-      // read: function() {
-        // var tmpList = ko.unwrap(ths.listOfWfmParameterOfWroup);
-        // return tmpList.filter(function(elem){
-          // return ko.unwrap(elem.isMonitored);
-        // });
-      // },
-      // deferEvaluation: true
-    // });
+    /**
+    * List of monitored params
+    * @type {Array.<module:models/wfm-parameter-of-well-group>}
+    */
+    this.listOfMonitoredParams = ko.computed({
+      read: function() {
+        var tmpList = ko.unwrap(ths.listOfWfmParameterOfWroup);
+        return tmpList.filter(function(elem){
+          return ko.unwrap(elem.isMonitored);
+        });
+      },
+      deferEvaluation: true
+    });
     
 		/**
 		 * Load data for all wells and for need date
