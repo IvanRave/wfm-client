@@ -1,2 +1,8 @@
-﻿<svg version="1.1" width="100%" viewbox="0 0 1200 400" data-bind="attr: { height: prfGraph.height }, svgResponsive: { koSvgWidth: prfGraph.width, tmpIsVisibleMenu: $root.isVisibleMenu }">
+﻿<!-- current: vwmMonitoringOfWell -->
+<svg version="1.1" width="100%" viewbox="0 0 1200 400" data-bind="attr: { height: mntrGraph.sizePx.height }, svgResponsive: { koSvgWidth: mntrGraph.sizePx.width, tmpIsVisibleMenu: $root.isVisibleMenu }">
+  <g data-bind="attr: { transform: mntrGraph.baseTransform }">
+    <g> <!-- svg zoom -->
+      <g class="axis x" data-bind="attr: { transform: mntrGraph.axisXTransform }"></g>
+    </g>
+  </g>
 </svg>

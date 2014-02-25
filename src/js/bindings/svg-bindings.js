@@ -7,7 +7,7 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
   */
 	function redrawGraph(tmpSvgPath, tmpAxis, tmpGraphWrap, tmpDataSet, tmpParams) {
 		// Redraw each curve (JSON obj)
-    var d3GroupOfGraphWrap = tmpGraphWrap.select('.svg-prf-graph-g');
+    var d3GroupOfGraphWrap = tmpGraphWrap.select('.svg-graph-g');
    
     // Clear all child elements
     d3GroupOfGraphWrap.text('');
@@ -23,19 +23,6 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
             .attr('visible', ko.unwrap(vwmParam.isVisible));
         }
     });
-    
-		// $.each(tmpSvgPath, function (elemKey, elemVal) {
-			// d3GroupOfGraphWrap.select('.grp-' + elemKey).attr('d', elemVal(tmpDataSet));
-		// });
-    
-    
-    
-    // <!-- ko foreach: {data: listOfSlcVwmWfmParameterOfWroup, as: 'vwmParam'} -->
-        // <path d="M0 0" clip-path="url(#graph-clip)" 
-        // data-bind="attr: { stroke: vwmParam.mdlWfmParameterOfWroup.color, 
-        //            class: 'grp-' + vwmParam.mdlWfmParameterOfWroup.wfmParameterId }, 
-        //            visible: vwmParam.isVisible"></path>
-        // <!-- /ko -->
 
 		// Redraw x axis
 		tmpGraphWrap.select('.axis.x').call(tmpAxis.x);
@@ -58,16 +45,16 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
       var tmpParams = ko.unwrap(acc.listOfSlcVwmWfmParameterOfWroup);
       
 			var graph = {
-				axis : ko.unwrap(acc.prfGraphAxis),
-				zoom : ko.unwrap(acc.prfGraphZoom),
-				viewBox : ko.unwrap(acc.prfGraphViewBox),
+				axis : ko.unwrap(acc.axisLines),
+				zoom : ko.unwrap(acc.zoomBehavior),
+				vboxSize : ko.unwrap(acc.vboxSize),
 				svgPath : ko.unwrap(acc.productionDataSetSvgPath)
 			};
 
 			// Zoom coefficient for plus/minus buttons
 			var scaleCoef = 1.1;
-			var diffX = (graph.viewBox.width / 2) * (scaleCoef - 1),
-			diffY = (graph.viewBox.height / 2) * (scaleCoef - 1);
+			var diffX = (graph.vboxSize.width / 2) * (scaleCoef - 1),
+			diffY = (graph.vboxSize.height / 2) * (scaleCoef - 1);
 
 			var graphWrap = d3.select(element);
 
@@ -114,7 +101,7 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 		// if height = 600svg (400px) then width = Xsvg (300px)
 		// X = (300px * 600svg) / 400px
 		// else if width = 1200svg (300px) then height = Ysvg (400px)
-		// Y = (400px * 1200svg) / 300px
+		// Y = (400px * 1200svg) / 300px    
 		if ((realImgSize.height * svgBlockSize.ratio) > realImgSize.width) {
 			svgImgSize.height = svgBlockSize.height;
 			svgImgSize.width = (realImgSize.width * svgBlockSize.height) / realImgSize.height;

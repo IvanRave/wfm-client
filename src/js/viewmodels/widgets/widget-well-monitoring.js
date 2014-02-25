@@ -17,8 +17,8 @@ define(['knockout',
         */
         this.toStringifyOpts = function () {
             return JSON.stringify({
-                'StartUnixTime': ko.unwrap(ths.widgetVwmMonitoringOfWell['startUnixTime']),
-                'EndUnixTime': ko.unwrap(ths.widgetVwmMonitoringOfWell['endUnixTime'])
+                'StartUnixTime': ko.unwrap(ths.widgetVwmMonitoringOfWell.mntrUnixTimeBorder.start),
+                'EndUnixTime': ko.unwrap(ths.widgetVwmMonitoringOfWell.mntrUnixTimeBorder.end)
             });
         };
     };

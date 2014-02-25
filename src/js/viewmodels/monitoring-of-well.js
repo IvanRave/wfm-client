@@ -1,5 +1,5 @@
 /** @module */
-define(['knockout'], function(ko){
+define(['knockout', 'viewmodels/svg-graph'], function(ko, SvgGraph){
   'use strict';
   
   /**
@@ -17,8 +17,8 @@ define(['knockout'], function(ko){
 		this.mntrUnixTimeBorder = {
       // By default: loaded from server options for a widget
       // no default for main section views
-			start : ko.observable(opts['StartUnixTime']),
-			end : ko.observable(opts['EndUnixTime'])
+			start : ko.observable(),
+			end : ko.observable()
 		};
     
     /**
@@ -37,6 +37,17 @@ define(['knockout'], function(ko){
     // When a user changes filtered dates - reload monitoring records
     this.mntrUnixTimeBorder.start.subscribe(ths.loadFilteredListOfMonitoringRecord);
     this.mntrUnixTimeBorder.end.subscribe(ths.loadFilteredListOfMonitoringRecord);
+    
+    //{ #region GRAPH
+    
+    this.mntrGraph = new SvgGraph();
+    
+    //} #endregion GRAPH
+    
+    // Load data (widget or main view options)
+    // Automatically will be loaded monitoring records for these dates
+    this.mntrUnixTimeBorder.start(opts['StartUnixTime']);
+    this.mntrUnixTimeBorder.end(opts['EndUnixTime']);
   };
   
   return exports;

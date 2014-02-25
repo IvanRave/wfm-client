@@ -4,8 +4,9 @@ define(['jquery',
 		'd3',
 		'helpers/modal-helper',
 		'moment',
-		'models/column-attribute'
-	], function ($, ko, d3, modalHelper, appMoment, ColumnAttribute) {
+		'models/column-attribute',
+    'viewmodels/svg-graph'
+	], function ($, ko, d3, modalHelper, appMoment, ColumnAttribute, SvgGraph) {
 	'use strict';
 
 	function fromOAtoJS(oaDate) {
@@ -434,61 +435,11 @@ define(['jquery',
 			});
 
 		// =============================== Perfomance graph ================================
-		vw.prfGraph = {
-			// Width -> Height
-			ratio : 1 / 3,
-			// size, depended of svg viewbox: 1200/400 minus all margins
-			viewBox : {
-				width : 1110,
-				height : 370,
-				// divide by 80 or 20 (where scale)
-				margin : {
-					top : 10,
-					right : 30,
-					bottom : 20,
-					left : 60
-				},
-			},
-			axisSize : 10
-		};
-    
     /**
-    * An attribute for a group of the graph
-    *    The group with data lines
-    * @type {string}
+    * A perfomance graph
+    * @type {module:viewmodels/svg-graph}
     */
-    vw.graphTransform = 'translate(' + vw.prfGraph.viewBox.margin.left + ', ' + vw.prfGraph.viewBox.margin.top + ')';
-
-    /**
-    * An attribute for the X axis
-    * @type {string}
-    */
-    vw.graphAxisXTransform = 'translate(0,' + vw.prfGraph.viewBox.height + ')';
-    
-		// actual width of graph and x-axis
-		// real size of svg
-		vw.prfGraph.width = ko.observable();
-
-		// actual height of graph and y-axis
-		vw.prfGraph.height = ko.computed({
-				read : function () {
-					var tmpWidth = ko.unwrap(vw.prfGraph.width);
-					if (tmpWidth && $.isNumeric(tmpWidth)) {
-						return tmpWidth * vw.prfGraph.ratio;
-					}
-				},
-				deferEvaluation : true
-			});
-
-		vw.prfGraph.axis = {
-			x : d3.svg.axis().tickSize(-vw.prfGraph.viewBox.height),
-			y : d3.svg.axis().orient('left').tickSize(-vw.prfGraph.viewBox.width)
-		};
-
-		// Min and max zoom coeficient - 1 by default - without zoom
-		////vw.prfGraph.scaleBorder = [0.0001, 10000];
-
-		vw.prfGraph.zoom = d3.behavior.zoom().scaleExtent([0.0001, 10000]);
+    vw.prfmGraph = new SvgGraph();
 
 		function getSvgPath(paramList, timeBorder, valueBorder) {
 			var resultJson = {};
@@ -502,24 +453,24 @@ define(['jquery',
 				$.isNumeric(valueBorder[1])) {
 
 				var x = d3.time.scale()
-					.range([0, vw.prfGraph.viewBox.width])
+					.range([0, vw.prfmGraph.vboxSize.width])
 					.domain([new Date(timeBorder[0] * 1000), new Date(timeBorder[1] * 1000)]);
 
 				var y = d3.scale.linear()
-					.range([vw.prfGraph.viewBox.height, 0])
+					.range([vw.prfmGraph.vboxSize.height, 0])
 					.domain(valueBorder);
 
-				vw.prfGraph.axis.x.scale(x);
-				vw.prfGraph.axis.y.scale(y);
+				vw.prfmGraph.axis.x.scale(x);
+				vw.prfmGraph.axis.y.scale(y);
 
-				vw.prfGraph.zoom.x(x).y(y);
+				vw.prfmGraph.zoomBehavior.x(x).y(y);
 
 				// tmp for axis ====================================
 				////var altX = d3.time.scale()
 				////        .domain([t1, t2])
 				////        .range([t1, t2].map(d3.time.scale()
 				////        .domain([t1, t2])
-				////        .range([0, vw.prfGraph.viewBox.width])));
+				////        .range([0, vw.prfmGraph.vboxSize.width])));
 				// end tmp =================================
 
 				$.each(paramList, function (paramIndex, paramElem) {

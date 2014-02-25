@@ -2,8 +2,16 @@
   <!-- current: vwmWidget -->
   <div data-bind="if: vwmWidget.isVisSettingPanel">
     <div class="widget-setting-panel">
+      <div data-bind="with: vwmWidget.widgetVwmMonitoringOfWell">
+        <input class="input-sm" size="10" data-bind="datepicker: mntrUnixTimeBorder.start, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }"/>
+        <span>-</span>
+        <input class="input-sm" size="10" data-bind="datepicker: mntrUnixTimeBorder.end, datepickerOptions: { format: 'yyyy-mm-dd', selectYears: true, selectMonths: true }"/>
+      </div>
     </div>
   </div>
   <div class="widget-content">
+    <div data-bind="with: vwmWidget.widgetVwmMonitoringOfWell">
+      {{> well-monitoring-graph }}
+    </div>
   </div>
 </script>
