@@ -1,3 +1,23 @@
+<a name="0.9.2"></a>
+### 0.9.2 (2014-02-26)
+
+
+#### Bug Fixes
+
+* **monitoringRecords:** allow only numbers ([94d6016c](https://github.com/IvanRave/wfm-client/commit/94d6016c15667103c4c06cb459ddd29eff22493c))
+* **pickadate:** change tab problem ([67d619d8](https://github.com/IvanRave/wfm-client/commit/67d619d8e101fa11f1cfd6a87e13d6fde776487d))
+* **wellPerfomance:** extract zoom behaviour ([6cad0f98](https://github.com/IvanRave/wfm-client/commit/6cad0f985d7ed8b9c1b02c5281a78b15fe912da5))
+
+
+#### Features
+
+* **monitoring:**
+  * build and draw a graph ([5edc918f](https://github.com/IvanRave/wfm-client/commit/5edc918fedf89c2425062302a5e94f8e5bf90465))
+  * add all for the graph ([b32fa6d0](https://github.com/IvanRave/wfm-client/commit/b32fa6d0cfa02725eceb899f92d01185952e6918))
+  * checkers, templates for graph ([cd56ffbb](https://github.com/IvanRave/wfm-client/commit/cd56ffbb38d9d5bd88432d7ac9d65d6c138d44b3))
+* **monitoringRecords:** percent's differences ([e1c228d4](https://github.com/IvanRave/wfm-client/commit/e1c228d46f4e44c7767305b00bb3c2b41d9d3faf))
+
+
 <a name="0.9.1"></a>
 ### 0.9.1 (2014-02-22)
 
