@@ -850,7 +850,7 @@ define([
 			});
 
 		/**
-		 * List of monitoring records
+		 * List of monitoring records 
 		 * @type {Array.<models/monitoring-record>}
 		 */
 		this.listOfMonitoringRecord = ko.observableArray();

@@ -375,8 +375,10 @@ define(['jquery',
 				deferEvaluation : true
 			});
 
-		// Real time border: min and max values in unix time format
-		// This time border other than WPDDateStartYear, EndYear (ant other selectable values)
+		/**
+		 * Real time border: min and max values in unix time format
+		 *    This time border other than WPDDateStartYear, EndYear (ant other selectable values)
+		 */
 		vw.filteredByDateProductionDataSetTimeBorder = ko.computed({
 				read : function () {
 					var arr = ko.unwrap(vw.filteredByDateProductionDataSet);
@@ -389,7 +391,9 @@ define(['jquery',
 				deferEvaluation : true
 			});
 
-		// Real value border: min and max values of data in selected squad
+		/**
+		 * Real value border: min and max values of data in selected squad
+		 */
 		vw.filteredByDateProductionDataSetValueBorder = ko.computed({
 				read : function () {
 					// Params viewmodels

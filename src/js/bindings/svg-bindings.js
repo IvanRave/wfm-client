@@ -2,11 +2,15 @@
 define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 	'use strict';
 
-	ko.bindingHandlers.svgAxis = {
+  /**
+  * Graph axis
+  */
+	ko.bindingHandlers.graphAxis = {
 		update : function (element, valueAccessor) {
 			var tmpAxis = ko.unwrap(valueAccessor());
 			if (tmpAxis) {
-				d3.select(element).call(tmpAxis);
+        d3.select(element).call(tmpAxis);
+        // alternative: tmpAxis($(element));
 			}
 		}
 	};
@@ -39,8 +43,11 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 			});
 		}
 	};
-
-	ko.bindingHandlers.svgZoomGraph = {
+  
+  /**
+  * Update behavior for element when data are changed
+  */
+	ko.bindingHandlers.graphZoom = {
 		update : function (element, valueAccessor) {
 			// zoom behavior
 			var tmpZoomBehavior = ko.unwrap(valueAccessor());

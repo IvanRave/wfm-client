@@ -208,8 +208,8 @@ To check "Whether the user has access to edit (or manage, or view..)?", you may 
 
 ### Tasks
 
-* JS: @todo fix: some method #LH!
-* HTML: <!-- TODO: feat: to do something good #AB! -->
+* JS: @todo fix: some method #23!
+* HTML: <!-- TODO: feat: to do something good #12! -->
 In accordance with 
 * JSDoc documentation (@todo tag)
 * Google styleguide (TODO comment)
@@ -217,11 +217,11 @@ In accordance with
 
 #### Priority
 
-* Format: #[LMH][LMH]! (Low, Medium, High)
-* First letter: level of importance (L - low importance, M, H - high importance)
-* Second letter: level of difficulty (L - low difficulty, M, H - high difficulty)
-Use development order: #HL! #HM! #HH! #ML! #MM! #MH! #LL! #LM! #LH!
-Use search (in all files) to find need priority
+* A format: #NN!
+* The first number: a level of importance (1 - very high important, 5 - non-important)
+* The second number: a level of difficulty (1 - very low difficulty, 5 - very high difficulty)
+Use this development order: from light and imporant tasks #11! to difficult and non-important #55!
+Use a search (in all files) to find a need priority (search by a regular expression)
 
 ### CORS support
 

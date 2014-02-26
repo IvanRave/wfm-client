@@ -11,7 +11,9 @@
   </div>
   <div class="widget-content">
     <div data-bind="with: vwmWidget.widgetVwmMonitoringOfWell">
-      {{> well-monitoring-graph }}
+      <div data-bind="with: mntrGraph">
+        {{> graph-partial }}
+      </div>
     </div>
   </div>
 </script>

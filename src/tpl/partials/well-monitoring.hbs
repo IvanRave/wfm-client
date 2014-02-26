@@ -43,7 +43,9 @@
         </table>
         <div data-bind="if: mdlStage.isLoadedListOfMonitoringRecord">
           <div data-bind="with: mainVwmMonitoringOfWell">
-            {{> well-monitoring-graph }}
+            <div data-bind="with: mntrGraph">
+              {{> graph-partial }}
+            </div>
           </div>
         </div>
       </div>

@@ -13,6 +13,11 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 	 * Svg graph
 	 *    used in the monitoring and perfomance sections (and may be in another)
 	 * @constructor
+   * @param {Array} koTimeBorder - Observable array with start and end unix times, 
+   *        like [124124,5425235] - elements of this array can be null
+   * @param {Array} koValueBorder - Observable array with min and max values for all curves, like [-12.432, 543]
+   * @param {Array.<object>} koPaths - Observable array of path objects 
+   *        [{prmStroke: "#fff", prmPath: "M0 0 Z", prmVisible: true},{...}]
 	 */
 	var exports = function (koTimeBorder, koValueBorder, koPaths) {
 		/** Alternative for this */

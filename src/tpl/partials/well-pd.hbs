@@ -101,7 +101,9 @@
       </div>
       <div data-bind="if: selectedAttrGroup">
         <div>
-          {{> pd-graph }}
+          <!-- ko with: prfmGraph -->
+          {{> graph-partial }}
+          <!-- /ko -->
           <div class="clearfix" style="margin-top:4px">
             <div class="text-center">
               <select data-bind="options: joinedYearList, value: WPDDateStartYear" class="input-sm"></select>
