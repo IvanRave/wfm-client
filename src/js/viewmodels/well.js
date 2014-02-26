@@ -646,7 +646,7 @@ define([
 
 		/**
 		 * A monitoring record, according to the selected unix time in the wroup
-		 * @type {<module:models/monitoring-record>}
+		 * @type {module:models/monitoring-record}
 		 */
 		this.monitoringRecordForWroup = ko.computed({
 				read : function () {
