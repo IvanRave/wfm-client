@@ -14,11 +14,9 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 	 *    used in the monitoring and perfomance sections (and may be in another)
 	 * @constructor
 	 */
-	var exports = function (koTimeBorder, koValueBorder) {
+	var exports = function (koTimeBorder, koValueBorder, koPaths) {
 		/** Alternative for this */
 		var ths = this;
-
-		this.d3Graph = d3;
 
 		/**
 		 * A standard ratio for the graph
@@ -84,6 +82,9 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 		 */
 		this.axisXTransform = 'translate(0,' + ths.vboxSize.height + ')';
 
+    /**
+    * Svg scale functions for a x-axis and y-axis
+    */
 		this.scaleObj = {
 			x : ko.computed({
 				read : function () {
@@ -153,18 +154,23 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 		 * Transfor attribute for the graph wrap, to manage a zoom behavior
 		 * @type {object}
 		 */
-		this.zoomTransform = ko.observable({
+		this.zoomTransform = ko.observable({});
+
+		/**
+		 * Set to default values
+		 */
+		this.setZoomTransformToDefault = function () {
+			ths.zoomTransform({
 				scale : 1,
 				translate : [0, 0]
 			});
+		};
 
 		function updateZoom(tmpScale, tmpTranslate) {
 			var tmpZoomTransform = {
 				scale : tmpScale,
 				translate : tmpTranslate
 			};
-
-			console.log('tzf', tmpZoomTransform);
 
 			// Set new zoom values to the block with data lines
 			ths.zoomTransform(tmpZoomTransform);
@@ -179,6 +185,10 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 					tmpYScale = ko.unwrap(ths.scaleObj.y);
 
 					if (tmpXScale && tmpYScale) {
+						// When set a new behavior
+						// Reload zoomTransofr to default values
+						ths.setZoomTransformToDefault();
+
 						return d3.behavior.zoom()
 						.x(tmpXScale)
 						.y(tmpYScale)
@@ -189,16 +199,6 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 				},
 				deferEvaluation : true
 			});
-
-		// /**
-		// * Set to default values
-		// */
-		// this.setZoomTransformToDefault = function () {
-		// ths.zoomTransform({
-		// scale : 1,
-		// translate : [0, 0]
-		// });
-		// };
 
 		/**
 		 * A zoom-in method for a graph
@@ -251,6 +251,12 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 			updateZoom(prevZoomTransform.scale, prevZoomTransform.translate);
 			//ths.zoomTransform(prevZoomTransform);
 		};
+    
+    /**
+    * Paths (graph lines)
+    * @type {Array.<object>}
+    */
+    this.paths = koPaths;
 	};
 
 	return exports;
