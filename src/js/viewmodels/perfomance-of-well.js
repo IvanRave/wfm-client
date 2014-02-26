@@ -454,12 +454,12 @@ define(['jquery',
 						// List of viewmodels with WFM parameters (units)
 						var listOfVwmParam = ko.unwrap(vw.listOfSlcVwmWfmParameterOfWroup);
 
-						var tmpDataSet = ko.unwrap(vw.filteredByDateProductionDataSet);
-
 						var tmpXScale = ko.unwrap(vw.prfmGraph.scaleObj.x),
 						tmpYScale = ko.unwrap(vw.prfmGraph.scaleObj.y);
 
 						if (tmpXScale && tmpYScale) {
+              var tmpDataSet = ko.unwrap(vw.filteredByDateProductionDataSet);
+            
 							listOfVwmParam.forEach(function (vwmParamItem) {
 								// parameter id, like CSG, WaterRate ...
 								var tmpIdOfParameter = vwmParamItem.mdlWfmParameterOfWroup.wfmParameterId;

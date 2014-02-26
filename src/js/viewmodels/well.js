@@ -642,7 +642,7 @@ define([
 				// can be loaded from cookies or setting by default, for example:
 				// for the last month period
 				// neccessary for widget
-			}, ths.mdlStage);
+			}, ths.mdlStage, parentVwmWroup.listOfMonitoredVwmParams);
 
 		/**
 		 * A monitoring record, according to the selected unix time in the wroup

@@ -805,7 +805,7 @@ define([
 		//} #endregion PERFOMANCE
 
 		//{ #region MONITORING (for a well group monitoring section and a well monitoring section)
-    
+
 		/**
 		 * Procent borders
 		 * @type {Array.<module:models/procent-border>}
@@ -850,45 +850,58 @@ define([
 			});
 
 		/**
-		 * List of monitoring records 
+		 * List of monitoring records
 		 * @type {Array.<models/monitoring-record>}
 		 */
 		this.listOfMonitoringRecord = ko.observableArray();
 
-    /**
-    * Whether data is loaded
-    * @type {boolean}
-    */
-    this.isLoadedListOfMonitoringRecord = ko.observable(false);
-    
-    /**
-    * Load the filtered list of monitoring records
-    */
-    this.loadListOfMonitoringRecord = function(startUnixTime, endUnixTime){
-    
-      // Reload every time: other users can change data in their cabinets
-      ths.isLoadedListOfMonitoringRecord(false);
-      monitoringRecordService.getFilteredData(ths.id, startUnixTime, endUnixTime).done(function(res){
-        ths.isLoadedListOfMonitoringRecord(true);
-        
-        var tmpMntrParams = ko.unwrap(ths.getWellGroup().listOfMonitoredParams);
-        
-        ths.importMonitoringRecords(res, tmpMntrParams);
-      });
-    };
-    
+		/**
+		 * Sorted records
+		 * @type {Array.<models/monitoring-record>}
+		 */
+		this.sortedListOfMonitoringRecord = ko.computed({
+				read : function () {
+					return ko.unwrap(ths.listOfMonitoringRecord).sort(function (l, r) {
+						return ko.unwrap(l.unixTime) > ko.unwrap(r.unixTime) ? 1 : -1;
+					});
+				},
+				deferEvaluation : true
+			});
+
+		/**
+		 * Whether data are loaded
+		 * @type {boolean}
+		 */
+		this.isLoadedListOfMonitoringRecord = ko.observable(false);
+
+		/**
+		 * Load the filtered list of monitoring records
+		 */
+		this.loadListOfMonitoringRecord = function (startUnixTime, endUnixTime) {
+
+			// Reload every time: other users can change data in their cabinets
+			ths.isLoadedListOfMonitoringRecord(false);
+			monitoringRecordService.getFilteredData(ths.id, startUnixTime, endUnixTime).done(function (res) {
+				ths.isLoadedListOfMonitoringRecord(true);
+
+				var tmpMntrParams = ko.unwrap(ths.getWellGroup().listOfMonitoredParams);
+
+				ths.importMonitoringRecords(res, tmpMntrParams);
+			});
+		};
+
 		/**
 		 * Import monitoring records
 		 */
 		this.importMonitoringRecords = function (tmpData, tmpMntrParams) {
 			var objArr = tmpData.map(function (tmpItem) {
-          // objProcentBorders to make computed properties: 
-          //         difference between the aveDict and the dict with some procent border
+					// objProcentBorders to make computed properties:
+					//         difference between the aveDict and the dict with some procent border
 					return new MonitoringRecord(tmpItem, tmpMntrParams, ths.objProcentBorders);
 				});
 
 			ths.listOfMonitoringRecord(objArr);
-      console.log('monitored parameter records: ', ko.unwrap(ths.listOfMonitoringRecord));
+			console.log('monitored parameter records: ', ko.unwrap(ths.listOfMonitoringRecord));
 		};
 
 		/**
@@ -901,25 +914,25 @@ define([
 				UnixTime : tmpUnixTime,
 				Dict : tmpDict
 			}).done(function () {
-				// Add to the list: not required - this method used only in a group section, 
-        //       where all data will be reload after posting (to get average values)
+				// Add to the list: not required - this method used only in a group section,
+				//       where all data will be reload after posting (to get average values)
 				////ths.listOfMonitoringRecord.push(new MonitoringRecord(response, tmpMntrParams, ths.objProcentBorders));
-        if (scsCallback){
-          scsCallback();
-        }
+				if (scsCallback) {
+					scsCallback();
+				}
 			});
 		};
 
-    /**
-    * Remove all records for this well
-    */
-    this.removeAllMonitoringRecords = function(){
-      monitoringRecordService.removeAll(ths.id).done(function(){
-        // Clean list
-        ths.listOfMonitoringRecord([]);
-      });
-    };
-    
+		/**
+		 * Remove all records for this well
+		 */
+		this.removeAllMonitoringRecords = function () {
+			monitoringRecordService.removeAll(ths.id).done(function () {
+				// Clean list
+				ths.listOfMonitoringRecord([]);
+			});
+		};
+
 		/**
 		 * Import server data to procent borders
 		 *    procent borders loaded through the wroup loadProcentBordersForAllWells method

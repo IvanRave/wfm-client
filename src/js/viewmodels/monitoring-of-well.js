@@ -1,12 +1,19 @@
 /** @module */
-define(['jquery', 'knockout', 'viewmodels/svg-graph'], function ($, ko, SvgGraph) {
+define(['jquery',
+		'knockout',
+		'viewmodels/svg-graph',
+		'd3'],
+	function ($,
+		ko,
+		SvgGraph,
+		d3) {
 	'use strict';
 
 	/**
 	 * A shared monitoring viewmodel for widgets and sections
 	 * @constructor
 	 */
-	var exports = function (opts, mdlWell) {
+	var exports = function (opts, mdlWell, koListOfVwmMonitoringParams) {
 		/** Alternative */
 		var ths = this;
 
@@ -90,7 +97,52 @@ define(['jquery', 'knockout', 'viewmodels/svg-graph'], function ($, ko, SvgGraph
 		 */
 		this.pathsArr = ko.computed({
 				read : function () {
-					return [];
+					var resultArr = [];
+
+					// Redraw data after changing a graph zoom
+					var tmpZoomTransform = ko.unwrap(ths.mntrGraph.zoomTransform);
+
+					// Without zoom initization - do not redraw
+					if (tmpZoomTransform) {
+
+						var listOfVwmParam = ko.unwrap(koListOfVwmMonitoringParams);
+
+						var tmpXScale = ko.unwrap(ths.mntrGraph.scaleObj.x),
+						tmpYScale = ko.unwrap(ths.mntrGraph.scaleObj.y);
+
+						if (tmpXScale && tmpYScale) {
+
+							// Monitoring records for all dates
+							var tmpRecords = ko.unwrap(mdlWell.sortedListOfMonitoringRecord);
+
+							listOfVwmParam.forEach(function (vwmParamItem) {
+								// parameter id, like CSG, WaterRate ...
+								var tmpIdOfParameter = vwmParamItem.mdlWfmParameterOfWroup.wfmParameterId;
+
+								/**
+								 * Create line with d3 lib
+								 *    https://github.com/mbostock/d3/wiki/SVG-Shapes#wiki-line
+								 */
+								var generateLinePath = d3.svg.line()
+									.interpolate('monotone') // monotone or linear
+									.x(function (d) {
+										return tmpXScale(new Date(ko.unwrap(d.unixTime) * 1000));
+									})
+									.y(function (d) {
+										return tmpYScale(
+											$.isNumeric(ko.unwrap(d.dict[tmpIdOfParameter])) ? (ko.unwrap(d.dict[tmpIdOfParameter]) * ko.unwrap(ko.unwrap(vwmParamItem.mdlWfmParameterOfWroup.wfmParameter).uomCoef)) : null);
+									});
+
+								resultArr.push({
+									prmPath : generateLinePath(tmpRecords),
+									prmStroke : ko.unwrap(vwmParamItem.mdlWfmParameterOfWroup.color),
+									prmVisible : ko.unwrap(vwmParamItem.isVisible)
+								});
+
+							});
+						}
+					}
+					return resultArr;
 				},
 				deferEvaluation : true
 			});

@@ -146,18 +146,6 @@ define([
       deferEvaluation: true
     }).trackHasItems();
     
-    /**
-    * Whether list is full - with one or more records
-    *    need for views to show warnings
-    * @type {boolean}
-    */
-    this.isFullListOfMonitoredVwmParams = ko.computed({
-      read: function(){
-        return ko.unwrap(ths.listOfMonitoredVwmParams).length > 0;
-      },
-      deferEvaluation: true
-    });
-    
 		/**
 		 * A selected date for the monitoring section
 		 *    By default: current date in unix time (set when the section is loaded)

@@ -15,7 +15,7 @@ define(['knockout'], function (ko) {
 		this.mdlWfmParameterOfWroup = mdlWfmParameterOfWroup;
 
 		/**
-		 * Whether parameter is visible on the test or the perfomance page
+		 * Whether parameter is visible on the test or perfomance page
 		 * @type {boolean}
 		 */
 		this.isVisible = ko.observable(true);

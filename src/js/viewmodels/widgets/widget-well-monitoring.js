@@ -6,11 +6,11 @@ define(['knockout',
     'use strict';
 
     // Subtype from Widget
-    var exports = function (opts, mdlWell) {
+    var exports = function (opts, mdlWell, koListOfMonitoredVwmParams) {
         var ths = this;
         opts = opts || {};
         
-        this.widgetVwmMonitoringOfWell = new VwmMonitoringOfWell(opts, mdlWell);
+        this.widgetVwmMonitoringOfWell = new VwmMonitoringOfWell(opts, mdlWell, koListOfMonitoredVwmParams);
 
         /**
         * Convert to JSON string to save options on the server

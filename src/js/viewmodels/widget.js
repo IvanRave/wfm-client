@@ -59,7 +59,7 @@ define(['knockout',
 			VwmWidgetWellPerfomance.call(ths, widgetOpts, tmpParentVwmStage);
 			break;
     case 'well-monitoring':
-      VwmWidgetWellMonitoring.call(ths, widgetOpts, tmpWidgetMdlStage);
+      VwmWidgetWellMonitoring.call(ths, widgetOpts, tmpWidgetMdlStage, tmpParentVwmStage.parentVwmWroup.listOfMonitoredVwmParams);
       break;
 		case 'well-history':
 			VwmWidgetWellHistory.call(ths, widgetOpts, tmpParentVwmStage);
