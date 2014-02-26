@@ -3,13 +3,22 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 	'use strict';
 
 	/**
+	 * A coefficient for zooming
+	 * @type {number}
+	 * @const
+	 */
+	var scaleCoef = 1.2;
+
+	/**
 	 * Svg graph
 	 *    used in the monitoring and perfomance sections (and may be in another)
 	 * @constructor
 	 */
-	var exports = function () {
+	var exports = function (koTimeBorder, koValueBorder) {
 		/** Alternative for this */
 		var ths = this;
+
+		this.d3Graph = d3;
 
 		/**
 		 * A standard ratio for the graph
@@ -75,19 +84,70 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 		 */
 		this.axisXTransform = 'translate(0,' + ths.vboxSize.height + ')';
 
+		this.scaleObj = {
+			x : ko.computed({
+				read : function () {
+					var tmpTimeBorder = ko.unwrap(koTimeBorder);
+					if ($.isNumeric(tmpTimeBorder[0]) && $.isNumeric(tmpTimeBorder[1])) {
+						// some x-scale function
+						return d3.time.scale()
+						.domain([new Date(tmpTimeBorder[0] * 1000), new Date(tmpTimeBorder[1] * 1000)])
+						.range([0, ths.vboxSize.width]);
+					}
+				},
+				deferEvaluation : true
+			}),
+			y : ko.computed({
+				read : function () {
+					var tmpValueBorder = ko.unwrap(koValueBorder);
+
+					if ($.isNumeric(tmpValueBorder[0]) && $.isNumeric(tmpValueBorder[1])) {
+						return d3.scale.linear()
+						.domain(tmpValueBorder)
+						.range([ths.vboxSize.height, 0]);
+					}
+				},
+				deferEvaluation : true
+			})
+		};
+
 		/**
 		 * Axis for the graph
 		 * @type {object}
 		 */
 		this.axis = {
-			x : d3.svg.axis().tickSize(-ths.vboxSize.height),
-			y : d3.svg.axis().orient('left').tickSize(-ths.vboxSize.width)
-		};
+			x : ko.computed({
+				read : function () {
+					var tmpZoomTransform = ko.unwrap(ths.zoomTransform);
+					if (tmpZoomTransform) {
 
-		/**
-		 * Min and max zoom coeficient - 1 by default - without zoom
-		 */
-		this.zoomBehavior = d3.behavior.zoom().scaleExtent([0.0001, 10000]);
+						var tmpXScale = ko.unwrap(ths.scaleObj.x);
+						if (tmpXScale) {
+							return d3.svg.axis()
+							.scale(tmpXScale)
+							.tickSize(-ths.vboxSize.height);
+						}
+					}
+				},
+				deferEvaluation : true
+			}),
+			y : ko.computed({
+				read : function () {
+					var tmpZoomTransform = ko.unwrap(ths.zoomTransform);
+					if (tmpZoomTransform) {
+
+						var tmpYScale = ko.unwrap(ths.scaleObj.y);
+						if (tmpYScale) {
+							return d3.svg.axis()
+							.scale(tmpYScale)
+							.orient('left')
+							.tickSize(-ths.vboxSize.width);
+						}
+					}
+				},
+				deferEvaluation : true
+			})
+		};
 
 		/**
 		 * Transfor attribute for the graph wrap, to manage a zoom behavior
@@ -98,59 +158,98 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 				translate : [0, 0]
 			});
 
+		function updateZoom(tmpScale, tmpTranslate) {
+			var tmpZoomTransform = {
+				scale : tmpScale,
+				translate : tmpTranslate
+			};
+
+			console.log('tzf', tmpZoomTransform);
+
+			// Set new zoom values to the block with data lines
+			ths.zoomTransform(tmpZoomTransform);
+		}
+
 		/**
-		 * A transform string for a zoom behavior (transform attribute in a g element)
-		 * @type {string}
+		 * Min and max zoom coeficient - 1 by default - without zoom
 		 */
-		this.zoomTransformString = ko.computed({
+		this.zoomBehavior = ko.computed({
 				read : function () {
-					var tmpZoomTransform = ko.unwrap(ths.zoomTransform);
-					return 'translate(' + tmpZoomTransform.translate.join() + '), scale(' + tmpZoomTransform.scale + ')';
+					var tmpXScale = ko.unwrap(ths.scaleObj.x),
+					tmpYScale = ko.unwrap(ths.scaleObj.y);
+
+					if (tmpXScale && tmpYScale) {
+						return d3.behavior.zoom()
+						.x(tmpXScale)
+						.y(tmpYScale)
+						.scaleExtent([0.0001, 10000]).on('zoom', function () {
+							updateZoom(d3.event.scale, d3.event.translate);
+						});
+					}
 				},
 				deferEvaluation : true
 			});
+
+		// /**
+		// * Set to default values
+		// */
+		// this.setZoomTransformToDefault = function () {
+		// ths.zoomTransform({
+		// scale : 1,
+		// translate : [0, 0]
+		// });
+		// };
 
 		/**
 		 * A zoom-in method for a graph
 		 */
 		this.zoomIn = function () {
+			var tmpZoomBehavior = ko.unwrap(ths.zoomBehavior);
+			if (!tmpZoomBehavior) {
+				return;
+			}
+
 			var prevZoomTransform = ko.unwrap(ths.zoomTransform);
-			prevZoomTransform.scale += 0.1;
-			ths.zoomTransform(prevZoomTransform);
-      
-      // Zoom coefficient for plus/minus buttons
-			// var scaleCoef = 1.1;
-			// var diffX = (graph.vboxSize.width / 2) * (scaleCoef - 1),
-			// diffY = (graph.vboxSize.height / 2) * (scaleCoef - 1);
-			// graphWrap.select('.zoom-in').on('click', function () {
-			// graph.zoom.scale(graph.zoom.scale() * scaleCoef);
+			prevZoomTransform.scale *= scaleCoef;
 
-			// var tmpTr = graph.zoom.translate();
-			// tmpTr[0] -= diffX;
-			// tmpTr[1] -= diffY;
-			// graph.zoom.translate(tmpTr);
+			var tmpDiff = {
+				x : (ths.vboxSize.width / 2) * (prevZoomTransform.scale - 1),
+				y : (ths.vboxSize.height / 2) * (prevZoomTransform.scale - 1)
+			};
 
-			// redrawGraphData(graphWrap, graph.svgPath, dataSet, tmpParams);
-			// redrawGraphAxis(graphWrap, graph.axis);
-			// });
+			prevZoomTransform.translate.x -= tmpDiff.x;
+			prevZoomTransform.translate.y -= tmpDiff.y;
+
+			tmpZoomBehavior.translate(prevZoomTransform.translate);
+			tmpZoomBehavior.scale(prevZoomTransform.scale);
+
+			updateZoom(prevZoomTransform.scale, prevZoomTransform.translate);
 		};
 
+		/**
+		 * A zoom-out method
+		 */
 		this.zoomOut = function () {
+			var tmpZoomBehavior = ko.unwrap(ths.zoomBehavior);
+			if (!tmpZoomBehavior) {
+				return;
+			}
 			var prevZoomTransform = ko.unwrap(ths.zoomTransform);
-			prevZoomTransform.scale -= 0.1;
-			ths.zoomTransform(prevZoomTransform);
-			// graphWrap.select('.zoom-out').on('click', function () {
-			// ////if (tmpSc > 1) {
-			// graph.zoom.scale(graph.zoom.scale() / scaleCoef);
+			prevZoomTransform.scale /= scaleCoef;
 
-			// var tmpTr = graph.zoom.translate();
-			// tmpTr[0] += diffX;
-			// tmpTr[1] += diffY;
-			// graph.zoom.translate(tmpTr);
+			var tmpDiff = {
+				x : (ths.vboxSize.width / 2) * (prevZoomTransform.scale - 1),
+				y : (ths.vboxSize.height / 2) * (prevZoomTransform.scale - 1)
+			};
 
-			// redrawGraphData(graphWrap, graph.svgPath, dataSet, tmpParams);
-			// redrawGraphAxis(graphWrap, graph.axis);
-			// });
+			prevZoomTransform.translate.x += tmpDiff.x;
+			prevZoomTransform.translate.y += tmpDiff.y;
+
+			tmpZoomBehavior.translate(prevZoomTransform.translate);
+			tmpZoomBehavior.scale(prevZoomTransform.scale);
+
+			updateZoom(prevZoomTransform.scale, prevZoomTransform.translate);
+			//ths.zoomTransform(prevZoomTransform);
 		};
 	};
 

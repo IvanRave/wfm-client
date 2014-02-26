@@ -1,12 +1,11 @@
 ﻿/** @module */
 define(['jquery',
 		'knockout',
-		'd3',
 		'helpers/modal-helper',
 		'moment',
 		'models/column-attribute',
-    'viewmodels/svg-graph'
-	], function ($, ko, d3, modalHelper, appMoment, ColumnAttribute, SvgGraph) {
+		'viewmodels/svg-graph'
+	], function ($, ko, modalHelper, appMoment, ColumnAttribute, SvgGraph) {
 	'use strict';
 
 	function fromOAtoJS(oaDate) {
@@ -435,81 +434,71 @@ define(['jquery',
 			});
 
 		// =============================== Perfomance graph ================================
-    /**
-    * A perfomance graph
-    * @type {module:viewmodels/svg-graph}
-    */
-    vw.prfmGraph = new SvgGraph();
+		/**
+		 * A perfomance graph
+		 * @type {module:viewmodels/svg-graph}
+		 */
+		vw.prfmGraph = new SvgGraph(vw.filteredByDateProductionDataSetTimeBorder, vw.filteredByDateProductionDataSetValueBorder);
 
-		function getSvgPath(paramList, timeBorder, valueBorder) {
+		function getSvgPath(paramList, tmpXScale, tmpYScale) {
+			console.log('get svg path');
+
 			var resultJson = {};
 
-			// Check parameter and data existence
-			// dataSet.length > 0 &&
-			if (paramList.length > 0 &&
-				$.isNumeric(timeBorder[0]) &&
-				$.isNumeric(timeBorder[1]) &&
-				$.isNumeric(valueBorder[0]) &&
-				$.isNumeric(valueBorder[1])) {
+			$.each(paramList, function (paramIndex, paramElem) {
+				var line = vw.prfmGraph.d3Graph.svg.line()
+					.interpolate('monotone') ////monotone //linear
+					.x(function (d) {
+						return tmpXScale(new Date(d.unixTime * 1000));
+					})
+					.y(function (d) {
+						return tmpYScale(
+							$.isNumeric(ko.unwrap(d[paramElem.wfmParameterId])) ? (ko.unwrap(d[paramElem.wfmParameterId]) * ko.unwrap(ko.unwrap(paramElem.wfmParameter).uomCoef)) : null);
+					});
 
-				var x = d3.time.scale()
-					.range([0, vw.prfmGraph.vboxSize.width])
-					.domain([new Date(timeBorder[0] * 1000), new Date(timeBorder[1] * 1000)]);
+				resultJson[paramElem.wfmParameterId] = line;
+				////resultJson[paramElem.wfmParameterId] = line(dataSet);
+				////if (ko.unwrap(paramElem.isVisible) === true) {
+				//}
+			});
 
-				var y = d3.scale.linear()
-					.range([vw.prfmGraph.vboxSize.height, 0])
-					.domain(valueBorder);
-
-				vw.prfmGraph.axis.x.scale(x);
-				vw.prfmGraph.axis.y.scale(y);
-
-				vw.prfmGraph.zoomBehavior.x(x).y(y);
-
-				// tmp for axis ====================================
-				////var altX = d3.time.scale()
-				////        .domain([t1, t2])
-				////        .range([t1, t2].map(d3.time.scale()
-				////        .domain([t1, t2])
-				////        .range([0, vw.prfmGraph.vboxSize.width])));
-				// end tmp =================================
-
-				$.each(paramList, function (paramIndex, paramElem) {
-					var line = d3.svg.line()
-						.interpolate('monotone') ////monotone //linear
-						.x(function (d) {
-							return x(new Date(d.unixTime * 1000));
-						})
-						.y(function (d) {
-							return y(
-								$.isNumeric(ko.unwrap(d[paramElem.wfmParameterId])) ? (ko.unwrap(d[paramElem.wfmParameterId]) * ko.unwrap(ko.unwrap(paramElem.wfmParameter).uomCoef)) : null);
-						});
-
-					resultJson[paramElem.wfmParameterId] = line;
-					////resultJson[paramElem.wfmParameterId] = line(dataSet);
-					////if (ko.unwrap(paramElem.isVisible) === true) {
-					//}
-				});
-			}
+			//console.log('liqrate: ', resultJson['LiquidRate']);
 
 			return resultJson;
 		}
 
-		// Update perfomance graph data: graph path for selected regions (d3 line objects in one json object)
-		///<return>{'WaterRate': d3Line, ...}</return>
+		/**
+		 * Update perfomance graph data: graph path for selected regions (d3 line objects in one json object)
+		 *    <return>{'WaterRate': d3Line, ...}</return>
+		 */
 		vw.productionDataSetSvgPath = ko.computed({
 				read : function () {
+					// Redraw data after changing a graph zoom
+					var tmpZoomTransform = ko.unwrap(vw.prfmGraph.zoomTransform);
+					if (!tmpZoomTransform) {
+						return;
+					}
+
 					// Generate model list from viewmodel list
 					var tmpList = ko.unwrap(vw.listOfSlcVwmWfmParameterOfWroup).map(function (elem) {
 							return elem.mdlWfmParameterOfWroup;
 						});
 
+					var tmpXScale = ko.unwrap(vw.prfmGraph.scaleObj.x),
+					tmpYScale = ko.unwrap(vw.prfmGraph.scaleObj.y);
+
 					return getSvgPath(
 						tmpList,
-						ko.unwrap(vw.filteredByDateProductionDataSetTimeBorder),
-						ko.unwrap(vw.filteredByDateProductionDataSetValueBorder));
+						tmpXScale,
+						tmpYScale);
 				},
 				deferEvaluation : true
 			});
+
+		/**
+		 * After changing this param - need to redraw a graph and set a translate attribue to the default value
+		 */
+		// vw.productionDataSetSvgPath.subscribe(vw.prfmGraph.setZoomTransformToDefault);
 
 		vw.joinedYearList = ko.computed({
 				read : function () {

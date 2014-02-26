@@ -2,80 +2,93 @@
 define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 	'use strict';
 
-  /**
-  * Redraw axis on the graph
-  */
-  function redrawGraphAxis(tmpGraphWrap, tmpAxis){
-    // Redraw x axis
-		tmpGraphWrap.select('.axis.x').call(tmpAxis.x);
+	/**
+	 * Redraw graph
+	 */
+	function redrawGraphData(d3GroupOfGraphWrap, tmpSvgPath, tmpDataSet, tmpParams) {
 
-		// Redraw y axis
-		tmpGraphWrap.select('.axis.y').call(tmpAxis.y);
-  }
-  
-  /**
-  * Redraw graph
-  */
-	function redrawGraphData(tmpGraphWrap, tmpSvgPath, tmpDataSet, tmpParams) {
+		// Clear all child elements
+		d3GroupOfGraphWrap.text('');
+
 		// Redraw each curve (JSON obj)
-    var d3GroupOfGraphWrap = tmpGraphWrap.select('.svg-graph-g');
-   
-    // Clear all child elements
-    d3GroupOfGraphWrap.text('');
-   
-    tmpParams.forEach(function(vwmParam) {
-        var tmpPath = tmpSvgPath[vwmParam.mdlWfmParameterOfWroup.wfmParameterId];
-        
-        if (tmpPath){
-          d3GroupOfGraphWrap.append('path')
-            .attr('d', tmpPath(tmpDataSet))
-            .attr('stroke', ko.unwrap(vwmParam.mdlWfmParameterOfWroup.color))
-            .attr('visible', ko.unwrap(vwmParam.isVisible));
-        }
-    });
+		tmpParams.forEach(function (vwmParam) {
+			var tmpPath = tmpSvgPath[vwmParam.mdlWfmParameterOfWroup.wfmParameterId];
+
+			if (tmpPath) {
+				d3GroupOfGraphWrap.append('path')
+				.attr('d', tmpPath(tmpDataSet))
+				.attr('stroke', ko.unwrap(vwmParam.mdlWfmParameterOfWroup.color))
+				.attr('visible', ko.unwrap(vwmParam.isVisible))
+				.attr('class', 'svg-graph-path');
+			}
+		});
 	}
 
-	ko.bindingHandlers.svgZoomGraph = {
+	ko.bindingHandlers.svgAxis = {
 		update : function (element, valueAccessor) {
-      console.log('graph updated');
+      var tmpAxis = ko.unwrap(valueAccessor());
+      if (tmpAxis){
+        d3.select(element).call(tmpAxis);
+      }
+		}
+	};
+
+	/**
+	 * Update paths for perfomance graph
+	 */
+	ko.bindingHandlers.perfomancePaths = {
+		update : function (element, valueAccessor) {
 			var acc = valueAccessor();
 
 			// Production data
 			var dataSet = ko.unwrap(acc.filteredByDateProductionDataSet);
+
 			if (dataSet.length === 0) {
 				return;
 			}
-      
-      var tmpParams = ko.unwrap(acc.listOfSlcVwmWfmParameterOfWroup);
-      
-			var graph = {
-				axis : ko.unwrap(acc.axisLines),
-				zoom : ko.unwrap(acc.zoomBehavior),
-				vboxSize : ko.unwrap(acc.vboxSize),
-				svgPath : ko.unwrap(acc.productionDataSetSvgPath),
-        koZoomTransform: acc.zoomTransform
-			};
 
-			var graphWrap = d3.select(element);
+			var tmpParams = ko.unwrap(acc.listOfSlcVwmWfmParameterOfWroup);
 
-			// When zooming redraw graph
-			graph.zoom.on('zoom', function(){
-        // Set new zoom values to the block with data lines
-        graph.koZoomTransform({
-          scale: d3.event.scale,
-          translate: d3.event.translate
-        });
-        //redrawGraphData(graphWrap, graph.svgPath, dataSet, tmpParams);
-        redrawGraphAxis(graphWrap, graph.axis);
-      });
+			var svgPathObj = ko.unwrap(acc.productionDataSetSvgPath);
 
-			// Apply zoom to whole graph (axis + lines)
-      // The graph zoom rect element need only for changing  zoom values
-			graphWrap.select('.graph-zoom-rect').call(graph.zoom);
+			var pathsWrap = d3.select(element);
 
 			// Redraw graph once like initial zoom event
-			redrawGraphData(graphWrap, graph.svgPath, dataSet, tmpParams);
-      redrawGraphAxis(graphWrap, graph.axis);
+			redrawGraphData(pathsWrap, svgPathObj, dataSet, tmpParams);
+      console.log('redraw data in bindings');
+		}
+	};
+
+	ko.bindingHandlers.svgZoomGraph = {
+		update : function (element, valueAccessor) {
+			//console.log('zoom updated');
+      // zoom behavior
+      var tmpZoomBehavior = ko.unwrap(valueAccessor());
+      if (tmpZoomBehavior){
+        d3.select(element).call(tmpZoomBehavior);
+      }
+      
+      // d3.select(element).call();
+      
+			// // var graph = {
+				// // //axis : ko.unwrap(acc.axisLines),
+				// // zoom : ,
+			
+				// // koZoomTransform : acc.zoomTransform
+			// // };
+
+      // // console.log(ko.unwrap(graph.koZoomTransform));
+      
+			// // var graphWrap = d3.select(element);
+
+			// // // When zooming redraw graph
+			
+
+			// // // Apply zoom to whole graph (axis + lines)
+			// // // The graph zoom rect element need only for changing  zoom values
+			// // graphWrap.select('.graph-zoom-rect').call(graph.zoom);
+
+			// // //redrawGraphAxis(graphWrap, graph.axis);
 		}
 	};
 
@@ -86,7 +99,7 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 		// if height = 600svg (400px) then width = Xsvg (300px)
 		// X = (300px * 600svg) / 400px
 		// else if width = 1200svg (300px) then height = Ysvg (400px)
-		// Y = (400px * 1200svg) / 300px    
+		// Y = (400px * 1200svg) / 300px
 		if ((realImgSize.height * svgBlockSize.ratio) > realImgSize.width) {
 			svgImgSize.height = svgBlockSize.height;
 			svgImgSize.width = (realImgSize.width * svgBlockSize.height) / realImgSize.height;
