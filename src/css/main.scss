@@ -46,6 +46,13 @@ $zindex-log-las-wrap: 1;            // Log wrap (contain upper blocks)
 
 //-- Other properties
 
+@mixin gradient-line($first, $second) {
+  background: $second;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$first', endColorstr='$second');
+  background: -webkit-gradient(linear, left top, left bottom, from($first), to($second));
+  background: -moz-linear-gradient(top,  $first,  $second);
+}
+
 $wfm-nav-height: 32px;
 
 //-- Loader's pathes
@@ -752,12 +759,13 @@ input.input-width-md {
 }
 
     .axis text {
-        font-size: 1em;
+        font-size: 1.4em;
+        font-family: 'Bookman Old Style', serif;
     }
 
     .axis line {
         fill: none;
-        stroke: #efefef;
+        stroke: #ccc;
         stroke-width: 1px;
     }
 
@@ -1023,4 +1031,8 @@ ul.wfm-light-list {
 .alert {
     padding: 8px !important;
     margin-bottom: 8px !important;
+}
+
+.graph-wrap{
+  @include gradient-line(#efefef, #fefefe);
 }

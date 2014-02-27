@@ -2,18 +2,20 @@
 define(['jquery',
 		'knockout',
 		'viewmodels/svg-graph',
-		'd3'],
+		'd3',
+		'viewmodels/wfm-parameter-of-wroup'],
 	function ($,
 		ko,
 		SvgGraph,
-		d3) {
+		d3,
+		VwmWfmParameterOfWroup) {
 	'use strict';
 
 	/**
 	 * A shared monitoring viewmodel for widgets and sections
 	 * @constructor
 	 */
-	var exports = function (opts, mdlWell, koListOfVwmMonitoringParams) {
+	var exports = function (opts, mdlWell, koListOfMonitoredParams) {
 		/** Alternative */
 		var ths = this;
 
@@ -60,7 +62,6 @@ define(['jquery',
 		/**
 		 * Min and max values of curves
 		 * @type {Array}
-		 * @todo #22! Initialize a logic
 		 */
 		this.valueBorderArr = ko.computed({
 				read : function () {
@@ -92,6 +93,28 @@ define(['jquery',
 			});
 
 		/**
+		 * List of viewmodels of params (for different views/widgets - need an IsVisible property)
+		 * @type {Array.<module:viewmodels/wfm-parameter-of-wroup>}
+		 */
+		this.listOfMonitoredVwmParams = ko.computed({
+				read : function () {
+					return ko.unwrap(koListOfMonitoredParams).map(function (paramItem) {
+						return new VwmWfmParameterOfWroup(paramItem);
+					});
+				},
+				deferEvaluation : true
+			}).trackHasItems();
+
+		/**
+		 * Remove all records: ovveride the model method with a confirmation and checking
+		 */
+		this.removeAllMonitoringRecords = function () {
+			if (confirm('{{capitalizeFirst lang.confirmToDelete}} all records for this well for all time?')) {
+				mdlWell.removeAllMonitoringRecords();
+			}
+		};
+
+		/**
 		 * Array with properties for svg paths
 		 * @type {Array.<object>}
 		 */
@@ -105,7 +128,7 @@ define(['jquery',
 					// Without zoom initization - do not redraw
 					if (tmpZoomTransform) {
 
-						var listOfVwmParam = ko.unwrap(koListOfVwmMonitoringParams);
+						var listOfVwmParam = ko.unwrap(ths.listOfMonitoredVwmParams);
 
 						var tmpXScale = ko.unwrap(ths.mntrGraph.scaleObj.x),
 						tmpYScale = ko.unwrap(ths.mntrGraph.scaleObj.y);
@@ -142,6 +165,7 @@ define(['jquery',
 							});
 						}
 					}
+
 					return resultArr;
 				},
 				deferEvaluation : true

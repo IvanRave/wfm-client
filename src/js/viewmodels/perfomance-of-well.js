@@ -5,8 +5,9 @@ define(['jquery',
 		'moment',
 		'models/column-attribute',
 		'viewmodels/svg-graph',
-		'd3'
-	], function ($, ko, modalHelper, appMoment, ColumnAttribute, SvgGraph, d3) {
+		'd3',
+    'viewmodels/wfm-parameter-of-wroup'
+	], function ($, ko, modalHelper, appMoment, ColumnAttribute, SvgGraph, d3, VwmWfmParameterOfWroup) {
 	'use strict';
 
 	function fromOAtoJS(oaDate) {
@@ -283,6 +284,20 @@ define(['jquery',
 		this.selectAttrGroupId = function (attrGroupId) {
 			vw.selectedAttrGroupId(attrGroupId);
 		};
+    
+    /**
+    * Recreate viewmodels for each perfomance of well
+    */
+    this.listOfVwmWfmParameterOfWroup = ko.computed({
+      read: function(){
+        // List of params from a wroup model
+        var tmpParams = ko.unwrap(vwmWell.getParentVwm().mdlStage.listOfWfmParameterOfWroup);
+        return tmpParams.map(function(paramItem){
+          return new VwmWfmParameterOfWroup(paramItem);
+        });
+      },
+      deferEvaluation: true
+    });
 
 		/**
 		 * List of selected viewmodels of parameters
@@ -295,7 +310,7 @@ define(['jquery',
 					var tmpSelectedAttrGroup = ko.unwrap(vw.selectedAttrGroup);
 
 					if (tmpSelectedAttrGroup) {
-						var tmpListGlobal = ko.unwrap(vwmWell.getParentVwm().listOfVwmWfmParameterOfWroup);
+						var tmpListGlobal = ko.unwrap(vw.listOfVwmWfmParameterOfWroup);
 
 						// list of parameter for selected squad
 						var tmpSelectedWfmParameterList = ko.unwrap(tmpSelectedAttrGroup.wfmParameterList);
@@ -512,7 +527,6 @@ define(['jquery',
 
 		/**
 		 * Select file and import perfomance data
-		 * @todo fix: get cell's fragments #HM! (using GetFragmentCell2D -> move to file spec controller)
 		 */
 		vw.importPerfomanceData = function () {
 			// Open file manager

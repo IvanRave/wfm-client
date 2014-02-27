@@ -228,7 +228,6 @@ define(['jquery',
 
 		//{ #region MONITORING
     
-    // This list is not required, because all operations go through the viewmodel
     /**
     * List of monitored params
     * @type {Array.<module:models/wfm-parameter-of-well-group>}

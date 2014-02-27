@@ -209,9 +209,7 @@ define([
     this.reloadMonitoringRecords = function(){
       var tmpUnixTime = ko.unwrap(ths.monitoringUnixTime);
       if (tmpUnixTime){
-        var tmpListOfParams = ko.unwrap(ths.listOfMonitoredVwmParams).map(function(elem){
-          return elem.mdlWfmParameterOfWroup;
-        });
+        var tmpListOfParams = ko.unwrap(ths.mdlStage.listOfMonitoredParams);
         
         if (tmpListOfParams.length > 0) {
           ths.mdlStage.loadListOfScopeOfMonitoring(tmpUnixTime, tmpListOfParams);

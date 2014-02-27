@@ -642,7 +642,7 @@ define([
 				// can be loaded from cookies or setting by default, for example:
 				// for the last month period
 				// neccessary for widget
-			}, ths.mdlStage, parentVwmWroup.listOfMonitoredVwmParams);
+			}, ths.mdlStage, parentVwmWroup.mdlStage.listOfMonitoredParams);
 
 		/**
 		 * A monitoring record, according to the selected unix time in the wroup
@@ -675,22 +675,11 @@ define([
 			var currentUnixTimeInWroup = ko.unwrap(parentVwmWroup.monitoringUnixTime);
 			if (currentUnixTimeInWroup) {
 
-				var tmpMntrParams = ko.unwrap(ths.getParentVwm().listOfMonitoredVwmParams).map(function (elem) {
-						return elem.mdlWfmParameterOfWroup;
-					});
+				var tmpMntrParams = ko.unwrap(ths.getParentVwm().mdlStage.listOfMonitoredParams);
 
 				// Create record with empty dictionary
 				// Last parameter - function to reload table (to get average params for the new record)
 				ths.mdlStage.postMonitoringRecord(currentUnixTimeInWroup, tmpMntrParams, {}, parentVwmWroup.reloadMonitoringRecords);
-			}
-		};
-
-		/**
-		 * Remove all records: ovveride the model method with a confirmation and checking
-		 */
-		this.removeAllMonitoringRecords = function () {
-			if (confirm('{{capitalizeFirst lang.confirmToDelete}} all records for this well for all time?')) {
-				ths.mdlStage.removeAllMonitoringRecords();
 			}
 		};
 
@@ -703,9 +692,7 @@ define([
 			var secondsInDay = 24 * 60 * 60;
 			var startUnixTime = curUnixTime - secondsInDay * 35; // minus 50 days
 
-			var tmpMntrParams = ko.unwrap(ths.getParentVwm().listOfMonitoredVwmParams).map(function (elem) {
-					return elem.mdlWfmParameterOfWroup;
-				});
+			var tmpMntrParams = ko.unwrap(ths.getParentVwm().mdlStage.listOfMonitoredParams);
 
 			for (var unt = startUnixTime; unt <= curUnixTime; unt += secondsInDay) {
 				// Last function for current time: reload table to get average values for the created record

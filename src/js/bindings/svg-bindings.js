@@ -26,6 +26,8 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 			if (!prmArr) {
 				return;
 			}
+      
+      console.log('graph is redrawing', prmArr);
 
       // Group for putting paths
 			var pathsWrap = d3.select(element);
@@ -38,8 +40,10 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 				pathsWrap.append('path')
 				.attr('class', 'svg-graph-path')
 				.attr('stroke', prmItem.prmStroke)
-				.attr('visible', prmItem.prmVisible)
-				.attr('d', prmItem.prmPath);
+				.attr('d', prmItem.prmPath)
+        .attr('visible', prmItem.prmVisible)
+        // The attribute 'visible' doesn't work always (with monitoring curves)
+        .style('visibility', prmItem.prmVisible ? 'visible' : 'hidden');
 			});
 		}
 	};
