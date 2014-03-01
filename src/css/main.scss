@@ -26,6 +26,9 @@ $icon-font-path: "../fonts/";
 //== JCrop without image
 @import "jcrop/jcrop";
 
+//== WFM icons, created from fonts
+@import "wfm-icons";
+
 //-- Z-index WFM list
 
 $zindex-loader-main: 9999;          // Loader for main ajax requests
@@ -76,6 +79,7 @@ $loader-line-medium-height: 22px;
 $input-width-xs: 16px;
 $input-width-sm: 32px;
 $input-width-md: 48px;
+
 
 //-- Main css
 
@@ -466,51 +470,49 @@ input.input-width-md {
     background-color: #333;
 }
 
-/* Well, field, group, region tab links to sections */
+/* Block for well, field, group, region tab links to sections */
 .wfm-section-panel {
     background-color: #222;
 }
 
-    .wfm-section-panel .nav-pills > li > div {
-        border-radius: 0;
-        padding: 0;
-        color: #a1a1a1;
-        width: 68px;
-        /*height:48px;*/
-        text-align: center;
-        cursor: pointer;
-    }
+/* Block with icon and caption */
+.wfm-section-item {
+    border-radius: 0;
+    padding: 0;
+    color: #a1a1a1;
+    width: 68px;
+    /*height:48px;*/
+    text-align: center;
+    cursor: pointer;
+}
 
-        .wfm-section-panel .nav-pills > li > div:focus {
-            background-color: #000;
-            color: #c0c0c0;
-        }
+/** A modificator for active blocks */
+.wfm-section-item_state_active {
+    background-color: #000;
+    color: #c0c0c0;
+}
 
-        .wfm-section-panel .nav-pills > li > div:hover {
-            background-color: #111;
-            color: #c8c8c8;
-        }
+  .wfm-section-item:focus {
+      background-color: #000;
+      color: #c0c0c0;
+  }
 
-        .wfm-section-panel .nav-pills > li > div .caret {
-            position: absolute;
-            bottom: 4px;
-            right: 4px;
-            border-top-color: #ccc;
-            border-bottom-color: #ccc;
-        }
+  .wfm-section-item:hover {
+      background-color: #111;
+      color: #c8c8c8;
+  }
 
-        .wfm-section-panel .nav-pills > li > div > span {
-            font-size: 70%;
-        }
-
-        .wfm-section-panel .nav-pills > li > div > i {
-            font-size: 150%;
-        }
-
-    .wfm-section-panel .nav-pills > li.active > div {
-        background-color: #000;
-        color: #c0c0c0;
-    }
+  .wfm-section-item__caret {
+      position: absolute;
+      bottom: 4px;
+      right: 4px;
+      border-top-color: #ccc;
+      border-bottom-color: #ccc;
+  }
+      
+  .wfm-section-item__caption {
+    font-size: 70%;
+  }
 
 .sidebar-toggle {
     width: 20px;
@@ -610,69 +612,6 @@ input.input-width-md {
 
 .tab-content-pad {
     padding: 8px 15px 0 0;
-}
-
-@font-face {
-    font-family: 'WfmIconFont';
-    src: url('../fonts/wfmicons-regular.eot');
-    src: url('../fonts/wfmicons-regular.eot?#iefix') format('embedded-opentype'),url('../fonts/wfmicons-regular.woff') format('woff'), url('../fonts/wfmicons-regular.ttf') format('truetype'), url('../fonts/wfmicons-regular.svg#glyphicons_halflingsregular') format('svg');
-}
-
-.wfm-icon-home-list > i {
-    color: #aaa;
-    font-size: 24px;
-}
-
-    .wfm-icon-home-list > i:hover {
-        color: #444;
-    }
-
-.wfmicon:before {
-    font-family: 'WfmIconFont';
-    font-style: normal;
-    font-weight: 400;
-    line-height: 1;
-    -webkit-font-smoothing: antialiased;
-}
-
-.wfmicon-summary:before {
-    content: "\e001";
-}
-
-.wfmicon-sketch:before {
-    content: "\e002";
-}
-
-.wfmicon-history:before {
-    content: "\e003";
-}
-
-.wfmicon-map:before {
-    content: "\e004";
-}
-
-.wfmicon-log:before {
-    content: "\e005";
-}
-
-.wfmicon-pd:before {
-    content: "\e006";
-}
-
-.wfmicon-test:before {
-    content: "\e007";
-}
-
-.wfmicon-integrity:before {
-    content: "\e008";
-}
-
-.wfmicon-nodalanalysis:before {
-    content: "\e009";
-}
-
-.wfmicon-report:before {
-    content: "\e010";
 }
 
 /*frequent margins for blocks*/

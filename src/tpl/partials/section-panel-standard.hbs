@@ -1,15 +1,15 @@
-﻿<div class="wfm-section-panel wfm-section-panel clearfix">
+﻿<!-- current: vwmStage (wroup ... company, exclude the well stage) -->
+<div class="wfm-section-panel clearfix">
   <div class="pull-left">
     <ul class="nav nav-pills" data-bind="foreach: listOfVwmSection">
       <!-- ko if: mdlSection.isVisibleAsView -->
-      <li data-bind="css: {'active': isSlcVwmSectionWrk }">
-        <div data-bind="click: $parent.selectVwmSectionWrk">
+      <li>
+        <div class="wfm-section-item" data-bind="click: $parent.selectVwmSectionWrk, css: {'wfm-section-item_state_active' : isSlcVwmSectionWrk }">
           <span data-bind="with: mdlSection.sectionPattern">
-            <span data-bind="text: name"></span>
+            <span class="wfm-section-item__caption" data-bind="text: name"></span>
+            <br />
+            <i class="wfm-icon" data-bind="css: iconClass"></i>
           </span>
-          <br />
-          <!-- TODO: style: set specific icons #MM! -->
-          <i class="wfmicon" data-bind="css: 'wfmicon-summary'"></i>
         </div>
       </li>
       <!-- /ko -->

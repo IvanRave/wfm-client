@@ -23,6 +23,12 @@ define([], function () {
         this.name = data.Name;
 
         /**
+        * A css class for the section pattern
+        * @type {string}
+        */
+        this.iconClass = this.id + '-icon';
+        
+        /**
         * Id of stage: 'well', 'wroup' etc
         * @type {string}
         */

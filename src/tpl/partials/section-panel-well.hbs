@@ -1,28 +1,32 @@
 ﻿<!-- current: vwmStage (well) -->
-<div class="wfm-section-panel wfm-section-panel clearfix">
+<div class="wfm-section-panel clearfix">
   <div class="pull-left">
     <ul class="nav nav-pills" data-bind="foreach: listOfVwmSection">
       <!-- ko if: mdlSection.isVisibleAsView -->
       <!-- ko if: (mdlSection.sectionPatternId !== 'well-perfomance') -->
-      <li data-bind="css: {'active': isSlcVwmSectionWrk }">
-        <div data-bind="click: $parent.selectVwmSectionWrk">
+      <li>
+        <div class="wfm-section-item" data-bind="click: $parent.selectVwmSectionWrk, css: {'wfm-section-item_state_active' : isSlcVwmSectionWrk }">
           <span data-bind="with: mdlSection.sectionPattern">
-            <span data-bind="text: name"></span>
+            <span class="wfm-section-item__caption" data-bind="text: name"></span>
+            <br />
+            <i class="wfm-icon" data-bind="css: iconClass"></i>
           </span>
-          <br />
-          <i class="wfmicon" data-bind="css: 'wfmicon-summary'"></i>
         </div>
       </li>
       <!-- /ko -->
       <!-- ko if: (mdlSection.sectionPatternId === 'well-perfomance') -->
-      <li class="dropup" data-bind="css: {'active': isSlcVwmSectionWrk }">
+      <li class="dropup">
         <div class="dropdown-toggle" data-toggle="dropdown" data-bind="drpdwn: {}">
-          <span data-bind="with: mdlSection.sectionPattern">
-            <span data-bind="text: name"></span>
-          </span>
-          <br />
-          <i class="wfmicon" data-bind="css: 'wfmicon-pd'"></i>
-          <span class="caret"></span>
+          <div class="wfm-section-item" data-bind="css: {'wfm-section-item_state_active' : isSlcVwmSectionWrk }">
+            <span data-bind="with: mdlSection.sectionPattern">
+              <span class="wfm-section-item__caption" data-bind="text: name"></span>
+              <br />
+              <i class="wfm-icon" data-bind="css: iconClass"></i>
+            </span>
+            <span class="wfm-section-item__caret">
+              <span class="caret"></span>
+            </span>
+          </div>
         </div>
         <ul class="dropdown-menu" data-bind="foreach: $root.mdlWorkspace.wfmParamSquadList">
           <li>

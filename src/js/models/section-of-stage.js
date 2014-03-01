@@ -9,7 +9,7 @@ define(['knockout',
         * @param {object} data - Server data with file specs
         */
         function importFileSpecs(data) {
-            return data.map(function (item) { return new FileSpec(item); });
+            return (data || []).map(function (item) { return new FileSpec(item); });
         }
 
         /**
