@@ -55,6 +55,13 @@ module.exports = function (grunt) {
             ////from: 'v0.8.8'
           }
         },
+        gitlog: {
+          options: {
+            dest: 'doc/month.log',
+            afterDate: new Date(2014, 1, 1),
+            beforeDate: new Date(2014, 2, 1)
+          }
+        },
         jshint: {
             gruntfile: {
                 options: {
@@ -411,4 +418,5 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-jsdoc');
     grunt.loadNpmTasks('grunt-notify');
     grunt.loadNpmTasks('grunt-contrib-sass');
+    grunt.loadNpmTasks('grunt-git-log');
 };
