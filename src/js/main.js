@@ -1,7 +1,7 @@
 ﻿require(['require-config'], function () {
 	'use strict';
 
-	require(['console-shim', 'es5-shim'], function () {
+	require(['console-shim', 'es5-shim', 'es5-sham'], function () {
 		require(['jquery', 'knockout', 'viewmodels/workspace', 'models/workspace', 'bindings/all-bindings', 'bindings/svg-bindings', 'jquery.panzoom'], function ($, ko, VwmWorkspace, MdlWorkspace) {
 
       // Can be added HasItems checker for all observable and computed arrays

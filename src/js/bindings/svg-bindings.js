@@ -135,7 +135,7 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 	}
 
 	/** Svg map */
-	ko.bindingHandlers.svgMap = {
+	ko.bindingHandlers.mapBinding = {
 		init : function (element, valueAccessor) {
 			var accessor = valueAccessor();
 

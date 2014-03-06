@@ -104,7 +104,7 @@ module.exports = function (grunt) {
                     dest: '<%= trgt %>/js/',
                     src: ['jquery/jquery.js', 'moment/moment.js',
                         'requirejs/require.js', 'knockout/knockout.js', 
-                        'console-shim/console-shim.js', 'es5-shim/es5-shim.js',
+                        'console-shim/console-shim.js', 'es5-shim/es5-shim.js', 'es5-shim/es5-sham.js',
                         'pickadate/lib/picker.js', 'pickadate/lib/picker.date.js', 'pickadate/lib/picker.time.js',
                         'jQuery-slimScroll/jquery.slimscroll.js', 'blueimp-file-upload/js/vendor/jquery.ui.widget.js',
                         'blueimp-file-upload/js/jquery.fileupload.js', 'blueimp-file-upload/js/jquery.iframe-transport.js',
@@ -242,7 +242,7 @@ module.exports = function (grunt) {
                     ////useSourceUrl: true,
                     //  wrap: true, // wrap in closure
                     // jQuery automatically excluded if it's loaded from CDN
-                    include: ['es5-shim', 'console-shim', 'jquery', 
+                    include: ['es5-shim', 'es5-sham', 'console-shim', 'jquery', 
                     'bootstrap/transition', 'bootstrap/modal', 'bootstrap/dropdown',
                     'jquery.panzoom', 
                     'bindings/all-bindings', 'bindings/svg-bindings',

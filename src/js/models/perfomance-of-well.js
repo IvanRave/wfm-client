@@ -363,6 +363,7 @@ define(['jquery',
 				well_id : wellObj.Id
 			}).done(function (result) {
 				prtl.hstProductionDataSet(importProductionDataSetDto(result, wellObj));
+        console.log('prodData', prtl.hstProductionDataSet());
 				prtl.isLoadedHstProductionData(true);
 			});
 		};

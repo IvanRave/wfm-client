@@ -151,13 +151,15 @@ define(['jquery',
 		// forecast data have no calculated properties, but you can construct forecast by last calculated row (other than last normal row)
 		self.isForecast = data.IsForecast;
 
+    console.log('dict', data.Dict);
+    
 		for (var dictItem in data.Dict) {
 			// if param is not calculated
 			if ($.inArray(calcParamIdList, dictItem) === -1) {
 				if ($.isNumeric(data.Dict[dictItem])) {
 					self[dictItem] = ko.observable(+data.Dict[dictItem]);
 				} else {
-					alert('Production data parameter is not float [' + dictItem + ': ' + data.Dict[dictItem] + ']');
+          console.log('Production data parameter is not float [' + dictItem + ': ' + data.Dict[dictItem] + ']');
 				}
 			}
 		}
@@ -176,12 +178,12 @@ define(['jquery',
 							return;
 						}
 
-						if (needGroupParam.isCalc() === false) {
+						if (ko.unwrap(needGroupParam.isCalc) === false) {
 							if (typeof data.Dict[prmId] !== 'undefined') {
 								if ($.isNumeric(data.Dict[prmId])) {
 									return +data.Dict[prmId];
 								} else {
-									alert('Production data parameter is not float [' + prmId + ': ' + data.Dict[prmId] + ']');
+									console.log('Production data parameter is not float [' + prmId + ': ' + data.Dict[prmId] + ']');
 								}
 							}
 							return;

@@ -51,30 +51,6 @@ define([
 		};
 
 		/**
-		 * Create well
-		 */
-		this.postVwmWell = function () {
-			var inputName = document.createElement('input');
-			inputName.type = 'text';
-			$(inputName).prop({
-				'required' : true
-			}).addClass('form-control');
-
-			var innerDiv = document.createElement('div');
-			$(innerDiv).addClass('form-horizontal').append(modalHelper.gnrtDom('Name', inputName));
-
-			function submitFunction() {
-				var tmpName = $(inputName).val();
-				if (tmpName) {
-					ths.mdlStage.postWell(tmpName, function () {});
-					modalHelper.closeModalWindow();
-				}
-			}
-
-			modalHelper.openModalWindow('Well', innerDiv, submitFunction);
-		};
-
-		/**
 		 * List of viewmodels of wfm parameters of well group
 		 * @type {Array.<module:viewmodels/wfm-parameter-of-wroup>}
 		 */
@@ -131,21 +107,21 @@ define([
 
 		//{ #region MONITORING
 
-    /**
-    * List of monitoring params (params of wroup)
-    * @type {Array.<module:viewmodels/wfm-parameter-of-wroup>}
-    */
-    this.listOfMonitoredVwmParams = ko.computed({
-      read: function(){
-        var tmpList = ko.unwrap(ths.listOfVwmWfmParameterOfWroup);
-        
-        return tmpList.filter(function(elem){
-          return ko.unwrap(elem.mdlWfmParameterOfWroup.isMonitored);
-        });
-      },
-      deferEvaluation: true
-    }).trackHasItems();
-    
+		/**
+		 * List of monitoring params (params of wroup)
+		 * @type {Array.<module:viewmodels/wfm-parameter-of-wroup>}
+		 */
+		this.listOfMonitoredVwmParams = ko.computed({
+				read : function () {
+					var tmpList = ko.unwrap(ths.listOfVwmWfmParameterOfWroup);
+
+					return tmpList.filter(function (elem) {
+						return ko.unwrap(elem.mdlWfmParameterOfWroup.isMonitored);
+					});
+				},
+				deferEvaluation : true
+			}).trackHasItems();
+
 		/**
 		 * A selected date for the monitoring section
 		 *    By default: current date in unix time (set when the section is loaded)
@@ -159,8 +135,8 @@ define([
 		this.goToMonitoringOfWell = function (tmpVwmWell) {
 			// Select monitoring section
 			tmpVwmWell.unzOfSlcVwmSectionWrk('well-monitoring');
-      // Load content (this event is triggered when an user click to the section)
-      tmpVwmWell.loadSectionContent('well-monitoring');
+			// Load content (this event is triggered when an user click to the section)
+			tmpVwmWell.loadSectionContent('well-monitoring');
 
 			// Activate well view
 			ths.activateVwmChild(tmpVwmWell);
@@ -172,10 +148,10 @@ define([
 		this.goToMonitoringOfWroup = function () {
 			// Select monitoring section
 			ths.unzOfSlcVwmSectionWrk('wroup-monitoring');
-      
-      // Load content (this event is triggered when an user click to the section)
-      ths.loadSectionContent('wroup-monitoring');
-      
+
+			// Load content (this event is triggered when an user click to the section)
+			ths.loadSectionContent('wroup-monitoring');
+
 			// Activate this wroup
 			parentVwmWield.activateVwmChild(ths);
 		};
@@ -200,81 +176,112 @@ define([
 			this.isMonthlyProcentView(false);
 		};
 
-    /**
-    * Get monitoring records 
-    *    after changing unix time 
-    *    or count of wfm properties
-    *    or by generating new records from well
-    */
-    this.reloadMonitoringRecords = function(){
-      var tmpUnixTime = ko.unwrap(ths.monitoringUnixTime);
-      if (tmpUnixTime){
-        var tmpListOfParams = ko.unwrap(ths.mdlStage.listOfMonitoredParams);
-        
-        if (tmpListOfParams.length > 0) {
-          ths.mdlStage.loadListOfScopeOfMonitoring(tmpUnixTime, tmpListOfParams);
-        }
-      }
-    };
-    
-    /**
+		/**
+		 * Get monitoring records
+		 *    after changing unix time
+		 *    or count of wfm properties
+		 *    or by generating new records from well
+		 */
+		this.reloadMonitoringRecords = function () {
+			var tmpUnixTime = ko.unwrap(ths.monitoringUnixTime);
+			if (tmpUnixTime) {
+				var tmpListOfParams = ko.unwrap(ths.mdlStage.listOfMonitoredParams);
+
+				if (tmpListOfParams.length > 0) {
+					ths.mdlStage.loadListOfScopeOfMonitoring(tmpUnixTime, tmpListOfParams);
+				}
+			}
+		};
+
+		/**
 		 * Load monitoring data when the user select some date
 		 */
 		this.monitoringUnixTime.subscribe(ths.reloadMonitoringRecords);
-    
-    /**
-     * Reload monitoring records when the user change monitoring parameters
-     */
-    this.listOfMonitoredVwmParams.subscribe(ths.reloadMonitoringRecords);
-    
+
+		/**
+		 * Reload monitoring records when the user change monitoring parameters
+		 */
+		this.listOfMonitoredVwmParams.subscribe(ths.reloadMonitoringRecords);
+
 		//} #endregion MONITORING
-    
-    /** Set this section as selected */
-		this.loadSectionContent = function (idOfSectionPattern) {
-			switch (idOfSectionPattern) {
-			case 'wroup-unit':
-				// Params (table headers)
-				ths.mdlStage.loadListOfWfmParameterOfWroup();
-				break;
-			case 'wroup-potential':
-				// Params (table headers)
-				ths.mdlStage.loadListOfWfmParameterOfWroup();
+	};
 
-				// Test data (table body)
-				ko.unwrap(ths.mdlStage.wells).forEach(function (elem) {
-					elem.loadListOfTestScope();
-				});
+	/**
+	 * Create well
+	 */
+	exports.prototype.postVwmWell = function () {
+		var ths = this;
 
-				break;
-			case 'wroup-monitoring':
-				// Params (table headers)
-				ths.mdlStage.loadListOfWfmParameterOfWroup();
-        // - load list
-        // - automatically creates list of monitoring parameters
-        // - automatically loaded monitoring data (only for this well group)
+		var inputName = document.createElement('input');
+		inputName.type = 'text';
+		$(inputName).prop({
+			'required' : true
+		}).addClass('form-control');
 
-				// Load procent borders
-				ths.mdlStage.loadProcentBordersForAllWells();
-        
-        var prevUnixTime = ko.unwrap(ths.monitoringUnixTime);
-        
-        if (!prevUnixTime){
-          var curDate = new Date();
-          var curUnixTime = Date.UTC(curDate.getFullYear(), curDate.getMonth(), curDate.getDate()) / 1000;
-          
-          prevUnixTime = curUnixTime;
-        }
-        
-        // Reload data (set to null - then set to previous date (or current date if no previous date))
-        ths.monitoringUnixTime(null);
-        
-        // Set the current date and 
-        //     automatically loaded monitoring values for this date
-        ths.monitoringUnixTime(prevUnixTime);
-        
-				break;
+		var innerDiv = document.createElement('div');
+		$(innerDiv).addClass('form-horizontal').append(modalHelper.gnrtDom('Name', inputName));
+
+		function submitFunction() {
+			var tmpName = $(inputName).val();
+			if (tmpName) {
+				ths.mdlStage.postWell(tmpName, function () {});
+				modalHelper.closeModalWindow();
 			}
-		};
+		}
+
+		modalHelper.openModalWindow('Well', innerDiv, submitFunction);
+	};
+
+	/**
+  * Set this section as selected
+  * @param {string} idOfSectionPattern - Id of a section pattern, like 'well-map'
+  */
+	exports.prototype.loadSectionContent = function (idOfSectionPattern) {
+		var ths = this;
+    
+		switch (idOfSectionPattern) {
+		case 'wroup-unit':
+			// Params (table headers)
+			ths.mdlStage.loadListOfWfmParameterOfWroup();
+			break;
+		case 'wroup-potential':
+			// Params (table headers)
+			ths.mdlStage.loadListOfWfmParameterOfWroup();
+
+			// Test data (table body)
+			ko.unwrap(ths.mdlStage.wells).forEach(function (elem) {
+				elem.loadListOfTestScope();
+			});
+
+			break;
+		case 'wroup-monitoring':
+			// Params (table headers)
+			ths.mdlStage.loadListOfWfmParameterOfWroup();
+			// - load list
+			// - automatically creates list of monitoring parameters
+			// - automatically loaded monitoring data (only for this well group)
+
+			// Load procent borders
+			ths.mdlStage.loadProcentBordersForAllWells();
+
+			var prevUnixTime = ko.unwrap(ths.monitoringUnixTime);
+
+			if (!prevUnixTime) {
+				var curDate = new Date();
+				var curUnixTime = Date.UTC(curDate.getFullYear(), curDate.getMonth(), curDate.getDate()) / 1000;
+
+				prevUnixTime = curUnixTime;
+			}
+
+			// Reload data (set to null - then set to previous date (or current date if no previous date))
+			ths.monitoringUnixTime(null);
+
+			// Set the current date and
+			//     automatically loaded monitoring values for this date
+			ths.monitoringUnixTime(prevUnixTime);
+
+			break;
+		}
 	};
 
 	return exports;

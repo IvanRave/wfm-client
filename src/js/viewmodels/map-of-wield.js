@@ -1,24 +1,27 @@
 ﻿/**
  * @module
- * @todo feat: add unit of measurement for a distance #MM!
+ * @todo feat: add unit of measurement for a distance #34!
  *             <ul>
  *             <li>foot and meter
  *             <li>toggle between these units
  *             </ul>
- * @todo feat: add well marker color #MH!
+ * @todo feat: add well marker color #34!
  *             <ul>
  *             <li>include marker color to company settings
  *             <li>like Oil/Gas/Water (Yellow/Gray/Blue)
  *             <li>and Active/InActive (well state) (green/red)
  *             <li>For example: Active Water Well - Blue marker with green stroke
  *             </ul>
+ * @todo fix: #42! After updating a webpage, map does not shows (with KnockoutJs v3.1.0)
  */
 define(['knockout',
 		'viewmodels/map-tool',
-		'viewmodels/well-marker-of-map-of-wield'],
+		'viewmodels/well-marker-of-map-of-wield',
+    'viewmodels/svg-map'],
 	function (ko,
 		VwmMapTool,
-		VwmWellMarker) {
+		VwmWellMarker,
+    SvgMap) {
 	'use strict';
 
 	var usualMapTools = [{
@@ -119,6 +122,12 @@ define(['knockout',
 				deferEvaluation : true
 			});
 
+    /**
+    * A map engine object
+    * @type {module:viewmodels/svg-map}
+    */
+    this.svgMap = new SvgMap();
+      
 		/**
 		 * Size of full svg block (viewbox), in vg
 		 */

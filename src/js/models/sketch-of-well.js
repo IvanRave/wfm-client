@@ -1,4 +1,6 @@
-﻿/** @module */
+﻿/**
+* @module
+*/
 define(['knockout', 'models/file-spec', 'services/sketch-of-well'], function (ko, FileSpec, sketchOfWellService) {
     'use strict';
 

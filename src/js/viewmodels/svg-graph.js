@@ -1,5 +1,7 @@
 /** @module */
-define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
+define(['jquery', 'knockout', 'd3',
+  'viewmodels/svg-block'], function ($, ko, d3,
+  SvgBlock) {
 	'use strict';
 
 	/**
@@ -13,6 +15,7 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 	 * Svg graph
 	 *    used in the monitoring and perfomance sections (and may be in another)
 	 * @constructor
+   * @augments {module:viewmodels/svg-block}
    * @param {Array} koTimeBorder - Observable array with start and end unix times, 
    *        like [124124,5425235] - elements of this array can be null
    * @param {Array} koValueBorder - Observable array with min and max values for all curves, like [-12.432, 543]
@@ -263,6 +266,11 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
     */
     this.paths = koPaths;
 	};
+  
+  // Alternative: new SvgBlock()
+  // But in the below case the constructor SvgBlock isn't called, 
+  // so Exports remains uninitialised until instantiated
+  exports.prototype = Object.create(SvgBlock.prototype); 
 
 	return exports;
 });
