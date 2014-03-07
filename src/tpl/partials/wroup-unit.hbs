@@ -38,7 +38,7 @@
             </span>
           </span>
           <span data-bind="if: $root.isEmployeeInEditMode">
-            <button class="btn btn-default btn-xs" type="button" data-bind="click: $parent.removeVwmWfmParameterOfWroup">
+            <button class="btn btn-default btn-xs" type="button" data-bind="click: $parent.removeVwmWfmParameterOfWroup.bind($parent)">
               <i class="glyphicon glyphicon-remove" ></i>
             </button>
           </span>

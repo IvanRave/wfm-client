@@ -63,13 +63,6 @@ define([
 				deferEvaluation : true
 			});
 
-		this.removeVwmWfmParameterOfWroup = function (vwmToRemove) {
-			var tmpName = ko.unwrap(ko.unwrap(vwmToRemove.mdlWfmParameterOfWroup.wfmParameter).name);
-			if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + tmpName + '"?')) {
-				ths.mdlStage.removeWfmParameterOfWroup(vwmToRemove.mdlWfmParameterOfWroup);
-			}
-		};
-
 		// WFM parameter which user select from unselected wfm parameter list (from root)
 		this.selectedWfmParameterId = ko.observable();
 
@@ -233,12 +226,12 @@ define([
 	};
 
 	/**
-  * Set this section as selected
-  * @param {string} idOfSectionPattern - Id of a section pattern, like 'well-map'
-  */
+	 * Set this section as selected
+	 * @param {string} idOfSectionPattern - Id of a section pattern, like 'well-map'
+	 */
 	exports.prototype.loadSectionContent = function (idOfSectionPattern) {
 		var ths = this;
-    
+
 		switch (idOfSectionPattern) {
 		case 'wroup-unit':
 			// Params (table headers)
@@ -281,6 +274,23 @@ define([
 			ths.monitoringUnixTime(prevUnixTime);
 
 			break;
+		}
+	};
+
+	/**
+	 * Remove a parameter
+	 * @param {module:viewmodels/wfm-parameter-of-wroup}
+	 */
+	exports.prototype.removeVwmWfmParameterOfWroup = function (vwmToRemove) {
+    // This (with bind($parent)) - vwmStage - vwmWroup
+    // First param is current parameter (in foreach)
+		var ths = this;
+    
+    console.log('Remove parameter {0} from {1}', vwmToRemove, this);
+    
+		var tmpName = ko.unwrap(ko.unwrap(vwmToRemove.mdlWfmParameterOfWroup.wfmParameter).name);
+		if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + tmpName + '"?')) {
+			ths.mdlStage.removeWfmParameterOfWroup(vwmToRemove.mdlWfmParameterOfWroup);
 		}
 	};
 

@@ -115,16 +115,6 @@ define(['jquery',
 		this.wells = ko.observableArray();
 
 		/**
-		 * Get well by id
-		 * @param {number} idOfWell - Id of well
-		 */
-		this.getWellById = function (idOfWell) {
-			return ko.unwrap(ths.wells).filter(function (elem) {
-				return elem.id === idOfWell;
-			})[0];
-		};
-
-		/**
 		 * List of wfm parameters for this group
 		 * @type {Array.<module:models/wfm-parameter-of-wroup>}
 		 */
@@ -135,64 +125,6 @@ define(['jquery',
 		 * @type {boolean}
 		 */
 		this.isLoadedListOfWfmParameterOfWroup = ko.observable(false);
-
-		this.loadListOfWfmParameterOfWroup = function () {
-			if (ko.unwrap(ths.isLoadedListOfWfmParameterOfWroup)) {
-				return;
-			}
-
-			wfmParameterOfWroupService.get(ths.id).done(function (response) {
-				ths.listOfWfmParameterOfWroup(importWellGroupWfmParameterDtoList(response));
-				ths.isLoadedListOfWfmParameterOfWroup(true);
-			});
-		};
-
-		/**
-		 * Remove param from well group
-		 * @param {module:models/wfm-parameter-of-wroup} - Model of the parameter to remove
-		 */
-		this.removeWfmParameterOfWroup = function (mdlToRemove) {
-			wfmParameterOfWroupService.remove(mdlToRemove.wellGroupId, mdlToRemove.wfmParameterId).done(function () {
-				ths.listOfWfmParameterOfWroup.remove(mdlToRemove);
-			});
-		};
-
-		/**
-		 * Add selected param to the server with default color and order number
-		 */
-		this.postWfmParameterOfWroup = function (tmpWfmParamId) {
-			wfmParameterOfWroupService.post(ths.id, {
-				Color : '',
-				SerialNumber : 1,
-				WellGroupId : ths.id,
-				WfmParameterId : tmpWfmParamId,
-				IsMonitored : false
-			}).done(function (response) {
-				ths.listOfWfmParameterOfWroup.push(new WellGroupWfmParameter(response, ths));
-			});
-		};
-
-		this.postWell = function (tmpName, scsCallback) {
-			datacontext.postWell({
-				Name : tmpName,
-				Description : '',
-				WellGroupId : ths.id,
-				IsActive : true
-			}).done(function (result) {
-				ths.wells.push(new Well(result, ths));
-				scsCallback();
-			});
-		};
-
-		this.removeChild = function (wellForDelete) {
-			datacontext.deleteWell(wellForDelete).done(function () {
-				ths.wells.remove(wellForDelete);
-			});
-		};
-
-		this.save = function () {
-			wroupService.put(ths.Id, ths.toDto());
-		};
 
 		/**
 		 * Sum of totals of test scopes
@@ -227,43 +159,20 @@ define(['jquery',
 			});
 
 		//{ #region MONITORING
-    
-    /**
-    * List of monitored params
-    * @type {Array.<module:models/wfm-parameter-of-well-group>}
-    */
-    this.listOfMonitoredParams = ko.computed({
-      read: function() {
-        var tmpList = ko.unwrap(ths.listOfWfmParameterOfWroup);
-        return tmpList.filter(function(elem){
-          return ko.unwrap(elem.isMonitored);
-        });
-      },
-      deferEvaluation: true
-    });
-    
+
 		/**
-		 * Load data for all wells and for need date
+		 * List of monitored params
+		 * @type {Array.<module:models/wfm-parameter-of-well-group>}
 		 */
-		this.loadListOfScopeOfMonitoring = function (tmpUnixTime, tmpMntrParams) {
-			// TODO: if there are data for this date - no need to load #LH!
-			monitoringRecordService.getListOfScope(ths.id, tmpUnixTime).done(function (tmpListOfScope) {
-				var tmpWells = ko.unwrap(ths.wells);
-
-				// Import data to each well
-				tmpWells.forEach(function (tmpWell) {
-					// Get array of data for need well
-					var needScope = tmpListOfScope.filter(function (scopeItem) {
-							return scopeItem.IdOfWell === tmpWell.id;
-						})[0];
-
-					if (needScope) {
-            // Import data to the well
-						tmpWell.importMonitoringRecords(needScope.ListOfMonitoringRecord, tmpMntrParams);
-					}
-				});
+		this.listOfMonitoredParams = ko.computed({
+				read : function () {
+					var tmpList = ko.unwrap(ths.listOfWfmParameterOfWroup);
+					return tmpList.filter(function (elem) {
+						return ko.unwrap(elem.isMonitored);
+					});
+				},
+				deferEvaluation : true
 			});
-		};
 
 		/**
 		 * Whether procent borders are loaded
@@ -271,51 +180,163 @@ define(['jquery',
 		 */
 		this.isLoadedProcentBordersForAllWells = ko.observable(false);
 
-		/**
-		 * Load procent borders for all wells
-		 */
-		this.loadProcentBordersForAllWells = function () {
-			if (ko.unwrap(ths.isLoadedProcentBordersForAllWells)) {
-				return;
-			}
-
-			procentBorderService.getForAllWells(ths.id).done(function (tmpScope) {
-				ths.isLoadedProcentBordersForAllWells(true);
-				console.log(tmpScope);
-				var tmpWells = ko.unwrap(ths.wells);
-
-				// Import data to each well
-				tmpWells.forEach(function (tmpWell) {
-					// Get array of procent borders for need well
-					var tmpProcentBordersForWell = tmpScope.filter(function (scopeItem) {
-							return scopeItem.IdOfWell === tmpWell.id;
-						})[0].ArrayOfProcentBorder;
-
-					tmpWell.importProcentBorders(tmpProcentBordersForWell);
-				});
-			});
-		};
-
 		//} #endregion MONITORING
-
-		this.toDto = function () {
-			var dtoObj = {
-				'Id' : ths.Id,
-				'WellFieldId' : ths.WellFieldId
-			};
-
-			ths.propSpecList.forEach(function (prop) {
-				dtoObj[prop.serverId] = ko.unwrap(ths[prop.clientId]);
-			});
-
-			return dtoObj;
-		};
 
 		/** Load wells */
 		this.wells(importWells(data.WellsDto, ths));
 
 		/** Load sections */
 		this.listOfSection(importListOfSectionOfWroupDto(data.ListOfSectionOfWroupDto, ths));
+	};
+
+	/**
+	 * Load procent borders for all wells
+	 */
+	exports.prototype.loadProcentBordersForAllWells = function () {
+		var ths = this;
+		if (ko.unwrap(ths.isLoadedProcentBordersForAllWells)) {
+			return;
+		}
+
+		procentBorderService.getForAllWells(ths.id).done(function (tmpScope) {
+			ths.isLoadedProcentBordersForAllWells(true);
+			console.log(tmpScope);
+			var tmpWells = ko.unwrap(ths.wells);
+
+			// Import data to each well
+			tmpWells.forEach(function (tmpWell) {
+				// Get array of procent borders for need well
+				var tmpProcentBordersForWell = tmpScope.filter(function (scopeItem) {
+						return scopeItem.IdOfWell === tmpWell.id;
+					})[0].ArrayOfProcentBorder;
+
+				tmpWell.importProcentBorders(tmpProcentBordersForWell);
+			});
+		});
+	};
+
+	/**
+	 * Convert to DTO
+	 */
+	exports.prototype.toDto = function () {
+		var ths = this;
+
+		var dtoObj = {
+			'Id' : ths.Id,
+			'WellFieldId' : ths.WellFieldId
+		};
+
+		ths.propSpecList.forEach(function (prop) {
+			dtoObj[prop.serverId] = ko.unwrap(ths[prop.clientId]);
+		});
+
+		return dtoObj;
+	};
+
+	/**
+	 * Load data for all wells and for need date
+	 * @param {number} tmpUnixTime - Need date
+	 * @param {object} tmpMntrParams - Monitored parameters
+	 */
+	exports.prototype.loadListOfScopeOfMonitoring = function (tmpUnixTime, tmpMntrParams) {
+		var ths = this;
+		// TODO: if there are data for this date - no need to load #LH!
+		monitoringRecordService.getListOfScope(ths.id, tmpUnixTime).done(function (tmpListOfScope) {
+			var tmpWells = ko.unwrap(ths.wells);
+
+			// Import data to each well
+			tmpWells.forEach(function (tmpWell) {
+				// Get array of data for need well
+				var needScope = tmpListOfScope.filter(function (scopeItem) {
+						return scopeItem.IdOfWell === tmpWell.id;
+					})[0];
+
+				if (needScope) {
+					// Import data to the well
+					tmpWell.importMonitoringRecords(needScope.ListOfMonitoringRecord, tmpMntrParams);
+				}
+			});
+		});
+	};
+
+	/**
+	 * Save this well group
+	 */
+	exports.prototype.save = function () {
+		wroupService.put(this.id, this.toDto());
+	};
+
+	/**
+	 * Remove a child well
+	 * @param {module:models/well} wellToRemove - Well to remove
+	 */
+	exports.prototype.removeChild = function (wellToRemove) {
+		var ths = this;
+
+		datacontext.deleteWell(wellToRemove).done(function () {
+			ths.wells.remove(wellToRemove);
+		});
+	};
+
+	/**
+	 * Create a new well
+	 * @param {string} tmpName - Well name
+	 */
+	exports.prototype.postWell = function (tmpName, scsCallback) {
+		var ths = this;
+		datacontext.postWell({
+			Name : tmpName,
+			Description : '',
+			WellGroupId : ths.id,
+			IsActive : true
+		}).done(function (result) {
+			ths.wells.push(new Well(result, ths));
+			scsCallback();
+		});
+	};
+
+	/**
+	 * Load parameters
+	 */
+	exports.prototype.loadListOfWfmParameterOfWroup = function () {
+		var ths = this;
+		if (ko.unwrap(ths.isLoadedListOfWfmParameterOfWroup)) {
+			return;
+		}
+
+		wfmParameterOfWroupService.get(ths.id).done(function (response) {
+			ths.listOfWfmParameterOfWroup(importWellGroupWfmParameterDtoList(response));
+			ths.isLoadedListOfWfmParameterOfWroup(true);
+		});
+	};
+
+	/**
+	 * Remove param from a well group
+	 * @param {module:models/wfm-parameter-of-wroup} - Model of the parameter to remove
+	 */
+	exports.prototype.removeWfmParameterOfWroup = function (mdlToRemove) {
+		var ths = this;
+		wfmParameterOfWroupService.remove(mdlToRemove.wellGroupId, mdlToRemove.wfmParameterId).done(function () {
+			ths.listOfWfmParameterOfWroup.remove(mdlToRemove);
+		});
+	};
+
+	/**
+	 * Add selected param to the server with default color and order number
+	 * @param {string} tmpWfmParamId - Id of a parameter, like well-map
+	 */
+	exports.prototype.postWfmParameterOfWroup = function (tmpWfmParamId) {
+		var ths = this;
+
+		wfmParameterOfWroupService.post(ths.id, {
+			Color : '',
+			SerialNumber : 1,
+			WellGroupId : ths.id,
+			WfmParameterId : tmpWfmParamId,
+			IsMonitored : false
+		}).done(function (response) {
+			ths.listOfWfmParameterOfWroup.push(new WellGroupWfmParameter(response, ths));
+		});
 	};
 
 	return exports;

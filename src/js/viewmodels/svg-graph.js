@@ -1,7 +1,12 @@
 /** @module */
 define(['jquery', 'knockout', 'd3',
-  'viewmodels/svg-block'], function ($, ko, d3,
-  SvgBlock) {
+		'helpers/app-helper',
+		'viewmodels/svg-block'],
+	function ($,
+		ko,
+		d3,
+		appHelper,
+		SvgBlock) {
 	'use strict';
 
 	/**
@@ -15,74 +20,20 @@ define(['jquery', 'knockout', 'd3',
 	 * Svg graph
 	 *    used in the monitoring and perfomance sections (and may be in another)
 	 * @constructor
-   * @augments {module:viewmodels/svg-block}
-   * @param {Array} koTimeBorder - Observable array with start and end unix times, 
-   *        like [124124,5425235] - elements of this array can be null
-   * @param {Array} koValueBorder - Observable array with min and max values for all curves, like [-12.432, 543]
-   * @param {Array.<object>} koPaths - Observable array of path objects 
-   *        [{prmStroke: "#fff", prmPath: "M0 0 Z", prmVisible: true},{...}]
+	 * @augments {module:viewmodels/svg-block}
+	 * @param {Array} koTimeBorder - Observable array with start and end unix times,
+	 *        like [124124,5425235] - elements of this array can be null
+	 * @param {Array} koValueBorder - Observable array with min and max values for all curves, like [-12.432, 543]
+	 * @param {Array.<object>} koPaths - Observable array of path objects
+	 *        [{prmStroke: "#fff", prmPath: "M0 0 Z", prmVisible: true},{...}]
 	 */
 	var exports = function (koTimeBorder, koValueBorder, koPaths) {
+
+		// Add base props
+		SvgBlock.call(this, 1 / 3, 1200);
+
 		/** Alternative for this */
 		var ths = this;
-
-		/**
-		 * A standard ratio for the graph
-		 * @type {number}
-		 */
-		this.ratio = 1 / 3;
-
-		/**
-		 * Real size of the graph, in pixels
-		 * @type {object}
-		 */
-		this.sizePx = {
-			width : ko.observable(),
-			height : ko.computed({
-				read : function () {
-					var tmpWidth = ko.unwrap(ths.sizePx.width);
-					if ($.isNumeric(tmpWidth)) {
-						return tmpWidth * ths.ratio;
-					}
-				},
-				deferEvaluation : true
-			})
-		};
-
-		/**
-		 * Viewbox size, with all margins, equals to the viewbox attribute of the svg element
-		 * @type {object}
-		 */
-		this.vboxOutSize = {
-			width : 1200,
-			height : 400
-		};
-
-		/**
-		 * Margins for axis and some space
-		 * @type {object}
-		 */
-		this.vboxMargin = {
-			top : 10,
-			right : 30,
-			bottom : 20,
-			left : 60
-		};
-
-		/**
-		 * Inner size of the graph in svg units
-		 * @type {object}
-		 */
-		this.vboxSize = {
-			width : ths.vboxOutSize.width - ths.vboxMargin.left - ths.vboxMargin.right,
-			height : ths.vboxOutSize.height - ths.vboxMargin.top - ths.vboxMargin.bottom
-		};
-
-		/**
-		 * An attribute for a group of the graph: like top-left padding
-		 * @type {string}
-		 */
-		this.baseTransform = 'translate(' + ths.vboxMargin.left + ', ' + ths.vboxMargin.top + ')';
 
 		/**
 		 * An attribute for the X axis
@@ -90,9 +41,9 @@ define(['jquery', 'knockout', 'd3',
 		 */
 		this.axisXTransform = 'translate(0,' + ths.vboxSize.height + ')';
 
-    /**
-    * Svg scale functions for a x-axis and y-axis
-    */
+		/**
+		 * Svg scale functions for a x-axis and y-axis
+		 */
 		this.scaleObj = {
 			x : ko.computed({
 				read : function () {
@@ -259,18 +210,16 @@ define(['jquery', 'knockout', 'd3',
 			updateZoom(prevZoomTransform.scale, prevZoomTransform.translate);
 			//ths.zoomTransform(prevZoomTransform);
 		};
-    
-    /**
-    * Paths (graph lines)
-    * @type {Array.<object>}
-    */
-    this.paths = koPaths;
+
+		/**
+		 * Paths (graph lines)
+		 * @type {Array.<object>}
+		 */
+		this.paths = koPaths;
 	};
-  
-  // Alternative: new SvgBlock()
-  // But in the below case the constructor SvgBlock isn't called, 
-  // so Exports remains uninitialised until instantiated
-  exports.prototype = Object.create(SvgBlock.prototype); 
+
+	// Inherit a prototype from the SvgBlock class
+	appHelper.inherits(exports, SvgBlock);
 
 	return exports;
 });

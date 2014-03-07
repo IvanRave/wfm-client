@@ -57,19 +57,19 @@ define(['knockout',
 	];
 
 	/** Calculate svg image size using real size and svg block size */
-	function calcSvgImgSize(realImgSize, svgBlockSize) {
+	function calcSvgImgSize(realImgSize, vboxWidth, vboxHeight, vboxRatio) {
 		var svgImgSize = {};
 		// If height is bigger side, then calculate width
 		// if height = 600svg (400px) then width = Xsvg (300px)
 		// X = (300px * 600svg) / 400px
 		// else if width = 1200svg (300px) then height = Ysvg (400px)
 		// Y = (400px * 1200svg) / 300px
-		if ((realImgSize.height * svgBlockSize.ratio) > realImgSize.width) {
-			svgImgSize.height = svgBlockSize.height;
-			svgImgSize.width = (realImgSize.width * svgBlockSize.height) / realImgSize.height;
+		if ((realImgSize.height / vboxRatio) > realImgSize.width) {
+			svgImgSize.height = vboxHeight;
+			svgImgSize.width = (realImgSize.width * vboxHeight) / realImgSize.height;
 		} else {
-			svgImgSize.width = svgBlockSize.width;
-			svgImgSize.height = (realImgSize.height * svgBlockSize.width) / realImgSize.width;
+			svgImgSize.width = vboxWidth;
+			svgImgSize.height = (realImgSize.height * vboxWidth) / realImgSize.width;
 		}
 
 		return svgImgSize;
@@ -127,31 +127,6 @@ define(['knockout',
     * @type {module:viewmodels/svg-map}
     */
     this.svgMap = new SvgMap();
-      
-		/**
-		 * Size of full svg block (viewbox), in vg
-		 */
-		this.svgBlockSize = {
-			width : 1200,
-			height : 600,
-			ratio : 2
-		};
-
-		this.mapWrap = {
-			ratio : 1 / 2,
-			width : ko.observable()
-		};
-
-		// actual height of map wrap and y-axis
-		this.mapWrap.height = ko.computed({
-				read : function () {
-					var tmpWidth = ko.unwrap(ths.mapWrap.width);
-					if (tmpWidth) {
-						return tmpWidth * ths.mapWrap.ratio;
-					}
-				},
-				deferEvaluation : true
-			});
 
 		/**
 		 * Id of selected tool
@@ -238,38 +213,30 @@ define(['knockout',
 				deferEvaluation : true
 			});
 
-		/////**
-		////* Amount pixels in vg (svg viewbox units)
-		////* @type {number}
-		////*/
-		////this.coefVgToPx = ko.computed({
-		////    read: function () {
-		////        var tmpImgSizePx = ko.unwrap(ths.imgSizePx);
-		////        var tmpSvgSizeVg = ths.svgBlockSize;
-		////        var tmpImgSizeVg = calcSvgImgSize(tmpImgSizePx, tmpSvgSizeVg);
-		////        return getCoefVgToPx(tmpImgSizePx, tmpImgSizeVg);
-		////    },
-		////    deferEvaluation: true
-		////});
-
 		/** Select well marker */
 		this.selectVwmWellMarker = function (vwmWellMarkerToSelect) {
 			ths.slcVwmWellMarker(vwmWellMarkerToSelect);
 			console.log('scale');
 			// Set to the center and scale to 10 * 8 (marker radius) = 80units
-			// Center of svg block
-			var svgCenterCoords = [ths.svgBlockSize.width / 2, ths.svgBlockSize.height / 2];
+			// Center of svg block: method from SvgBlock prototype
+			var svgCenterCoords = ths.svgMap.getVboxCenter();
+      console.log('Center coords of this map: ', svgCenterCoords);
 			// Svg marker coords = Real marker coords (in pixels) -> Real marker coords (in svg units) + Image margin (in svg units)
 			var wellMarkerCoordsInPx = ko.unwrap(vwmWellMarkerToSelect.mdlWellMarker.coords);
 			// TODO: change null values
 			var tmpImgSizePx = ko.unwrap(ths.imgSizePx);
-			var tmpSvgSizeVg = ths.svgBlockSize;
-			var tmpImgSizeVg = calcSvgImgSize(tmpImgSizePx, tmpSvgSizeVg);
+      
+      // Image size in vg units
+			var tmpImgSizeVg = calcSvgImgSize(tmpImgSizePx, 
+        ths.svgMap.vboxOutSize.width, 
+        ths.svgMap.vboxOutSize.height, 
+        ths.svgMap.ratio);
+        
 			var coefVgToPx = getCoefVgToPx(tmpImgSizePx, tmpImgSizeVg);
 
 			var imgStartPos = {
-				x : (ths.svgBlockSize.width - tmpImgSizeVg.width) / 2,
-				y : (ths.svgBlockSize.height - tmpImgSizeVg.height) / 2
+				x : (ths.svgMap.vboxOutSize.width - tmpImgSizeVg.width) / 2,
+				y : (ths.svgMap.vboxOutSize.height - tmpImgSizeVg.height) / 2
 			};
 
 			var wellMarkerCoordsInVg = [wellMarkerCoordsInPx[0] * coefVgToPx.x + imgStartPos.x, wellMarkerCoordsInPx[1] * coefVgToPx.y + imgStartPos.y];

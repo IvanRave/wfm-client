@@ -44,8 +44,8 @@
           {{capitalizeFirst lang.toDelete}}
         </button>
       </div>
-      <div class="pull-right min-right-margin">
-        <button class="btn btn-sm btn-success" data-bind="click: mdlStage.save">
+      <div class="pull-right min-right-margin" data-bind="with: mdlStage">
+        <button class="btn btn-sm btn-success" data-bind="click: save">
           <i class="glyphicon glyphicon-saved"></i>
           {{capitalizeFirst lang.toSave}}
         </button>
