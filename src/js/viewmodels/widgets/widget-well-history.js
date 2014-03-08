@@ -1,27 +1,39 @@
 ﻿/** @module */
 define(['knockout',
-    'viewmodels/scope-of-history-of-well'],
-    function (ko,
-        VwmScopeOfHistoryOfWell) {
-        'use strict';
+		'viewmodels/scope-of-history-of-well',
+		'helpers/app-helper',
+		'viewmodels/widget'],
+	function (ko,
+		VwmScopeOfHistoryOfWell,
+		appHelper,
+		VwmWidget) {
+	'use strict';
 
-        /** History widget with date filter, asc or desc */
-        var exports = function (opts, vwmWell) {
-            opts = opts || {};
+	/**
+	 * History widget with date filter, asc or desc
+	 * @constructor
+	 * @augments {module:viewmodels/widget}
+	 */
+	var exports = function (mdlWidget, opts, vwmWell) {
+		VwmWidget.call(this, mdlWidget);
 
-            var ths = this;
+		opts = opts || {};
 
-            this.vwmScopeOfHistoryOfWell = new VwmScopeOfHistoryOfWell(opts, vwmWell);
+		this.vwmScopeOfHistoryOfWell = new VwmScopeOfHistoryOfWell(opts, vwmWell);
+	};
 
-            this.toStringifyOpts = function () {
-                return JSON.stringify({
-                    'StartDate': ko.unwrap(ths.vwmScopeOfHistoryOfWell['startDate']),
-                    'EndDate': ko.unwrap(ths.vwmScopeOfHistoryOfWell['endDate']),
-                    'SortByDateOrder': ko.unwrap(ths.vwmScopeOfHistoryOfWell['sortByDateOrder']),
-                    'JobTypeId': ko.unwrap(ths.vwmScopeOfHistoryOfWell['jobTypeId'])
-                });
-            };
-        };
-
-        return exports;
-    });
+  /** Inherit from a widget viewmodel */
+	appHelper.inherits(exports, VwmWidget);
+  
+  /** Convert to string */
+  exports.prototype.toStringifyOpts = function () {
+			return JSON.stringify({
+				'StartDate' : ko.unwrap(this.vwmScopeOfHistoryOfWell['startDate']),
+				'EndDate' : ko.unwrap(this.vwmScopeOfHistoryOfWell['endDate']),
+				'SortByDateOrder' : ko.unwrap(this.vwmScopeOfHistoryOfWell['sortByDateOrder']),
+				'JobTypeId' : ko.unwrap(this.vwmScopeOfHistoryOfWell['jobTypeId'])
+			});
+		};
+  
+	return exports;
+});

@@ -1,27 +1,39 @@
 ﻿/** @module */
 define(['knockout',
-  'viewmodels/monitoring-of-well'], 
-  function (ko,
-  VwmMonitoringOfWell) {
-    'use strict';
+		'viewmodels/monitoring-of-well',
+		'helpers/app-helper',
+		'viewmodels/widget'],
+	function (ko,
+		VwmMonitoringOfWell,
+		appHelper,
+		VwmWidget) {
+	'use strict';
 
-    // Subtype from Widget
-    var exports = function (opts, mdlWell, koListOfMonitoredParams) {
-        var ths = this;
-        opts = opts || {};
-        
-        this.widgetVwmMonitoringOfWell = new VwmMonitoringOfWell(opts, mdlWell, koListOfMonitoredParams);
+	/**
+	 * A monitoring widget
+	 * @constructor
+	 * @augments {module:viewmodels/widget}
+	 */
+	var exports = function (mdlWidget, opts, mdlWell, koListOfMonitoredParams) {
+		VwmWidget.call(this, mdlWidget);
 
-        /**
-        * Convert to JSON string to save options on the server
-        */
-        this.toStringifyOpts = function () {
-            return JSON.stringify({
-                'StartUnixTime': ko.unwrap(ths.widgetVwmMonitoringOfWell.mntrUnixTimeBorder.start),
-                'EndUnixTime': ko.unwrap(ths.widgetVwmMonitoringOfWell.mntrUnixTimeBorder.end)
-            });
-        };
-    };
+		opts = opts || {};
 
-    return exports;
+		this.widgetVwmMonitoringOfWell = new VwmMonitoringOfWell(opts, mdlWell, koListOfMonitoredParams);
+	};
+
+	/** Inherit from a widget viewmodel */
+	appHelper.inherits(exports, VwmWidget);
+
+	/**
+	 * Convert to JSON string to save options on the server
+	 */
+	exports.prototype.toStringifyOpts = function () {
+		return JSON.stringify({
+			'StartUnixTime' : ko.unwrap(this.widgetVwmMonitoringOfWell.mntrUnixTimeBorder.start),
+			'EndUnixTime' : ko.unwrap(this.widgetVwmMonitoringOfWell.mntrUnixTimeBorder.end)
+		});
+	};
+
+	return exports;
 });

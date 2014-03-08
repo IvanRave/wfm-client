@@ -469,7 +469,7 @@ define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-he
             });
         }
 
-        /* Redraw elements */
+        /** Redraw elements */
         function drawLogElements(logCntx, svgElements, jqrLogLasImg) {
             var logLasImgTopPos = Math.abs(jqrLogLasImg.position().top);
             require(['helpers/log-helper'], function (logHelper) {

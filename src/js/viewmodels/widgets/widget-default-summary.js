@@ -1,34 +1,55 @@
 ﻿/** @module */
-define(['knockout'], function (ko) {
-    'use strict';
+define(['knockout',
+		'helpers/app-helper',
+		'viewmodels/widget'],
+	function (ko,
+		appHelper,
+		VwmWidget) {
+	'use strict';
 
-    /*
-    * Widget for summary info: for all stages
-    * @constructor
+	/**
+	 * Widget for summary info: for all stages
+	 * @constructor
+	 * @augments {module:viewmodels/widget}
+	 */
+	var exports = function (mdlWidget, opts, propSpecList) {
+		VwmWidget.call(this, mdlWidget);
+    
+		var ths = this;
+    
+    /**
+    * Property's specifications
     */
-    var exports = function (opts, propSpecList) {
-        var ths = this;
-        opts = opts || {};
+    this.propSpecList = propSpecList;
+    
+		opts = opts || {};
 
-        propSpecList.forEach(function (propSpec) {
-            // Properties without type not needed
-            if (propSpec.tpe) {
-                ths['isVis' + propSpec.clientId] = ko.observable(opts['IsVis' + propSpec.serverId]);
-            }
-        });
+		this.propSpecList.forEach(function (propSpec) {
+			// Properties without type not needed
+			if (propSpec.tpe) {
+				ths['isVis' + propSpec.clientId] = ko.observable(opts['IsVis' + propSpec.serverId]);
+			}
+		});
+	};
 
-        this.toStringifyOpts = function () {
-            var obj = {};
+  /** Inherit from a widget viewmodel */
+	appHelper.inherits(exports, VwmWidget);
 
-            propSpecList.forEach(function (propSpec) {
-                if (propSpec.tpe) {
-                    obj['IsVis' + propSpec.serverId] = ko.unwrap(ths['isVis' + propSpec.clientId]);
-                }
-            });
+  /**
+  * Convert to the option string
+  */
+	exports.prototype.toStringifyOpts = function () {
+		var ths = this;
+		var obj = {};
 
-            return JSON.stringify(obj);
-        };
-    };
+		this.propSpecList.forEach(function (propSpec) {
+			if (propSpec.tpe) {
+				obj['IsVis' + propSpec.serverId] = ko.unwrap(ths['isVis' + propSpec.clientId]);
+			}
+		});
 
-    return exports;
+		return JSON.stringify(obj);
+	};
+
+	return exports;
 });

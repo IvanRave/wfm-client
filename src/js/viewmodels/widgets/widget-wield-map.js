@@ -1,12 +1,21 @@
 ﻿/** @module */
-define(['knockout', 'viewmodels/map-of-wield'], function (ko, VwmMapOfWield) {
+define(['knockout',
+		'viewmodels/map-of-wield',
+		'helpers/app-helper',
+		'viewmodels/widget'],
+	function (ko,
+		VwmMapOfWield,
+		appHelper,
+		VwmWidget) {
 	'use strict';
 
 	/**
 	 * Base: widget view model for map of well field
 	 * @constuctor
+	 * @augments {module:viewmodels/widget}
 	 */
-	var exports = function (opts, mdlWield) {
+	var exports = function (mdlWidget, opts, mdlWield) {
+		VwmWidget.call(this, mdlWidget);
 		opts = opts || {};
 
 		var ths = this;
@@ -23,7 +32,8 @@ define(['knockout', 'viewmodels/map-of-wield'], function (ko, VwmMapOfWield) {
 							})[0];
 
 						if (needMapModel) {
-							var needVwm = new VwmMapOfWield(needMapModel, ths.vidOfSlcVwmMapOfWield,
+							var needVwm = new VwmMapOfWield(needMapModel,
+									ths.vidOfSlcVwmMapOfWield,
 									opts['TransformScale'],
 									opts['TransformTranslate']);
 
@@ -63,19 +73,22 @@ define(['knockout', 'viewmodels/map-of-wield'], function (ko, VwmMapOfWield) {
 
 		/** Whether map is visible */
 		this.isVisImg = ko.observable(opts['IsVisImg']);
+	};
 
-		/** Convert to plain JSON to send to the server as widget settings */
-		this.toStringifyOpts = function () {
-			var tmpSlcVwm = ko.unwrap(ths.slcVwmMapOfWield);
+	/** Inherit from a widget viewmodel */
+	appHelper.inherits(exports, VwmWidget);
 
-			return JSON.stringify({
-				'IdOfSlcMapOfWield' : tmpSlcVwm ? tmpSlcVwm.vid : null,
-				'IsVisName' : ko.unwrap(ths.isVisName),
-				'IsVisImg' : ko.unwrap(ths.isVisImg),
-				'TransformScale' : tmpSlcVwm ? ko.unwrap(tmpSlcVwm.transformAttr).scale : null,
-				'TransformTranslate' : tmpSlcVwm ? ko.unwrap(tmpSlcVwm.transformAttr).translate : null
-			});
-		};
+	/** Convert to plain JSON to send to the server as widget settings */
+	exports.prototype.toStringifyOpts = function () {
+		var tmpSlcVwm = ko.unwrap(this.slcVwmMapOfWield);
+
+		return JSON.stringify({
+			'IdOfSlcMapOfWield' : tmpSlcVwm ? tmpSlcVwm.vid : null,
+			'IsVisName' : ko.unwrap(this.isVisName),
+			'IsVisImg' : ko.unwrap(this.isVisImg),
+			'TransformScale' : tmpSlcVwm ? ko.unwrap(tmpSlcVwm.transformAttr).scale : null,
+			'TransformTranslate' : tmpSlcVwm ? ko.unwrap(tmpSlcVwm.transformAttr).translate : null
+		});
 	};
 
 	return exports;

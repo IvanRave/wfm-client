@@ -1,8 +1,18 @@
 ﻿/** @module */
 define(['knockout',
-		'viewmodels/widget'],
+		'viewmodels/widgets/widget-default-summary',
+		'viewmodels/widgets/widget-well-perfomance',
+		'viewmodels/widgets/widget-well-monitoring',
+		'viewmodels/widgets/widget-well-sketch',
+		'viewmodels/widgets/widget-well-history',
+		'viewmodels/widgets/widget-wield-map'],
 	function (ko,
-		VwmWidget) {
+		VwmWidgetDefaultSummary,
+		VwmWidgetWellPerfomance,
+		VwmWidgetWellMonitoring,
+		VwmWidgetWellSketch,
+		VwmWidgetWellHistory,
+		VwmWidgetWieldMap) {
 	'use strict';
 
 	/**
@@ -72,13 +82,38 @@ define(['knockout',
 		}
 	};
 
-  /**
-  * Get all viewmodels for widgets
-  */
+	/**
+	 * Get all viewmodels for widgets
+	 */
 	exports.prototype.getListOfVwmWidget = function () {
 		var ths = this;
+
+		var tmpWidgetMdlStage = ths.mdlWidgock.getWidgout().getParent();
+		var tmpParentVwmStage = ths.getVwmWidgout().getParentVwmStage();
+
 		return ko.unwrap(ths.mdlWidgock.widgetList).map(function (elem) {
-			return new VwmWidget(elem, ths);
+			var widgetOpts = elem.widgetOpts;
+
+			switch (elem.idOfSectionPattern) {
+			case 'well-summary':
+			case 'wroup-summary':
+			case 'wield-summary':
+			case 'wegion-summary':
+			case 'company-summary':
+				var tmpPropSpecList = ko.unwrap(tmpWidgetMdlStage.propSpecList);
+				// No view properties in summary section
+				return new VwmWidgetDefaultSummary(elem, widgetOpts, tmpPropSpecList);
+			case 'well-perfomance':
+				return new VwmWidgetWellPerfomance(elem, widgetOpts, tmpParentVwmStage);
+			case 'well-monitoring':
+				return new VwmWidgetWellMonitoring(elem, widgetOpts, tmpWidgetMdlStage, tmpParentVwmStage.getParentVwm().mdlStage.listOfMonitoredParams);
+			case 'well-history':
+				return new VwmWidgetWellHistory(elem, widgetOpts, tmpParentVwmStage);
+			case 'wield-map':
+				return new VwmWidgetWieldMap(elem, widgetOpts, tmpWidgetMdlStage);
+			case 'well-sketch':
+				return new VwmWidgetWellSketch(elem, widgetOpts);
+			}
 		});
 	};
 
