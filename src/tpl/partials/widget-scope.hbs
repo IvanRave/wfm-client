@@ -53,7 +53,7 @@
                       <i class="glyphicon glyphicon-cog" title="{{capitalizeFirst lang.settings}}"></i>
                     </button>
                     <!-- parent: vwmWidgock -->
-                    <button class="btn btn-xs" type="button" data-bind="click: $parent.removeVwmWidget">
+                    <button class="btn btn-xs" type="button" data-bind="click: $parent.removeVwmWidget.bind($parent)">
                       <i class="glyphicon glyphicon-remove" title="{{capitalizeFirst lang.toDelete}}"></i>
                     </button>
                   </div>

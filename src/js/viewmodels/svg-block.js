@@ -8,8 +8,8 @@ define(['jquery', 'knockout'], function ($, ko) {
 	 * @param {number} tmpRatio - A block ratio
 	 */
 	var exports = function (tmpRatio, tmpVboxWidth) {
-    var ths = this;
-  
+		var ths = this;
+
 		/**
 		 * A standard ratio for the block
 		 * @type {number}
@@ -32,8 +32,8 @@ define(['jquery', 'knockout'], function ($, ko) {
 				deferEvaluation : true
 			})
 		};
-    
-    /**
+
+		/**
 		 * Viewbox size, with all margins, equals to the viewbox attribute of the svg element
 		 * @type {object}
 		 */
@@ -52,8 +52,8 @@ define(['jquery', 'knockout'], function ($, ko) {
 			bottom : 20,
 			left : 60
 		};
-    
-    /**
+
+		/**
 		 * Inner size of the block in svg units
 		 * @type {object}
 		 */
@@ -61,21 +61,44 @@ define(['jquery', 'knockout'], function ($, ko) {
 			width : ths.vboxOutSize.width - ths.vboxMargin.left - ths.vboxMargin.right,
 			height : ths.vboxOutSize.height - ths.vboxMargin.top - ths.vboxMargin.bottom
 		};
-    
-    /**
+
+		/**
 		 * An attribute for a group of the block: like top-left padding
 		 * @type {string}
 		 */
 		this.baseTransform = 'translate(' + ths.vboxMargin.left + ', ' + ths.vboxMargin.top + ')';
+
+		/**
+		 * Transfor attribute for the svg object, to manage a zoom behavior
+     *    Default value
+		 * @type {object}
+		 */
+		this.zoomTransform = ko.observable({
+      scale : 1,
+			translate : [0, 0]
+    });
 	};
-  
-  /**
-  * Get center of a vbox
-  * @returns {Array} - Center cooords, like [x, y]
-  */
-  exports.prototype.getVboxCenter = function(){
-    return [this.vboxSize.width / 2, this.vboxSize.height / 2];
-  };
+
+	/**
+	 * Get center of a vbox
+	 * @returns {Array} - Center cooords, like [x, y]
+	 */
+	exports.prototype.getVboxCenter = function () {
+		return [this.vboxSize.width / 2, this.vboxSize.height / 2];
+	};
+
+	/**
+	 * Set to default values
+   * @param {number} [optScale=1] - Current element's scale option
+   * @param {Array} [optTranslate=[0,0]] - Current element's translate option
+	 */
+	exports.prototype.setZoomTransform = function (optScale, optTranslate) {
+		this.zoomTransform({
+      // Scale cannot be zero - in this case a map or graph doesn't exists
+			scale : optScale || 1,
+			translate : optTranslate || [0, 0]
+		});
+	};
 
 	return exports;
 });

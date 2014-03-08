@@ -36,7 +36,7 @@ define(['jquery', 'knockout', 'd3',
 		var ths = this;
 
 		/**
-		 * An attribute for the X axis
+		 * An attribute for the X axis of the graph
 		 * @type {string}
 		 */
 		this.axisXTransform = 'translate(0,' + ths.vboxSize.height + ')';
@@ -110,32 +110,6 @@ define(['jquery', 'knockout', 'd3',
 		};
 
 		/**
-		 * Transfor attribute for the graph wrap, to manage a zoom behavior
-		 * @type {object}
-		 */
-		this.zoomTransform = ko.observable({});
-
-		/**
-		 * Set to default values
-		 */
-		this.setZoomTransformToDefault = function () {
-			ths.zoomTransform({
-				scale : 1,
-				translate : [0, 0]
-			});
-		};
-
-		function updateZoom(tmpScale, tmpTranslate) {
-			var tmpZoomTransform = {
-				scale : tmpScale,
-				translate : tmpTranslate
-			};
-
-			// Set new zoom values to the block with data lines
-			ths.zoomTransform(tmpZoomTransform);
-		}
-
-		/**
 		 * Min and max zoom coeficient - 1 by default - without zoom
 		 */
 		this.zoomBehavior = ko.computed({
@@ -145,14 +119,14 @@ define(['jquery', 'knockout', 'd3',
 
 					if (tmpXScale && tmpYScale) {
 						// When set a new behavior
-						// Reload zoomTransofr to default values
-						ths.setZoomTransformToDefault();
+						// Reload zoomTransofr to default values (without options - set to default)
+						ths.setZoomTransform();
 
 						return d3.behavior.zoom()
 						.x(tmpXScale)
 						.y(tmpYScale)
 						.scaleExtent([0.0001, 10000]).on('zoom', function () {
-							updateZoom(d3.event.scale, d3.event.translate);
+							ths.setZoomTransform(d3.event.scale, d3.event.translate);
 						});
 					}
 				},
@@ -182,7 +156,7 @@ define(['jquery', 'knockout', 'd3',
 			tmpZoomBehavior.translate(prevZoomTransform.translate);
 			tmpZoomBehavior.scale(prevZoomTransform.scale);
 
-			updateZoom(prevZoomTransform.scale, prevZoomTransform.translate);
+			ths.setZoomTransform(prevZoomTransform.scale, prevZoomTransform.translate);
 		};
 
 		/**
@@ -207,7 +181,7 @@ define(['jquery', 'knockout', 'd3',
 			tmpZoomBehavior.translate(prevZoomTransform.translate);
 			tmpZoomBehavior.scale(prevZoomTransform.scale);
 
-			updateZoom(prevZoomTransform.scale, prevZoomTransform.translate);
+			ths.setZoomTransform(prevZoomTransform.scale, prevZoomTransform.translate);
 			//ths.zoomTransform(prevZoomTransform);
 		};
 

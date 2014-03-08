@@ -2,14 +2,14 @@
 define(['knockout',
 		'viewmodels/widgets/widget-default-summary',
 		'viewmodels/widgets/widget-well-perfomance',
-    'viewmodels/widgets/widget-well-monitoring',
+		'viewmodels/widgets/widget-well-monitoring',
 		'viewmodels/widgets/widget-well-sketch',
 		'viewmodels/widgets/widget-well-history',
 		'viewmodels/widgets/widget-wield-map'],
 	function (ko,
 		VwmWidgetDefaultSummary,
 		VwmWidgetWellPerfomance,
-    VwmWidgetWellMonitoring,
+		VwmWidgetWellMonitoring,
 		VwmWidgetWellSketch,
 		VwmWidgetWellHistory,
 		VwmWidgetWieldMap) {
@@ -29,15 +29,12 @@ define(['knockout',
 		 */
 		this.mdlWidget = mdlWidget;
 
+    /** Getter for a viewmodel of the widget block */
 		this.getVwmWidgock = function () {
 			return vwmWidgock;
 		};
 
 		this.isVisSettingPanel = ko.observable(false);
-
-		this.showVisSettingPanel = function () {
-			ths.isVisSettingPanel(true);
-		};
 
 		var widgetOpts = mdlWidget.widgetOpts;
 
@@ -58,9 +55,9 @@ define(['knockout',
 		case 'well-perfomance':
 			VwmWidgetWellPerfomance.call(ths, widgetOpts, tmpParentVwmStage);
 			break;
-    case 'well-monitoring':
-      VwmWidgetWellMonitoring.call(ths, widgetOpts, tmpWidgetMdlStage, tmpParentVwmStage.getParentVwm().mdlStage.listOfMonitoredParams);
-      break;
+		case 'well-monitoring':
+			VwmWidgetWellMonitoring.call(ths, widgetOpts, tmpWidgetMdlStage, tmpParentVwmStage.getParentVwm().mdlStage.listOfMonitoredParams);
+			break;
 		case 'well-history':
 			VwmWidgetWellHistory.call(ths, widgetOpts, tmpParentVwmStage);
 			break;
@@ -71,14 +68,20 @@ define(['knockout',
 			VwmWidgetWellSketch.call(ths, widgetOpts);
 			break;
 		}
+	};
 
-		/** Save model through viewmodel */
-		this.saveVwmWidget = function () {
-			mdlWidget.putWidget(ths.toStringifyOpts(), function () {
-				// Close settings after saving
-				ths.isVisSettingPanel(false);
-			});
-		};
+	/** Save model through viewmodel */
+	exports.prototype.saveVwmWidget = function () {
+		var ths = this;
+		this.mdlWidget.putWidget(this.toStringifyOpts(), function () {
+			// Close settings after saving
+			ths.isVisSettingPanel(false);
+		});
+	};
+
+	/** Show setting panel */
+	exports.prototype.showVisSettingPanel = function () {
+		this.isVisSettingPanel(true);
 	};
 
 	return exports;

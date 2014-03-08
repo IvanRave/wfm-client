@@ -12,7 +12,7 @@
           <div style="position: absolute">
             <div class="min-top-margin min-left-margin" data-bind="foreach: mapTools">
               <!-- ko if: $root.isEmployeeInEditMode() || isPublicTool -->
-              <button class="btn btn-sm btn-default" data-bind="click: $parent.selectMapTool, css: { 'active': isSlc}">
+              <button class="btn btn-sm btn-default" data-bind="click: $parent.selectMapTool.bind($parent), css: { 'active': isSlc}">
                 <i data-bind="css: icon, attr: {title: name}"></i>
               </button>
               <!-- /ko -->
@@ -60,12 +60,12 @@
                 <div class="clearfix">
                   <div class="pull-left">
                     <i class="glyphicon glyphicon-leaf"></i>
-                    <span class="link-view pointer" data-bind="click: $parent.selectVwmWellMarker">
+                    <span class="link-view pointer" data-bind="click: $parent.selectVwmWellMarker.bind($parent)">
                       <span data-bind="text: mdlWellMarker.wellName, css: { 'bld': isSlc }"></span>
                     </span>
                   </div>
                   <div class="pull-right" data-bind="if: $root.isEmployeeInEditMode">
-                    <i class="glyphicon glyphicon-remove link-icon" data-bind="click: $parent.removeVwmWellMarker"></i>
+                    <i class="glyphicon glyphicon-remove link-icon" data-bind="click: $parent.removeVwmWellMarker.bind($parent)"></i>
                   </div>
                 </div>
               </div>
@@ -82,8 +82,8 @@
                       <select class="input-sm" data-bind="options: $parent.mdlMapOfWield.outWellsOfWield, optionsText: 'Name', optionsValue: 'id', value: idOfWell, optionsCaption: 'select well...'"></select>
                     </div>
                     <div class="min-top-margin">
-                      <button class="btn btn-sm btn-success" data-bind="enable: idOfWell, click: $parent.addWellMarkerToMap">Add</button>
-                      <button class="btn btn-sm btn-default" data-bind="click: $parent.cancelAddingWellMarker">Cancel</button>
+                      <button class="btn btn-sm btn-success" data-bind="enable: idOfWell, click: $parent.addWellMarkerToMap.bind($parent)">Add</button>
+                      <button class="btn btn-sm btn-default" data-bind="click: $parent.cancelAddingWellMarker.bind($parent)">Cancel</button>
                     </div>
                   </div>
                 </div>

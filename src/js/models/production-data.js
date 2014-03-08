@@ -150,8 +150,6 @@ define(['jquery',
 
 		// forecast data have no calculated properties, but you can construct forecast by last calculated row (other than last normal row)
 		self.isForecast = data.IsForecast;
-
-    console.log('dict', data.Dict);
     
 		for (var dictItem in data.Dict) {
 			// if param is not calculated
