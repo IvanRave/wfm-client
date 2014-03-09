@@ -17,9 +17,8 @@ define(['knockout',
 
 		var tmpOpts = JSON.parse(data.Opts);
 		// todo: #23! Load after initialization -> init graph redrawing
-		this.opts.startUnixTime = ko.observable(tmpOpts['StartUnixTime']);
-
-		this.opts.endUnixTime = ko.observable(tmpOpts['EndUnixTime']);
+		this.opts.startUnixTime = ko.observable(tmpOpts['startUnixTime']);
+		this.opts.endUnixTime = ko.observable(tmpOpts['endUnixTime']);
 	};
 
 	/** Inherit from a widget model */
@@ -30,10 +29,6 @@ define(['knockout',
 	 */
 	exports.prototype.toPlainOpts = function () {
 		return ko.toJSON(this.opts);
-		// return JSON.stringify({
-		// 'StartUnixTime' : ko.unwrap(this.startUnixTime),
-		// 'EndUnixTime' : ko.unwrap(this.endUnixTime)
-		// });
 	};
 
 	return exports;

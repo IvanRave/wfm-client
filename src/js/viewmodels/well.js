@@ -649,7 +649,9 @@ define([
 		 * Viewmodel (partial of well), used in the main view section
 		 * @type {module:viewmodels/monitoring-of-well}
 		 */
-		this.mainVwmMonitoringOfWell = new VwmMonitoringOfWell(ths.mdlStage, parentVwmWroup.mdlStage.listOfMonitoredParams, null, null);
+		this.mainVwmMonitoringOfWell = new VwmMonitoringOfWell(ths.mdlStage,
+				ko.observable(null),
+				ko.observable(null));
 
 		/**
 		 * A monitoring record, according to the selected unix time in the wroup

@@ -16,14 +16,13 @@ define(['knockout',
 	 */
 	var exports = function (mdlWidget, vwmWell) {
 		VwmWidget.call(this, mdlWidget);
-
-    var koListOfMonitoredParams = vwmWell.mdlStage.listOfMonitoredParams;
     
-		this.widgetVwmMonitoringOfWell = new VwmMonitoringOfWell(vwmWell.mdlStage, koListOfMonitoredParams, 
+		this.widgetVwmMonitoringOfWell = new VwmMonitoringOfWell(vwmWell.mdlStage,
       mdlWidget.opts.startUnixTime, 
       mdlWidget.opts.endUnixTime);
     
-    // TODO: #23! Load after initialization -> init graph redrawing
+    // TODO: #43! Load after initialization -> init graph redrawing
+    mdlWidget.opts.startUnixTime.valueHasMutated();
 	};
 
 	/** Inherit from a widget viewmodel */

@@ -23,12 +23,12 @@ define(['knockout',
 		 */
 		var tmpOpts = JSON.parse(data.Opts);
     
-		this.opts.startYear = ko.observable(tmpOpts['StartYear']);
-		this.opts.endYear = ko.observable(tmpOpts['EndYear']);
-		this.opts.startMonth = ko.observable(tmpOpts['StartMonth']);
-		this.opts.endMonth = ko.observable(tmpOpts['EndMonth']);
-		this.opts.selectedAttrGroupId = ko.observable(tmpOpts['SelectedAttrGroupId']);
-		this.opts.isVisibleForecastData = ko.observable(tmpOpts['IsVisibleForecastData']);
+		this.opts.startYear = ko.observable(tmpOpts['startYear']);
+		this.opts.endYear = ko.observable(tmpOpts['endYear']);
+		this.opts.startMonth = ko.observable(tmpOpts['startMonth']);
+		this.opts.endMonth = ko.observable(tmpOpts['endMonth']);
+		this.opts.selectedAttrGroupId = ko.observable(tmpOpts['selectedAttrGroupId']);
+		this.opts.isVisibleForecastData = ko.observable(tmpOpts['isVisibleForecastData']);
 	};
 
 	/** Inherit from a widget model */
@@ -37,14 +37,6 @@ define(['knockout',
 	/** Convert to string */
 	exports.prototype.toPlainOpts = function () {
     return ko.toJSON(this.opts);
-		// return JSON.stringify({
-      // 'StartYear' : ko.unwrap(this.startYear),
-			// 'EndYear' : ko.unwrap(this.endYear),
-      // 'StartMonth' : ko.unwrap(this.startMonth),
-			// 'EndMonth' : ko.unwrap(this.endMonth),
-      // 'SelectedAttrGroupId' : ko.unwrap(this.selectedAttrGroupId),
-      // 'IsVisibleForecastData' : ko.unwrap(this.isVisibleForecastData)
-		// });
 	};
 
 	return exports;
