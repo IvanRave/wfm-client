@@ -5,15 +5,41 @@ define(['knockout',
 		'viewmodels/widgets/widget-well-monitoring',
 		'viewmodels/widgets/widget-well-sketch',
 		'viewmodels/widgets/widget-well-history',
-		'viewmodels/widgets/widget-wield-map'],
+		'viewmodels/widgets/widget-wield-map',
+		'viewmodels/widgets/widget-well-map'],
 	function (ko,
 		VwmWidgetDefaultSummary,
 		VwmWidgetWellPerfomance,
 		VwmWidgetWellMonitoring,
 		VwmWidgetWellSketch,
 		VwmWidgetWellHistory,
-		VwmWidgetWieldMap) {
+		VwmWidgetWieldMap,
+		VwmWidgetWellMap) {
 	'use strict';
+
+  /** Create a viewmodel for a widget from a widget model */
+	function buildVwmWidget(elem, tmpParentVwmStage) {
+		switch (elem.idOfSectionPattern) {
+		case 'well-summary':
+		case 'wroup-summary':
+		case 'wield-summary':
+		case 'wegion-summary':
+		case 'company-summary':
+			return new VwmWidgetDefaultSummary(elem);
+		case 'well-perfomance':
+			return new VwmWidgetWellPerfomance(elem, tmpParentVwmStage);
+		case 'well-monitoring':
+			return new VwmWidgetWellMonitoring(elem, tmpParentVwmStage);
+		case 'well-history':
+			return new VwmWidgetWellHistory(elem, tmpParentVwmStage);
+		case 'wield-map':
+			return new VwmWidgetWieldMap(elem);
+		case 'well-map':
+			return new VwmWidgetWellMap(elem);
+		case 'well-sketch':
+			return new VwmWidgetWellSketch(elem);
+		}
+	}
 
 	/**
 	 * Viewmodel: widget block
@@ -86,34 +112,10 @@ define(['knockout',
 	 * Get all viewmodels for widgets
 	 */
 	exports.prototype.getListOfVwmWidget = function () {
-		var ths = this;
+		var tmpParentVwmStage = this.getVwmWidgout().getParentVwmStage();
 
-		var tmpWidgetMdlStage = ths.mdlWidgock.getWidgout().getParent();
-		var tmpParentVwmStage = ths.getVwmWidgout().getParentVwmStage();
-
-		return ko.unwrap(ths.mdlWidgock.widgetList).map(function (elem) {
-			var widgetOpts = elem.widgetOpts;
-
-			switch (elem.idOfSectionPattern) {
-			case 'well-summary':
-			case 'wroup-summary':
-			case 'wield-summary':
-			case 'wegion-summary':
-			case 'company-summary':
-				var tmpPropSpecList = ko.unwrap(tmpWidgetMdlStage.propSpecList);
-				// No view properties in summary section
-				return new VwmWidgetDefaultSummary(elem, widgetOpts, tmpPropSpecList);
-			case 'well-perfomance':
-				return new VwmWidgetWellPerfomance(elem, widgetOpts, tmpParentVwmStage);
-			case 'well-monitoring':
-				return new VwmWidgetWellMonitoring(elem, widgetOpts, tmpWidgetMdlStage, tmpParentVwmStage.getParentVwm().mdlStage.listOfMonitoredParams);
-			case 'well-history':
-				return new VwmWidgetWellHistory(elem, widgetOpts, tmpParentVwmStage);
-			case 'wield-map':
-				return new VwmWidgetWieldMap(elem, widgetOpts, tmpWidgetMdlStage);
-			case 'well-sketch':
-				return new VwmWidgetWellSketch(elem, widgetOpts);
-			}
+		return ko.unwrap(this.mdlWidgock.widgetList).map(function (elem) {
+			return buildVwmWidget(elem, tmpParentVwmStage);
 		});
 	};
 

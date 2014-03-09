@@ -23,7 +23,7 @@ define(['knockout'], function (ko) {
 	/** Save model through viewmodel */
 	exports.prototype.saveVwmWidget = function () {
 		var ths = this;
-		this.mdlWidget.putWidget(this.toStringifyOpts(), function () {
+		this.mdlWidget.putWidget(function () {
 			// Close settings after saving
 			ths.isVisSettingPanel(false);
 		});

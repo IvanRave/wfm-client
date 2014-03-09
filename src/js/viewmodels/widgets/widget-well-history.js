@@ -14,26 +14,18 @@ define(['knockout',
 	 * @constructor
 	 * @augments {module:viewmodels/widget}
 	 */
-	var exports = function (mdlWidget, opts, vwmWell) {
+	var exports = function (mdlWidget, vwmWell) {
 		VwmWidget.call(this, mdlWidget);
 
-		opts = opts || {};
-
-		this.vwmScopeOfHistoryOfWell = new VwmScopeOfHistoryOfWell(opts, vwmWell);
+		this.vwmScopeOfHistoryOfWell = new VwmScopeOfHistoryOfWell(vwmWell,
+				mdlWidget.opts.startDate,
+				mdlWidget.opts.endDate,
+				mdlWidget.opts.jobTypeId,
+				mdlWidget.opts.sortByDateOrder);
 	};
 
-  /** Inherit from a widget viewmodel */
+	/** Inherit from a widget viewmodel */
 	appHelper.inherits(exports, VwmWidget);
-  
-  /** Convert to string */
-  exports.prototype.toStringifyOpts = function () {
-			return JSON.stringify({
-				'StartDate' : ko.unwrap(this.vwmScopeOfHistoryOfWell['startDate']),
-				'EndDate' : ko.unwrap(this.vwmScopeOfHistoryOfWell['endDate']),
-				'SortByDateOrder' : ko.unwrap(this.vwmScopeOfHistoryOfWell['sortByDateOrder']),
-				'JobTypeId' : ko.unwrap(this.vwmScopeOfHistoryOfWell['jobTypeId'])
-			});
-		};
-  
+
 	return exports;
 });

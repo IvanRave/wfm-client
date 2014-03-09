@@ -14,81 +14,53 @@ define(['knockout',
 	 * @constuctor
 	 * @augments {module:viewmodels/widget}
 	 */
-	var exports = function (mdlWidget, opts, mdlWield) {
+	var exports = function (mdlWidget) {
 		VwmWidget.call(this, mdlWidget);
-		opts = opts || {};
-
-		var ths = this;
 
 		/**
 		 * Selected view map
+     * @type {module:viewmodels/map-of-wield}
 		 */
 		this.slcVwmMapOfWield = ko.computed({
-				read : function () {
-					var tmpVid = ko.unwrap(ths.vidOfSlcVwmMapOfWield);
-					if (tmpVid) {
-						var needMapModel = ko.unwrap(mdlWield.WellFieldMaps).filter(function (elem) {
-								return elem.id === tmpVid;
-							})[0];
-
-						if (needMapModel) {
-							var needVwm = new VwmMapOfWield(needMapModel,
-									ths.vidOfSlcVwmMapOfWield,
-									opts['TransformScale'],
-									opts['TransformTranslate']);
-
-							// Remove default options for translate (after the first success initialization)
-							delete opts['TransformScale'];
-							delete opts['TransformTranslate'];
-
-							return needVwm;
-						}
-					}
-				},
-				deferEvaluation : true
+				read : this.getSlcVwmMapOfWield,
+				deferEvaluation : true,
+				owner : this
 			});
-
-		/**
-		 * Viewmodel id of selected map viewmodel
-		 */
-		this.vidOfSlcVwmMapOfWield = ko.observable(opts['IdOfSlcMapOfWield']);
-
-		/**
-		 * Dictionary for select box (value, text) with maps
-		 */
-		this.dictOfMap = ko.computed({
-				read : function () {
-					return ko.unwrap(mdlWield.WellFieldMaps).map(function (elem) {
-						return {
-							optText : ko.unwrap(elem.name),
-							optValue : ko.unwrap(elem.id)
-						};
-					});
-				},
-				deferEvaluation : true
-			});
-
-		/** Whether name of map is visible */
-		this.isVisName = ko.observable(opts['IsVisName']);
-
-		/** Whether map is visible */
-		this.isVisImg = ko.observable(opts['IsVisImg']);
 	};
 
 	/** Inherit from a widget viewmodel */
 	appHelper.inherits(exports, VwmWidget);
 
-	/** Convert to plain JSON to send to the server as widget settings */
-	exports.prototype.toStringifyOpts = function () {
-		var tmpSlcVwm = ko.unwrap(this.slcVwmMapOfWield);
+	/**
+	 * Get selected viewmodel of map of well field
+	 */
+	exports.prototype.getSlcVwmMapOfWield = function () {
+		console.log('getSlcVwmMapOfWield has executed');
+		var tmpVid = ko.unwrap(this.mdlWidget.opts.idOfSlcMapOfWield);
+		if (tmpVid) {
+      var allMaps = ko.unwrap(this.mdlWidget.getWidgock().getWidgout().getParent().WellFieldMaps);
+      
+			var needMapModel = allMaps.filter(function (elem) {
+					return elem.id === tmpVid;
+				})[0];
 
-		return JSON.stringify({
-			'IdOfSlcMapOfWield' : tmpSlcVwm ? tmpSlcVwm.vid : null,
-			'IsVisName' : ko.unwrap(this.isVisName),
-			'IsVisImg' : ko.unwrap(this.isVisImg),
-			'TransformScale' : tmpSlcVwm ? ko.unwrap(tmpSlcVwm.transformAttr).scale : null,
-			'TransformTranslate' : tmpSlcVwm ? ko.unwrap(tmpSlcVwm.transformAttr).translate : null
-		});
+			if (needMapModel) {
+				// TODO: #32! Set a transform option to the default value, 
+        //            when a selected map is not equals the map from options
+				// // if (needMapModel.id !== this.mdlWidget.widgetOpts['IdOfSlcMapOfWield']) {
+					// // this.mdlWidget.opts.transform({
+						// // scale : 1,
+						// // translate : [0, 0]
+					// // });
+				// // }
+
+				var needVwm = new VwmMapOfWield(needMapModel,
+						this.mdlWidget.opts.idOfSlcMapOfWield,
+						this.mdlWidget.opts.transform);
+
+				return needVwm;
+			}
+		}
 	};
 
 	return exports;

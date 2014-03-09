@@ -1,186 +1,191 @@
 ﻿/** @module */
 define(['jquery',
-    'knockout',
-    'helpers/modal-helper',
-    'viewmodels/wroup',
-    'viewmodels/map-of-wield',
-    'viewmodels/bases/stage-child-base',
-    'viewmodels/bases/stage-base'],
-    function ($,
-        ko,
-        modalHelper,
-        VwmWroup,
-        VwmMapOfWield,
-        VwmStageChildBase,
-        VwmStageBase) {
-        'use strict';
+		'knockout',
+		'helpers/modal-helper',
+		'viewmodels/wroup',
+		'viewmodels/map-of-wield',
+		'viewmodels/bases/stage-child-base',
+		'viewmodels/bases/stage-base'],
+	function ($,
+		ko,
+		modalHelper,
+		VwmWroup,
+		VwmMapOfWield,
+		VwmStageChildBase,
+		VwmStageBase) {
+	'use strict';
 
-        /**
-        * View for well field maps: contains filtered maps and selected map
-        * @constructor
-        */
-        var exports = function (mdlWield, parentVwmWegion, defaultSlcData) {
-            ////* @param {object} opts - options for this view, like id of selected map, sort direction, filters etc.
-            ////* @param {Array.<module:models/map-of-wield>} koMapsOfWield - models for maps (knockout wrapped)
+	/**
+	 * View for well field maps: contains filtered maps and selected map
+	 * @constructor
+	 */
+	var exports = function (mdlWield, parentVwmWegion, defaultSlcData) {
+		////* @param {object} opts - options for this view, like id of selected map, sort direction, filters etc.
+		////* @param {Array.<module:models/map-of-wield>} koMapsOfWield - models for maps (knockout wrapped)
 
-            /** Alternative for this */
-            var ths = this;
+		/** Alternative for this */
+		var ths = this;
 
-            this.mdlStage = mdlWield;
+		this.mdlStage = mdlWield;
 
-            this.unq = mdlWield.id;
+		this.unq = mdlWield.id;
 
-            /** Link to company file manager */
-            this.fmgr = parentVwmWegion.fmgr;
+		/** Link to company file manager */
+		this.fmgr = parentVwmWegion.fmgr;
 
-            /**
-            * List of views of well wroups
-            * @type {Array.<module:viewmodels/wroup>}
-            */
-            this.listOfVwmChild = ko.computed({
-                read: function () {
-                    return ko.unwrap(mdlWield.wroups).map(function (elem) {
-                        return new VwmWroup(elem, ths, defaultSlcData);
-                    });
-                },
-                deferEvaluation: true
-            });
+		/**
+		 * List of views of well wroups
+		 * @type {Array.<module:viewmodels/wroup>}
+		 */
+		this.listOfVwmChild = ko.computed({
+				read : function () {
+					return ko.unwrap(mdlWield.wroups).map(function (elem) {
+						return new VwmWroup(elem, ths, defaultSlcData);
+					});
+				},
+				deferEvaluation : true
+			});
 
-            // Has a children (wroups)
-            VwmStageChildBase.call(this, defaultSlcData.wroupId);
-            // Has sections and widgets
-            VwmStageBase.call(this, defaultSlcData.wieldSectionId, parentVwmWegion.unqOfSlcVwmChild);
+		// Has a children (wroups)
+		VwmStageChildBase.call(this, defaultSlcData.wroupId);
+		// Has sections and widgets
+		VwmStageBase.call(this, defaultSlcData.wieldSectionId, parentVwmWegion.unqOfSlcVwmChild);
 
-            /**
-            * Select all ancestor's view models
-            */
-            this.selectAncestorVwms = function () {
-                // 1. take parent view - company
-                // 2. take parent view of employee - userprofile
-                parentVwmWegion.unqOfSlcVwmChild(ths.unq);
-                parentVwmWegion.selectAncestorVwms();
-            };
+		/**
+		 * Select all ancestor's view models
+		 */
+		this.selectAncestorVwms = function () {
+			// 1. take parent view - company
+			// 2. take parent view of employee - userprofile
+			parentVwmWegion.unqOfSlcVwmChild(ths.unq);
+			parentVwmWegion.selectAncestorVwms();
+		};
 
-            /** List of views of maps of this well field view*/
-            this.listOfVwmMapOfWield = ko.computed({
-                read: function () {
-                    return ko.unwrap(mdlWield.WellFieldMaps).map(function (elem) {
-                        return new VwmMapOfWield(elem, ths.vidOfSlcVwmMapOfWield);
-                    });
-                },
-                deferEvaluation: true
-            });
+		/** List of views of maps of this well field view*/
+		this.listOfVwmMapOfWield = ko.computed({
+				read : function () {
+					return ko.unwrap(mdlWield.WellFieldMaps).map(function (elem) {
+						return new VwmMapOfWield(elem, ths.vidOfSlcVwmMapOfWield, ko.observable({
+								scale : 1,
+								translate : [0, 0]
+							}));
+					});
+				},
+				deferEvaluation : true
+			});
 
-            /** Sorted list */
-            this.sortedListOfVwmMapOfWield = ko.computed({
-                read: function () {
-                    var tmpMaps = ko.unwrap(ths.listOfVwmMapOfWield);
-                    // Sort by name
-                    return tmpMaps.sort(function (a, b) {
-                        return ko.unwrap(a.mdlMapOfWield.name) > ko.unwrap(b.mdlMapOfWield.name);
-                    });
-                },
-                deferEvaluation: true
-            });
+		/** Sorted list */
+		this.sortedListOfVwmMapOfWield = ko.computed({
+				read : function () {
+					var tmpMaps = ko.unwrap(ths.listOfVwmMapOfWield);
+					// Sort by name
+					return tmpMaps.sort(function (a, b) {
+						return ko.unwrap(a.mdlMapOfWield.name) > ko.unwrap(b.mdlMapOfWield.name);
+					});
+				},
+				deferEvaluation : true
+			});
 
-            /** Id of selected view of map of well field = id of map */
-            this.vidOfSlcVwmMapOfWield = ko.observable();
+		/** Id of selected view of map of well field = id of map */
+		this.vidOfSlcVwmMapOfWield = ko.observable();
 
-            /** Selected view of map of well field */
-            this.slcVwmMapOfWield = ko.computed({
-                read: function () {
-                    var tmpVid = ko.unwrap(ths.vidOfSlcVwmMapOfWield);
-                    var tmpListOfVwm = ko.unwrap(ths.sortedListOfVwmMapOfWield);
-                    if (tmpVid) {
-                        return tmpListOfVwm.filter(function (elem) {
-                            return elem.vid === tmpVid;
-                        })[0];
-                        // CAUTION: few viewmodels from one field model
-                    }
-                    else {
-                        var tmpFirstVwm = tmpListOfVwm[0];
-                        if (tmpFirstVwm){
-                            ths.vidOfSlcVwmMapOfWield(tmpFirstVwm.vid);
-                            // Select first map if no selected
-                            return tmpFirstVwm;
-                        }
-                    }
-                },
-                deferEvaluation: true
-            });
+		/** Selected view of map of well field */
+		this.slcVwmMapOfWield = ko.computed({
+				read : function () {
+					var tmpVid = ko.unwrap(ths.vidOfSlcVwmMapOfWield);
+					var tmpListOfVwm = ko.unwrap(ths.sortedListOfVwmMapOfWield);
+					if (tmpVid) {
+						return tmpListOfVwm.filter(function (elem) {
+							return elem.vid === tmpVid;
+						})[0];
+						// CAUTION: few viewmodels from one field model
+					} else {
+						var tmpFirstVwm = tmpListOfVwm[0];
+						if (tmpFirstVwm) {
+							ths.vidOfSlcVwmMapOfWield(tmpFirstVwm.vid);
+							// Select first map if no selected
+							return tmpFirstVwm;
+						}
+					}
+				},
+				deferEvaluation : true
+			});
 
-            /** Select view */
-            this.selectVwmMapOfWield = function (vwmMapOfWieldToSelect) {
-                ths.vidOfSlcVwmMapOfWield(vwmMapOfWieldToSelect.vid);
-            };
+		/** Select view */
+		this.selectVwmMapOfWield = function (vwmMapOfWieldToSelect) {
+			ths.vidOfSlcVwmMapOfWield(vwmMapOfWieldToSelect.vid);
+		};
 
-            /**
-            * Create map from file
-            */
-            this.createMapFromFile = function () {
-                ths.unzOfSlcVwmSectionFmg(ths.mdlStage.stageKey + '-map');
+		/**
+		 * Create map from file
+		 */
+		this.createMapFromFile = function () {
+			ths.unzOfSlcVwmSectionFmg(ths.mdlStage.stageKey + '-map');
 
-                function mgrCallback() {
-                    ths.fmgr.okError('');
+			function mgrCallback() {
+				ths.fmgr.okError('');
 
-                    var tmpSlcVwmSection = ko.unwrap(ths.slcVwmSectionFmg);
+				var tmpSlcVwmSection = ko.unwrap(ths.slcVwmSectionFmg);
 
-                    if (!tmpSlcVwmSection) { throw new Error('No selected section'); }
+				if (!tmpSlcVwmSection) {
+					throw new Error('No selected section');
+				}
 
-                    // Select file from file manager
-                    var selectedFileSpecs = ko.unwrap(tmpSlcVwmSection.mdlSection.listOfFileSpec).filter(function (elem) {
-                        return ko.unwrap(elem.isSelected);
-                    });
+				// Select file from file manager
+				var selectedFileSpecs = ko.unwrap(tmpSlcVwmSection.mdlSection.listOfFileSpec).filter(function (elem) {
+						return ko.unwrap(elem.isSelected);
+					});
 
-                    if (selectedFileSpecs.length !== 1) {
-                        ths.fmgr.okError('need to select one file');
-                        return;
-                    }
+				if (selectedFileSpecs.length !== 1) {
+					ths.fmgr.okError('need to select one file');
+					return;
+				}
 
-                    ths.mdlStage.postMapOfWield(selectedFileSpecs[0].id, ko.unwrap(selectedFileSpecs[0].name), function () {
-                        ths.fmgr.hide();
-                    });
-                }
+				ths.mdlStage.postMapOfWield(selectedFileSpecs[0].id, ko.unwrap(selectedFileSpecs[0].name), function () {
+					ths.fmgr.hide();
+				});
+			}
 
-                // Add to observable
-                ths.fmgr.okCallback(mgrCallback);
+			// Add to observable
+			ths.fmgr.okCallback(mgrCallback);
 
-                // Notification
-                ths.fmgr.okDescription('Please select a file for a map');
+			// Notification
+			ths.fmgr.okDescription('Please select a file for a map');
 
-                // Open file manager
-                ths.fmgr.show();
-            };
+			// Open file manager
+			ths.fmgr.show();
+		};
 
-            this.addVwmWroup = function () {
-                var inputName = document.createElement('input');
-                inputName.type = 'text';
-                $(inputName).prop({ 'required': true }).addClass('form-control');
+		this.addVwmWroup = function () {
+			var inputName = document.createElement('input');
+			inputName.type = 'text';
+			$(inputName).prop({
+				'required' : true
+			}).addClass('form-control');
 
-                var innerDiv = document.createElement('div');
-                $(innerDiv).addClass('form-horizontal').append(
-                    modalHelper.gnrtDom('Name', inputName)
-                );
+			var innerDiv = document.createElement('div');
+			$(innerDiv).addClass('form-horizontal').append(
+				modalHelper.gnrtDom('Name', inputName));
 
-                function submitFunction() {
-                    mdlWield.postWroup($(inputName).val());
+			function submitFunction() {
+				mdlWield.postWroup($(inputName).val());
 
-                    modalHelper.closeModalWindow();
-                }
+				modalHelper.closeModalWindow();
+			}
 
-                modalHelper.openModalWindow('Well group', innerDiv, submitFunction);
-            };
-            
-            /** Set this section as selected */
-            this.loadSectionContent = function (idOfSectionPattern) {
-                switch (idOfSectionPattern) {
-                    case 'wield-map':
-                        // Get all maps from this field
-                        ths.mdlStage.loadMapsOfWield();
-                        break;
-                }
-            };
-        };
+			modalHelper.openModalWindow('Well group', innerDiv, submitFunction);
+		};
 
-        return exports;
-    });
+		/** Set this section as selected */
+		this.loadSectionContent = function (idOfSectionPattern) {
+			switch (idOfSectionPattern) {
+			case 'wield-map':
+				// Get all maps from this field
+				ths.mdlStage.loadMapsOfWield();
+				break;
+			}
+		};
+	};
+
+	return exports;
+});

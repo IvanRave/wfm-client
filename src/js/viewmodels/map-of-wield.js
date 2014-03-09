@@ -87,10 +87,13 @@ define(['knockout',
 	 * @constructor
    * @param {module:models/map-of-wield} mdlMapOfWield - Model of this map
    * @param {string} koVidOfSlcVwmMapOfWield - Id of selected viewmodel
-   * @param {number} optScale - Map scale
-   * @param {Array} optTranslate - Map translate
+   * @param {object} koTransform - A transform attribute for a map
+   *        ko.observable({
+   *        scale : optScale || 1,
+   *        translate : optTranslate || [0, 0]
+   *        });
 	 */
-	var exports = function (mdlMapOfWield, koVidOfSlcVwmMapOfWield, optScale, optTranslate) {
+	var exports = function (mdlMapOfWield, koVidOfSlcVwmMapOfWield, koTransform) {
 		/** Alternative for this */
 		var ths = this;
 
@@ -204,10 +207,7 @@ define(['knockout',
 		 * Zoom and translate for svg map: can be set from server or by user click or by mouse scroll. By default: 1
 		 * @type {number}
 		 */
-		this.transformAttr = ko.observable({
-				scale : optScale || 1,
-				translate : optTranslate || [0, 0]
-			});
+		this.transformAttr = koTransform;
 
 		/**
 		 * Well marker to add

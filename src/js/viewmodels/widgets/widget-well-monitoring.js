@@ -14,26 +14,20 @@ define(['knockout',
 	 * @constructor
 	 * @augments {module:viewmodels/widget}
 	 */
-	var exports = function (mdlWidget, opts, mdlWell, koListOfMonitoredParams) {
+	var exports = function (mdlWidget, vwmWell) {
 		VwmWidget.call(this, mdlWidget);
 
-		opts = opts || {};
-
-		this.widgetVwmMonitoringOfWell = new VwmMonitoringOfWell(opts, mdlWell, koListOfMonitoredParams);
+    var koListOfMonitoredParams = vwmWell.mdlStage.listOfMonitoredParams;
+    
+		this.widgetVwmMonitoringOfWell = new VwmMonitoringOfWell(vwmWell.mdlStage, koListOfMonitoredParams, 
+      mdlWidget.opts.startUnixTime, 
+      mdlWidget.opts.endUnixTime);
+    
+    // TODO: #23! Load after initialization -> init graph redrawing
 	};
 
 	/** Inherit from a widget viewmodel */
 	appHelper.inherits(exports, VwmWidget);
-
-	/**
-	 * Convert to JSON string to save options on the server
-	 */
-	exports.prototype.toStringifyOpts = function () {
-		return JSON.stringify({
-			'StartUnixTime' : ko.unwrap(this.widgetVwmMonitoringOfWell.mntrUnixTimeBorder.start),
-			'EndUnixTime' : ko.unwrap(this.widgetVwmMonitoringOfWell.mntrUnixTimeBorder.end)
-		});
-	};
 
 	return exports;
 });

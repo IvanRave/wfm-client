@@ -9,7 +9,7 @@ define(['knockout',
         * Well history view for history section, report section and history widgets
         * @constructor
         */
-        var exports = function (opts, vwmWell) {
+        var exports = function (vwmWell, koStartUnixTime, koEndUnixTime, koJobTypeId, koSortByDateOrder) {
             var ths = this;
 
             /** Company model for this well */
@@ -28,12 +28,12 @@ define(['knockout',
             };
 
             // UTC unix time (in seconds)
-            this.startDate = ko.observable(opts['StartDate']);
-            this.endDate = ko.observable(opts['EndDate']);
+            this.startDate = koStartUnixTime;
+            this.endDate = koEndUnixTime;
 
-            this.jobTypeId = ko.observable(opts['JobTypeId']);
+            this.jobTypeId = koJobTypeId;
 
-            this.sortByDateOrder = ko.observable(opts['SortByDateOrder'] || -1);
+            this.sortByDateOrder = koSortByDateOrder;
 
             this.sortByDateCss = ko.computed({
                 read: function () {

@@ -1,19 +1,18 @@
 ﻿<script type="text/html" id="widget-tpl-well-sketch">
   <!-- current: vwmWidget -->
   <div data-bind="if: vwmWidget.isVisSettingPanel">
-    <div class="widget-setting-panel">
+    <div class="widget-setting-panel" data-bind="with: vwmWidget.mdlWidget">
       <label>
-        <input type="checkbox" data-bind="checked: vwmWidget.isVisImg" /> Image
+        <input type="checkbox" data-bind="checked: opts.isVisImg" /> Image
       </label>
       <label>
-        <input type="checkbox" data-bind="checked: vwmWidget.isVisDescription" /> Description
+        <input type="checkbox" data-bind="checked: opts.isVisDescription" /> Description
       </label>
     </div>
   </div>
   <div class="widget-content">
-    <!--  -->
     <div data-bind="with: $parents[3].mdlStage">
-      <div data-bind="if: vwmWidget.isVisImg">
+      <div data-bind="if: vwmWidget.mdlWidget.opts.isVisImg">
         <div data-bind="with: sketchOfWell">
           <div data-bind="with: fileSpec">
             <span class="pointer" data-bind="panzoomImg: { src: fileUrl }">
@@ -22,7 +21,7 @@
           </div>
         </div>
       </div>
-      <div data-bind="if: vwmWidget.isVisDescription">
+      <div data-bind="if: vwmWidget.mdlWidget.opts.isVisDescription">
         <div data-bind="with: sketchOfWell">
           <div class="break-word pre-wrap-text" data-bind="text: description" style="padding: 8px 2px;"></div>
         </div>

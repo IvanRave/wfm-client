@@ -200,7 +200,15 @@ define([
 
 		//{ #region HISTORY
 
-		this.vwmScopeOfHistoryOfWell = new VwmScopeOfHistoryOfWell({}, ths);
+		/**
+		 * A viewmodel for history records
+		 * @type {module:viewmodels/history-of-well}
+		 */
+		this.vwmScopeOfHistoryOfWell = new VwmScopeOfHistoryOfWell(ths,
+				ko.observable(null),
+				ko.observable(null),
+				ko.observable(null),
+				ko.observable(1));
 
 		//} #endregion HISTORY
 
@@ -597,9 +605,13 @@ define([
 
 		//{ #region PERFOMANCE
 
-		this.mainVwmPerfomanceOfWell = new VwmPerfomanceOfWell({
-				isVisibleForecastData : false
-			}, ths.mdlStage.perfomanceOfWell, ths);
+		/**
+		 * Viewmodel for the perfomance section
+		 * @type {module:viewmodels/perfomance-of-well}
+		 */
+		this.mainVwmPerfomanceOfWell = new VwmPerfomanceOfWell(ths.mdlStage.perfomanceOfWell, ths,
+				ko.observable(null), ko.observable(null), ko.observable(null), ko.observable(null),
+				ko.observable(null), ko.observable(false));
 
 		//} #endregion PERFOMANCE
 
@@ -637,12 +649,7 @@ define([
 		 * Viewmodel (partial of well), used in the main view section
 		 * @type {module:viewmodels/monitoring-of-well}
 		 */
-		this.mainVwmMonitoringOfWell = new VwmMonitoringOfWell({
-				// some options, like startUnixTime, endUnixTime
-				// can be loaded from cookies or setting by default, for example:
-				// for the last month period
-				// neccessary for widget
-			}, ths.mdlStage, parentVwmWroup.mdlStage.listOfMonitoredParams);
+		this.mainVwmMonitoringOfWell = new VwmMonitoringOfWell(ths.mdlStage, parentVwmWroup.mdlStage.listOfMonitoredParams, null, null);
 
 		/**
 		 * A monitoring record, according to the selected unix time in the wroup

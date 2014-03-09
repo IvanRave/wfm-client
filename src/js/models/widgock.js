@@ -1,80 +1,121 @@
 ﻿/** @module */
 define(['jquery',
-    'knockout',
-    'services/widget',
-    'models/widget'], function ($, ko, widgetService, Widget) {
-        'use strict';
+		'knockout',
+		'services/widget',
+		'models/widgets/widget-default-summary',
+		'models/widgets/widget-well-history',
+		'models/widgets/widget-well-map',
+		'models/widgets/widget-well-monitoring',
+		'models/widgets/widget-well-perfomance',
+		'models/widgets/widget-well-sketch',
+		'models/widgets/widget-wield-map'],
+	function ($,
+		ko,
+		widgetService,
+		MdlWidgetDefaultSummary,
+		MdlWidgetWellHistory,
+		MdlWidgetWellMap,
+		MdlWidgetWellMonitoring,
+		MdlWidgetWellPerfomance,
+		MdlWidgetWellSketch,
+		MdlWidgetWieldMap) {
+	'use strict';
 
-        // Well widget layout list
-        function importWidgetList(data, widgockItem) {
-            return (data || []).map(function (item) { return new Widget(item, widgockItem); });
-        }
+	/** Create a model for a widget from widget data */
+	function buildWidget(widgetData, widgockItem) {
+		switch (widgetData.IdOfSectionPattern) {
+		case 'well-summary':
+		case 'wroup-summary':
+		case 'wield-summary':
+		case 'wegion-summary':
+		case 'company-summary':
+			return new MdlWidgetDefaultSummary(widgetData, widgockItem);
+		case 'well-perfomance':
+			return new MdlWidgetWellPerfomance(widgetData, widgockItem);
+		case 'well-monitoring':
+			return new MdlWidgetWellMonitoring(widgetData, widgockItem);
+		case 'well-history':
+			return new MdlWidgetWellHistory(widgetData, widgockItem);
+		case 'wield-map':
+			return new MdlWidgetWieldMap(widgetData, widgockItem);
+		case 'well-map':
+			return new MdlWidgetWellMap(widgetData, widgockItem);
+		case 'well-sketch':
+			return new MdlWidgetWellSketch(widgetData, widgockItem);
+		}
+	}
 
-        /**
-        * Widget block of widget layout; Widget layout divides to widget blocks; Widget block divibed to widgets
-        * @param {object} data - Widget block data
-        * @param {module:models/widgout} widgoutItem - Layout - parent of this widget block
-        * @constructor
-        */
-        var exports = function (data, widgoutItem) {
-            data = data || {};
+	/** Fill the well widget layout list */
+	function importWidgetList(data, widgockItem) {
+		return (data || []).map(function (item) {
+      return buildWidget(item, widgockItem);
+		});
+	}
 
-            var ths = this;
+	/**
+	 * Widget block of widget layout; Widget layout divides to widget blocks; Widget block divibed to widgets
+	 * @param {object} data - Widget block data
+	 * @param {module:models/widgout} widgoutItem - Layout - parent of this widget block
+	 * @constructor
+	 */
+	var exports = function (data, widgoutItem) {
+		data = data || {};
 
-            this.getWidgout = function () {
-                return widgoutItem;
-            };
+		var ths = this;
 
-            this.id = data.Id;
-            this.orderNumber = ko.observable(data.OrderNumber);
-            this.columnCount = ko.observable(data.ColumnCount);
+		this.getWidgout = function () {
+			return widgoutItem;
+		};
 
-            this.columnStyle = ko.computed({
-                read: function () {
-                    return 'col-md-' + ko.unwrap(ths.columnCount);
-                },
-                deferEvaluation: true
-            });
+		this.id = data.Id;
+		this.orderNumber = ko.observable(data.OrderNumber);
+		this.columnCount = ko.observable(data.ColumnCount);
 
-            this.widgetList = ko.observableArray();
+		this.columnStyle = ko.computed({
+				read : function () {
+					return 'col-md-' + ko.unwrap(ths.columnCount);
+				},
+				deferEvaluation : true
+			});
 
-            this.addWidget = function (tmpWidgetName, tmpIdOfSectionPattern, scsCallback) {
-                var tmpWidgetList = ko.unwrap(ths.widgetList);
+		this.widgetList = ko.observableArray();
 
-                // Get order number of last widget
-                var lastOrderNumber;
+		this.addWidget = function (tmpWidgetName, tmpIdOfSectionPattern, scsCallback) {
+			var tmpWidgetList = ko.unwrap(ths.widgetList);
 
-                if (tmpWidgetList.length > 0) {
-                    lastOrderNumber = ko.unwrap(tmpWidgetList[tmpWidgetList.length - 1].orderNumber);
-                }
-                else {
-                    lastOrderNumber = 0;
-                }
+			// Get order number of last widget
+			var lastOrderNumber;
 
-                widgetService.post(ths.getWidgout().getParent().stageKey, ths.id, {
-                    Name: tmpWidgetName,
-                    IdOfSectionPattern: tmpIdOfSectionPattern,
-                    OrderNumber: lastOrderNumber + 1,
-                    Opts: '{}',
-                    WidgockId: ths.id
-                }).done(function (createdWidget) {
-                    var widgetNew = new Widget(createdWidget, ths);
-                    ths.widgetList.push(widgetNew);
+			if (tmpWidgetList.length > 0) {
+				lastOrderNumber = ko.unwrap(tmpWidgetList[tmpWidgetList.length - 1].orderNumber);
+			} else {
+				lastOrderNumber = 0;
+			}
 
-                    // Open settings after creation
-                    scsCallback(widgetNew.id);
-                });
-            };
+			widgetService.post(ths.getWidgout().getParent().stageKey, ths.id, {
+				Name : tmpWidgetName,
+				IdOfSectionPattern : tmpIdOfSectionPattern,
+				OrderNumber : lastOrderNumber + 1,
+				Opts : '{}',
+				WidgockId : ths.id
+			}).done(function (createdWidgetData) {
+				var widgetNew = buildWidget(createdWidgetData, ths);
+				ths.widgetList.push(widgetNew);
 
-            /** Remove widget from widget block */
-            this.removeWidget = function (widgetToDelete) {
-                widgetService.remove(ths.getWidgout().getParent().stageKey, ths.id, widgetToDelete.id).done(function () {
-                    ths.widgetList.remove(widgetToDelete);
-                });
-            };
+				// Open settings after creation
+				scsCallback(widgetNew.id);
+			});
+		};
 
-            this.widgetList(importWidgetList(data.WidgetDtoList, ths));
-        };
+		/** Remove widget from widget block */
+		this.removeWidget = function (widgetToDelete) {
+			widgetService.remove(ths.getWidgout().getParent().stageKey, ths.id, widgetToDelete.id).done(function () {
+				ths.widgetList.remove(widgetToDelete);
+			});
+		};
 
-        return exports;
-    });
+		this.widgetList(importWidgetList(data.WidgetDtoList, ths));
+	};
+
+	return exports;
+});

@@ -6,14 +6,14 @@
       <div class="widget-setting-panel" data-bind="foreach: propSpecList">
         <span data-bind="if: tpe">
           <label style="font-weight: normal">
-            <input type="checkbox" data-bind="checked: vwmWidget['isVis' + clientId]" />
+            <input type="checkbox" data-bind="checked: vwmWidget.mdlWidget.opts['isVis' + serverId]" />
             <span data-bind="text: ttl"></span>
           </label>
         </span>
       </div>
     </div>
     <div class="widget-content" data-bind="foreach: propSpecList">
-      <div data-bind="if: vwmWidget['isVis' + clientId]">
+      <div data-bind="if: vwmWidget.mdlWidget.opts['isVis' + serverId]">
         <small class="bld" data-bind="text: ttl"></small>:
         <span data-bind="if: tpe === 'SingleLine'">
           <!-- parent: mdlStage -->

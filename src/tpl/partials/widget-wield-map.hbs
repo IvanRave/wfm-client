@@ -2,30 +2,29 @@
   <!-- current: vwmWidget -->
   
   <div data-bind="if: vwmWidget.isVisSettingPanel">
-    <div class="widget-setting-panel">
+    <div class="widget-setting-panel" data-bind="with: vwmWidget.mdlWidget">
       <label>
         {{capitalizeFirst lang.toSelectMapOfWield}}:
-        <select class="input-sm" data-bind="options: dictOfMap, optionsText: 'optText', optionsValue: 'optValue', value: vidOfSlcVwmMapOfWield"></select>
+        <select class="input-sm" data-bind="options: dictOfMap, optionsText: 'optText', optionsValue: 'optValue', value: opts.idOfSlcMapOfWield"></select>
       </label>
       <label>
-        <input type="checkbox" data-bind="checked: vwmWidget.isVisImg" /> {{capitalizeFirst lang.isVisImgOfMapOfWield}}
+        <input type="checkbox" data-bind="checked: opts.isVisImg" /> {{capitalizeFirst lang.isVisImgOfMapOfWield}}
       </label>
       <label>
-        <input type="checkbox" data-bind="checked: vwmWidget.isVisName" /> {{capitalizeFirst lang.isVisNameOfMapOfWield}}
+        <input type="checkbox" data-bind="checked: opts.isVisName" /> {{capitalizeFirst lang.isVisNameOfMapOfWield}}
       </label>
     </div>
   </div>
-  <div class="widget-content" data-bind="with: slcVwmMapOfWield">
-    <div data-bind="if: vwmWidget.isVisName">
+  <div class="widget-content" data-bind="with: vwmWidget.slcVwmMapOfWield">
+    <div data-bind="if: vwmWidget.mdlWidget.opts.isVisName">
       <div class="text-center">
         <span data-bind="text: name"></span>
       </div>
     </div>
-    <div data-bind="if: vwmWidget.isVisImg">
+    <div data-bind="if: vwmWidget.mdlWidget.opts.isVisImg">
       <div>
         {{> wield-map-image }}
       </div>
     </div>
   </div>
-  
 </script>

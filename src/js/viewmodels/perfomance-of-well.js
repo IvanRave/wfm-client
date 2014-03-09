@@ -6,7 +6,7 @@ define(['jquery',
 		'models/column-attribute',
 		'viewmodels/svg-graph',
 		'd3',
-    'viewmodels/wfm-parameter-of-wroup'
+		'viewmodels/wfm-parameter-of-wroup'
 	], function ($, ko, modalHelper, appMoment, ColumnAttribute, SvgGraph, d3, VwmWfmParameterOfWroup) {
 	'use strict';
 
@@ -225,24 +225,25 @@ define(['jquery',
 	 * Perfomance of well viewmodel (one well - one perfomance)
 	 * @constructor
 	 */
-	var exports = function (optns, mdlPerfomanceOfWell, vwmWell) {
+	var exports = function (mdlPerfomanceOfWell, vwmWell,
+		koStartYear, koEndYear, koStartMonth, koEndMonth, koSlcAttrGroupId, koIsVisibleForecastData) {
 		var vw = this;
 
-		vw.mdlPerfomanceOfWell = mdlPerfomanceOfWell;
+		this.mdlPerfomanceOfWell = mdlPerfomanceOfWell;
 
-		vw.isVisibleForecastData = ko.observable(optns.isVisibleForecastData);
+		this.isVisibleForecastData = koIsVisibleForecastData;
 
-		vw.selectedPrfTableYear = ko.observable();
-		vw.selectPrfTableYear = function (selectedPrfTableYearItem) {
+		this.selectedPrfTableYear = ko.observable();
+		this.selectPrfTableYear = function (selectedPrfTableYearItem) {
 			vw.selectedPrfTableYear(selectedPrfTableYearItem);
 		};
 
-		vw.monthList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+		this.monthList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
-		vw.WPDDateStartYear = ko.observable(optns.startYear);
-		vw.WPDDateEndYear = ko.observable(optns.endYear);
-		vw.WPDDateStartMonth = ko.observable(optns.startMonth);
-		vw.WPDDateEndMonth = ko.observable(optns.endMonth);
+		this.WPDDateStartYear = koStartYear;
+		this.WPDDateEndYear = koEndYear;
+		this.WPDDateStartMonth = koStartMonth;
+		this.WPDDateEndMonth = koEndMonth;
 
 		function updateSelectedPrfTableYear() {
 			var tmpWpdDateStartYear = ko.unwrap(vw.WPDDateStartYear),
@@ -259,9 +260,11 @@ define(['jquery',
 		vw.WPDDateStartYear.subscribe(updateSelectedPrfTableYear);
 		vw.WPDDateEndYear.subscribe(updateSelectedPrfTableYear);
 
-		// Id of group (squad) of wfm parameters
-		// Can be set through options (optns) or using any html view
-		vw.selectedAttrGroupId = ko.observable(optns.selectedAttrGroupId);
+		/**
+		 * Id of group (squad) of wfm parameters
+		 * @type {string}
+		 */
+		vw.selectedAttrGroupId = koSlcAttrGroupId;
 
 		vw.selectedAttrGroup = ko.computed({
 				read : function () {
@@ -284,20 +287,20 @@ define(['jquery',
 		this.selectAttrGroupId = function (attrGroupId) {
 			vw.selectedAttrGroupId(attrGroupId);
 		};
-    
-    /**
-    * Recreate viewmodels for each perfomance of well
-    */
-    this.listOfVwmWfmParameterOfWroup = ko.computed({
-      read: function(){
-        // List of params from a wroup model
-        var tmpParams = ko.unwrap(vwmWell.getParentVwm().mdlStage.listOfWfmParameterOfWroup);
-        return tmpParams.map(function(paramItem){
-          return new VwmWfmParameterOfWroup(paramItem);
-        });
-      },
-      deferEvaluation: true
-    });
+
+		/**
+		 * Recreate viewmodels for each perfomance of well
+		 */
+		this.listOfVwmWfmParameterOfWroup = ko.computed({
+				read : function () {
+					// List of params from a wroup model
+					var tmpParams = ko.unwrap(vwmWell.getParentVwm().mdlStage.listOfWfmParameterOfWroup);
+					return tmpParams.map(function (paramItem) {
+						return new VwmWfmParameterOfWroup(paramItem);
+					});
+				},
+				deferEvaluation : true
+			});
 
 		/**
 		 * List of selected viewmodels of parameters
@@ -473,8 +476,8 @@ define(['jquery',
 						tmpYScale = ko.unwrap(vw.prfmGraph.scaleObj.y);
 
 						if (tmpXScale && tmpYScale) {
-              var tmpDataSet = ko.unwrap(vw.filteredByDateProductionDataSet);
-            
+							var tmpDataSet = ko.unwrap(vw.filteredByDateProductionDataSet);
+
 							listOfVwmParam.forEach(function (vwmParamItem) {
 								// parameter id, like CSG, WaterRate ...
 								var tmpIdOfParameter = vwmParamItem.mdlWfmParameterOfWroup.wfmParameterId;

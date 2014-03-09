@@ -1,194 +1,218 @@
 ﻿/** @module */
 define([
-    'jquery',
-    'knockout',
-    'helpers/modal-helper'],
-    function (
-        $,
-        ko,
-        bootstrapModal) {
-        'use strict';
+		'jquery',
+		'knockout',
+		'helpers/modal-helper'],
+	function (
+		$,
+		ko,
+		bootstrapModal) {
+	'use strict';
 
-        /**
-        * Viewmodel: history of well
-        * @constructor
-        */
-        var exports = function (mdlHistoryOfWell, vwmWell, koStartUnixTime, koEndUnixTime, koIdOfJobType) {
+	/**
+	 * Viewmodel: history of well
+	 * @constructor
+	 */
+	var exports = function (mdlHistoryOfWell, vwmWell, koStartUnixTime, koEndUnixTime, koIdOfJobType) {
 
-            var ths = this;
+		/**
+		 * Getter for a well viewmodel
+		 */
+		this.getVwmWell = function () {
+			return vwmWell;
+		};
 
-            /**
-            * Model: history of well
-            * @type {module:models/history-of-well}
-            */
-            this.mdlHistoryOfWell = mdlHistoryOfWell;
+		this.filterUnixTime = {
+			start : koStartUnixTime,
+			end : koEndUnixTime
+		};
 
-            /**
-            * Whether history record is visible (filtered)
-            * @type {boolean}
-            */
-            this.isVisible = ko.computed({
-                read: function () {
-                    var tmpFilterUnixTime = {
-                        start: ko.unwrap(koStartUnixTime),
-                        end: ko.unwrap(koEndUnixTime)
-                    };
+		this.idOfSlcJobType = koIdOfJobType;
 
-                    console.log('tmpFilterUnixTime', tmpFilterUnixTime);
+		/**
+		 * Model: history of well
+		 * @type {module:models/history-of-well}
+		 */
+		this.mdlHistoryOfWell = mdlHistoryOfWell;
 
-                    // Step 1: filter by date
-                    if (tmpFilterUnixTime.start || tmpFilterUnixTime.end) {
-                        var tmpElemUnixTime = {
-                            start: ko.unwrap(ths.mdlHistoryOfWell.startUnixTime),
-                            end: ko.unwrap(ths.mdlHistoryOfWell.endUnixTime)
-                        };
+		/**
+		 * Whether history record is visible (filtered)
+		 * @type {boolean}
+		 */
+		this.isVisible = ko.computed({
+				read : this.checkIsVisibleRecord,
+				deferEvaluation : true,
+				owner : this
+			});
+	};
 
-                        console.log('tmpElemUnixTime', tmpElemUnixTime);
+	/**
+	 * Create file spec for history of well
+	 */
+	exports.prototype.createFileSpecOfHistoryOfWell = function () {
+		var ths = this;
+		// Select file section with history files (load and unselect files)
+		var tmpVwmWell = this.getVwmWell();
+		tmpVwmWell.unzOfSlcVwmSectionFmg(tmpVwmWell.mdlStage.stageKey + '-history');
+		var fmgr = tmpVwmWell.fmgr;
+		// Calback for selected file
+		function mgrCallback() {
+			fmgr.okError('');
 
-                        if (tmpFilterUnixTime.start && (tmpFilterUnixTime.start > tmpElemUnixTime.start)) {
-                            return false;
-                        }
+			var tmpSlcVwmSection = ko.unwrap(tmpVwmWell.slcVwmSectionFmg);
 
-                        if (tmpFilterUnixTime.end && (tmpFilterUnixTime.end < tmpElemUnixTime.end)) {
-                            return false;
-                        }
-                    }
+			if (!tmpSlcVwmSection) {
+				throw new Error('No selected section');
+			}
 
-                    // Step 2: filter by job type
-                    var tmpIdOfJobType = ko.unwrap(koIdOfJobType);
+			// Select file from file manager
+			var selectedFileSpecs = ko.unwrap(tmpSlcVwmSection.mdlSection.listOfFileSpec).filter(function (elem) {
+					return ko.unwrap(elem.isSelected);
+				});
 
-                    if (tmpIdOfJobType) {
-                        if (ko.unwrap(ths.mdlHistoryOfWell.jobTypeId) !== tmpIdOfJobType) {
-                            return false;
-                        }
-                    }
+			if (selectedFileSpecs.length !== 1) {
+				fmgr.okError('need to select one file');
+				return;
+			}
 
-                    return true;
-                },
-                deferEvaluation: true
-            });
+			ths.mdlHistoryOfWell.postFileSpecOfHistoryOfWell(selectedFileSpecs[0].id, function () {
+				fmgr.hide();
+			}, function (jqXhr) {
+				if (jqXhr.status === 422) {
+					var resJson = jqXhr.responseJSON;
+					require(['helpers/lang-helper'], function (langHelper) {
+						var tmpProcessError = (langHelper.translate(resJson.errId) || '{{lang.unknownError}}');
+						fmgr.okError(tmpProcessError);
+					});
+				}
+			});
+		}
 
-            /**
-            * Create file spec for history of well
-            */
-            this.createFileSpecOfHistoryOfWell = function () {
-                // Select file section with history files (load and unselect files)
-                vwmWell.unzOfSlcVwmSectionFmg(vwmWell.mdlStage.stageKey + '-history');
-                var fmgr = vwmWell.fmgr;
-                // Calback for selected file
-                function mgrCallback() {
-                    fmgr.okError('');
+		// Add to observable
+		fmgr.okCallback(mgrCallback);
 
-                    var tmpSlcVwmSection = ko.unwrap(vwmWell.slcVwmSectionFmg);
+		// Notification
+		fmgr.okDescription('Please select a file for this history record');
 
-                    if (!tmpSlcVwmSection) { throw new Error('No selected section'); }
+		// Open file manager
+		fmgr.show();
+	};
 
-                    // Select file from file manager
-                    var selectedFileSpecs = ko.unwrap(tmpSlcVwmSection.mdlSection.listOfFileSpec).filter(function (elem) {
-                        return ko.unwrap(elem.isSelected);
-                    });
+	/**
+	 * Create cropped image from file (for history of well)
+	 */
+	exports.prototype.createImageFromFileSpec = function () {
+		var ths = this;
+		var tmpVwmWell = this.getVwmWell();
+		tmpVwmWell.unzOfSlcVwmSectionFmg(tmpVwmWell.mdlStage.stageKey + '-history');
+		var fmgr = this.getVwmWell().fmgr;
 
-                    if (selectedFileSpecs.length !== 1) {
-                        fmgr.okError('need to select one file');
-                        return;
-                    }
+		function mgrCallback() {
+			fmgr.okError('');
 
-                    ths.mdlHistoryOfWell.postFileSpecOfHistoryOfWell(selectedFileSpecs[0].id, function () {
-                        fmgr.hide();
-                    }, function (jqXhr) {
-                        if (jqXhr.status === 422) {
-                            var resJson = jqXhr.responseJSON;
-                            require(['helpers/lang-helper'], function (langHelper) {
-                                var tmpProcessError = (langHelper.translate(resJson.errId) || '{{lang.unknownError}}');
-                                fmgr.okError(tmpProcessError);
-                            });
-                        }
-                    });
-                }
+			var tmpSlcVwmSection = ko.unwrap(tmpVwmWell.slcVwmSectionFmg);
 
-                // Add to observable
-                fmgr.okCallback(mgrCallback);
+			if (!tmpSlcVwmSection) {
+				throw new Error('No selected section');
+			}
 
-                // Notification
-                fmgr.okDescription('Please select a file for this history record');
+			// Select file from file manager
+			var selectedFileSpecs = ko.unwrap(tmpSlcVwmSection.mdlSection.listOfFileSpec).filter(function (elem) {
+					return ko.unwrap(elem.isSelected);
+				});
 
-                // Open file manager
-                fmgr.show();
-            };
+			if (selectedFileSpecs.length !== 1) {
+				fmgr.okError('need to select one file');
+				return;
+			}
 
-            /**
-            * Create cropped image from file (for history of well)
-            */
-            this.createImageFromFileSpec = function () {
-                vwmWell.unzOfSlcVwmSectionFmg(vwmWell.mdlStage.stageKey + '-history');
-                var fmgr = vwmWell.fmgr;
+			var imageFileSpec = selectedFileSpecs[0];
 
-                function mgrCallback() {
-                    fmgr.okError('');
+			fmgr.hide();
 
-                    var tmpSlcVwmSection = ko.unwrap(vwmWell.slcVwmSectionFmg);
+			// history image src
+			var innerDiv = document.createElement('div');
+			var historyImgElem = document.createElement('img');
+			innerDiv.appendChild(historyImgElem);
+			// load image before open window and set JCrop
+			historyImgElem.onload = function () {
+				// load need libraries for cropping
+				require(['jquery.Jcrop'], function () {
+					var coords = [0, 0, 0, 0];
 
-                    if (!tmpSlcVwmSection) { throw new Error('No selected section'); }
+					function jcropSaveCoords(c) {
+						coords = [c.x, c.y, c.x2, c.y2];
+					}
 
-                    // Select file from file manager
-                    var selectedFileSpecs = ko.unwrap(tmpSlcVwmSection.mdlSection.listOfFileSpec).filter(function (elem) {
-                        return ko.unwrap(elem.isSelected);
-                    });
+					// The variable jcrop_api will hold a reference to the Jcrop API once Jcrop is instantiated
+					$(historyImgElem).Jcrop({
+						onChange : jcropSaveCoords,
+						onSelect : jcropSaveCoords,
+						bgOpacity : 0.6
+					});
 
-                    if (selectedFileSpecs.length !== 1) {
-                        fmgr.okError('need to select one file');
-                        return;
-                    }
+					// submitted by OK button
+					bootstrapModal.openModalWideWindow(innerDiv, function () {
+						// TODO: check not null comments = if user can't choose whole images
+						ths.mdlHistoryOfWell.postImageOfHistoryOfWell(imageFileSpec.id, coords, function () {
+							bootstrapModal.closeModalWideWindow();
+						});
+					}, 'Please select area to crop');
+					// end of require
+				});
+			};
 
-                    var imageFileSpec = selectedFileSpecs[0];
+			// start load image
+			historyImgElem.src = imageFileSpec.fileUrl;
+		}
+		// Add to observable
+		fmgr.okCallback(mgrCallback);
 
-                    fmgr.hide();
+		// Notification
+		fmgr.okDescription('Please select a history image to crop');
 
-                    // history image src
-                    var innerDiv = document.createElement('div');
-                    var historyImgElem = document.createElement('img');
-                    innerDiv.appendChild(historyImgElem);
-                    // load image before open window and set JCrop
-                    historyImgElem.onload = function () {
-                        // load need libraries for cropping
-                        require(['jquery.Jcrop'], function () {
-                            var coords = [0, 0, 0, 0];
+		// Open file manager
+		fmgr.show();
+	};
 
-                            function jcropSaveCoords(c) {
-                                coords = [c.x, c.y, c.x2, c.y2];
-                            }
+  /**
+  * Check whether is this record visible
+  */
+	exports.prototype.checkIsVisibleRecord = function () {
+		var ths = this;
+		var tmpFilterUnixTime = ko.toJS(this.filterUnixTime);
 
-                            // The variable jcrop_api will hold a reference to the Jcrop API once Jcrop is instantiated
-                            $(historyImgElem).Jcrop({
-                                onChange: jcropSaveCoords,
-                                onSelect: jcropSaveCoords,
-                                bgOpacity: 0.6
-                            });
+		console.log('tmpFilterUnixTime', tmpFilterUnixTime);
 
-                            // submitted by OK button
-                            bootstrapModal.openModalWideWindow(innerDiv, function () {
-                                // TODO: check not null comments = if user can't choose whole images
-                                mdlHistoryOfWell.postImageOfHistoryOfWell(imageFileSpec.id, coords, function () {
-                                    bootstrapModal.closeModalWideWindow();
-                                });
-                            }, 'Please select area to crop');
-                            // end of require
-                        });
-                    };
+		// Step 1: filter by date
+		if (tmpFilterUnixTime.start || tmpFilterUnixTime.end) {
+			var tmpElemUnixTime = {
+				start : ko.unwrap(ths.mdlHistoryOfWell.startUnixTime),
+				end : ko.unwrap(ths.mdlHistoryOfWell.endUnixTime)
+			};
 
-                    // start load image
-                    historyImgElem.src = imageFileSpec.fileUrl;
-                }
-                // Add to observable
-                fmgr.okCallback(mgrCallback);
+			console.log('tmpElemUnixTime', tmpElemUnixTime);
 
-                // Notification
-                fmgr.okDescription('Please select a history image to crop');
+			if (tmpFilterUnixTime.start && (tmpFilterUnixTime.start > tmpElemUnixTime.start)) {
+				return false;
+			}
 
-                // Open file manager
-                fmgr.show();
-            };
-        };
+			if (tmpFilterUnixTime.end && (tmpFilterUnixTime.end < tmpElemUnixTime.end)) {
+				return false;
+			}
+		}
 
-        return exports;
-    });
+		// Step 2: filter by job type
+		var tmpIdOfSlcJobType = ko.unwrap(ths.idOfSlcJobType);
+
+		if (tmpIdOfSlcJobType) {
+			if (ko.unwrap(ths.mdlHistoryOfWell.jobTypeId) !== tmpIdOfSlcJobType) {
+				return false;
+			}
+		}
+
+		return true;
+	};
+
+	return exports;
+});

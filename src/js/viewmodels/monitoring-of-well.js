@@ -14,8 +14,12 @@ define(['jquery',
 	/**
 	 * A shared monitoring viewmodel for widgets and sections
 	 * @constructor
+   * @param {number} optStartUnixTime - Start time for monitoring
+   * @param {number} optEndUnixTime - End time for monitoring
+   *        these times can be loaded as options for a widget 
+   *        or as cookie values for a main view
 	 */
-	var exports = function (opts, mdlWell, koListOfMonitoredParams) {
+	var exports = function (mdlWell, koListOfMonitoredParams, optKoStartUnixTime, optKoEndUnixTime) {
 		/** Alternative */
 		var ths = this;
 
@@ -26,8 +30,8 @@ define(['jquery',
 		this.mntrUnixTimeBorder = {
 			// By default: loaded from server options for a widget
 			// no default for main section views
-			start : ko.observable(),
-			end : ko.observable()
+			start : optKoStartUnixTime || ko.observable(),
+			end : optKoEndUnixTime || ko.observable()
 		};
 
 		/**
@@ -178,10 +182,10 @@ define(['jquery',
 
 		//} #endregion GRAPH
 
-		// Load data (widget or main view options)
-		// Automatically will be loaded monitoring records for these dates
-		this.mntrUnixTimeBorder.start(opts['StartUnixTime']);
-		this.mntrUnixTimeBorder.end(opts['EndUnixTime']);
+		// // Load data (widget or main view options)
+		// // Automatically will be loaded monitoring records for these dates
+		// this.mntrUnixTimeBorder.start(optStartUnixTime);
+		// this.mntrUnixTimeBorder.end(optEndUnixTime);
 	};
 
 	return exports;

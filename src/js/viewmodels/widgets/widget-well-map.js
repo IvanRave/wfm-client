@@ -8,8 +8,8 @@ define(['knockout',
 	'use strict';
 
 	/**
-	 * Viewmodel: widget for sketch (image plus desc)
-	 * @constructor
+	 * Base: widget view model for map of well
+	 * @constuctor
 	 * @augments {module:viewmodels/widget}
 	 */
 	var exports = function (mdlWidget) {
