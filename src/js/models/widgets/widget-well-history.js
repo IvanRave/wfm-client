@@ -20,7 +20,12 @@ define(['knockout',
 		this.opts.startDate = ko.observable(tmpOpts['startDate']);
 		this.opts.endDate = ko.observable(tmpOpts['endDate']);
 		this.opts.jobTypeId = ko.observable(tmpOpts['jobTypeId']);
-		this.opts.sortByDateOrder = ko.observable(tmpOpts['sortByDateOrder']);
+
+		/**
+		 * A sort order (1 or -1), by default -1 (from newer to older)
+		 * @type {number}
+		 */
+		this.opts.sortByDateOrder = ko.observable(tmpOpts['sortByDateOrder'] || -1);
 	};
 
 	/** Inherit from a widget model */

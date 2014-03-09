@@ -201,14 +201,14 @@ define([
 		//{ #region HISTORY
 
 		/**
-		 * A viewmodel for history records
+		 * A viewmodel for history records (order from newer to older)
 		 * @type {module:viewmodels/history-of-well}
 		 */
 		this.vwmScopeOfHistoryOfWell = new VwmScopeOfHistoryOfWell(ths,
 				ko.observable(null),
 				ko.observable(null),
 				ko.observable(null),
-				ko.observable(1));
+				ko.observable(-1));
 
 		//} #endregion HISTORY
 

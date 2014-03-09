@@ -71,7 +71,7 @@
                   <button class="btn btn-default" type="button" data-bind="click: createImageFromFileSpec">
                     <i class="glyphicon glyphicon-picture"></i> {{capitalizeFirst lang.cropImage}}
                   </button>
-                  <button class="btn btn-default" type="button" data-bind="click: $parent.removeVwmHistoryOfWell">
+                  <button class="btn btn-default" type="button" data-bind="click: $parent.removeVwmHistoryOfWell.bind($parent)">
                     <i class="glyphicon glyphicon-remove"></i> {{capitalizeFirst lang.toDelete}}
                   </button>
                 </div>

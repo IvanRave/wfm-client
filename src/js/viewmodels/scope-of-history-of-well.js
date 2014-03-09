@@ -1,125 +1,162 @@
 ﻿/** @module */
 define(['knockout',
-    'viewmodels/history-of-well'],
-    function (ko,
-        VwmHistoryOfWell) {
-        'use strict';
+		'viewmodels/history-of-well'],
+	function (ko,
+		VwmHistoryOfWell) {
+	'use strict';
 
-        /**
-        * Well history view for history section, report section and history widgets
-        * @constructor
-        */
-        var exports = function (vwmWell, koStartUnixTime, koEndUnixTime, koJobTypeId, koSortByDateOrder) {
-            var ths = this;
+	/**
+	 * Well history view for history section, report section and history widgets
+	 * @constructor
+	 */
+	var exports = function (vwmWell, koFilteredStartUnixTime, koFilteredEndUnixTime, koIdOfSlcJobType, koSortByDateOrder) {
+		/**
+		 * Getter for a parent viewmodel
+		 *    Not defined as a property to exclude loop between a parent child and a child parent
+		 */
+		this.getVwmWell = function () {
+			return vwmWell;
+		};
 
-            /** Company model for this well */
-            var mdlCompany = vwmWell.mdlStage.getWellGroup().getWellField().getWellRegion().getCompany();
+		/**
+		 * A well model
+		 * @type {module:models/well}
+		 */
+		this.mdlWell = vwmWell.mdlStage;
 
-            /**
-            * Link to company job type list (observable)
-            */
-            this.jobTypeList = mdlCompany.jobTypeList;
+		/** Company model for this well */
+		var mdlCompany = this.mdlWell.getWellGroup().getWellField().getWellRegion().getCompany();
 
-            this.goToPostingJobType = function () {
-                var jobTypeNewName = window.prompt('{{capitalizeFirst lang.toAddJobTypeToList}}');
-                if (jobTypeNewName) {
-                    mdlCompany.postJobType(jobTypeNewName);
-                }
-            };
+		/**
+		 * Link to company job type list (observable)
+		 */
+		this.jobTypeList = mdlCompany.jobTypeList;
 
-            // UTC unix time (in seconds)
-            this.startDate = koStartUnixTime;
-            this.endDate = koEndUnixTime;
+		this.goToPostingJobType = function () {
+			var jobTypeNewName = window.prompt('{{capitalizeFirst lang.toAddJobTypeToList}}');
+			if (jobTypeNewName) {
+				mdlCompany.postJobType(jobTypeNewName);
+			}
+		};
 
-            this.jobTypeId = koJobTypeId;
+		// UTC unix time (in seconds)
+		this.startDate = koFilteredStartUnixTime;
+		this.endDate = koFilteredEndUnixTime;
 
-            this.sortByDateOrder = koSortByDateOrder;
+		this.jobTypeId = koIdOfSlcJobType;
 
-            this.sortByDateCss = ko.computed({
-                read: function () {
-                    return ko.unwrap(ths.sortByDateOrder) === 1 ? 'glyphicon-arrow-down' : 'glyphicon-arrow-up';
-                },
-                deferEvaluation: true
-            });
+		this.sortByDateOrder = koSortByDateOrder;
 
-            this.changeSortByDateOrder = function () {
-                ths.sortByDateOrder(-parseInt(ko.unwrap(ths.sortByDateOrder), 10));
-            };
+		this.sortByDateCss = ko.computed({
+				read : this.getSortByDateCss,
+				deferEvaluation : true,
+				owner : this
+			});
 
-            this.listOfVwmHistoryOfWell = ko.computed({
-                read: function () {
-                    var tmpMdlList = ko.unwrap(vwmWell.mdlStage.historyList);
-                    return tmpMdlList.map(function (elem) {
-                        return new VwmHistoryOfWell(elem, vwmWell, ths.startDate, ths.endDate, ths.jobTypeId);
-                    });               
-                },
-                deferEvaluation: true
-            });
+		this.listOfVwmHistoryOfWell = ko.computed({
+				read : this.getListOfVwmHistoryOfWell,
+				deferEvaluation : true,
+				owner : this
+			});
 
-            /**
-            * Sorted list of history records
-            *    Separated from main list, to prevent recreation of this list
-            * @type {Array.<module:viewmodels/history-of-well>}
-            */
-            this.sortedListOfVwmHistoryOfWell = ko.computed({
-                read: function () {
-                    var tmpVwmList = ko.unwrap(ths.listOfVwmHistoryOfWell);
+		/**
+		 * Sorted list of history records
+		 *    Separated from main list, to prevent recreation of this list
+		 * @type {Array.<module:viewmodels/history-of-well>}
+		 */
+		this.sortedListOfVwmHistoryOfWell = ko.computed({
+				read : this.getSortedListOfVwmHistoryOfWell,
+				deferEvaluation : true,
+				owner : this
+			});
 
-                    var tmpOrder = parseInt(ko.unwrap(ths.sortByDateOrder), 10);
+		this.wellHistoryNew = {
+			startUnixTime : ko.observable(),
+			endUnixTime : ko.observable()
+		};
 
-                    return tmpVwmList.sort(function (left, right) {
-                        return ko.unwrap(left.mdlHistoryOfWell.startUnixTime) === ko.unwrap(right.mdlHistoryOfWell.startUnixTime) ? 0 :
-                            (ko.unwrap(left.mdlHistoryOfWell.startUnixTime) > ko.unwrap(right.mdlHistoryOfWell.startUnixTime) ? tmpOrder : -tmpOrder);
-                    });
-                },
-                deferEvaluation: true
-            });
+		/**
+		 * Whether is a record posting enable
+		 * @type {boolean}
+		 */
+		this.isEnabledPostHistoryOfWell = ko.computed({
+				read : this.checkIsEnabledPostHistoryOfWell,
+				deferEvaluation : true,
+				owner : this
+			});
+	};
 
-            this.wellHistoryNew = {
-                startUnixTime: ko.observable(),
-                endUnixTime: ko.observable()
-            };
+	/** Check whether is a record posting enable */
+	exports.prototype.checkIsEnabledPostHistoryOfWell = function () {
+		if (ko.unwrap(this.wellHistoryNew.startUnixTime)) {
+			return true;
+		} else {
+			return false;
+		}
+	};
 
-            this.isEnabledPostHistoryOfWell = ko.computed({
-                read: function () {
-                    if (ko.unwrap(ths.wellHistoryNew.startUnixTime)) {
-                        return true;
-                    }
-                    else {
-                        return false;
-                    }
-                },
-                deferEvaluation: true
-            });
+	/** Create a history record */
+	exports.prototype.postVwmHistoryOfWell = function () {
+		var ths = this;
+		if (ko.unwrap(this.isEnabledPostHistoryOfWell)) {
+			var wellHistoryNewData = ko.toJS(this.wellHistoryNew);
 
-            this.postVwmHistoryOfWell = function () {
-                if (ko.unwrap(ths.isEnabledPostHistoryOfWell)) {
-                    var wellHistoryNewData = ko.toJS(ths.wellHistoryNew);
+			if (wellHistoryNewData.startUnixTime) {
+				if (!wellHistoryNewData.endUnixTime) {
+					wellHistoryNewData.endUnixTime = wellHistoryNewData.startUnixTime;
+				}
 
-                    if (wellHistoryNewData.startUnixTime) {
-                        if (!wellHistoryNewData.endUnixTime) {
-                            wellHistoryNewData.endUnixTime = wellHistoryNewData.startUnixTime;
-                        }
+				this.mdlWell.postHistoryOfWell(wellHistoryNewData.startUnixTime,
+					wellHistoryNewData.endUnixTime, function () {
+					// Set to null for psblty creating new well history
+					ths.wellHistoryNew.startUnixTime(null);
+					ths.wellHistoryNew.endUnixTime(null);
+				});
+			}
+		}
+	};
 
-                        vwmWell.mdlStage.postHistoryOfWell(wellHistoryNewData.startUnixTime,
-                            wellHistoryNewData.endUnixTime, function () {
-                                // Set to null for psblty creating new well history
-                                ths.wellHistoryNew.startUnixTime(null);
-                                ths.wellHistoryNew.endUnixTime(null);
-                            });
-                    }
-                }
-            };
+	/**
+	 * Remove history record: model and viewmodel
+	 */
+	exports.prototype.removeVwmHistoryOfWell = function (vwmHistoryOfWellToRemove) {
+		if (confirm('{{capitalizeFirst lang.confirmToDelete}} record?')) {
+			this.mdlWell.deleteWellHistory(vwmHistoryOfWellToRemove.mdlHistoryOfWell);
+		}
+	};
 
-            /**
-            * Remove history record: model and viewmodel
-            */
-            this.removeVwmHistoryOfWell = function (vwmHistoryOfWellToRemove) {
-                if (confirm('{{capitalizeFirst lang.confirmToDelete}} record?')) {
-                    vwmWell.mdlStage.deleteWellHistory(vwmHistoryOfWellToRemove.mdlHistoryOfWell);
-                }
-            };
-        };
+	/**
+	 * Get sorted list
+	 */
+	exports.prototype.getSortedListOfVwmHistoryOfWell = function () {
+		var tmpVwmList = ko.unwrap(this.listOfVwmHistoryOfWell);
 
-        return exports;
-    });
+		var tmpOrder = parseInt(ko.unwrap(this.sortByDateOrder), 10);
+
+		return tmpVwmList.sort(function (left, right) {
+			return ko.unwrap(left.mdlHistoryOfWell.startUnixTime) === ko.unwrap(right.mdlHistoryOfWell.startUnixTime) ? 0 :
+			(ko.unwrap(left.mdlHistoryOfWell.startUnixTime) > ko.unwrap(right.mdlHistoryOfWell.startUnixTime) ? tmpOrder : -tmpOrder);
+		});
+	};
+
+	/** Get list of viewmodels */
+	exports.prototype.getListOfVwmHistoryOfWell = function () {
+		var ths = this;
+		var tmpMdlList = ko.unwrap(this.mdlWell.historyList);
+		return tmpMdlList.map(function (elem) {
+			return new VwmHistoryOfWell(elem, ths.getVwmWell(), ths.startDate, ths.endDate, ths.jobTypeId);
+		});
+	};
+
+	/** Get css for the button with a date filter */
+	exports.prototype.getSortByDateCss = function () {
+		return ko.unwrap(this.sortByDateOrder) === 1 ? 'glyphicon-arrow-down' : 'glyphicon-arrow-up';
+	};
+
+	/** Change a sort order */
+	exports.prototype.changeSortByDateOrder = function () {
+		this.sortByDateOrder(-parseInt(ko.unwrap(this.sortByDateOrder), 10));
+	};
+
+	return exports;
+});

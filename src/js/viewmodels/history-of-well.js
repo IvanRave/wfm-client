@@ -13,7 +13,8 @@ define([
 	 * Viewmodel: history of well
 	 * @constructor
 	 */
-	var exports = function (mdlHistoryOfWell, vwmWell, koStartUnixTime, koEndUnixTime, koIdOfJobType) {
+	var exports = function (mdlHistoryOfWell, vwmWell, 
+    koStartUnixTime, koEndUnixTime, koIdOfSlcJobType) {
 
 		/**
 		 * Getter for a well viewmodel
@@ -27,7 +28,7 @@ define([
 			end : koEndUnixTime
 		};
 
-		this.idOfSlcJobType = koIdOfJobType;
+		this.idOfSlcJobType = koIdOfSlcJobType;
 
 		/**
 		 * Model: history of well
