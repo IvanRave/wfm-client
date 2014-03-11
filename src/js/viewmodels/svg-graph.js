@@ -33,6 +33,32 @@ define(['jquery', 'knockout', 'd3',
 		this.timeBorder = koTimeBorder;
 		this.valueBorder = koValueBorder;
 
+    /**
+		 * Margins for axis and some space
+		 * @type {object}
+		 */
+		this.vboxMargin = {
+			top : 10,
+			right : 30,
+			bottom : 20,
+			left : 60
+		};
+    
+    /**
+		 * Inner size of the block in svg units
+		 * @type {object}
+		 */
+		this.vboxSize = {
+			width : this.vboxOutSize.width - this.vboxMargin.left - this.vboxMargin.right,
+			height : this.vboxOutSize.height - this.vboxMargin.top - this.vboxMargin.bottom
+		};
+    
+    /**
+		 * An attribute for a group of the block: like top-left padding
+		 * @type {string}
+		 */
+		this.baseTransform = 'translate(' + this.vboxMargin.left + ', ' + this.vboxMargin.top + ')';
+    
 		/**
 		 * An attribute for the X axis of the graph
 		 * @type {string}
@@ -55,7 +81,7 @@ define(['jquery', 'knockout', 'd3',
 				owner : this
 			})
 		};
-
+    
 		/**
 		 * Paths (graph lines)
 		 * @type {Array.<object>}
@@ -115,6 +141,20 @@ define(['jquery', 'knockout', 'd3',
 			.domain(tmpValueBorder)
 			.range([this.vboxSize.height, 0]);
 		}
+	};
+  
+  /**
+	 * A zoom-in method for a graph
+	 */
+	exports.prototype.zoomIn = function () {
+    exports.superClass_.zoomInOut.call(this, this.vboxSize.width, this.vboxSize.height, 1);
+	};
+
+  /**
+	 * A zoom-out method
+	 */
+	exports.prototype.zoomOut = function () {
+    exports.superClass_.zoomInOut.call(this, this.vboxSize.width, this.vboxSize.height, -1);
 	};
 
 	return exports;

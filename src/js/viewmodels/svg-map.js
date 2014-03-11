@@ -9,7 +9,7 @@ define(['knockout',
 		appHelper,
 		d3) {
 	'use strict';
-
+  
 	/** Calculate svg image size using real size and svg block size */
 	function calcImgSizeVg(imgWidthPx, imgHeightPx, vboxWidth, vboxHeight, vboxRatio) {
 		var svgImgSize = {};
@@ -71,6 +71,28 @@ define(['knockout',
 	exports.prototype.getScaleY = function () {
 		return d3.scale.linear().range([this.imgStartVgY, this.imgStartVgY + this.imgHeightVg]);
 	};
+  
+  /**
+	 * A zoom-in method for a map
+	 */
+	exports.prototype.zoomIn = function () {
+    exports.superClass_.zoomInOut.call(this, this.imgWidthVg, this.imgHeightVg, 1);
+	};
 
+  /**
+	 * A zoom-out method
+	 */
+	exports.prototype.zoomOut = function () {
+    exports.superClass_.zoomInOut.call(this, this.imgWidthVg, this.imgHeightVg, -1);
+	};
+  
+  /**
+	 * Get center of a vbox
+	 * @returns {Array} - Center cooords, like [x, y]
+	 */
+	exports.prototype.getVboxCenter = function () {
+		return [this.vboxOutSize.width / 2, this.vboxOutSize.height / 2];
+	};
+  
 	return exports;
 });

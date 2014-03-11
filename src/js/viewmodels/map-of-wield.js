@@ -251,12 +251,7 @@ define(['knockout',
 		// Svg marker coords = Real marker coords (in pixels) -> Real marker coords (in svg units) + Image margin (in svg units)
 		var wellMarkerCoordsInPx = ko.unwrap(vwmWellMarkerToSelect.mdlWellMarker.coords);
 
-		var imgStartPos = {
-			x : (ths.svgMap.vboxOutSize.width - ths.svgMap.imgWidthVg) / 2,
-			y : (ths.svgMap.vboxOutSize.height - ths.svgMap.imgHeightVg) / 2
-		};
-
-		var wellMarkerCoordsInVg = [wellMarkerCoordsInPx[0] * ths.svgMap.widthCoefVgToPx + imgStartPos.x, wellMarkerCoordsInPx[1] * ths.svgMap.heightCoefVgToPx + imgStartPos.y];
+		var wellMarkerCoordsInVg = [wellMarkerCoordsInPx[0] * ths.svgMap.widthCoefVgToPx + ths.svgMap.imgStartVgX, wellMarkerCoordsInPx[1] * ths.svgMap.heightCoefVgToPx + ths.svgMap.imgStartVgY];
 
 		var transformCoords = [svgCenterCoords[0] - wellMarkerCoordsInVg[0], svgCenterCoords[1] - wellMarkerCoordsInVg[1]];
 

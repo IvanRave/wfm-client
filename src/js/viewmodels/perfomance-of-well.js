@@ -480,7 +480,6 @@ define(['jquery',
 
 	/** Generate paths for a graph */
 	exports.prototype.generatePerfomancePaths = function () {
-		console.log('graph paths are generated');
 		var resultArr = [];
 		// Redraw data after changing a graph zoom
 		var tmpZoomTransform = ko.unwrap(this.prfmGraph.zoomTransform);

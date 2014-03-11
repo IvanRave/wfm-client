@@ -53,32 +53,6 @@ define(['jquery',
 		};
 
 		/**
-		 * Margins for axis and some space
-		 * @type {object}
-		 */
-		this.vboxMargin = {
-			top : 10,
-			right : 30,
-			bottom : 20,
-			left : 60
-		};
-
-		/**
-		 * Inner size of the block in svg units
-		 * @type {object}
-		 */
-		this.vboxSize = {
-			width : ths.vboxOutSize.width - ths.vboxMargin.left - ths.vboxMargin.right,
-			height : ths.vboxOutSize.height - ths.vboxMargin.top - ths.vboxMargin.bottom
-		};
-
-		/**
-		 * An attribute for a group of the block: like top-left padding
-		 * @type {string}
-		 */
-		this.baseTransform = 'translate(' + ths.vboxMargin.left + ', ' + ths.vboxMargin.top + ')';
-
-		/**
 		 * Svg scale functions for a x-axis and y-axis
 		 */
 		this.scaleX = ko.computed({
@@ -93,9 +67,9 @@ define(['jquery',
 				owner : this
 			});
 
-    this.scaleX.subscribe(this.updateZoomScale, this);
-    this.scaleY.subscribe(this.updateZoomScale, this);
-      
+		this.scaleX.subscribe(this.updateZoomScale, this);
+		this.scaleY.subscribe(this.updateZoomScale, this);
+
 		/**
 		 * An observable transform attribute for the svg object, to manage a zoom behavior
 		 *    Default value
@@ -120,17 +94,11 @@ define(['jquery',
 			});
 
 		this.zoomTransform.subscribe(this.buildZoomBehavior, this);
-    
-    // Apply default values to the behavior
-    this.zoomTransform.valueHasMutated();
-	};
 
-	/**
-	 * Get center of a vbox
-	 * @returns {Array} - Center cooords, like [x, y]
-	 */
-	exports.prototype.getVboxCenter = function () {
-		return [this.vboxSize.width / 2, this.vboxSize.height / 2];
+		// Apply default values to the behavior
+		//    before an user will fired a zoom event by scrolling or panning
+		//    in this case - values will be null (scale: 1, translate [0,0]
+		this.zoomTransform.valueHasMutated();
 	};
 
 	/**
@@ -155,7 +123,6 @@ define(['jquery',
 			// Reload zoomTransform to default values (without options - set to default)
 			//this.setZoomTransform();
 			this.baseZoomBhvr.x(tmpXScale).y(tmpYScale);
-			//.scale(tmpTr.scale).translate(tmpTr.translate);
 		}
 	};
 
@@ -181,48 +148,48 @@ define(['jquery',
 			translate : this.baseZoomBhvr.translate()
 		};
 
-    // If event was fired from the event of a zoom behavior - don't update
+		// If event was fired from the event of a zoom behavior - don't update
 		if (prevTr.scale !== tmpTr.scale && prevTr.translate !== tmpTr.translate) {
 			this.baseZoomBhvr.scale(tmpTr.scale).translate(tmpTr.translate);
 		}
 	};
 
 	/**
-	 * A zoom-out method
-	 */
-	exports.prototype.zoomOut = function () {
-		console.log('zoomOut is fired');
-		var prevZoomTransform = ko.unwrap(this.zoomTransform);
-		prevZoomTransform.scale /= scaleCoef;
-
-		var tmpDiff = {
-			x : (this.vboxSize.width / 2) * (prevZoomTransform.scale - 1),
-			y : (this.vboxSize.height / 2) * (prevZoomTransform.scale - 1)
-		};
-
-		prevZoomTransform.translate.x += tmpDiff.x;
-		prevZoomTransform.translate.y += tmpDiff.y;
-
-		this.setZoomTransform(prevZoomTransform.scale, prevZoomTransform.translate);
-	};
-
-	/**
 	 * A zoom-in method for a graph
 	 */
-	exports.prototype.zoomIn = function () {
-		console.log('zoomIn is fired');
+	exports.prototype.zoomInOut = function (elemWidth, elemHeight, zoomDirection) {
+		// for example: {3, [10,20]}
+		// scale = 3
+		// left translate = 10
+		// upper translate = 20
 		var prevZoomTransform = ko.unwrap(this.zoomTransform);
-		prevZoomTransform.scale *= scaleCoef;
 
-		var tmpDiff = {
-			x : (this.vboxSize.width / 2) * (prevZoomTransform.scale - 1),
-			y : (this.vboxSize.height / 2) * (prevZoomTransform.scale - 1)
-		};
+		// new scale = 3*1.2 = 3.6
+		var curScale;
+		if (zoomDirection === 1) {
+			curScale = prevZoomTransform.scale * scaleCoef;
+		} else {
+			curScale = prevZoomTransform.scale / scaleCoef;
+		}
 
-		prevZoomTransform.translate.x -= tmpDiff.x;
-		prevZoomTransform.translate.y -= tmpDiff.y;
+		// Round cur scale
+		curScale = Math.round(curScale * 1000) / 1000;
 
-		this.setZoomTransform(prevZoomTransform.scale, prevZoomTransform.translate);
+		// width = 3.6 * initial width
+		// height = 3.6 * initial height
+
+		// new left translate = [10 - new width / 2]
+		// new upper translate = [20 - new height / 2]
+		// vboxSize
+		var tmpDiffX = (elemWidth * (curScale - 1)) / 2,
+		tmpDiffY = (elemHeight * (curScale - 1)) / 2;
+
+		var curX = prevZoomTransform.translate[0] - tmpDiffX;
+		var curY = prevZoomTransform.translate[1] - tmpDiffY;
+
+		console.log(curScale, [curX, curY]);
+
+		this.setZoomTransform(curScale, [curX, curY]);
 		// auto setting zoom behavior
 	};
 
