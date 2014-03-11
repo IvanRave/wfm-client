@@ -17,11 +17,13 @@
 define(['knockout',
 		'viewmodels/map-tool',
 		'viewmodels/well-marker-of-map-of-wield',
-		'viewmodels/svg-map'],
+		'viewmodels/svg-map',
+		'd3'],
 	function (ko,
 		VwmMapTool,
 		VwmWellMarker,
-		SvgMap) {
+		SvgMap,
+		d3) {
 	'use strict';
 
 	var usualMapTools = [{
@@ -56,47 +58,18 @@ define(['knockout',
 		////}
 	];
 
-	/** Calculate svg image size using real size and svg block size */
-	function calcSvgImgSize(realImgSize, vboxWidth, vboxHeight, vboxRatio) {
-		var svgImgSize = {};
-		// If height is bigger side, then calculate width
-		// if height = 600svg (400px) then width = Xsvg (300px)
-		// X = (300px * 600svg) / 400px
-		// else if width = 1200svg (300px) then height = Ysvg (400px)
-		// Y = (400px * 1200svg) / 300px
-		if ((realImgSize.height / vboxRatio) > realImgSize.width) {
-			svgImgSize.height = vboxHeight;
-			svgImgSize.width = (realImgSize.width * vboxHeight) / realImgSize.height;
-		} else {
-			svgImgSize.width = vboxWidth;
-			svgImgSize.height = (realImgSize.height * vboxWidth) / realImgSize.width;
-		}
-
-		return svgImgSize;
-	}
-
-	function getCoefVgToPx(imgSizeInPx, imgSizeInVg) {
-		return {
-			x : imgSizeInVg.width / imgSizeInPx.width,
-			y : imgSizeInVg.height / imgSizeInPx.height
-		};
-	}
-
 	/**
 	 * View for well field map: contains selected objects, zoom, translate options
 	 * @constructor
-   * @param {module:models/map-of-wield} mdlMapOfWield - Model of this map
-   * @param {string} koVidOfSlcVwmMapOfWield - Id of selected viewmodel
-   * @param {object} koTransform - A transform attribute for a map
-   *        ko.observable({
-   *        scale : optScale || 1,
-   *        translate : optTranslate || [0, 0]
-   *        });
+	 * @param {module:models/map-of-wield} mdlMapOfWield - Model of this map
+	 * @param {string} koVidOfSlcVwmMapOfWield - Id of selected viewmodel
+	 * @param {object} koTransform - A transform attribute for a map
+	 *        ko.observable({
+	 *        scale : optScale || 1,
+	 *        translate : optTranslate || [0, 0]
+	 *        });
 	 */
 	var exports = function (mdlMapOfWield, koVidOfSlcVwmMapOfWield, koTransform) {
-		/** Alternative for this */
-		var ths = this;
-
 		/**
 		 * Model of map
 		 */
@@ -120,17 +93,19 @@ define(['knockout',
 		 */
 		this.isSlcVwmMapOfWield = ko.computed({
 				read : function () {
-					return ths.vid === ko.unwrap(koVidOfSlcVwmMapOfWield);
+					return this.vid === ko.unwrap(koVidOfSlcVwmMapOfWield);
 				},
-				deferEvaluation : true
+				deferEvaluation : true,
+				owner : this
 			});
 
 		/** Filtered and sorted areas */
 		this.handledAreas = ko.computed({
 				read : function () {
-					return ko.unwrap(mdlMapOfWield.areas);
+					return ko.unwrap(this.mdlMapOfWield.areas);
 				},
-				deferEvaluation : true
+				deferEvaluation : true,
+				owner : this
 			});
 
 		/**
@@ -154,12 +129,9 @@ define(['knockout',
 		 * @type {Array.<module:models/map-tool>}
 		 */
 		this.mapTools = ko.computed({
-				read : function () {
-					return usualMapTools.map(function (elem) {
-						return new VwmMapTool(elem, ths.idOfSlcVwmMapTool);
-					});
-				},
-				deferEvaluation : true
+				read : this.buildMapTools,
+				deferEvaluation : true,
+				owner : this
 			});
 
 		/**
@@ -167,12 +139,9 @@ define(['knockout',
 		 * @type {Array.<module:viewmodels/well-marker-of-map-of-wield>}
 		 */
 		this.listVwmWellMarker = ko.computed({
-				read : function () {
-					return ko.unwrap(mdlMapOfWield.wellMarkers).map(function (elem) {
-						return new VwmWellMarker(elem, ths.slcVwmWellMarker);
-					});
-				},
-				deferEvaluation : true
+				read : this.getListVwmWellMarker,
+				deferEvaluation : true,
+				owner : this
 			});
 
 		/**
@@ -182,26 +151,12 @@ define(['knockout',
 		this.slcVwmWellMarker = ko.observable();
 
 		/**
-		 * Image (map) size in pixels
-		 * @type {Object}
-		 */
-		this.imgSizePx = ko.computed({
-				read : function () {
-					var tmpFileSpec = ths.mdlMapOfWield.fileSpec;
-
-					return {
-						width : ko.unwrap(tmpFileSpec.imgWidth),
-						height : ko.unwrap(tmpFileSpec.imgHeight)
-					};
-				},
-				deferEvaluation : true
-			});
-
-		/**
 		 * A map engine object
 		 * @type {module:viewmodels/svg-map}
 		 */
-		this.svgMap = new SvgMap();
+		this.svgMap = new SvgMap(this.mdlMapOfWield.fileSpec.fileUrl,
+				this.mdlMapOfWield.fileSpec.imgWidth,
+				this.mdlMapOfWield.fileSpec.imgHeight);
 
 		/**
 		 * Zoom and translate for svg map: can be set from server or by user click or by mouse scroll. By default: 1
@@ -218,6 +173,50 @@ define(['knockout',
 			coords : ko.observable(),
 			idOfWell : ko.observable()
 		};
+
+		var ths = this;
+		this.mapZoomBehavior = d3.behavior.zoom()
+			.x(ths.svgMap.scaleX)
+			.y(ths.svgMap.scaleY)
+			.scaleExtent([0.5, 15])
+			.on('zoom', function () {
+				ths.transformAttr({
+					scale : d3.event.scale,
+					translate : d3.event.translate
+				});
+			});
+
+		this.mapGroupTransform = ko.observable();
+
+		function applyTransform(tmpTransform) {
+			ths.mapZoomBehavior.scale(tmpTransform.scale).translate(tmpTransform.translate);
+			ths.mapGroupTransform('translate(' + tmpTransform.translate.join(',') + ') scale(' + tmpTransform.scale + ')');
+		}
+
+		// Scroll -> zoomed method -> changed koTransform -> subscribe event -> apply zoom (again for scroll) -> set attr to group
+		this.transformAttr.subscribe(applyTransform);
+
+		// Default scale and translate: apply first time
+		//applyTransform(ko.unwrap(ths.transformAttr));
+
+		/** Binding options for maps */
+		this.mapBindingOptions = {
+			imgUrl : this.svgMap.imgUrl,
+			imgWidthPx : this.svgMap.imgWidthPx,
+			imgHeightPx : this.svgMap.imgHeightPx,
+			imgWidthVg : this.svgMap.imgWidthVg,
+			imgHeightVg : this.svgMap.imgHeightVg,
+			imgStartVgX : this.svgMap.imgStartVgX,
+			imgStartVgY : this.svgMap.imgStartVgY,
+			widthCoefVgToPx : this.svgMap.widthCoefVgToPx,
+			heightCoefVgToPx : this.svgMap.heightCoefVgToPx,
+			listOfVwmWellMarker : this.listVwmWellMarker,
+			wellMarkerRadius : 8,
+			idOfSlcMapTool : this.idOfSlcVwmMapTool,
+			slcVwmWellMarker : this.slcVwmWellMarker,
+			wellMarkerDataToAdd : this.wellMarkerDataToAdd
+		};
+
 	};
 
 	/**
@@ -283,23 +282,13 @@ define(['knockout',
 		console.log('Center coords of this map: ', svgCenterCoords);
 		// Svg marker coords = Real marker coords (in pixels) -> Real marker coords (in svg units) + Image margin (in svg units)
 		var wellMarkerCoordsInPx = ko.unwrap(vwmWellMarkerToSelect.mdlWellMarker.coords);
-		// TODO: change null values
-		var tmpImgSizePx = ko.unwrap(ths.imgSizePx);
-
-		// Image size in vg units
-		var tmpImgSizeVg = calcSvgImgSize(tmpImgSizePx,
-				ths.svgMap.vboxOutSize.width,
-				ths.svgMap.vboxOutSize.height,
-				ths.svgMap.ratio);
-
-		var coefVgToPx = getCoefVgToPx(tmpImgSizePx, tmpImgSizeVg);
 
 		var imgStartPos = {
-			x : (ths.svgMap.vboxOutSize.width - tmpImgSizeVg.width) / 2,
-			y : (ths.svgMap.vboxOutSize.height - tmpImgSizeVg.height) / 2
+			x : (ths.svgMap.vboxOutSize.width - ths.svgMap.imgWidthVg) / 2,
+			y : (ths.svgMap.vboxOutSize.height - ths.svgMap.imgHeightVg) / 2
 		};
 
-		var wellMarkerCoordsInVg = [wellMarkerCoordsInPx[0] * coefVgToPx.x + imgStartPos.x, wellMarkerCoordsInPx[1] * coefVgToPx.y + imgStartPos.y];
+		var wellMarkerCoordsInVg = [wellMarkerCoordsInPx[0] * ths.svgMap.widthCoefVgToPx + imgStartPos.x, wellMarkerCoordsInPx[1] * ths.svgMap.heightCoefVgToPx + imgStartPos.y];
 
 		var transformCoords = [svgCenterCoords[0] - wellMarkerCoordsInVg[0], svgCenterCoords[1] - wellMarkerCoordsInVg[1]];
 
@@ -307,6 +296,20 @@ define(['knockout',
 			scale : 1,
 			translate : transformCoords
 		});
+	};
+
+	/** Create viewmodels for map tools */
+	exports.prototype.buildMapTools = function () {
+		return usualMapTools.map(function (elem) {
+			return new VwmMapTool(elem, this.idOfSlcVwmMapTool);
+		}, this);
+	};
+
+	/** Get markers' viewmodels */
+	exports.prototype.getListVwmWellMarker = function () {
+		return ko.unwrap(this.mdlMapOfWield.wellMarkers).map(function (elem) {
+			return new VwmWellMarker(elem, this.slcVwmWellMarker);
+		}, this);
 	};
 
 	return exports;

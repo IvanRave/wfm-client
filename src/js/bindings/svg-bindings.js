@@ -51,7 +51,7 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 	/**
 	 * Update behavior for element when data are changed
 	 */
-	ko.bindingHandlers.graphZoom = {
+	ko.bindingHandlers.svgZoomBehavior = {
 		update : function (element, valueAccessor) {
 			// zoom behavior
 			var tmpZoomBehavior = ko.unwrap(valueAccessor());
@@ -61,27 +61,8 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 		}
 	};
 
-	/** Calculate svg image size using real size and svg block size */
-	function calcSvgImgSize(realImgSize, vboxWidth, vboxHeight, vboxRatio) {
-		var svgImgSize = {};
-		// If height is bigger side, then calculate width
-		// if height = 600svg (400px) then width = Xsvg (300px)
-		// X = (300px * 600svg) / 400px
-		// else if width = 1200svg (300px) then height = Ysvg (400px)
-		// Y = (400px * 1200svg) / 300px
-		if ((realImgSize.height / vboxRatio) > realImgSize.width) {
-			svgImgSize.height = vboxHeight;
-			svgImgSize.width = (realImgSize.width * vboxHeight) / realImgSize.height;
-		} else {
-			svgImgSize.width = vboxWidth;
-			svgImgSize.height = (realImgSize.height * vboxWidth) / realImgSize.width;
-		}
-
-		return svgImgSize;
-	}
-
 	/** Drag and drop for circles */
-	function getDragSvgCircle(wellMarkerItem, coefVgToPx) {
+	function getDragSvgCircle(wellMarkerItem, widthCoefVgToPx, heightCoefVgToPx) {
 		var imgBounds = {};
 		// TODO: get radius from view
 		var markerRadius = 8;
@@ -117,8 +98,8 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 			})
 			.on('dragend', function () {
 				var tmpElem = d3.select(this);
-				wellMarkerItem.coords([(+tmpElem.attr('cx') - imgBounds.left) / coefVgToPx.x,
-						(+tmpElem.attr('cy') - imgBounds.top) / coefVgToPx.y]);
+				wellMarkerItem.coords([(+tmpElem.attr('cx') - imgBounds.left) / widthCoefVgToPx,
+						(+tmpElem.attr('cy') - imgBounds.top) / heightCoefVgToPx]);
 
 				////console.log(tmpCoords);
 				////console.log(wellMarkerItem);
@@ -127,80 +108,21 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 		return dragSvgCircle;
 	}
 
-	function getCoefVgToPx(imgSizeInPx, imgSizeInVg) {
-		return {
-			x : imgSizeInVg.width / imgSizeInPx.width,
-			y : imgSizeInVg.height / imgSizeInPx.height
-		};
-	}
-
 	/** Svg map */
 	ko.bindingHandlers.mapBinding = {
 		init : function (element, valueAccessor) {
 			var accessor = valueAccessor();
 
 			// Only non-observable objects or initial states of objects
-			// Image url doesn't change
-			var imgUrl = ko.unwrap(accessor.imgUrl);
-			var koTransformAttr = accessor.transformAttr;
-
-			// Image size doesn't change, like {width: 300, height: 400}
-			var realImgSize = ko.unwrap(accessor.imgSizePx);
-
-      // Block (svg) size without margins (doesn't change)
-      var vboxRatio = +ko.unwrap(accessor.vboxRatio);
-      var vboxWidth = +ko.unwrap(accessor.vboxWidth);
-      var vboxHeight = vboxWidth * vboxRatio;
-
-			// Calculate image size in svg viewbox
-			var svgImgSize = calcSvgImgSize(realImgSize, vboxWidth, vboxHeight, vboxRatio);
-
-			var imgStartPos = {
-				x : (vboxWidth - svgImgSize.width) / 2,
-				y : (vboxHeight - svgImgSize.height) / 2
-			};
-
-			var d3GroupWrap = d3.select(element);
-
-			var d3Group = d3GroupWrap.select('g');
-
+			// Image url and size doesn't change
+			
 			// Append image with map (only once on init event)
-			d3Group.append('image')
-			.attr('xlink:href', imgUrl)
-			.attr('height', svgImgSize.height)
-			.attr('width', svgImgSize.width)
-			.attr('x', imgStartPos.x)
-			.attr('y', imgStartPos.y);
-
-			// Add zoom for all elements (group) only once on init event
-			var x = d3.scale.linear().range([imgStartPos.x, imgStartPos.x + svgImgSize.width]);
-			var y = d3.scale.linear().range([imgStartPos.y, imgStartPos.y + svgImgSize.height]);
-
-			function zoomed() {
-				koTransformAttr({
-					scale : d3.event.scale,
-					translate : d3.event.translate
-				});
-			}
-
-			var zoom = d3.behavior.zoom()
-				.x(x)
-				.y(y)
-				.scaleExtent([0.5, 15])
-				.on('zoom', zoomed);
-
-			function applyTransform(tmpTransform) {
-				zoom.scale(tmpTransform.scale).translate(tmpTransform.translate);
-				d3Group.attr('transform', 'translate(' + tmpTransform.translate.join(',') + ') scale(' + tmpTransform.scale + ')');
-			}
-
-			// Scroll -> zoomed method -> changed koTransform -> subscribe event -> apply zoom (again for scroll) -> set attr to group
-			koTransformAttr.subscribe(applyTransform);
-
-			// Default scale and translate: apply first time
-			applyTransform(ko.unwrap(koTransformAttr));
-
-			d3GroupWrap.call(zoom);
+			d3.select(element).append('image')
+			.attr('xlink:href', accessor.imgUrl)
+			.attr('width', accessor.imgWidthVg)
+			.attr('height', accessor.imgHeightVg)
+			.attr('x', accessor.imgStartVgX)
+			.attr('y', accessor.imgStartVgY);
 		},
 		update : function (element, valueAccessor) {
 			// Working with observables values
@@ -210,23 +132,20 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 			var wellMarkerDataToAdd = accessor.wellMarkerDataToAdd;
 
 			// Image size, in pixels
-			var realImgSize = ko.unwrap(accessor.imgSizePx);
+			var imgWidthPx = accessor.imgWidthPx;
+			var imgHeightPx = accessor.imgHeightPx;
 
-      // Block (svg) size without margins
-      var vboxRatio = +ko.unwrap(accessor.vboxRatio);
-      var vboxWidth = +ko.unwrap(accessor.vboxWidth);
-      var vboxHeight = vboxWidth * vboxRatio;
+			var imgWidthVg = accessor.imgWidthVg;
+			var imgHeightVg = accessor.imgHeightVg;
 
-			// Calculate image size in svg viewbox
-			var svgImgSize = calcSvgImgSize(realImgSize, vboxWidth, vboxHeight, vboxRatio);
-
-			var coefVgToPx = getCoefVgToPx(realImgSize, svgImgSize);
-
-			console.log('coefVgToPx', coefVgToPx);
+			var coefVgToPx = {
+				x : accessor.widthCoefVgToPx,
+				y : accessor.heightCoefVgToPx
+			};
 
 			var imgStartPos = {
-				x : (vboxWidth - svgImgSize.width) / 2,
-				y : (vboxHeight - svgImgSize.height) / 2
+				x : accessor.imgStartVgX,
+				y : accessor.imgStartVgY
 			};
 
 			var listOfVwmWellMarker = ko.unwrap(accessor.listOfVwmWellMarker);
@@ -234,7 +153,7 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 			// Draw well markers
 			var d3GroupWrap = d3.select(element);
 
-			var d3Group = d3GroupWrap.select('g');
+			var d3Group = d3GroupWrap;// d3GroupWrap.select('g');
 
 			var d3Image = d3Group.select('image');
 
@@ -252,8 +171,8 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 				// Calculate coords on map image in pixels
 				// realX / svgX = realWidth / svgWidth
 				var realMarkerPos = {
-					x : (coords[0] - imgStartPos.x) * (realImgSize.width / svgImgSize.width),
-					y : (coords[1] - imgStartPos.y) * (realImgSize.height / svgImgSize.height)
+					x : (coords[0] - imgStartPos.x) * (imgWidthPx / imgWidthVg),
+					y : (coords[1] - imgStartPos.y) * (imgHeightPx / imgHeightVg)
 				};
 
 				// Send to the server in PUT method (change well marker data)
@@ -274,7 +193,7 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 
 				if (!wellMarkerCoordsInPx[0] || !wellMarkerCoordsInPx[1]) {
 					// set to the center of image
-					wellMarkerCoordsInPx = [realImgSize.width / 2, realImgSize.height / 2];
+					wellMarkerCoordsInPx = [imgWidthPx / 2, imgHeightPx / 2];
 				}
 
 				/** In svg units (abbr: vg) */
@@ -296,7 +215,7 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 					}
 					//console.log('circle hoora', cx, cy);
 				})
-				.call(getDragSvgCircle(wellMarkerItem, coefVgToPx));
+				.call(getDragSvgCircle(wellMarkerItem, coefVgToPx.x, coefVgToPx.y));
 			}
 
 			// Add fresh values
