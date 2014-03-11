@@ -1,13 +1,16 @@
 /** @module */
-define(['viewmodels/svg-block',
+define(['knockout',
+		'viewmodels/svg-block',
 		'helpers/app-helper',
-    'd3'],
-	function (SvgBlock,
+		'd3'],
+	function (
+		ko,
+		SvgBlock,
 		appHelper,
-    d3) {
+		d3) {
 	'use strict';
 
-  /** Calculate svg image size using real size and svg block size */
+	/** Calculate svg image size using real size and svg block size */
 	function calcImgSizeVg(imgWidthPx, imgHeightPx, vboxWidth, vboxHeight, vboxRatio) {
 		var svgImgSize = {};
 		// If height is bigger side, then calculate width
@@ -25,45 +28,49 @@ define(['viewmodels/svg-block',
 
 		return svgImgSize;
 	}
-  
+
 	/**
 	 * Svg map
 	 *    used in the wield and well map sections
 	 * @constructor
 	 * @augments {module:viewmodels/svg-block}
 	 */
-	var exports = function (tmpImgUrl, tmpImgWidthPx, tmpImgHeightPx) {
+	var exports = function (tmpImgUrl, tmpImgWidthPx, tmpImgHeightPx, koTransform) {
 		// Add base props
-		SvgBlock.call(this, 1 / 2, 1200);
-    
-    this.imgUrl = tmpImgUrl;
-    
-    this.imgWidthPx = tmpImgWidthPx;
-    
-    this.imgHeightPx = tmpImgHeightPx;
-    
-    var tmpImgSizeVg = calcImgSizeVg(this.imgWidthPx, this.imgHeightPx, 
-      this.vboxOutSize.width, this.vboxOutSize.height, this.ratio);
-    
-    this.imgWidthVg = tmpImgSizeVg.width;
-    
-    this.imgHeightVg = tmpImgSizeVg.height;
+		SvgBlock.call(this, 1 / 2, 1200, koTransform);
 
-    this.widthCoefVgToPx = this.imgWidthVg / this.imgWidthPx;
-    
-    this.heightCoefVgToPx = this.imgHeightVg / this.imgHeightPx;
-    
-    this.imgStartVgX = (this.vboxOutSize.width - this.imgWidthVg) / 2;
-    
-    this.imgStartVgY = (this.vboxOutSize.height - this.imgHeightVg) / 2;
-    
-    this.scaleX = d3.scale.linear().range([this.imgStartVgX, this.imgStartVgX + this.imgWidthVg]);
-    
-    this.scaleY = d3.scale.linear().range([this.imgStartVgY, this.imgStartVgY + this.imgHeightVg]);
+		this.imgUrl = tmpImgUrl;
+
+		this.imgWidthPx = tmpImgWidthPx;
+
+		this.imgHeightPx = tmpImgHeightPx;
+
+		var tmpImgSizeVg = calcImgSizeVg(this.imgWidthPx, this.imgHeightPx,
+				this.vboxOutSize.width, this.vboxOutSize.height, this.ratio);
+
+		this.imgWidthVg = tmpImgSizeVg.width;
+
+		this.imgHeightVg = tmpImgSizeVg.height;
+
+		this.widthCoefVgToPx = this.imgWidthVg / this.imgWidthPx;
+
+		this.heightCoefVgToPx = this.imgHeightVg / this.imgHeightPx;
+
+		this.imgStartVgX = (this.vboxOutSize.width - this.imgWidthVg) / 2;
+
+		this.imgStartVgY = (this.vboxOutSize.height - this.imgHeightVg) / 2;
 	};
-  
-  // Inherit a prototype from the SvgBlock class
+
+	// Inherit a prototype from the SvgBlock class
 	appHelper.inherits(exports, SvgBlock);
+
+	exports.prototype.getScaleX = function () {
+		return d3.scale.linear().range([this.imgStartVgX, this.imgStartVgX + this.imgWidthVg]);
+	};
+
+	exports.prototype.getScaleY = function () {
+		return d3.scale.linear().range([this.imgStartVgY, this.imgStartVgY + this.imgHeightVg]);
+	};
 
 	return exports;
 });

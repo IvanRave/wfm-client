@@ -177,8 +177,8 @@ define(['jquery',
 
 			var listOfVwmParam = ko.unwrap(this.listOfMonitoredVwmParams);
 
-			var tmpXScale = ko.unwrap(this.mntrGraph.scaleObj.x),
-			tmpYScale = ko.unwrap(this.mntrGraph.scaleObj.y);
+			var tmpXScale = ko.unwrap(this.mntrGraph.scaleX),
+			tmpYScale = ko.unwrap(this.mntrGraph.scaleY);
 
 			if (tmpXScale && tmpYScale) {
 

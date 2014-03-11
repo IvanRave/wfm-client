@@ -3,11 +3,14 @@
      data-bind="attr: { height: svgMap.sizePx.height }, svgResponsive: { koSvgWidth: svgMap.sizePx.width, tmpIsVisibleMenu: $root.isVisibleMenu}">
   <!-- Draw wrap rectange: just for a gray background -->
   <rect class="wield-map-svg__back-rect" width="1200" height="600"></rect>
-  <g data-bind="svgZoomBehavior: mapZoomBehavior">
-    <g data-bind="attr: { 'transform' : mapGroupTransform }">
+  <g data-bind="svgZoomBehavior: svgMap.baseZoomBhvr">
+    <g data-bind="attr: { 'transform' : svgMap.zoomTransformAttr }">
       <g data-bind="mapBinding: mapBindingOptions">
         <!--inner group for transforming and scale group of next elements: image, well markers and areas-->
       </g>
     </g>
   </g>
+  <!-- ko with: svgMap -->
+  {{> zoom-controls}}
+  <!-- /ko -->
 </svg>

@@ -27,8 +27,6 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 				return;
 			}
 
-			console.log('graph is redrawing', prmArr);
-
 			// Group for putting paths
 			var pathsWrap = d3.select(element);
 
@@ -52,7 +50,8 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 	 * Update behavior for element when data are changed
 	 */
 	ko.bindingHandlers.svgZoomBehavior = {
-		update : function (element, valueAccessor) {
+		init : function (element, valueAccessor) {
+      console.log('svgZoomBehavior bindind has executed');
 			// zoom behavior
 			var tmpZoomBehavior = ko.unwrap(valueAccessor());
 			if (tmpZoomBehavior) {

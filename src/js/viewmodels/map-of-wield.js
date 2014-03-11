@@ -17,13 +17,11 @@
 define(['knockout',
 		'viewmodels/map-tool',
 		'viewmodels/well-marker-of-map-of-wield',
-		'viewmodels/svg-map',
-		'd3'],
+		'viewmodels/svg-map'],
 	function (ko,
 		VwmMapTool,
 		VwmWellMarker,
-		SvgMap,
-		d3) {
+		SvgMap) {
 	'use strict';
 
 	var usualMapTools = [{
@@ -63,7 +61,7 @@ define(['knockout',
 	 * @constructor
 	 * @param {module:models/map-of-wield} mdlMapOfWield - Model of this map
 	 * @param {string} koVidOfSlcVwmMapOfWield - Id of selected viewmodel
-	 * @param {object} koTransform - A transform attribute for a map
+	 * @param {object} koTransform - An observable transform attribute for a map
 	 *        ko.observable({
 	 *        scale : optScale || 1,
 	 *        translate : optTranslate || [0, 0]
@@ -156,13 +154,8 @@ define(['knockout',
 		 */
 		this.svgMap = new SvgMap(this.mdlMapOfWield.fileSpec.fileUrl,
 				this.mdlMapOfWield.fileSpec.imgWidth,
-				this.mdlMapOfWield.fileSpec.imgHeight);
-
-		/**
-		 * Zoom and translate for svg map: can be set from server or by user click or by mouse scroll. By default: 1
-		 * @type {number}
-		 */
-		this.transformAttr = koTransform;
+				this.mdlMapOfWield.fileSpec.imgHeight,
+        koTransform);
 
 		/**
 		 * Well marker to add
@@ -173,31 +166,6 @@ define(['knockout',
 			coords : ko.observable(),
 			idOfWell : ko.observable()
 		};
-
-		var ths = this;
-		this.mapZoomBehavior = d3.behavior.zoom()
-			.x(ths.svgMap.scaleX)
-			.y(ths.svgMap.scaleY)
-			.scaleExtent([0.5, 15])
-			.on('zoom', function () {
-				ths.transformAttr({
-					scale : d3.event.scale,
-					translate : d3.event.translate
-				});
-			});
-
-		this.mapGroupTransform = ko.observable();
-
-		function applyTransform(tmpTransform) {
-			ths.mapZoomBehavior.scale(tmpTransform.scale).translate(tmpTransform.translate);
-			ths.mapGroupTransform('translate(' + tmpTransform.translate.join(',') + ') scale(' + tmpTransform.scale + ')');
-		}
-
-		// Scroll -> zoomed method -> changed koTransform -> subscribe event -> apply zoom (again for scroll) -> set attr to group
-		this.transformAttr.subscribe(applyTransform);
-
-		// Default scale and translate: apply first time
-		//applyTransform(ko.unwrap(ths.transformAttr));
 
 		/** Binding options for maps */
 		this.mapBindingOptions = {
@@ -292,7 +260,7 @@ define(['knockout',
 
 		var transformCoords = [svgCenterCoords[0] - wellMarkerCoordsInVg[0], svgCenterCoords[1] - wellMarkerCoordsInVg[1]];
 
-		ths.transformAttr({
+		ths.svgMap.zoomTransform({
 			scale : 1,
 			translate : transformCoords
 		});
