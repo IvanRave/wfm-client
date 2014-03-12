@@ -975,3 +975,18 @@ ul.wfm-light-list {
 .graph-wrap{
   @include gradient-line(#efefef, #fefefe);
 }
+
+  .well-marker_pre-created {
+    fill: green;
+    stroke: #ccc;
+  }
+
+  .well-marker_drilled {
+    fill: #000;
+    stroke: #777;
+  }
+  
+  .well-marker_non-drilled {
+    fill: #999;
+    stroke: #555;
+  }

@@ -34,9 +34,18 @@ define(['knockout'], function (ko) {
 				read : function () {
 					return ths === ko.unwrap(koSlcVwmWellMarker);
 				},
-				deferEvaluation : true
+				deferEvaluation : true,
+        owner: this
 			});
 	};
 
+  /** Create a viewmodel of a map of wield */
+  // exports.prototype.createVwmMapOfWield = function(){
+      // return new VwmMapOfWield(this.mdlWellMarker.getWellFieldMap(), null, ko.observable({
+        // scale: 1,
+        // translate: [0,0]
+      // }));
+  // };
+  
 	return exports;
 });

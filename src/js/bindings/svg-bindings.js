@@ -120,8 +120,6 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 			.attr('xlink:href', accessor.imgUrl)
 			.attr('width', accessor.imgWidthVg)
 			.attr('height', accessor.imgHeightVg);
-			// .attr('x', accessor.imgStartVgX)
-			// .attr('y', accessor.imgStartVgY);
 		},
 		update : function (element, valueAccessor) {
 			// Working with observables values
@@ -179,7 +177,7 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 			// Clear all values
 			d3Group.selectAll('circle').remove();
 
-			function drawWellMarker(wellMarkerItem, fillColor) {
+			function drawWellMarker(wellMarkerItem) {
 				// Convert empty coords
 				var wellMarkerCoordsInPx = ko.unwrap(wellMarkerItem.coords);
 
@@ -200,8 +198,7 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 				.attr('cx', tmpCx)
 				.attr('cy', tmpCy)
 				.attr('r', wellMarkerRadius)
-				.attr('fill', fillColor)
-				.attr('stroke', 'white')
+				.attr('class', ko.unwrap(wellMarkerItem.markerStyle))
 				.on('click', function () {
 					// Show info about well in this point
 					if (d3.event.defaultPrevented) {
@@ -214,7 +211,7 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 
 			// Add fresh values
 			listOfVwmWellMarker.forEach(function (elem) {
-				drawWellMarker(elem.mdlWellMarker, 'black');
+				drawWellMarker(elem.mdlWellMarker);
 			});
 
 			if (ko.unwrap(wellMarkerDataToAdd.coords)) {

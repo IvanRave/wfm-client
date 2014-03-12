@@ -164,7 +164,9 @@ define(['knockout',
 		 */
 		this.wellMarkerDataToAdd = {
 			coords : ko.observable(),
-			idOfWell : ko.observable()
+			idOfWell : ko.observable(),
+      isDrilled: ko.observable(true),
+      markerStyle: 'well-marker_pre-created'
 		};
 
 		/** Binding options for maps */
@@ -216,7 +218,8 @@ define(['knockout',
 	/** Add well marker: different methods for different views */
 	exports.prototype.addWellMarkerToMap = function () {
 		this.mdlMapOfWield.postWellMarker(ko.unwrap(this.wellMarkerDataToAdd.idOfWell),
-			ko.unwrap(this.wellMarkerDataToAdd.coords));
+			ko.unwrap(this.wellMarkerDataToAdd.coords),
+      ko.unwrap(this.wellMarkerDataToAdd.isDrilled));
 
 		// Clear selection: if post is unsuccessful - then only show error
 		this.cancelAddingWellMarker();

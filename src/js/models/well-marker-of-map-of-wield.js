@@ -1,109 +1,146 @@
 ﻿/** @module */
 define(['knockout',
-    'services/well-marker-of-map-of-wield'],
-    function (ko,
-        wellMarkerService) {
+		'services/well-marker-of-map-of-wield'],
+	function (ko,
+		wellMarkerService) {
 
-        /**
-        * Model: well in map of well field
-        * @constructor
-        */
-        var exports = function (data, wellFieldMap) {
-            data = data || {};
+	/**
+	 * Model: well in map of well field
+	 * @constructor
+	 */
+	var exports = function (data, wellFieldMap) {
+		data = data || {};
 
-            var ths = this;
+    /** Getter for a map parent */
+		this.getWellFieldMap = function () {
+			return wellFieldMap;
+		};
 
-            this.getWellFieldMap = function () {
-                return wellFieldMap;
-            };
+		/**
+		 * Pixels from top-left of map image (1. longitude and 2.latitude)
+		 * @type {Array}
+		 */
+		this.coords = ko.observable([data.CoordX, data.CoordY]);
 
-            /**
-            * Pixels from top-left of map image (1. longitude and 2.latitude)
-            * @type {Array}
-            */
-            this.coords = ko.observable([data.CoordX, data.CoordY]);
+		/**
+		 * Whether this well is drilled on this map (active)
+		 * @type {boolean}
+		 */
+		this.isDrilled = ko.observable(data.IsDrilled);
 
-            /////**
-            ////* Pixels from top of map image (latitude)
-            ////* @type {number}
-            ////*/
-            ////this.coordY = ko.observable(data.CoordY);
+		/**
+		 * Id of map
+		 * @type {number}
+		 */
+		this.idOfMapOfWield = data.IdOfMapOfWield;
 
-            /**
-            * Id of map
-            * @type {number}
-            */
-            this.idOfMapOfWield = data.IdOfMapOfWield;
+		/**
+		 * Id of well
+		 * @type {number}
+		 */
+		this.idOfWell = data.IdOfWell;
 
-            /**
-            * Id of well
-            * @type {number}
-            */
-            this.idOfWell = data.IdOfWell;
+		/**
+		 * A style of the marker, depend from whether drilled
+		 * @type {string}
+		 */
+		this.markerStyle = ko.computed({
+				read : this.calcMarkerStyle,
+				deferEvaluation : true,
+				owner : this
+			});
 
-            ////var tileLength = 255;
-            ////var mapCoordScale = Math.max(ths.getWellFieldMap().Width, ths.getWellFieldMap().Height) / tileLength;
+		////var tileLength = 255;
+		////var mapCoordScale = Math.max(ths.getWellFieldMap().Width, ths.getWellFieldMap().Height) / tileLength;
 
-            ////this.coordX = ko.computed(function () {
-            ////    return ths.latitude() * mapCoordScale;
-            ////});
+		////this.coordX = ko.computed(function () {
+		////    return ths.latitude() * mapCoordScale;
+		////});
 
-            ////this.coordY = ko.computed(function () {
-            ////    return (tileLength - ths.longitude()) * mapCoordScale;
-            ////});
+		////this.coordY = ko.computed(function () {
+		////    return (tileLength - ths.longitude()) * mapCoordScale;
+		////});
 
-            ////var tileLength = 255;
-            ////var coordX = 0, coordY = 0;
-            ////// if width > height
-            ////var mapCoordScale = Math.max(ths.Width, ths.Height) / tileLength;
+		////var tileLength = 255;
+		////var coordX = 0, coordY = 0;
+		////// if width > height
+		////var mapCoordScale = Math.max(ths.Width, ths.Height) / tileLength;
 
-            ////coordX = latitude * mapCoordScale;
-            ////coordY = (tileLength - longitude) * mapCoordScale;
+		////coordX = latitude * mapCoordScale;
+		////coordY = (tileLength - longitude) * mapCoordScale;
 
-            /** Get well for this marker */
-            this.getWell = function () {
-                var wellFieldItem = ths.getWellFieldMap().getWellField();
-                for (var WellGroupKey = 0; WellGroupKey < wellFieldItem.wroups().length; WellGroupKey++) {
-                    for (var WellKey = 0; WellKey < wellFieldItem.wroups()[WellGroupKey].wells().length; WellKey++) {
-                        if (wellFieldItem.wroups()[WellGroupKey].wells()[WellKey].Id === ths.idOfWell) {
-                            return wellFieldItem.wroups()[WellGroupKey].wells()[WellKey];
-                        }
-                    }
-                }
+		/**
+		 * Well name
+		 * @type {string}
+		 */
+		this.wellName = ko.computed({
+				read : this.calcWellName,
+				deferEvaluation : true,
+				owner : this
+			});
 
-                return null;
-            };
+    /**
+    * A name of the map
+    * @type {string}
+    */
+    this.nameOfMap = ko.computed({
+      read: this.calcNameOfMap,
+      deferEvaluation: true,
+      owner: this
+    });    
+      
+		/** Save coords when change */
+		this.coords.subscribe(this.save, this);
 
-            /**
-            * Well name
-            * @type {string}
-            */
-            this.wellName = ko.computed({
-                read: function () {
-                    var tmpWell = ths.getWell();
-                    if (tmpWell) {
-                        return ko.unwrap(tmpWell.Name);
-                    }
-                },
-                deferEvaluation: true
-            });
+		////this.toPlainJson = function () { return ko.toJS(ths); };
+	};
 
-            /** Save marker */
-            this.save = function () {
-                wellMarkerService.put(ths.idOfMapOfWield, ths.idOfWell, {
-                    'IdOfMapOfWield': ths.idOfMapOfWield,
-                    'IdOfWell': ths.idOfWell,
-                    'CoordX': ko.unwrap(ths.coords)[0],
-                    'CoordY': ko.unwrap(ths.coords)[1]
-                });
-            };
+  /** Calculate a name of the map (parent) */
+  exports.prototype.calcNameOfMap = function(){
+    return ko.unwrap(this.getWellFieldMap().name);
+  };
+  
+	/** Save marker */
+	exports.prototype.save = function () {
+		var ths = this;
+		wellMarkerService.put(ths.idOfMapOfWield, ths.idOfWell, {
+			'IdOfMapOfWield' : ths.idOfMapOfWield,
+			'IdOfWell' : ths.idOfWell,
+			'CoordX' : ko.unwrap(ths.coords)[0],
+			'CoordY' : ko.unwrap(ths.coords)[1],
+			'IsDrilled' : ko.unwrap(ths.isDrilled)
+		});
+	};
 
-            /** Save coords when change */
-            this.coords.subscribe(ths.save);
+	/** Calculate a style for the marker */
+	exports.prototype.calcMarkerStyle = function () {
+		return ko.unwrap(this.isDrilled) ? 'well-marker_drilled' : 'well-marker_non-drilled';
+	};
 
-            ////this.toPlainJson = function () { return ko.toJS(ths); };
-        };
+	/** Calculate a name of the well */
+	exports.prototype.calcWellName = function () {
+		var tmpWell = this.getWell();
+		if (tmpWell) {
+			return ko.unwrap(tmpWell.Name);
+		}
+	};
 
+	/** Get well for this marker */
+	exports.prototype.getWell = function () {
+		var wellFieldItem = this.getWellFieldMap().getWellField();
+    var listOfWroup = ko.unwrap(wellFieldItem.wroups);
+		var tmpIdOfWell = this.idOfWell;
+		for (var keyOfWroup = 0; keyOfWroup < listOfWroup.length; keyOfWroup += 1) {
+      var listOfWell = ko.unwrap(listOfWroup[keyOfWroup].wells);
+			for (var keyOfWell = 0; keyOfWell < listOfWell.length; keyOfWell += 1) {
+				if (listOfWell[keyOfWell].id === tmpIdOfWell) {
+					return listOfWell[keyOfWell];
+				}
+			}
+		}
 
-        return exports;
-    });
+		return null;
+	};
+
+	return exports;
+});

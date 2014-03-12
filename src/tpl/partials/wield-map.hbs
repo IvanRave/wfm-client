@@ -18,7 +18,7 @@
               <!-- /ko -->
             </div>
           </div>
-          {{> wield-map-image }}
+          {{> oil-map }}
         </div>
       </div>
     </div>
@@ -38,7 +38,7 @@
             <div class="pull-left">
               <i class="glyphicon glyphicon-circle-arrow-down" data-bind="visible: isSlcVwmMapOfWield"></i>
               <i class="glyphicon glyphicon-circle-arrow-right" data-bind="hidden: isSlcVwmMapOfWield"></i>
-              <span class="link-view pointer" data-bind="click: $parent.selectVwmMapOfWield">
+              <span class="link-view pointer" data-bind="click: $parent.selectVwmMapOfWield.bind($parent)">
                 <span data-bind="with: mdlMapOfWield">
                   <span data-bind="text: name, attr: { title: description }"></span>
                 </span>
@@ -47,11 +47,14 @@
             <div class="pull-right" data-bind="if: $root.isEmployeeInEditMode">
               <span data-bind="with: mdlMapOfWield">
                 <!-- TODO: replace method -->
-                <i class="glyphicon glyphicon-edit link-icon" data-bind="click: editWellFieldMap"></i>
-                <!-- parent: vwmMapOfWield -->
-                <!-- parents[1]: vwmWield -->
-                <i class="glyphicon glyphicon-remove link-icon" data-bind="click: $parents[1].mdlStage.removeMapOfWield"></i>
+                <button class="btn btn-xs btn-default" data-bind="click: editWellFieldMap">
+                  <i class="glyphicon glyphicon-edit link-icon"></i>
+                </button>
               </span>
+              <!-- parent: vwmWield -->
+              <button class="btn btn-xs btn-default" data-bind="click: $parent.removeVwmMapOfWield.bind($parent)">
+                <i class="glyphicon glyphicon-remove link-icon"></i>
+              </button>
             </div>
           </div>
           <div data-bind="slideVisible: isSlcVwmMapOfWield">
@@ -59,13 +62,20 @@
               <div class="min-left-margin">
                 <div class="clearfix">
                   <div class="pull-left">
-                    <i class="glyphicon glyphicon-leaf"></i>
+                    <span data-bind="visible: mdlWellMarker.isDrilled">
+                      <i class="glyphicon glyphicon-tint"></i>
+                    </span>
+                    <span data-bind="hidden: mdlWellMarker.isDrilled">
+                      <i class="glyphicon glyphicon-tint text-muted"></i>
+                    </span>
                     <span class="link-view pointer" data-bind="click: $parent.selectVwmWellMarker.bind($parent)">
                       <span data-bind="text: mdlWellMarker.wellName, css: { 'bld': isSlc }"></span>
                     </span>
                   </div>
                   <div class="pull-right" data-bind="if: $root.isEmployeeInEditMode">
-                    <i class="glyphicon glyphicon-remove link-icon" data-bind="click: $parent.removeVwmWellMarker.bind($parent)"></i>
+                    <button class="btn btn-xs btn-default" data-bind="click: $parent.removeVwmWellMarker.bind($parent)">
+                      <i class="glyphicon glyphicon-remove link-icon"></i>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -80,6 +90,11 @@
                     </div>
                     <div>
                       <select class="input-sm" data-bind="options: $parent.mdlMapOfWield.outWellsOfWield, optionsText: 'Name', optionsValue: 'id', value: idOfWell, optionsCaption: 'select well...'"></select>
+                    </div>
+                    <div class="checkbox">
+                      <label>
+                        <input type="checkbox" data-bind="checked: isDrilled"/> Is active
+                      </label>
                     </div>
                     <div class="min-top-margin">
                       <button class="btn btn-sm btn-success" data-bind="enable: idOfWell, click: $parent.addWellMarkerToMap.bind($parent)">Add</button>

@@ -16,7 +16,8 @@ define([
 		'viewmodels/integrity-of-well',
 		'viewmodels/perfomance-of-well',
 		'viewmodels/test-scope',
-		'viewmodels/monitoring-of-well'],
+		'viewmodels/monitoring-of-well',
+    'viewmodels/well-marker-of-map-of-wield'],
 	function (
 		$,
 		ko,
@@ -30,7 +31,8 @@ define([
 		VwmIntegrity,
 		VwmPerfomanceOfWell,
 		VwmTestScope,
-		VwmMonitoringOfWell) {
+		VwmMonitoringOfWell,
+    VwmWellMarkerOfMapOfWield) {
 	'use strict';
 
 	/**
@@ -75,14 +77,6 @@ define([
 
 		// Has sections and widgets
 		VwmStageBase.call(this, defaultSlcData.wellSectionId, parentVwmWroup.unqOfSlcVwmChild);
-
-		/**
-		 * Select all ancestor's view models
-		 */
-		this.selectAncestorVwms = function () {
-			parentVwmWroup.unqOfSlcVwmChild(ths.unq);
-			parentVwmWroup.selectAncestorVwms();
-		};
 
 		//mdlSketchOfWell, koWellUnzOfSlcVwmSectionFmg, koSlcVwmSectionFmg,  fmgrLink
 		this.vwmSketchOfWell = new VwmSketchOfWell(ths.mdlStage.sketchOfWell, ths.unzOfSlcVwmSectionFmg, ths.slcVwmSectionFmg, ths.fmgr);
@@ -649,7 +643,7 @@ define([
 		 * Viewmodel (partial of well), used in the main view section
 		 * @type {module:viewmodels/monitoring-of-well}
 		 */
-		this.mainVwmMonitoringOfWell = new VwmMonitoringOfWell(ths.mdlStage,
+		this.mainVwmMonitoringOfWell = new VwmMonitoringOfWell(this.mdlStage,
 				ko.observable(null),
 				ko.observable(null));
 
@@ -658,146 +652,213 @@ define([
 		 * @type {module:models/monitoring-record}
 		 */
 		this.monitoringRecordForWroup = ko.computed({
-				read : function () {
-					var currentUnixTimeInWroup = ko.unwrap(parentVwmWroup.monitoringUnixTime);
-
-					if (!currentUnixTimeInWroup) {
-						return;
-					}
-
-					var allRecs = ko.unwrap(ths.mdlStage.listOfMonitoringRecord);
-
-					var needRec = allRecs.filter(function (recItem) {
-							return ko.unwrap(recItem.unixTime) === currentUnixTimeInWroup;
-						})[0];
-
-					return needRec;
-				},
-				deferEvaluation : true
+				read : this.calcMonitoringRecordForWroup,
+				deferEvaluation : true,
+				owner : this
 			});
 
-		/**
-		 * Create a monitoring record for selected time in well group
-		 */
-		this.createMonitoringRecord = function () {
-			// Time, selected in the well group of this well
-			var currentUnixTimeInWroup = ko.unwrap(parentVwmWroup.monitoringUnixTime);
-			if (currentUnixTimeInWroup) {
+		//} #endregion MONITORING
+    
+    //{ #region MAP
+    
+    /**
+    * A list of viewmodels of map markers
+    * @type {Array.<module:viewmodels/well-marker-of-map-of-wield>}
+    */
+    this.listOfVwmMapMarker = ko.computed({
+      read: this.buildListOfVwmMapMarker,
+      deferEvaluation: true,
+      owner: this
+    });
+    
+    /**
+    * Id of the map
+    * @type {number}
+    */
+    this.idOfMapOfSlcVwmMapMarker = ko.observable();
+    
+    /**
+    * A selected viewmodel of a map marker
+    * @type {module:viewmodels/well-marker-of-map-of-wield}
+    */
+    this.slcVwmMapMarker = ko.computed({
+      read: this.calcSlcVwmMapMarker,
+      deferEvaluation: true,
+      owner: this
+    });
+    
+    //} #endregion MAP
+	};
+  
+  /** Calculate a selected marker, using id of map */
+  exports.prototype.calcSlcVwmMapMarker = function(){
+    var tmpIdOfMap = ko.unwrap(this.idOfMapOfSlcVwmMapMarker);
+    if (tmpIdOfMap){
+      var tmpList = ko.unwrap(this.listOfVwmMapMarker);
+      return tmpList.filter(function(vwmElem){
+        return vwmElem.mdlWellMarker.idOfMapOfWield === tmpIdOfMap;
+      })[0];
+    }
+  };
+  
+  /** Select marker */
+  exports.prototype.selectVwmMapMarker = function(vwmToSelect){
+    this.idOfMapOfSlcVwmMapMarker(vwmToSelect.mdlWellMarker.idOfMapOfWield);
+  };
 
-				var tmpMntrParams = ko.unwrap(ths.getParentVwm().mdlStage.listOfMonitoredParams);
-
-				// Create record with empty dictionary
-				// Last parameter - function to reload table (to get average params for the new record)
-				ths.mdlStage.postMonitoringRecord(currentUnixTimeInWroup, tmpMntrParams, {}, parentVwmWroup.reloadMonitoringRecords);
+  /** Build viewmodels for map markers */
+  exports.prototype.buildListOfVwmMapMarker = function(){
+    var tmpList = ko.unwrap(this.mdlStage.listOfMapMarker);
+    console.log('mapMarkers', tmpList);
+    return tmpList.map(function(elem){
+      return new VwmWellMarkerOfMapOfWield(elem, this.slcVwmMapMarker);
+    }, this);
+  };
+  
+	/**
+	 * Load content of the section
+	 * @param {string} idOfSectionPattern - Section
+	 */
+	exports.prototype.loadSectionContent = function (idOfSectionPattern) {
+		switch (idOfSectionPattern) {
+			// Dashboard: from undefined to null
+		case 'well-history': {
+				this.mdlStage.loadWellHistoryList();
+				break;
 			}
-		};
-
-		/**
-		 * Create demo records for the monitoring section
-		 */
-		this.createDemoMonitoringRecords = function () {
-			var curDate = new Date();
-			var curUnixTime = Date.UTC(curDate.getFullYear(), curDate.getMonth(), curDate.getDate()) / 1000;
-			var secondsInDay = 24 * 60 * 60;
-			var startUnixTime = curUnixTime - secondsInDay * 35; // minus 50 days
-
-			var tmpMntrParams = ko.unwrap(ths.getParentVwm().mdlStage.listOfMonitoredParams);
-
-			for (var unt = startUnixTime; unt <= curUnixTime; unt += secondsInDay) {
-				// Last function for current time: reload table to get average values for the created record
-				ths.mdlStage.postMonitoringRecord(unt, tmpMntrParams, generateDict(tmpMntrParams), unt === curUnixTime ? parentVwmWroup.reloadMonitoringRecords : null);
+		case 'well-sketch': {
+				this.mdlStage.sketchOfWell.load();
+				break;
 			}
-		};
-
-		//{
-
-		/**
-		 * Load content of the section
-		 * @param {object} section - Section
-		 */
-		this.loadSectionContent = function (idOfSectionPattern) {
-			switch (idOfSectionPattern) {
-				// Dashboard: from undefined to null
-			case 'well-history': {
-					ths.mdlStage.loadWellHistoryList();
-					break;
-				}
-			case 'well-sketch': {
-					ths.mdlStage.sketchOfWell.load();
-					break;
-				}
-			case 'well-volume': {
-					ths.mdlStage.loadVolumes();
-					break;
-				}
-			case 'well-perfomance': {
-					ths.mdlStage.getWellGroup().loadListOfWfmParameterOfWroup();
-					ths.mdlStage.perfomanceOfWell.forecastEvolution.getDict();
-					ths.mdlStage.perfomanceOfWell.getHstProductionDataSet();
-					break;
-				}
-			case 'well-nodalanalysis': {
-					ths.mdlStage.loadListOfNodalAnalysis();
-					break;
-				}
-			case 'well-integrity': {
-					ths.mdlStage.loadListOfIntegrity();
-					break;
-				}
-			case 'well-log': {
-					ths.mdlStage.loadLogsOfWell();
-					break;
-				}
-			case 'well-test': {
-					ths.mdlStage.loadListOfTestScope();
-					ths.mdlStage.getWellGroup().loadListOfWfmParameterOfWroup();
-					break;
-				}
-			case 'well-monitoring': {
-					ths.mdlStage.getWellGroup().loadListOfWfmParameterOfWroup();
-
-					// Load procent borders for all wells
-					// No perfomance when load this data separately (for every well), because
-					//      a company user opens a well group monitoring section frequently than a well monitoring section
-					ths.mdlStage.getWellGroup().loadProcentBordersForAllWells();
-
-					// Load monitoring records
-					// There is another loader: load records for all wells, but in this case - need to reload data
-					ths.mainVwmMonitoringOfWell.loadFilteredListOfMonitoringRecord();
-
-					break;
-				}
-			case 'well-map': {
-					// find wellfield_id
-					var wellFieldItem = ths.mdlStage.getWellGroup().getWellField();
-
-					wellFieldItem.loadMapsOfWield();
-					////function () {
-					////var arr = ko.unwrap(wellFieldItem.WellFieldMaps);
-					// TODO:???
-					////arr = $.grep(arr, function (arrElem, arrIndex) {
-					////    var cnt = 0;
-					////    $.each(arrElem.wellMarkers(), function(wwfIndex, wwfElem){
-					////        if (wwfElem.Id === ths.Id) {
-					////            cnt++;
-					////        }
-					////    });
-
-					////    return cnt > 0;
-					////});
-
-					break;
-					// no well in new map
-					////wellFieldParent.initMapFileUpload();
-					// find wellfieldmap from wellfield where id =
-					// get all WellInWellFieldMap where wellid = ths.wellId
-					// get all maps
-					// get only maps where well_id == ths.Id
-					// get all maps
-					// in wellMarkers
-				}
+		case 'well-volume': {
+				this.mdlStage.loadVolumes();
+				break;
 			}
-		};
+		case 'well-perfomance': {
+				this.mdlStage.getWellGroup().loadListOfWfmParameterOfWroup();
+				this.mdlStage.perfomanceOfWell.forecastEvolution.getDict();
+				this.mdlStage.perfomanceOfWell.getHstProductionDataSet();
+				break;
+			}
+		case 'well-nodalanalysis': {
+				this.mdlStage.loadListOfNodalAnalysis();
+				break;
+			}
+		case 'well-integrity': {
+				this.mdlStage.loadListOfIntegrity();
+				break;
+			}
+		case 'well-log': {
+				this.mdlStage.loadLogsOfWell();
+				break;
+			}
+		case 'well-test': {
+				this.mdlStage.loadListOfTestScope();
+				this.mdlStage.getWellGroup().loadListOfWfmParameterOfWroup();
+				break;
+			}
+		case 'well-monitoring': {
+				this.mdlStage.getWellGroup().loadListOfWfmParameterOfWroup();
+
+				// Load procent borders for all wells
+				// No perfomance when load this data separately (for every well), because
+				//      a company user opens a well group monitoring section frequently than a well monitoring section
+				this.mdlStage.getWellGroup().loadProcentBordersForAllWells();
+
+				// Load monitoring records
+				// There is another loader: load records for all wells, but in this case - need to reload data
+				this.mainVwmMonitoringOfWell.loadFilteredListOfMonitoringRecord();
+
+				break;
+			}
+		case 'well-map': {
+				// find wellfield_id
+				var wellFieldItem = this.mdlStage.getWellGroup().getWellField();
+
+				wellFieldItem.loadMapsOfWield();
+				////function () {
+				////var arr = ko.unwrap(wellFieldItem.WellFieldMaps);
+				// TODO:???
+				////arr = $.grep(arr, function (arrElem, arrIndex) {
+				////    var cnt = 0;
+				////    $.each(arrElem.wellMarkers(), function(wwfIndex, wwfElem){
+				////        if (wwfElem.Id === ths.Id) {
+				////            cnt++;
+				////        }
+				////    });
+
+				////    return cnt > 0;
+				////});
+
+				break;
+				// no well in new map
+				////wellFieldParent.initMapFileUpload();
+				// find wellfieldmap from wellfield where id =
+				// get all WellInWellFieldMap where wellid = ths.wellId
+				// get all maps
+				// get only maps where well_id == ths.Id
+				// get all maps
+				// in wellMarkers
+			}
+		}
+	};
+
+	/**
+	 * Create demo records for the monitoring section
+	 */
+	exports.prototype.createDemoMonitoringRecords = function () {
+		var curDate = new Date();
+		var curUnixTime = Date.UTC(curDate.getFullYear(), curDate.getMonth(), curDate.getDate()) / 1000;
+		var secondsInDay = 24 * 60 * 60;
+		var startUnixTime = curUnixTime - secondsInDay * 35; // minus 50 days
+
+		var tmpMntrParams = ko.unwrap(this.getParentVwm().mdlStage.listOfMonitoredParams);
+		var ths = this;
+		for (var unt = startUnixTime; unt <= curUnixTime; unt += secondsInDay) {
+			// Last function for current time: reload table to get average values for the created record
+			ths.mdlStage.postMonitoringRecord(unt, tmpMntrParams, generateDict(tmpMntrParams), unt === curUnixTime ? ths.getParentVwm().reloadMonitoringRecords : null);
+		}
+	};
+
+	/**
+	 * Create a monitoring record for selected time in well group
+	 */
+	exports.prototype.createMonitoringRecord = function () {
+		// Time, selected in the well group of this well
+		var currentUnixTimeInWroup = ko.unwrap(this.getParentVwm().monitoringUnixTime);
+		if (currentUnixTimeInWroup) {
+
+			var tmpMntrParams = ko.unwrap(this.getParentVwm().mdlStage.listOfMonitoredParams);
+
+			// Create record with empty dictionary
+			// Last parameter - function to reload table (to get average params for the new record)
+			this.mdlStage.postMonitoringRecord(currentUnixTimeInWroup, tmpMntrParams, {}, this.getParentVwm().reloadMonitoringRecords);
+		}
+	};
+
+	/** Calculate the record for a well group for a need time point */
+	exports.prototype.calcMonitoringRecordForWroup = function () {
+		var currentUnixTimeInWroup = ko.unwrap(this.getParentVwm().monitoringUnixTime);
+
+		if (!currentUnixTimeInWroup) {
+			return;
+		}
+
+		var allRecs = ko.unwrap(this.mdlStage.listOfMonitoringRecord);
+
+		var needRec = allRecs.filter(function (recItem) {
+				return ko.unwrap(recItem.unixTime) === currentUnixTimeInWroup;
+			})[0];
+
+		return needRec;
+	};
+
+	/**
+	 * Select all ancestor's view models
+	 */
+	exports.prototype.selectAncestorVwms = function () {
+		this.getParentVwm().unqOfSlcVwmChild(this.unq);
+		this.getParentVwm().selectAncestorVwms();
 	};
 
 	return exports;

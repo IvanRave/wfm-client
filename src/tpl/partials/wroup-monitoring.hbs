@@ -58,10 +58,12 @@
               <!-- ko ifnot: vwmWell.monitoringRecordForWroup -->
                 <td colspan="100">
                   <span data-bind="if: $root.isEmployeeInEditMode">
-                     <button class="btn btn-sm btn-default" data-bind="click: vwmWell.createMonitoringRecord">Create record</button>
-                     <span data-bind="if: $root.isUserInDemoMode">
-                      <button class="btn btn-sm btn-default" data-bind="click: vwmWell.createDemoMonitoringRecords">Generate records for last month</button>
-                     </span>
+                    <span data-bind="with: vwmWell">
+                      <button class="btn btn-sm btn-default" data-bind="click: createMonitoringRecord">Create record</button>
+                      <span data-bind="if: $root.isUserInDemoMode">
+                        <button class="btn btn-sm btn-default" data-bind="click: createDemoMonitoringRecords">Generate records for last month</button>
+                      </span>
+                    </span>
                   </span>
                 </td>
               <!-- /ko -->

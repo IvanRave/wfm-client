@@ -98,19 +98,6 @@ define([
 		});
 	}
 
-	/** Get well map list from well field maps with need well id */
-	function getWellMapList(wellFieldMapList, wellId) {
-		return $.grep(wellFieldMapList, function (elemValue) {
-			var tmpWellMarkers = ko.unwrap(elemValue.wellMarkers);
-
-			var wellIdList = tmpWellMarkers.map(function (wfmElem) {
-					return ko.unwrap(wfmElem.WellId);
-				});
-
-			return $.inArray(wellId, wellIdList) >= 0;
-		});
-	}
-
 	/** Well property specifications: will be good to manage this params on the server side */
 	var wellPropSpecList = [
 		new PropSpec('Name', 'Name', 'Well name', 'SingleLine', {
@@ -197,36 +184,37 @@ define([
 		 */
 		this.WellGroupId = data.WellGroupId;
 
-		/**
-		 * Field maps for this well
-		 * @type {Array.<WellFieldMap>}
-		 */
-		this.wellMapList = ko.computed({
-				read : function () {
-					return getWellMapList(ko.unwrap(this.getWellGroup().getWellField().WellFieldMaps), this.Id);
-				},
-				deferEvaluation : true,
-				owner : this
-			});
-
 		/** Sketch of well: by default - empty */
 		this.sketchOfWell = new SketchOfWell(ths);
-
-		this.loadDashboard = function () {
-			ths.sketchOfWell.load();
-			// TODO: load data only if there is one or more perfomance widgets (only once) for entire well
-			ths.getWellGroup().loadListOfWfmParameterOfWroup();
-			ths.perfomanceOfWell.forecastEvolution.getDict();
-			ths.perfomanceOfWell.getHstProductionDataSet();
-			ths.loadWellHistoryList();
-		};
 
 		/** Save this well main properties */
 		this.save = function () {
 			wellService.put(ths.id, ths.toDto());
 		};
 
-		this.wellMarkers = ko.observableArray();
+		//{ #region MAP
+
+		/**
+		 * Well markers on a well field map
+		 * @type {Array.<module:well-marker-of-map-of-wield>}
+		 */
+		this.listOfMapMarker = ko.computed({
+				read : this.calcMarkersForWell,
+				deferEvaluation : true,
+				owner : this
+			});
+
+		// /**
+		// * Field maps for this well
+		// * @type {Array.<WellFieldMap>}
+		// */
+		// this.listOfMapForWell = ko.computed({
+		// read : this.filterMapsForWell,
+		// deferEvaluation : true,
+		// owner : this
+		// });
+
+		//} #endregion MAP
 
 		//{ #region TEST
 
@@ -945,15 +933,6 @@ define([
 			console.log('Well: ' + ths.id + ': ', ko.unwrap(ths.procentBorders));
 		};
 
-		/**
-		 * Remove (clear) a procent border
-		 */
-		this.removeProcentBorder = function (itemToRemove) {
-			procentBorderService.remove(itemToRemove.idOfWell, itemToRemove.idOfWfmParameter).done(function () {
-				ths.procentBorders.remove(itemToRemove);
-			});
-		};
-
 		//} #endregion
 
 		/** Load well sections */
@@ -974,6 +953,60 @@ define([
 
 			return dtoObj;
 		};
+	};
+
+	/**
+	 * Remove (clear) a procent border
+	 */
+	exports.prototype.removeProcentBorder = function (itemToRemove) {
+		var ths = this;
+		procentBorderService.remove(itemToRemove.idOfWell, itemToRemove.idOfWfmParameter).done(function () {
+			ths.procentBorders.remove(itemToRemove);
+		});
+	};
+
+	/** Get well map list from well field maps with need well id */
+	exports.prototype.calcMarkersForWell = function () {
+		var wellFieldMapList = ko.unwrap(this.getWellGroup().getWellField().WellFieldMaps);
+    console.log('calc markers for a well', wellFieldMapList);
+		var wellId = this.id;
+
+		var arrMarkers = [];
+
+		wellFieldMapList.forEach(function (elemValue) {
+			var tmpWellMarkers = ko.unwrap(elemValue.wellMarkers);
+
+			var needMarkers = tmpWellMarkers.filter(function (wfmElem) {
+					// If the marker belongs to this well
+					if (ko.unwrap(wfmElem.idOfWell) === wellId) {
+						// If the marker is active (is drilled)
+						if (ko.unwrap(wfmElem.isDrilled)) {
+							return true;
+						}
+					}
+
+					return false;
+				});
+
+			if (needMarkers.length === 1) {
+				arrMarkers.push(needMarkers[0]);
+			} else if (needMarkers.length > 1) {
+				// (only one marker (of one well) may be in every map)
+				throw new Error('Only one well per each map');
+			}
+		});
+    
+		return arrMarkers;
+	};
+
+	/** Load a dashboard */
+	exports.prototype.loadDashboard = function () {
+		this.sketchOfWell.load();
+		// TODO: load data only if there is one or more perfomance widgets (only once) for entire well
+		this.getWellGroup().loadListOfWfmParameterOfWroup();
+		this.perfomanceOfWell.forecastEvolution.getDict();
+		this.perfomanceOfWell.getHstProductionDataSet();
+		this.loadWellHistoryList();
 	};
 
 	return exports;
