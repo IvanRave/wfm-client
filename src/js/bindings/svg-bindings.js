@@ -119,9 +119,9 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 			d3.select(element).append('image')
 			.attr('xlink:href', accessor.imgUrl)
 			.attr('width', accessor.imgWidthVg)
-			.attr('height', accessor.imgHeightVg)
-			.attr('x', accessor.imgStartVgX)
-			.attr('y', accessor.imgStartVgY);
+			.attr('height', accessor.imgHeightVg);
+			// .attr('x', accessor.imgStartVgX)
+			// .attr('y', accessor.imgStartVgY);
 		},
 		update : function (element, valueAccessor) {
 			// Working with observables values
@@ -140,11 +140,6 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 			var coefVgToPx = {
 				x : accessor.widthCoefVgToPx,
 				y : accessor.heightCoefVgToPx
-			};
-
-			var imgStartPos = {
-				x : accessor.imgStartVgX,
-				y : accessor.imgStartVgY
 			};
 
 			var listOfVwmWellMarker = ko.unwrap(accessor.listOfVwmWellMarker);
@@ -170,8 +165,8 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 				// Calculate coords on map image in pixels
 				// realX / svgX = realWidth / svgWidth
 				var realMarkerPos = {
-					x : (coords[0] - imgStartPos.x) * (imgWidthPx / imgWidthVg),
-					y : (coords[1] - imgStartPos.y) * (imgHeightPx / imgHeightVg)
+					x : (coords[0]) * (imgWidthPx / imgWidthVg), // - imgStartPos.x
+					y : (coords[1]) * (imgHeightPx / imgHeightVg) //  - imgStartPos.y
 				};
 
 				// Send to the server in PUT method (change well marker data)
@@ -199,8 +194,8 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 				////var wellMarkerCoordsInVg = convertCoordsPxToVg(wellMarkerCoordsInPx, realImgSize, ..);
 				//// F.E.: convert([300px, 300px], {width: 500px, height: 700px}, {width: 1200vg, height: 600vg, ratio: 2})
 				////addWellMarker
-				var tmpCx = wellMarkerCoordsInPx[0] * coefVgToPx.x + imgStartPos.x;
-				var tmpCy = wellMarkerCoordsInPx[1] * coefVgToPx.y + imgStartPos.y;
+				var tmpCx = wellMarkerCoordsInPx[0] * coefVgToPx.x; // + imgStartPos.x;
+				var tmpCy = wellMarkerCoordsInPx[1] * coefVgToPx.y; // + imgStartPos.y;
 				d3Group.append('circle')
 				.attr('cx', tmpCx)
 				.attr('cy', tmpCy)

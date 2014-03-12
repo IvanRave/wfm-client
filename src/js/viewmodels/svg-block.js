@@ -164,15 +164,17 @@ define(['jquery',
 		// upper translate = 20
 		var prevZoomTransform = ko.unwrap(this.zoomTransform);
 
+    var prevScale = prevZoomTransform.scale;
+    
 		// new scale = 3*1.2 = 3.6
 		var curScale;
 		if (zoomDirection === 1) {
-			curScale = prevZoomTransform.scale * scaleCoef;
+			curScale = prevScale * scaleCoef;
 		} else {
-			curScale = prevZoomTransform.scale / scaleCoef;
+			curScale = prevScale / scaleCoef;
 		}
 
-		// Round cur scale
+		// Round the scale (to decrease calculation faults with long numbers)
 		curScale = Math.round(curScale * 1000) / 1000;
 
 		// width = 3.6 * initial width
@@ -181,13 +183,21 @@ define(['jquery',
 		// new left translate = [10 - new width / 2]
 		// new upper translate = [20 - new height / 2]
 		// vboxSize
-		var tmpDiffX = (elemWidth * (curScale - 1)) / 2,
-		tmpDiffY = (elemHeight * (curScale - 1)) / 2;
+    var sizeNew = {
+      width: elemWidth * curScale,
+      height: elemHeight * curScale
+    };
+    
+    var sizePrev = {
+      width: elemWidth * prevScale,
+      height: elemHeight * prevScale
+    };
+    
+		var tmpDiffX = (sizeNew.width - sizePrev.width) / 2,
+		tmpDiffY = (sizeNew.height - sizePrev.height) / 2;
 
-		var curX = prevZoomTransform.translate[0] - tmpDiffX;
-		var curY = prevZoomTransform.translate[1] - tmpDiffY;
-
-		console.log(curScale, [curX, curY]);
+		var curX = prevZoomTransform.translate[0] - tmpDiffX; 
+		var curY = prevZoomTransform.translate[1] - tmpDiffY; 
 
 		this.setZoomTransform(curScale, [curX, curY]);
 		// auto setting zoom behavior
