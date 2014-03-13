@@ -3,10 +3,9 @@
   <div class="row">
     <div class="col-md-8">
         <div data-bind="with: slcVwmMapMarker">
-          <span data-bind="text: mdlWellMarker.nameOfMap"></span>
-          <!-- <div data-bind="with: createVwmMapOfWield()">
-            
-          </div> -->
+          <div data-bind="with: getVwmMapOfWield()">
+            {{> oil-map }}
+          </div>
         </div>
     </div>
     <div class="col-md-4">

@@ -1,11 +1,15 @@
 ﻿<script type="text/html" id="widget-tpl-well-map">
-  <!-- current: vwmWidget -->
-  
+  <!-- current: vwmWidget -->  
   <div data-bind="if: vwmWidget.isVisSettingPanel">
-    <div class="widget-setting-panel">
+    <div class="widget-setting-panel" data-bind="with: vwmWidget.mdlWidget">
+      <select class="input-sm" data-bind="options: dictOfMapMarker, optionsText: 'optText', optionsValue: 'optValue', value: opts.idOfSlcMapOfWield"></select>
     </div>
   </div>
   <div class="widget-content">
-    
+      <div data-bind="with: vwmWidget.slcVwmMapMarker">
+        <div data-bind="with: getVwmMapOfWield()">
+          {{> oil-map }}
+        </div>
+      </div>
   </div>
 </script>

@@ -1,10 +1,14 @@
 ﻿/** @module */
 define(['knockout',
 		'helpers/app-helper',
-		'viewmodels/widget'],
+		'viewmodels/widget',
+		'viewmodels/map-of-wield',
+		'viewmodels/well-marker-of-map-of-wield'],
 	function (ko,
 		appHelper,
-		VwmWidget) {
+		VwmWidget,
+		VwmMapOfWield,
+		VwmWellMarkerOfMapOfWield) {
 	'use strict';
 
 	/**
@@ -14,10 +18,44 @@ define(['knockout',
 	 */
 	var exports = function (mdlWidget) {
 		VwmWidget.call(this, mdlWidget);
+
+		/**
+		 * A selected viewmodel of the map marker
+		 * @type {module:viewmodels/well-marker-of-map-of-wield}
+		 */
+		this.slcVwmMapMarker = ko.computed({
+				read : this.calcSlcVwmMapMarker,
+				deferEvaluation : true,
+				owner : this
+			});
 	};
 
 	/** Inherit from a widget viewmodel */
 	appHelper.inherits(exports, VwmWidget);
+
+	/** Calculate a selected marker */
+	exports.prototype.calcSlcVwmMapMarker = function () {
+		var tmpIdOfMap = ko.unwrap(this.mdlWidget.opts.idOfSlcMapOfWield);
+		if (tmpIdOfMap) {
+
+			// List of map markers from a parent well
+			var tmpList = ko.unwrap(this.mdlWidget.getWidgock().getWidgout().getParent().listOfMapMarker);
+
+			// Find a model for a marker by id of the map
+			var markerModel = tmpList.filter(function (markerItem) {
+					return markerItem.idOfMapOfWield === tmpIdOfMap;
+				})[0];
+
+			if (markerModel) {
+      
+        var tmpKoTransform = this.mdlWidget.opts.transform;
+				// Create a view for a map
+				// Create a view for a marker, using a map view
+				var tmpVwmMap = new VwmMapOfWield(markerModel.getWellFieldMap(), null, tmpKoTransform);
+				return new VwmWellMarkerOfMapOfWield(markerModel, null, tmpVwmMap);
+			}
+		}
+	};
 
 	return exports;
 });

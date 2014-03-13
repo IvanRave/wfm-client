@@ -1,5 +1,10 @@
 ﻿/** @module */
-define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
+define(['jquery',
+		'knockout',
+		'd3',
+		'helpers/map-helper'],
+	function ($, ko, d3,
+		mapHelper) {
 	'use strict';
 
 	/**
@@ -51,7 +56,7 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 	 */
 	ko.bindingHandlers.svgZoomBehavior = {
 		init : function (element, valueAccessor) {
-      console.log('svgZoomBehavior bindind has executed');
+			console.log('svgZoomBehavior bindind has executed');
 			// zoom behavior
 			var tmpZoomBehavior = ko.unwrap(valueAccessor());
 			if (tmpZoomBehavior) {
@@ -60,53 +65,6 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 		}
 	};
 
-	/** Drag and drop for circles */
-	function getDragSvgCircle(wellMarkerItem, widthCoefVgToPx, heightCoefVgToPx) {
-		var imgBounds = {};
-		// TODO: get radius from view
-		var markerRadius = 8;
-		var dragSvgCircle = d3.behavior.drag()
-			////.origin()
-			.on('dragstart', function () {
-				// silence other listeners
-				d3.event.sourceEvent.stopPropagation();
-
-				var d3BoundImage = d3.select(this).select(function () {
-						return this.parentNode;
-					}).select('image');
-
-				var boundCoords = {
-					left : +d3BoundImage.attr('x'),
-					right : +d3BoundImage.attr('x') + (+d3BoundImage.attr('width')),
-					top : +d3BoundImage.attr('y'),
-					bottom : +d3BoundImage.attr('y') + (+d3BoundImage.attr('height'))
-				};
-
-				imgBounds = boundCoords;
-			})
-			.on('drag', function () {
-				// Change circle coords
-				////console.log('event', d3.event.x, d3.event.y);
-				////console.log('mouse', d3.mouse(this));
-				var xNew = Math.max(Math.min(d3.event.x, imgBounds.right - markerRadius), imgBounds.left + markerRadius),
-				yNew = Math.max(Math.min(d3.event.y, imgBounds.bottom - markerRadius), imgBounds.top + markerRadius);
-
-				d3.select(this)
-				.attr('cx', xNew)
-				.attr('cy', yNew);
-			})
-			.on('dragend', function () {
-				var tmpElem = d3.select(this);
-				wellMarkerItem.coords([(+tmpElem.attr('cx') - imgBounds.left) / widthCoefVgToPx,
-						(+tmpElem.attr('cy') - imgBounds.top) / heightCoefVgToPx]);
-
-				////console.log(tmpCoords);
-				////console.log(wellMarkerItem);
-			});
-
-		return dragSvgCircle;
-	}
-
 	/** Svg map */
 	ko.bindingHandlers.mapBinding = {
 		init : function (element, valueAccessor) {
@@ -114,7 +72,7 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 
 			// Only non-observable objects or initial states of objects
 			// Image url and size doesn't change
-			
+
 			// Append image with map (only once on init event)
 			d3.select(element).append('image')
 			.attr('xlink:href', accessor.imgUrl)
@@ -125,8 +83,7 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 			// Working with observables values
 			var accessor = valueAccessor();
 			var idOfSlcMapTool = ko.unwrap(accessor.idOfSlcMapTool);
-			var slcVwmWellMarker = ko.unwrap(accessor.slcVwmWellMarker);
-			var wellMarkerDataToAdd = accessor.wellMarkerDataToAdd;
+			var vwmWellMarkerToAdd = accessor.vwmWellMarkerToAdd;
 
 			// Image size, in pixels
 			var imgWidthPx = accessor.imgWidthPx;
@@ -135,19 +92,15 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 			var imgWidthVg = accessor.imgWidthVg;
 			var imgHeightVg = accessor.imgHeightVg;
 
-			var coefVgToPx = {
-				x : accessor.widthCoefVgToPx,
-				y : accessor.heightCoefVgToPx
-			};
+			var widthCoefVgToPx = accessor.widthCoefVgToPx;
+			var heightCoefVgToPx = accessor.heightCoefVgToPx;
 
 			var listOfVwmWellMarker = ko.unwrap(accessor.listOfVwmWellMarker);
 			var wellMarkerRadius = ko.unwrap(accessor.wellMarkerRadius);
 			// Draw well markers
 			var d3GroupWrap = d3.select(element);
 
-			var d3Group = d3GroupWrap;// d3GroupWrap.select('g');
-
-			var d3Image = d3Group.select('image');
+			var d3Image = d3GroupWrap.select('image');
 
 			d3Image.on('click', function () {
 				console.log(idOfSlcMapTool);
@@ -169,57 +122,41 @@ define(['jquery', 'knockout', 'd3'], function ($, ko, d3) {
 
 				// Send to the server in PUT method (change well marker data)
 				console.log('realMarkerPos', realMarkerPos);
-				wellMarkerDataToAdd.coords([realMarkerPos.x, realMarkerPos.y]);
-				//addWellMarker(realMarkerPos.x, realMarkerPos.y);
+				vwmWellMarkerToAdd.coords([realMarkerPos.x, realMarkerPos.y]);
 			});
 
 			// Redraw all well markers: user can remove/add/change coords or any actions with markers outside of svg block
 			// Clear all values
-			d3Group.selectAll('circle').remove();
-
-			function drawWellMarker(wellMarkerItem) {
-				// Convert empty coords
-				var wellMarkerCoordsInPx = ko.unwrap(wellMarkerItem.coords);
-
-				console.log('wellMarkerCoordsInPx', wellMarkerCoordsInPx);
-
-				if (!wellMarkerCoordsInPx[0] || !wellMarkerCoordsInPx[1]) {
-					// set to the center of image
-					wellMarkerCoordsInPx = [imgWidthPx / 2, imgHeightPx / 2];
-				}
-
-				/** In svg units (abbr: vg) */
-				////var wellMarkerCoordsInVg = convertCoordsPxToVg(wellMarkerCoordsInPx, realImgSize, ..);
-				//// F.E.: convert([300px, 300px], {width: 500px, height: 700px}, {width: 1200vg, height: 600vg, ratio: 2})
-				////addWellMarker
-				var tmpCx = wellMarkerCoordsInPx[0] * coefVgToPx.x; // + imgStartPos.x;
-				var tmpCy = wellMarkerCoordsInPx[1] * coefVgToPx.y; // + imgStartPos.y;
-				d3Group.append('circle')
-				.attr('cx', tmpCx)
-				.attr('cy', tmpCy)
-				.attr('r', wellMarkerRadius)
-				.attr('class', ko.unwrap(wellMarkerItem.markerStyle))
-				.on('click', function () {
-					// Show info about well in this point
-					if (d3.event.defaultPrevented) {
-						return;
-					}
-					//console.log('circle hoora', cx, cy);
-				})
-				.call(getDragSvgCircle(wellMarkerItem, coefVgToPx.x, coefVgToPx.y));
-			}
+			d3GroupWrap.selectAll('circle').remove();
 
 			// Add fresh values
 			listOfVwmWellMarker.forEach(function (elem) {
-				drawWellMarker(elem.mdlWellMarker);
+				var tmpCoords = ko.unwrap(elem.mdlWellMarker.coords);
+				mapHelper.drawWellMarker(
+					tmpCoords[0] * widthCoefVgToPx,
+					tmpCoords[1] * heightCoefVgToPx,
+					ko.unwrap(elem.isSlc) ? 'well-marker_selected' : ko.unwrap(elem.mdlWellMarker.markerStyle),
+					d3GroupWrap,
+					wellMarkerRadius,
+					function (endCoordX, endCoordY) {
+					elem.mdlWellMarker.coords([endCoordX / widthCoefVgToPx, endCoordY / heightCoefVgToPx]);
+				});
 			});
 
-			if (ko.unwrap(wellMarkerDataToAdd.coords)) {
-				console.log('wellmarkertoadd', wellMarkerDataToAdd);
-				drawWellMarker(wellMarkerDataToAdd, 'green');
-			}
+			if (ko.unwrap(vwmWellMarkerToAdd.coords)) {
+				console.log('wellmarkertoadd', vwmWellMarkerToAdd);
+				var tmpCoords = ko.unwrap(vwmWellMarkerToAdd.coords);
 
-			console.log('slcWell: ', slcVwmWellMarker);
+				mapHelper.drawWellMarker(
+					tmpCoords[0] * widthCoefVgToPx,
+					tmpCoords[1] * heightCoefVgToPx,
+					vwmWellMarkerToAdd.markerStyle,
+					d3GroupWrap,
+					wellMarkerRadius,
+					function (endCoordX, endCoordY) {
+					vwmWellMarkerToAdd.coords([endCoordX / widthCoefVgToPx, endCoordY / heightCoefVgToPx]);
+				});
+			}
 		}
 	};
 

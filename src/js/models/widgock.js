@@ -48,7 +48,7 @@ define(['jquery',
 	/** Fill the well widget layout list */
 	function importWidgetList(data, widgockItem) {
 		return (data || []).map(function (item) {
-      return buildWidget(item, widgockItem);
+			return buildWidget(item, widgockItem);
 		});
 	}
 
@@ -61,60 +61,90 @@ define(['jquery',
 	var exports = function (data, widgoutItem) {
 		data = data || {};
 
-		var ths = this;
-
+		/**
+		 * Getter for a parent (widget layout)
+		 * @returns {module:models/widgout}
+		 */
 		this.getWidgout = function () {
 			return widgoutItem;
 		};
 
+		/**
+		 * An id of a widget block
+		 * @type {string}
+		 */
 		this.id = data.Id;
+
+		/**
+		 * An order number of the block
+		 * @type {number}
+		 */
 		this.orderNumber = ko.observable(data.OrderNumber);
+
+		/**
+		 * A number of the column, when placed this block
+		 * @type {number}
+		 */
 		this.columnCount = ko.observable(data.ColumnCount);
 
+		/**
+		 * A css class for this block
+		 * @type {string}
+		 */
 		this.columnStyle = ko.computed({
 				read : function () {
-					return 'col-md-' + ko.unwrap(ths.columnCount);
+					return 'col-md-' + ko.unwrap(this.columnCount);
 				},
-				deferEvaluation : true
+				deferEvaluation : true,
+				owner : this
 			});
 
+		/**
+		 * A list of widgets
+		 * @type {Array.<module:models/widget>}
+		 */
 		this.widgetList = ko.observableArray();
 
-		this.addWidget = function (tmpWidgetName, tmpIdOfSectionPattern, scsCallback) {
-			var tmpWidgetList = ko.unwrap(ths.widgetList);
+		// Fill a widget list
+		this.widgetList(importWidgetList(data.WidgetDtoList, this));
+	};
 
-			// Get order number of last widget
-			var lastOrderNumber;
+	/** Remove widget from widget block */
+	exports.prototype.removeWidget = function (widgetToDelete) {
+		var ths = this;
+		widgetService.remove(ths.getWidgout().getParent().stageKey, ths.id, widgetToDelete.id).done(function () {
+			ths.widgetList.remove(widgetToDelete);
+		});
+	};
 
-			if (tmpWidgetList.length > 0) {
-				lastOrderNumber = ko.unwrap(tmpWidgetList[tmpWidgetList.length - 1].orderNumber);
-			} else {
-				lastOrderNumber = 0;
-			}
+	/** Create a widget */
+	exports.prototype.addWidget = function (tmpWidgetName, tmpIdOfSectionPattern, scsCallback) {
+		var tmpWidgetList = ko.unwrap(this.widgetList);
 
-			widgetService.post(ths.getWidgout().getParent().stageKey, ths.id, {
-				Name : tmpWidgetName,
-				IdOfSectionPattern : tmpIdOfSectionPattern,
-				OrderNumber : lastOrderNumber + 1,
-				Opts : '{}',
-				WidgockId : ths.id
-			}).done(function (createdWidgetData) {
-				var widgetNew = buildWidget(createdWidgetData, ths);
-				ths.widgetList.push(widgetNew);
+		// Get order number of last widget
+		var lastOrderNumber;
 
-				// Open settings after creation
-				scsCallback(widgetNew.id);
-			});
-		};
+		if (tmpWidgetList.length > 0) {
+			lastOrderNumber = ko.unwrap(tmpWidgetList[tmpWidgetList.length - 1].orderNumber);
+		} else {
+			lastOrderNumber = 0;
+		}
 
-		/** Remove widget from widget block */
-		this.removeWidget = function (widgetToDelete) {
-			widgetService.remove(ths.getWidgout().getParent().stageKey, ths.id, widgetToDelete.id).done(function () {
-				ths.widgetList.remove(widgetToDelete);
-			});
-		};
+		var ths = this;
 
-		this.widgetList(importWidgetList(data.WidgetDtoList, ths));
+		widgetService.post(ths.getWidgout().getParent().stageKey, ths.id, {
+			Name : tmpWidgetName,
+			IdOfSectionPattern : tmpIdOfSectionPattern,
+			OrderNumber : lastOrderNumber + 1,
+			Opts : '{}',
+			WidgockId : ths.id
+		}).done(function (createdWidgetData) {
+			var widgetNew = buildWidget(createdWidgetData, ths);
+			ths.widgetList.push(widgetNew);
+
+			// Open settings after creation
+			scsCallback(widgetNew.id);
+		});
 	};
 
 	return exports;

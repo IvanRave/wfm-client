@@ -1007,6 +1007,7 @@ define([
 		this.perfomanceOfWell.forecastEvolution.getDict();
 		this.perfomanceOfWell.getHstProductionDataSet();
 		this.loadWellHistoryList();
+    this.getWellGroup().getWellField().loadMapsOfWield();
 	};
 
 	return exports;

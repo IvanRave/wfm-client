@@ -11,7 +11,7 @@ define(['knockout',
 	var exports = function (data, wellFieldMap) {
 		data = data || {};
 
-    /** Getter for a map parent */
+		/** Getter for a map parent */
 		this.getWellFieldMap = function () {
 			return wellFieldMap;
 		};
@@ -79,27 +79,27 @@ define(['knockout',
 				owner : this
 			});
 
-    /**
-    * A name of the map
-    * @type {string}
-    */
-    this.nameOfMap = ko.computed({
-      read: this.calcNameOfMap,
-      deferEvaluation: true,
-      owner: this
-    });    
-      
+		/**
+		 * A name of the map
+		 * @type {string}
+		 */
+		this.nameOfMap = ko.computed({
+				read : this.calcNameOfMap,
+				deferEvaluation : true,
+				owner : this
+			});
+
 		/** Save coords when change */
 		this.coords.subscribe(this.save, this);
 
 		////this.toPlainJson = function () { return ko.toJS(ths); };
 	};
 
-  /** Calculate a name of the map (parent) */
-  exports.prototype.calcNameOfMap = function(){
-    return ko.unwrap(this.getWellFieldMap().name);
-  };
-  
+	/** Calculate a name of the map (parent) */
+	exports.prototype.calcNameOfMap = function () {
+		return ko.unwrap(this.getWellFieldMap().name);
+	};
+
 	/** Save marker */
 	exports.prototype.save = function () {
 		var ths = this;
@@ -114,7 +114,15 @@ define(['knockout',
 
 	/** Calculate a style for the marker */
 	exports.prototype.calcMarkerStyle = function () {
-		return ko.unwrap(this.isDrilled) ? 'well-marker_drilled' : 'well-marker_non-drilled';
+		var tmpIsDrilled = ko.unwrap(this.isDrilled);
+		if (tmpIsDrilled === true) {
+			return 'well-marker_drilled';
+		} else if (tmpIsDrilled === false) {
+			return 'well-marker_non-drilled';
+		} else {
+      // Pre-created markers
+			return 'well-marker_pre-created';
+		}
 	};
 
 	/** Calculate a name of the well */
@@ -128,10 +136,10 @@ define(['knockout',
 	/** Get well for this marker */
 	exports.prototype.getWell = function () {
 		var wellFieldItem = this.getWellFieldMap().getWellField();
-    var listOfWroup = ko.unwrap(wellFieldItem.wroups);
+		var listOfWroup = ko.unwrap(wellFieldItem.wroups);
 		var tmpIdOfWell = this.idOfWell;
 		for (var keyOfWroup = 0; keyOfWroup < listOfWroup.length; keyOfWroup += 1) {
-      var listOfWell = ko.unwrap(listOfWroup[keyOfWroup].wells);
+			var listOfWell = ko.unwrap(listOfWroup[keyOfWroup].wells);
 			for (var keyOfWell = 0; keyOfWell < listOfWell.length; keyOfWell += 1) {
 				if (listOfWell[keyOfWell].id === tmpIdOfWell) {
 					return listOfWell[keyOfWell];

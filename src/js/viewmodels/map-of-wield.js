@@ -162,12 +162,16 @@ define(['knockout',
 		 *    Set point on the map, show adding panel right of the map
 		 * @type {Object}
 		 */
-		this.wellMarkerDataToAdd = {
-			coords : ko.observable(),
-			idOfWell : ko.observable(),
+		this.vwmWellMarkerToAdd = {
+      coords: ko.observable(),
       isDrilled: ko.observable(true),
+      idOfWell: ko.observable(),
       markerStyle: 'well-marker_pre-created'
-		};
+    };
+    
+    // // new VwmWellMarker({
+      // // IdOfMapOfWield: this.id
+    // // }, null, this);
 
 		/** Binding options for maps */
 		this.mapBindingOptions = {
@@ -181,8 +185,7 @@ define(['knockout',
 			listOfVwmWellMarker : this.listVwmWellMarker,
 			wellMarkerRadius : 8,
 			idOfSlcMapTool : this.idOfSlcVwmMapTool,
-			slcVwmWellMarker : this.slcVwmWellMarker,
-			wellMarkerDataToAdd : this.wellMarkerDataToAdd
+			vwmWellMarkerToAdd : this.vwmWellMarkerToAdd
 		};
 
 	};
@@ -217,9 +220,9 @@ define(['knockout',
 
 	/** Add well marker: different methods for different views */
 	exports.prototype.addWellMarkerToMap = function () {
-		this.mdlMapOfWield.postWellMarker(ko.unwrap(this.wellMarkerDataToAdd.idOfWell),
-			ko.unwrap(this.wellMarkerDataToAdd.coords),
-      ko.unwrap(this.wellMarkerDataToAdd.isDrilled));
+		this.mdlMapOfWield.postWellMarker(ko.unwrap(this.vwmWellMarkerToAdd.idOfWell),
+			ko.unwrap(this.vwmWellMarkerToAdd.coords),
+      ko.unwrap(this.vwmWellMarkerToAdd.isDrilled));
 
 		// Clear selection: if post is unsuccessful - then only show error
 		this.cancelAddingWellMarker();
@@ -229,8 +232,8 @@ define(['knockout',
 	 * Cancel adding: clear object to adding
 	 */
 	exports.prototype.cancelAddingWellMarker = function () {
-		this.wellMarkerDataToAdd.coords(null);
-		this.wellMarkerDataToAdd.idOfWell(null);
+		this.vwmWellMarkerToAdd.coords(null);
+		this.vwmWellMarkerToAdd.idOfWell(null);
 	};
 
 	/** Remove analog for model */
@@ -272,7 +275,7 @@ define(['knockout',
 	/** Get markers' viewmodels */
 	exports.prototype.getListVwmWellMarker = function () {
 		return ko.unwrap(this.mdlMapOfWield.wellMarkers).map(function (elem) {
-			return new VwmWellMarker(elem, this.slcVwmWellMarker);
+			return new VwmWellMarker(elem, this.slcVwmWellMarker, this);
 		}, this);
 	};
 

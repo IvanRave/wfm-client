@@ -17,6 +17,7 @@ define([
 		'viewmodels/perfomance-of-well',
 		'viewmodels/test-scope',
 		'viewmodels/monitoring-of-well',
+    'viewmodels/map-of-wield',
     'viewmodels/well-marker-of-map-of-wield'],
 	function (
 		$,
@@ -32,6 +33,7 @@ define([
 		VwmPerfomanceOfWell,
 		VwmTestScope,
 		VwmMonitoringOfWell,
+    VwmMapOfWield,
     VwmWellMarkerOfMapOfWield) {
 	'use strict';
 
@@ -709,9 +711,17 @@ define([
   /** Build viewmodels for map markers */
   exports.prototype.buildListOfVwmMapMarker = function(){
     var tmpList = ko.unwrap(this.mdlStage.listOfMapMarker);
-    console.log('mapMarkers', tmpList);
-    return tmpList.map(function(elem){
-      return new VwmWellMarkerOfMapOfWield(elem, this.slcVwmMapMarker);
+    
+    var tmpSlcVwmMapMarker = this.slcVwmMapMarker;
+    
+    return tmpList.map(function(markerModel){
+      //mdlMapOfWield, koVidOfSlcVwmMapOfWield, koTransform
+      var tmpVwmMap = new VwmMapOfWield(markerModel.getWellFieldMap(), null, ko.observable({
+        scale: 1,
+        translate: [0, 0]
+      }));
+      
+      return new VwmWellMarkerOfMapOfWield(markerModel, tmpSlcVwmMapMarker, tmpVwmMap);
     }, this);
   };
   

@@ -15,37 +15,30 @@ define(['knockout'], function (ko) {
 	 * Viewmodel: well marker (in map of field)
 	 * @constructor
 	 */
-	var exports = function (mdlWellMarker, koSlcVwmWellMarker) {
-
-		/** Alternative */
-		var ths = this;
-
+	var exports = function (mdlWellMarker, koSlcVwmWellMarker, vwmMapOfWield) {
 		/**
 		 * Model: well marker
 		 * @type {module:models/well-marker-of-map-of-wield}
 		 */
 		this.mdlWellMarker = mdlWellMarker;
 
+    /** Getter for a map */
+    this.getVwmMapOfWield = function(){
+      return vwmMapOfWield;
+    };
+    
 		/**
 		 * Whether well marker is selected
 		 * @type {boolean}
 		 */
 		this.isSlc = ko.computed({
 				read : function () {
-					return ths === ko.unwrap(koSlcVwmWellMarker);
+					return this === ko.unwrap(koSlcVwmWellMarker);
 				},
 				deferEvaluation : true,
         owner: this
 			});
 	};
-
-  /** Create a viewmodel of a map of wield */
-  // exports.prototype.createVwmMapOfWield = function(){
-      // return new VwmMapOfWield(this.mdlWellMarker.getWellFieldMap(), null, ko.observable({
-        // scale: 1,
-        // translate: [0,0]
-      // }));
-  // };
   
 	return exports;
 });

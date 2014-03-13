@@ -28,9 +28,15 @@ define(['knockout',
 		/** Whether map is visible */
 		this.opts.isVisImg = ko.observable(tmpOpts['isVisImg']);
 
+    /**
+    * A transform attribute
+    *    two parameters in one observable object, to don't repeat redrawing, 
+    *    when both params are updated
+    * @type {Object}
+    */
 		this.opts.transform = ko.observable({
-				scale : tmpOpts['transformScale'] || 1,
-				translate : tmpOpts['transformTranslate'] || [0, 0]
+				scale : tmpOpts.transform ? (tmpOpts.transform.scale || 1) : 1,
+				translate : tmpOpts.transform ? (tmpOpts.transform.translate || [0, 0]) : [0, 0]
 			});
 
 		/**
@@ -48,13 +54,7 @@ define(['knockout',
 
 	/** Convert to plain JSON to send to the server as widget settings */
 	exports.prototype.toPlainOpts = function () {
-		return JSON.stringify({
-			'idOfSlcMapOfWield' : ko.unwrap(this.opts.idOfSlcMapOfWield),
-			'isVisName' : ko.unwrap(this.opts.isVisName),
-			'isVisImg' : ko.unwrap(this.opts.isVisImg),
-			'transformScale' : ko.unwrap(this.opts.transform).scale,
-			'transformTranslate' : ko.unwrap(this.opts.transform).translate
-		});
+    return ko.toJSON(this.opts);
 	};
   
   /**
@@ -64,8 +64,8 @@ define(['knockout',
     var allMaps = ko.unwrap(this.getWidgock().getWidgout().getParent().WellFieldMaps);
 		return allMaps.map(function (elem) {
 			return {
-				optText : ko.unwrap(elem.name),
-				optValue : ko.unwrap(elem.id)
+        optValue : ko.unwrap(elem.id),
+				optText : ko.unwrap(elem.name)
 			};
 		});
 	};
