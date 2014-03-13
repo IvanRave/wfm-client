@@ -3,6 +3,7 @@ define([
 		'jquery',
 		'knockout',
 		'helpers/modal-helper',
+		'helpers/app-helper',
 		'viewmodels/well',
 		'base-viewmodels/stage-child-base',
 		'base-viewmodels/stage-base',
@@ -11,6 +12,7 @@ define([
 		$,
 		ko,
 		modalHelper,
+		appHelper,
 		VwmWell,
 		VwmStageChildBase,
 		VwmStageBase,
@@ -21,34 +23,33 @@ define([
 	/**
 	 * Well group view model
 	 * @constructor
+	 * @augments {module:base-viewmodels/stage-base}
 	 */
 	var exports = function (mdlWroup, parentVwmWield, defaultSlcData) {
 		var ths = this;
 
 		this.mdlStage = mdlWroup;
 
+		this.getParentVwm = function () {
+			return parentVwmWield;
+		};
+
 		this.unq = mdlWroup.id;
 
-		this.fmgr = parentVwmWield.fmgr;
+		this.fmgr = this.getParentVwm().fmgr;
+
+		this.defaultSlcData = defaultSlcData;
 
 		this.listOfVwmChild = ko.computed({
-				read : function () {
-					return ko.unwrap(mdlWroup.wells).map(function (elem) {
-						return new VwmWell(elem, ths, defaultSlcData);
-					});
-				},
-				deferEvaluation : true
+				read : this.buildListOfVwmChild,
+				deferEvaluation : true,
+				owner : this
 			});
 
 		// Has a children (wroups)
 		VwmStageChildBase.call(this, defaultSlcData.wellId);
 		// Has sections and widgets
 		VwmStageBase.call(this, defaultSlcData.wroupSectionId, parentVwmWield.unqOfSlcVwmChild);
-
-		this.selectAncestorVwms = function () {
-			parentVwmWield.unqOfSlcVwmChild(ths.unq);
-			parentVwmWield.selectAncestorVwms();
-		};
 
 		/**
 		 * List of viewmodels of wfm parameters of well group
@@ -199,6 +200,14 @@ define([
 		//} #endregion MONITORING
 	};
 
+	/** Inherit from a stage base viewmodel */
+	appHelper.inherits(exports, VwmStageBase);
+
+	exports.prototype.selectAncestorVwms = function () {
+		this.getParentVwm().unqOfSlcVwmChild(this.unq);
+		this.getParentVwm().selectAncestorVwms();
+	};
+
 	/**
 	 * Create well
 	 */
@@ -282,16 +291,23 @@ define([
 	 * @param {module:viewmodels/wfm-parameter-of-wroup}
 	 */
 	exports.prototype.removeVwmWfmParameterOfWroup = function (vwmToRemove) {
-    // This (with bind($parent)) - vwmStage - vwmWroup
-    // First param is current parameter (in foreach)
+		// This (with bind($parent)) - vwmStage - vwmWroup
+		// First param is current parameter (in foreach)
 		var ths = this;
-    
-    console.log('Remove parameter {0} from {1}', vwmToRemove, this);
-    
+
+		console.log('Remove parameter {0} from {1}', vwmToRemove, this);
+
 		var tmpName = ko.unwrap(ko.unwrap(vwmToRemove.mdlWfmParameterOfWroup.wfmParameter).name);
 		if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + tmpName + '"?')) {
 			ths.mdlStage.removeWfmParameterOfWroup(vwmToRemove.mdlWfmParameterOfWroup);
 		}
+	};
+
+	/** Build a list of viewmodels of childs */
+	exports.prototype.buildListOfVwmChild = function () {
+		return ko.unwrap(this.mdlStage.wells).map(function (elem) {
+			return new VwmWell(elem, this, this.defaultSlcData);
+		}, this);
 	};
 
 	return exports;

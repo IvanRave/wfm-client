@@ -1,78 +1,107 @@
 ﻿/** @module */
 define(['jquery',
-    'knockout',
-    'helpers/modal-helper',
-    'viewmodels/wield',
-    'base-viewmodels/stage-child-base',
-    'base-viewmodels/stage-base'],
-    function ($, ko, bootstrapModal, VwmWield, VwmStageChildBase, VwmStageBase) {
-        'use strict';
+		'knockout',
+		'helpers/modal-helper',
+		'helpers/app-helper',
+		'viewmodels/wield',
+		'base-viewmodels/stage-child-base',
+		'base-viewmodels/stage-base'],
+	function ($,
+		ko,
+		bootstrapModal,
+		appHelper,
+		VwmWield,
+		VwmStageChildBase,
+		VwmStageBase) {
+	'use strict';
 
-        /**
-        * Well region view model
-        * @constructor
-        */
-        var exports = function (mdlWegion, parentVwmCompany, defaultSlcData) {
-            var ths = this;
+	/**
+	 * Well region view model
+	 * @constructor
+	 * @augments {module:base-viewmodels/stage-base}
+	 */
+	var exports = function (mdlWegion, parentVwmCompany, defaultSlcData) {
+		/**
+		 * Model wegion
+		 * @type {module:models/wegion}
+		 */
+		this.mdlStage = mdlWegion;
 
-            /**
-            * Model wegion
-            * @type {module:models/wegion}
-            */
-            this.mdlStage = mdlWegion;
+		/** Default data to select */
+		this.defaultSlcData = defaultSlcData;
 
-            /** Unique id for view */
-            this.unq = mdlWegion.id;
+		/** Unique id for view */
+		this.unq = this.mdlStage.id;
 
-            /** Link to file manager of company */
-            this.fmgr = parentVwmCompany.fmgr;
+		/**
+		 * Get a parent viewmodel
+		 * @type {module:viewmodels/company}
+		 */
+		this.getParentVwm = function () {
+			return parentVwmCompany;
+		};
 
-            /**
-            * List of views of well fields 
-            * @type {Array.<module:viewmodels/wield>}
-            */
-            this.listOfVwmChild = ko.computed({
-                read: function () {
-                    return ko.unwrap(mdlWegion.wields).map(function (elem) {
-                        return new VwmWield(elem, ths, defaultSlcData);
-                    });
-                },
-                deferEvaluation: true
-            });
+		/** Link to file manager of company */
+		this.fmgr = parentVwmCompany.fmgr;
 
-            VwmStageChildBase.call(this, defaultSlcData.wieldId);
-            VwmStageBase.call(this, defaultSlcData.wegionSectionId, parentVwmCompany.unqOfSlcVwmChild);
+		/**
+		 * List of views of well fields
+		 * @type {Array.<module:viewmodels/wield>}
+		 */
+		this.listOfVwmChild = ko.computed({
+				read : this.buildListOfVwmChild,
+				deferEvaluation : true,
+				owner : this
+			});
 
-            /**
-            * Select all ancestor's view models
-            */
-            this.selectAncestorVwms = function () {
-                // 1. take parent view - company
-                // 2. take parent view of employee - userprofile
-                parentVwmCompany.unqOfSlcVwmChild(ths.unq);
-                parentVwmCompany.selectAncestorVwms();
-            };
+		VwmStageChildBase.call(this, defaultSlcData.wieldId);
+		VwmStageBase.call(this, defaultSlcData.wegionSectionId, parentVwmCompany.unqOfSlcVwmChild);
+	};
 
-            /** Add new well field model and viewmodel */
-            this.addVwmWield = function () {
-                var inputName = document.createElement('input');
-                inputName.type = 'text';
-                $(inputName).prop({ 'required': true }).addClass('form-control');
+	/** Inherit from a stage base viewmodel */
+	appHelper.inherits(exports, VwmStageBase);
 
-                var innerDiv = document.createElement('div');
+	/**
+	 * Select all ancestor's view models
+	 */
+	exports.prototype.selectAncestorVwms = function () {
+		// 1. take parent view - company
+		// 2. take parent view of employee - userprofile
+		this.getParentVwm().unqOfSlcVwmChild(this.unq);
+		this.getParentVwm().selectAncestorVwms();
+	};
 
-                $(innerDiv).addClass('form-horizontal').append(
-                    bootstrapModal.gnrtDom('Name', inputName)
-                );
+	/** Add new well field model and viewmodel */
+	exports.prototype.addVwmWield = function () {
+		var ths = this;
+		var inputName = document.createElement('input');
+		inputName.type = 'text';
+		$(inputName).prop({
+			'required' : true
+		}).addClass('form-control');
 
-                function submitFunction() {
-                    mdlWegion.postWield($(inputName).val());
-                    bootstrapModal.closeModalWindow();
-                }
+		var innerDiv = document.createElement('div');
 
-                bootstrapModal.openModalWindow('Well field', innerDiv, submitFunction);
-            };
-        };
+		$(innerDiv).addClass('form-horizontal').append(
+			bootstrapModal.gnrtDom('Name', inputName));
 
-        return exports;
-    });
+		function submitFunction() {
+			ths.mdlStage.postWield($(inputName).val());
+			bootstrapModal.closeModalWindow();
+		}
+
+		bootstrapModal.openModalWindow('Well field', innerDiv, submitFunction);
+	};
+
+	/**
+	 * Build a list of viewmodels of childs
+	 * @returns {module:viewmodels/wield}
+	 */
+	exports.prototype.buildListOfVwmChild = function () {
+		return ko.unwrap(this.mdlStage.wields).map(function (elem) {
+			return new VwmWield(elem, this, this.defaultSlcData);
+		}, this);
+	};
+
+	return exports;
+});

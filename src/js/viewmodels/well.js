@@ -7,6 +7,7 @@ define([
 		'jquery',
 		'knockout',
 		'helpers/modal-helper',
+    'helpers/app-helper',
 		'base-viewmodels/stage-base',
 		'viewmodels/sketch-of-well',
 		'viewmodels/volume-of-well',
@@ -23,6 +24,7 @@ define([
 		$,
 		ko,
 		bootstrapModal,
+    appHelper,
 		VwmStageBase,
 		VwmSketchOfWell,
 		VwmVolumeOfWell,
@@ -60,6 +62,7 @@ define([
 	/**
 	 * Well view model
 	 * @constructor
+   * @augments {module:base-viewmodels/stage-base}
 	 */
 	var exports = function (mdlWell, parentVwmWroup, defaultSlcData) {
 		var ths = this;
@@ -691,6 +694,9 @@ define([
     
     //} #endregion MAP
 	};
+
+  /** Inherit from a stage base viewmodel */
+	appHelper.inherits(exports, VwmStageBase);
   
   /** Calculate a selected marker, using id of map */
   exports.prototype.calcSlcVwmMapMarker = function(){
@@ -862,7 +868,7 @@ define([
 
 		return needRec;
 	};
-
+  
 	/**
 	 * Select all ancestor's view models
 	 */

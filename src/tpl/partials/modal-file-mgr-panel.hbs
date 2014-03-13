@@ -8,7 +8,7 @@
       <div class="btn-group" data-bind="foreach: listOfVwmSection">
         <!-- ko if: mdlSection.sectionPattern -->
         <!-- ko if: mdlSection.sectionPattern().isFolder -->
-        <button class="btn btn-sm btn-default" data-bind="css: {'active': isSlcVwmSectionFmg }, click: $parent.selectVwmSectionFmg">
+        <button class="btn btn-sm btn-default" data-bind="css: {'active': isSlcVwmSectionFmg }, click: $parent.selectVwmSectionFmg.bind($parent)">
           <span data-bind="with: mdlSection.sectionPattern">
             <span data-bind="text: name"></span>
           </span>
@@ -56,7 +56,7 @@
         <div class="checkbox">
           <label>
             <input type="checkbox" data-bind="checked: isSelected"></input>
-            <span class="link-view" data-bind="click: download">
+            <span>
               <span class="break-word" data-bind="text: name, attr: {title: fullTitle }"></span>
             </span>
           </label>
@@ -69,6 +69,9 @@
         <span data-bind="unixTime: createdUnixTime"></span>
       </div>
       <div class="col-sm-1">
+        <button class="btn btn-default btn-xs" data-bind="click: download">
+          <i class="glyphicon glyphicon-download-alt"></i>
+        </button>
         <span data-bind="text: lengthInKb, attr:{title: length + ' bytes'}"></span>
       </div>
     </div>

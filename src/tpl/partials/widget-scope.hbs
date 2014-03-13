@@ -20,7 +20,7 @@
       </div>
       <div class="pull-right" data-bind="if: $root.isEmployeeInEditMode">
         <span data-bind="with: slcVwmWidgout">
-          <button class="btn btn-sm btn-default" data-bind="click: $parent.removeVwmWidgout">{{capitalizeFirst lang.toDeleteLayout}}</button>
+          <button class="btn btn-sm btn-default" data-bind="click: $parent.removeVwmWidgout.bind($parent)">{{capitalizeFirst lang.toDeleteLayout}}</button>
         </span>
       </div>
       <div class="pull-right" data-bind="visible: slcVwmWidgout" style="margin-left: 32px">

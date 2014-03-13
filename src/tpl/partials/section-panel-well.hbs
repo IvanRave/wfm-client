@@ -5,7 +5,7 @@
       <!-- ko if: mdlSection.isVisibleAsView -->
       <!-- ko if: (mdlSection.sectionPatternId !== 'well-perfomance') -->
       <li>
-        <div class="wfm-section-item" data-bind="click: $parent.selectVwmSectionWrk, css: {'wfm-section-item_state_active' : isSlcVwmSectionWrk }">
+        <div class="wfm-section-item" data-bind="click: $parent.selectVwmSectionWrk.bind($parent), css: {'wfm-section-item_state_active' : isSlcVwmSectionWrk }">
           <span data-bind="with: mdlSection.sectionPattern">
             <span class="wfm-section-item__caption" data-bind="text: name"></span>
             <br />

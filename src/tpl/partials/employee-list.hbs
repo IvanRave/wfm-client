@@ -8,24 +8,29 @@
           <!-- select employee -->
           <span class="pointer" data-bind="click: $parent.activateVwmChild">
             <span data-bind="with: vwmCompany">
-              <!-- current: vwmCompany-->
-              <!-- ko with: mdlStage -->
-              <span data-bind="with: fileSpecOfLogo">
-                <img class="company-logo" src="#" data-bind="attr: {src: fileUrl, width: $parent.getPropSpecByClientId('fileSpecOfLogo').bind($parent).addtData.width }" title="{{capitalizeFirst lang.toView}} {{lang.wfm}}" />
+              <span data-bind="with: mdlStage">
+                <span data-bind="with: fileSpecOfLogo">
+                   <img class="company-logo" src="#" data-bind="attr: {src: fileUrl }" title="{{capitalizeFirst lang.toView}} {{lang.wfm}}" /> 
+                </span>
+                <span data-bind="ifnot: fileSpecOfLogo">
+                  <img class="company-logo" src="img/question.jpg"></img>
+                </span>
               </span>
-              <span data-bind="ifnot: fileSpecOfLogo">
-                <img class="company-logo" src="img/question.jpg"></img>
-              </span>
-              <!-- /ko -->
             </span>
           </span>
         </div>
-        <div class="pull-left min-left-margin" data-bind="with: vwmCompany">
-          <h4>
-            <span data-bind="text: mdlStage.name"></span>
+        <div class="pull-left min-left-margin">
+          <h4 class="min-left-margin">
+            <span class="link-view" data-bind="click: $parent.activateVwmChild">
+              <span data-bind="with: vwmCompany">
+                <span data-bind="text: mdlStage.name"></span>
+              </span>
+            </span>
           </h4>
-          <h5>
-            <span data-bind="text: mdlStage.description"></span>
+          <h5 class="min-left-margin">
+            <span data-bind="with: vwmCompany">
+              <span data-bind="text: mdlStage.description"></span>
+            </span>
           </h5>
         </div>
       </div>

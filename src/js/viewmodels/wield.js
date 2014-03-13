@@ -2,6 +2,7 @@
 define(['jquery',
 		'knockout',
 		'helpers/modal-helper',
+    'helpers/app-helper',
 		'viewmodels/wroup',
 		'viewmodels/map-of-wield',
 		'base-viewmodels/stage-child-base',
@@ -9,6 +10,7 @@ define(['jquery',
 	function ($,
 		ko,
 		modalHelper,
+    appHelper,
 		VwmWroup,
 		VwmMapOfWield,
 		VwmStageChildBase,
@@ -18,6 +20,7 @@ define(['jquery',
 	/**
 	 * View for well field maps: contains filtered maps and selected map
 	 * @constructor
+   * @augments {module:base-viewmodels/stage-base}
 	 */
 	var exports = function (mdlWield, parentVwmWegion, defaultSlcData) {
 		////* @param {object} opts - options for this view, like id of selected map, sort direction, filters etc.
@@ -32,10 +35,10 @@ define(['jquery',
 
 		this.mdlStage = mdlWield;
 
-		this.unq = mdlWield.id;
+		this.unq = this.mdlStage.id;
 
 		/** Link to company file manager */
-		this.fmgr = parentVwmWegion.fmgr;
+		this.fmgr = this.getParentVwm().fmgr;
 
 		/**
 		 * List of views of well wroups
@@ -76,6 +79,9 @@ define(['jquery',
 				owner : this
 			});
 	};
+  
+  /** Inherit from a stage base viewmodel */
+	appHelper.inherits(exports, VwmStageBase);
 
 	/** Select view */
 	exports.prototype.selectVwmMapOfWield = function (vwmMapOfWieldToSelect) {
