@@ -3,13 +3,13 @@ define(['knockout'], function (ko) {
 	'use strict';
 
 	/**
-	 * Viewmodel: widget
+	 * Viewmodel: a base viewmodel for widgets
 	 * @constructor
 	 */
 	var exports = function (mdlWidget) {
 		/**
 		 * Model: widget
-		 * @type {module:models/widget}
+		 * @type {module:base-models/widget-base}
 		 */
 		this.mdlWidget = mdlWidget;
 

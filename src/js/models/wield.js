@@ -3,7 +3,7 @@ define(['jquery',
 		'knockout',
 		'services/datacontext',
 		'helpers/file-helper',
-		'models/bases/stage-base',
+		'base-models/stage-base',
 		'models/map-of-wield',
 		'services/map-of-wield',
 		'models/section-of-stage',
@@ -11,10 +11,11 @@ define(['jquery',
 		'models/prop-spec',
 		'services/wield',
 		'services/wroup',
-		'constants/stage-constants'],
+		'constants/stage-constants',
+    'helpers/app-helper'],
 	function ($, ko, datacontext,
 		fileHelper, StageBase, MapOfWield, mapOfWieldService, SectionOfWield, WellGroup,
-		PropSpec, wieldService, wroupService, stageConstants) {
+		PropSpec, wieldService, wroupService, stageConstants, appHelper) {
 	'use strict';
 
 	// 10. WellFieldMaps (convert data objects into array)
@@ -141,6 +142,9 @@ define(['jquery',
 		this.listOfSection(importListOfSectionOfWieldDto(data.ListOfSectionOfWieldDto, ths));
 	};
 
+  /** Inherit from a stage base model */
+	appHelper.inherits(exports, StageBase);
+  
 	/** Load all maps for this field */
 	exports.prototype.loadMapsOfWield = function () {
 		if (ko.unwrap(this.isLoadedMapsOfWield)) {

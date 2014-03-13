@@ -2,7 +2,7 @@
 define(['knockout',
 		'viewmodels/map-of-wield',
 		'helpers/app-helper',
-		'viewmodels/widget'],
+		'base-viewmodels/widget-base'],
 	function (ko,
 		VwmMapOfWield,
 		appHelper,
@@ -12,7 +12,7 @@ define(['knockout',
 	/**
 	 * Base: widget view model for map of well field
 	 * @constuctor
-	 * @augments {module:viewmodels/widget}
+	 * @augments {module:base-viewmodels/widget-base}
 	 */
 	var exports = function (mdlWidget) {
 		VwmWidget.call(this, mdlWidget);

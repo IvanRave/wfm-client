@@ -3,8 +3,8 @@ define(['jquery',
     'knockout',
     'helpers/modal-helper',
     'viewmodels/wield',
-    'viewmodels/bases/stage-child-base',
-    'viewmodels/bases/stage-base'],
+    'base-viewmodels/stage-child-base',
+    'base-viewmodels/stage-base'],
     function ($, ko, bootstrapModal, VwmWield, VwmStageChildBase, VwmStageBase) {
         'use strict';
 

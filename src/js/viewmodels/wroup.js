@@ -4,8 +4,8 @@ define([
 		'knockout',
 		'helpers/modal-helper',
 		'viewmodels/well',
-		'viewmodels/bases/stage-child-base',
-		'viewmodels/bases/stage-base',
+		'base-viewmodels/stage-child-base',
+		'base-viewmodels/stage-base',
 		'viewmodels/wfm-parameter-of-wroup'],
 	function (
 		$,

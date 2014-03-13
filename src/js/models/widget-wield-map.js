@@ -1,7 +1,7 @@
 ﻿/** @module */
 define(['knockout',
 		'helpers/app-helper',
-		'models/widget'],
+		'base-models/widget-base'],
 	function (ko,
 		appHelper,
 		Widget) {
@@ -10,7 +10,7 @@ define(['knockout',
 	/**
 	 * Base: widget model for map of well field
 	 * @constuctor
-	 * @augments {module:models/widget}
+	 * @augments {module:base-models/widget-base}
 	 */
 	var exports = function (data, widgockItem) {
 		Widget.call(this, data, widgockItem);

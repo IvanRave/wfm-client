@@ -1,8 +1,8 @@
 ﻿/** @module */
 define(['knockout',
     'viewmodels/wegion',
-    'viewmodels/bases/stage-base',
-    'viewmodels/bases/stage-child-base'],
+    'base-viewmodels/stage-base',
+    'base-viewmodels/stage-child-base'],
     function (ko,
         VwmWegion,
         VwmStageBase,

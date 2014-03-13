@@ -18,7 +18,7 @@ define(['knockout', 'models/widgock', 'services/widgout'], function (ko, Widgock
 
     /**
     * Getter for a parent stage (well, group, field... )
-    * @returns {module:models/bases/stage-base}
+    * @returns {module:base-models/stage-base}
     */
 		this.getParent = function () {
 			return parent;

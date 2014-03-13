@@ -7,7 +7,7 @@ define([
 		'jquery',
 		'knockout',
 		'helpers/modal-helper',
-		'viewmodels/bases/stage-base',
+		'base-viewmodels/stage-base',
 		'viewmodels/sketch-of-well',
 		'viewmodels/volume-of-well',
 		'viewmodels/scope-of-history-of-well',

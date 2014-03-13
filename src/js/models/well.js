@@ -6,7 +6,7 @@ define([
 		'helpers/file-helper',
 		'helpers/app-helper',
 		'moment',
-		'models/bases/stage-base',
+		'base-models/stage-base',
 		'models/perfomance-of-well',
 		'models/section-of-stage',
 		'models/sketch-of-well',
@@ -123,6 +123,7 @@ define([
 	 * @param {object} data - Well data
 	 * @param {WellGroup} wellGroup - Well group
 	 * @constructor
+   * @augments {module:base-models/stage-base}
 	 */
 	var exports = function (data, wellGroup) {
 		data = data || {};
@@ -955,6 +956,9 @@ define([
 		};
 	};
 
+  /** Inherit from a stage base model */
+	appHelper.inherits(exports, StageBase);
+  
 	/**
 	 * Remove (clear) a procent border
 	 */

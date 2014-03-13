@@ -6,12 +6,13 @@ define(['jquery',
 		'models/wfm-parameter-of-wroup',
 		'services/wfm-parameter-of-wroup',
 		'models/section-of-stage',
-		'models/bases/stage-base',
+		'base-models/stage-base',
 		'models/prop-spec',
 		'services/wroup',
 		'constants/stage-constants',
 		'services/procent-border',
-		'services/monitoring-record'],
+		'services/monitoring-record',
+    'helpers/app-helper'],
 	function ($,
 		ko,
 		datacontext,
@@ -24,7 +25,8 @@ define(['jquery',
 		wroupService,
 		stageConstants,
 		procentBorderService,
-		monitoringRecordService) {
+		monitoringRecordService,
+    appHelper) {
 	'use strict';
 
 	// 18. WellGroupWfmParameter
@@ -189,6 +191,9 @@ define(['jquery',
 		this.listOfSection(importListOfSectionOfWroupDto(data.ListOfSectionOfWroupDto, ths));
 	};
 
+  /** Inherit from a stage base model */
+	appHelper.inherits(exports, StageBase);
+  
 	/**
 	 * Load procent borders for all wells
 	 */

@@ -2,7 +2,7 @@
 define(['knockout',
 		'viewmodels/perfomance-of-well',
 		'helpers/app-helper',
-		'viewmodels/widget'],
+		'base-viewmodels/widget-base'],
 	function (ko,
 		VwmPerfomanceOfWell,
 		appHelper,
@@ -12,7 +12,7 @@ define(['knockout',
 	/**
 	 * A perfomance widget
 	 * @constructor
-	 * @augments {module:viewmodels/widget}
+	 * @augments {module:base-viewmodels/widget-base}
 	 */
 	var exports = function (mdlWidget, vwmWell) {
 		

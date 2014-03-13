@@ -1,7 +1,7 @@
 ﻿/** @module */
 define(['knockout',
     'viewmodels/employee',
-    'viewmodels/bases/stage-child-base'],
+    'base-viewmodels/stage-child-base'],
     function (ko,
         VwmEmployee,
         VwmStageChildBase) {

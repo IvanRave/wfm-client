@@ -1,12 +1,12 @@
 ﻿/** @module */
 define(['knockout',
-		'viewmodels/widgets/widget-default-summary',
-		'viewmodels/widgets/widget-well-perfomance',
-		'viewmodels/widgets/widget-well-monitoring',
-		'viewmodels/widgets/widget-well-sketch',
-		'viewmodels/widgets/widget-well-history',
-		'viewmodels/widgets/widget-wield-map',
-		'viewmodels/widgets/widget-well-map'],
+		'viewmodels/widget-default-summary',
+		'viewmodels/widget-well-perfomance',
+		'viewmodels/widget-well-monitoring',
+		'viewmodels/widget-well-sketch',
+		'viewmodels/widget-well-history',
+		'viewmodels/widget-wield-map',
+		'viewmodels/widget-well-map'],
 	function (ko,
 		VwmWidgetDefaultSummary,
 		VwmWidgetWellPerfomance,
@@ -61,7 +61,6 @@ define(['knockout',
 
 		/**
 		 * List of viewmodels of widgets
-		 * @type {Array.<module:viewmodels/widget>}
 		 */
 		this.listOfVwmWidget = ko.computed({
 				read : this.getListOfVwmWidget,

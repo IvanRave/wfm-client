@@ -8,16 +8,30 @@ define(['jquery',
 		'services/datacontext',
 		'helpers/modal-helper',
 		'helpers/history-helper',
-		'models/bases/stage-base',
+		'base-models/stage-base',
 		'models/section-of-stage',
 		'models/prop-spec',
 		'services/company',
 		'models/file-spec',
 		'services/wegion',
 		'constants/stage-constants',
-		'helpers/knockout-lazy'],
-	function ($, ko, Wegion, JobType, appDatacontext, modalHelper, historyHelper,
-		StageBase, SectionOfCompany, PropSpec, companyService, FileSpec, wegionService, stageConstants) {
+    'helpers/app-helper',
+    'helpers/knockout-lazy'],
+	function ($, 
+    ko, 
+    Wegion, 
+    JobType, 
+    appDatacontext, 
+    modalHelper, 
+    historyHelper,
+		StageBase, 
+    SectionOfCompany, 
+    PropSpec, 
+    companyService, 
+    FileSpec, 
+    wegionService, 
+    stageConstants, 
+    appHelper) {
 	'use strict';
 
 	/** Import well regions for company */
@@ -237,5 +251,8 @@ define(['jquery',
 		this.loadWegions();
 	};
 
+  /** Inherit from a stage base model */
+	appHelper.inherits(exports, StageBase);
+  
 	return exports;
 });

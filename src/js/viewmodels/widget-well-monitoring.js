@@ -2,7 +2,7 @@
 define(['knockout',
 		'viewmodels/monitoring-of-well',
 		'helpers/app-helper',
-		'viewmodels/widget'],
+		'base-viewmodels/widget-base'],
 	function (ko,
 		VwmMonitoringOfWell,
 		appHelper,
@@ -12,7 +12,7 @@ define(['knockout',
 	/**
 	 * A monitoring widget
 	 * @constructor
-	 * @augments {module:viewmodels/widget}
+	 * @augments {module:base-viewmodels/widget-base}
 	 */
 	var exports = function (mdlWidget, vwmWell) {
 		VwmWidget.call(this, mdlWidget);

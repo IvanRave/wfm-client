@@ -1,7 +1,7 @@
 ﻿/** @module */
 define(['knockout',
 		'helpers/app-helper',
-		'viewmodels/widget'],
+		'base-viewmodels/widget-base'],
 	function (ko,
 		appHelper,
 		VwmWidget) {
@@ -10,7 +10,7 @@ define(['knockout',
 	/**
 	 * Viewmodel: widget for sketch (image plus desc)
 	 * @constructor
-	 * @augments {module:viewmodels/widget}
+	 * @augments {module:base-viewmodels/widget-base}
 	 */
 	var exports = function (mdlWidget) {
 		VwmWidget.call(this, mdlWidget);

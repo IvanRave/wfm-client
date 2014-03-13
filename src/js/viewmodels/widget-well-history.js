@@ -2,7 +2,7 @@
 define(['knockout',
 		'viewmodels/scope-of-history-of-well',
 		'helpers/app-helper',
-		'viewmodels/widget'],
+		'base-viewmodels/widget-base'],
 	function (ko,
 		VwmScopeOfHistoryOfWell,
 		appHelper,
@@ -12,7 +12,7 @@ define(['knockout',
 	/**
 	 * History widget with date filter, asc or desc
 	 * @constructor
-	 * @augments {module:viewmodels/widget}
+	 * @augments {module:base-viewmodels/widget-base}
 	 */
 	var exports = function (mdlWidget, vwmWell) {
 		VwmWidget.call(this, mdlWidget);

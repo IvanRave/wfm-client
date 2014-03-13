@@ -2,13 +2,13 @@
 define(['jquery',
 		'knockout',
 		'services/widget',
-		'models/widgets/widget-default-summary',
-		'models/widgets/widget-well-history',
-		'models/widgets/widget-well-map',
-		'models/widgets/widget-well-monitoring',
-		'models/widgets/widget-well-perfomance',
-		'models/widgets/widget-well-sketch',
-		'models/widgets/widget-wield-map'],
+		'models/widget-default-summary',
+		'models/widget-well-history',
+		'models/widget-well-map',
+		'models/widget-well-monitoring',
+		'models/widget-well-perfomance',
+		'models/widget-well-sketch',
+		'models/widget-wield-map'],
 	function ($,
 		ko,
 		widgetService,
@@ -101,7 +101,6 @@ define(['jquery',
 
 		/**
 		 * A list of widgets
-		 * @type {Array.<module:models/widget>}
 		 */
 		this.widgetList = ko.observableArray();
 
