@@ -6,8 +6,8 @@ define(['jquery'], function ($) {
 
 	// Hidden Iframe for file loading (to the client comp)
 	exports.downloadURL = function (url) {
-		var hiddenIFrameID = 'hiddenDownloader',
-		iframe = document.getElementById(hiddenIFrameID);
+		var hiddenIFrameID = 'hiddenDownloader';
+		var iframe = document.getElementById(hiddenIFrameID);
 		if (iframe === null) {
 			iframe = document.createElement('iframe');
 			iframe.id = hiddenIFrameID;
@@ -98,8 +98,8 @@ define(['jquery'], function ($) {
 	};
 
 	/**
-	* Get element from list by property value: element with property [propName] equals [propValue]
-	*/
+	 * Get element from list by property value: element with property [propName] equals [propValue]
+	 */
 	exports.getElementByPropertyValue = function (elemList, propName, propValue) {
 		var needElemValue = null;
 
@@ -154,7 +154,7 @@ define(['jquery'], function ($) {
 	 * @param {Function} childCtor Child class.
 	 * @param {Function} parentCtor Parent class.
 	 */
-	exports.inherits = function (childCtor, parentCtor) {		
+	exports.inherits = function (childCtor, parentCtor) {
 		function TempCtor() {}
 		TempCtor.prototype = parentCtor.prototype;
 		childCtor.superClass_ = parentCtor.prototype;

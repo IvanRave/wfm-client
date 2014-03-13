@@ -1,250 +1,284 @@
 ﻿/** @module */
 define(['knockout',
-    'models/file-spec',
-    'services/file-spec'], function (ko, FileSpec, fileSpecService) {
-        'use strict';
+		'models/file-spec',
+		'services/file-spec'], function (ko, FileSpec, fileSpecService) {
+	'use strict';
 
-        /**
-        * Import file specification to the list
-        * @param {object} data - Server data with file specs
-        */
-        function importFileSpecs(data) {
-            return (data || []).map(function (item) { return new FileSpec(item); });
-        }
+	/**
+	 * Import file specification to the list
+	 * @param {object} data - Server data with file specs
+	 */
+	function importFileSpecs(data) {
+		return (data || []).map(function (item) {
+			return new FileSpec(item);
+		});
+	}
 
-        /**
-        * Section base: sharep props for other types of sections - insert using call method
-        * @constructor
-        * @param {object} data - Section data
-        */
-        var exports = function (data, parentStage, idOfParentStage) {
-            /** Alternative */
-            var ths = this;
+	/**
+	 * Section base: shared props for other types of sections - insert using call method
+	 * @constructor
+	 * @param {object} data - Section data
+	 */
+	var exports = function (data, parentStage, idOfParentStage) {
+		/** Get parent (well) */
+		this.getParent = function () {
+			return parentStage;
+		};
 
-            /** Get parent (well) */
-            this.getParent = function () {
-                return parentStage;
-            };
+		/**
+		 * Id of parent stage of section. Duplicated in section.parentId and section.parent.id
+		 * @type {string}
+		 */
+		this.idOfParentStage = idOfParentStage;
 
-            /**
-            * Id of parent stage of section. Duplicated in section.parentId and section.parent.id
-            * @type {string}
-            */
-            this.idOfParentStage = idOfParentStage;
+		/**
+		 * Stage, like 'well', 'wield', 'wroup', 'wegion', 'company'
+		 * @type {string}
+		 */
+		this.stageKey = this.getParent().stageKey;
 
-            /**
-            * Stage, like 'well', 'wield', 'wroup', 'wegion', 'company'
-            * @type {string}
-            */
-            var stageKey = ths.getParent().stageKey;
+		/**
+		 * Section guid
+		 * @type {string}
+		 */
+		this.id = data.Id;
 
-            /**
-            * Section guid
-            * @type {string}
-            */
-            this.id = data.Id;
+		/**
+		 * Whether the section is visible as a view: can ovveride default checkbox from section pattern (isView)
+		 * @type {boolean}
+		 */
+		this.isVisible = ko.observable(data.IsVisible);
 
-            /**
-            * Whether the section is visible as a view: can ovveride default checkbox from section pattern (isView)
-            * @type {boolean}
-            */
-            this.isVisible = ko.observable(data.IsVisible);
+		/**
+		 * Id of section pattern: contains info like section Name and other
+		 * @type {string}
+		 */
+		this.sectionPatternId = data.SectionPatternId;
 
-            /**
-            * Id of section pattern: contains info like section Name and other
-            * @type {string}
-            */
-            this.sectionPatternId = data.SectionPatternId;
+		/**
+		 * Section pattern (default name, file formats and other params for section)
+		 * @type {module:models/section-pattern}
+		 */
+		this.sectionPattern = ko.computed({
+				read : this.calcSectionPattern,
+				deferEvaluation : true,
+				owner : this
+			});
 
-            /**
-            * Section pattern (default name, file formats and other params for section)
-            * @type {module:models/section-pattern}
-            */
-            this.sectionPattern = ko.computed({
-                read: function () {
-                    var tmpListOfSectionPattern = ko.unwrap(ths.getParent().stagePatterns);
-                    var tmpSectionPatternId = ths.sectionPatternId;
-                    var byId = tmpListOfSectionPattern.filter(function (arrElem) {
-                        return arrElem.id === tmpSectionPatternId;
-                    });
+		/**
+		 * Whether section is visible as view: calculated using section checkbox and pattern checkbox
+		 * @type {boolean}
+		 */
+		this.isVisibleAsView = ko.computed({
+				read : this.calcIsVisibleAsView,
+				deferEvaluation : true,
+				owner : this
+			});
 
-                    if (byId.length === 1) {
-                        return byId[0];
-                    }
-                },
-                deferEvaluation: true
-            });
+		/**
+		 * List of file specifications
+		 * @type {Array.<module:models/file-spec>}
+		 */
+		this.listOfFileSpec = ko.observableArray();
 
-            /**
-            * Whether section is visible as view: calculated using section checkbox and pattern checkbox
-            * @type {boolean}
-            */
-            this.isVisibleAsView = ko.computed({
-                read: function () {
-                    var tmpSectionPattern = ko.unwrap(ths.sectionPattern);
-                    var tmpIsVisible = ko.unwrap(ths.isVisible);
-                    if (tmpSectionPattern) {
-                        return tmpSectionPattern.isView && tmpIsVisible;
-                    }
-                    else {
-                        return false;
-                    }
-                },
-                deferEvaluation: true
-            });
+		/**
+		 * Sorted and filtered list of files: ready to view
+		 * @type {Array.<module:models/file-spec>}
+		 */
+		this.readyListOfFileSpec = ko.computed({
+				read : this.buildReadyListOfFileSpec,
+				deferEvaluation : true,
+				owner : this
+			}).trackHasItems();
 
-            /**
-            * List of file specifications
-            * @type {Array.<module:models/file-spec>}
-            */
-            this.listOfFileSpec = ko.observableArray();
+		/**
+		 * Whether files are loaded
+		 * @type {boolean}
+		 */
+		this.isLoadedListOfFileSpec = ko.observable(false);
 
-            /**
-            * Sorted and filtered list of files: ready to view
-            * @type {Array.<module:models/file-spec>}
-            */
-            this.readyListOfFileSpec = ko.computed({
-                read: function () {
-                    var tmpList = ko.unwrap(ths.listOfFileSpec);
-                    return tmpList.sort(function (a, b) {
-                        return b.createdUnixTime - a.createdUnixTime;
-                    });
-                },
-                deferEvaluation: true
-            });
+		/**
+		 * A list of selected files
+		 * @type {Array.<module:models/file-spec>}
+		 */
+		this.listOfSlcFileSpec = ko.computed({
+				read : this.calcListOfSlcFileSpec,
+				deferEvaluation : true,
+				owner : this
+			});
 
-            /**
-            * Whether files are loaded
-            * @type {boolean}
-            */
-            this.isLoadedListOfFileSpec = ko.observable(false);
+		/**
+		 * Whether any file is selected: to activate delete button or smth else
+		 * @type {boolean}
+		 */
+		this.isSelectedAnyFile = ko.computed({
+				read : this.calcIsSelectedAnyFile,
+				deferEvaluation : true,
+				owner : this
+			});
+	};
 
-            /** Load list of file spec from the server */
-            this.loadListOfFileSpec = function () {
-                // Do not load if loaded already
-                if (ko.unwrap(ths.isLoadedListOfFileSpec)) {
-                    // Unselect all files in this section
-                    var tmpListOfFileSpec = ko.unwrap(ths.listOfFileSpec);
+	/** Calculate whether any file is selected */
+	exports.prototype.calcIsSelectedAnyFile = function () {
+		return ko.unwrap(this.listOfSlcFileSpec).length > 0;
+	};
 
-                    tmpListOfFileSpec.forEach(function (elem) {
-                        elem.isSelected(false);
-                    });
+	/**
+	 * Update section after removing files
+	 */
+	exports.prototype.updateSectionAfterRemovingFiles = function (idOfSectionPattern) {
+		switch (idOfSectionPattern) {
+		case 'well-volume':
+			this.getParent().isLoadedVolumes(false);
+			this.getParent().loadVolumes();
+			break;
+		case 'well-sketch':
+			this.getParent().sketchOfWell.isLoaded(false);
+			this.getParent().sketchOfWell.load();
+			break;
+		case 'well-history':
+			this.getParent().isLoadedHistoryList(false);
+			this.getParent().loadWellHistoryList();
+			break;
+		}
+	};
 
-                    return;
-                }
+	/** Calculate a list of selected files */
+	exports.prototype.calcListOfSlcFileSpec = function () {
+		return ko.unwrap(this.listOfFileSpec).filter(function (elem) {
+			return ko.unwrap(elem.isSelected);
+		});
+	};
 
-                // Loaded files are unselected by default
-                fileSpecService.get(stageKey, this.id).done(function (r) {
-                    // Import data to objects
-                    ths.listOfFileSpec(importFileSpecs(r));
-                    // Set flag (do not load again)
-                    ths.isLoadedListOfFileSpec(true);
-                });
-            };
+	/** Delete selected files from this section */
+	exports.prototype.deleteSelectedFileSpecs = function () {
+		// Choose selected files
+		var tmpSelectedList = ko.unwrap(this.listOfSlcFileSpec);
 
-            /** Get settings for file loader: only after defining of SectionPattern */
-            this.getSectionFiloader = function () {
-                return {
-                    callback: function (result) {
-                        ths.listOfFileSpec.push(new FileSpec(result[0]));
-                    },
-                    url: fileSpecService.getUrl(stageKey, this.id),
-                    fileTypeRegExp: ko.unwrap(ths.sectionPattern).fileTypeRegExp
-                };
-            };
+		// Need to send to the server (only ids - to define and remove files on the server)
+		var tmpIdList = tmpSelectedList.map(function (elem) {
+				return {
+					id : elem.id
+				};
+			});
 
-            /** Delete selected files from this section */
-            this.deleteSelectedFileSpecs = function () {
-                var tmpList = ko.unwrap(ths.listOfFileSpec);
+		var ths = this;
 
-                // Choose selected files
-                var tmpSelectedList = tmpList.filter(function (elem) {
-                    return ko.unwrap(elem.isSelected);
-                });
+		// Remove from the server
+		fileSpecService.deleteArray(ths.stageKey, ths.id, tmpIdList).done(function () {
+			// If success
+			// Remove from client file list (all selected files)
+			tmpSelectedList.forEach(function (elem) {
+				ths.listOfFileSpec.remove(elem);
+				ths.updateSectionAfterRemovingFiles(ths.sectionPatternId);
+			});
+		});
+	};
 
-                // Need to send to the server (only ids - to define and remove files on the server)
-                var tmpIdList = tmpSelectedList.map(function (elem) {
-                    return { id: elem.id };
-                });
+	/**
+	 * Get file spec by id
+	 * @param {string} idOfFileSpec
+	 * @returns {module:models/file-spec}
+	 */
+	exports.prototype.getFileSpecById = function (idOfFileSpec) {
+		return ko.unwrap(this.listOfFileSpec).filter(function (elem) {
+			return elem.id === idOfFileSpec;
+		})[0];
+	};
+  
+	/**
+	 * Delete file spec by id
+	 * @param {string} idOfFileSpec
+	 * @param {function} callback
+	 */
+	exports.prototype.deleteFileSpecById = function (idOfFileSpec, callback) {
+		var ths = this;
+		// Remove from server
+		fileSpecService.deleteArray(this.stageKey, this.id, [{
+					id : idOfFileSpec
+				}
+			]).done(function () {
+			// If success
+			// Remove from client file list if exists
+			var removedFileSpec = ths.getFileSpecById(idOfFileSpec);
+			if (removedFileSpec) {
+				ths.listOfFileSpec.remove(removedFileSpec);
+			}
 
-                // Remove from server
-                fileSpecService.deleteArray(stageKey, ths.id, tmpIdList).done(function () {
-                    // If success
-                    // Remove from client file list (all selected files)
-                    tmpSelectedList.forEach(function (elem) {
-                        ths.listOfFileSpec.remove(elem);
+			if (callback) {
+				callback();
+			}
+		});
+	};
 
-                        updateSectionAfterRemovingFiles(ths.sectionPatternId);
-                    });
-                });
-            };
+	/** Load list of file spec from the server */
+	exports.prototype.loadListOfFileSpec = function () {
+		console.log('load list of file specs');
+		var ths = this;
+		// Do not load if loaded already
+		if (ko.unwrap(ths.isLoadedListOfFileSpec)) {
+			// Unselect all files in this section
+			var tmpListOfFileSpec = ko.unwrap(ths.listOfFileSpec);
 
-            /**
-            * Update section after removing files
-            */
-            function updateSectionAfterRemovingFiles(idOfSectionPattern) {
-                switch (idOfSectionPattern) {
-                    case 'well-volume':
-                        ths.getParent().isLoadedVolumes(false);
-                        ths.getParent().loadVolumes();
-                        break;
-                    case 'well-sketch':
-                        ths.getParent().sketchOfWell.isLoaded(false);
-                        ths.getParent().sketchOfWell.load();
-                        break;
-                    case 'well-history':
-                        ths.getParent().isLoadedHistoryList(false);
-                        ths.getParent().loadWellHistoryList();
-                        break;
-                }
-            }
+			tmpListOfFileSpec.forEach(function (elem) {
+				elem.isSelected(false);
+			});
 
-            /**
-            * Delete file spec by id
-            * @param {string} idOfFileSpec
-            * @param {function} callback
-            */
-            this.deleteFileSpecById = function (idOfFileSpec, callback) {
-                // Remove from server
-                fileSpecService.deleteArray(stageKey, ths.id, [{ id: idOfFileSpec }]).done(function () {
-                    // If success
-                    // Remove from client file list if exists
-                    var removedFileSpec = ths.getFileSpecById(idOfFileSpec);
-                    if (removedFileSpec) {
-                        ths.listOfFileSpec.remove(removedFileSpec);
-                    }
+			return;
+		}
 
-                    if (callback) {
-                        callback();
-                    }
-                });
-            };
+		// Loaded files are unselected by default
+		fileSpecService.get(ths.stageKey, this.id).done(function (r) {
+			// Import data to objects
+			ths.listOfFileSpec(importFileSpecs(r));
+			// Set flag (do not load again)
+			ths.isLoadedListOfFileSpec(true);
+		});
+	};
 
-            /**
-            * Get file spec by id
-            * @param {string} idOfFileSpec
-            */
-            this.getFileSpecById = function (idOfFileSpec) {
-                return ko.unwrap(ths.listOfFileSpec).filter(function (elem) {
-                    return elem.id === idOfFileSpec;
-                })[0];
-            };
+	/** Build a list for a view */
+	exports.prototype.buildReadyListOfFileSpec = function () {
+		var tmpList = ko.unwrap(this.listOfFileSpec);
+		return tmpList.sort(function (a, b) {
+			return b.createdUnixTime - a.createdUnixTime;
+		});
+	};
 
-            /**
-            * Whether any file is selected: to activate delete button or smth else
-            * @type {boolean}
-            */
-            this.isSelectedAnyFile = ko.computed({
-                read: function () {
-                    var tmpList = ko.unwrap(ths.listOfFileSpec);
+	/** Calculate a pattern id for this section */
+	exports.prototype.calcSectionPattern = function () {
+		var tmpListOfSectionPattern = ko.unwrap(this.getParent().stagePatterns);
+		var tmpSectionPatternId = this.sectionPatternId;
+		var byId = tmpListOfSectionPattern.filter(function (arrElem) {
+				return arrElem.id === tmpSectionPatternId;
+			});
 
-                    return tmpList.filter(function (elem) {
-                        return ko.unwrap(elem.isSelected);
-                    }).length > 0;
-                },
-                deferEvaluation: true
-            });
-        };
+		if (byId.length === 1) {
+			return byId[0];
+		}
+	};
 
-        return exports;
-    });
+	/** Calculate whether this section is visible as a view */
+	exports.prototype.calcIsVisibleAsView = function () {
+		var tmpSectionPattern = ko.unwrap(this.sectionPattern);
+		var tmpIsVisible = ko.unwrap(this.isVisible);
+		if (tmpSectionPattern) {
+			return tmpSectionPattern.isView && tmpIsVisible;
+		} else {
+			return false;
+		}
+	};
+
+	/** Get settings for file loader: only after defining of SectionPattern */
+	exports.prototype.getSectionFiloader = function () {
+		var ths = this;
+		return {
+			callback : function (result) {
+				ths.listOfFileSpec.push(new FileSpec(result[0]));
+			},
+			url : fileSpecService.getUrl(ths.stageKey, this.id),
+			fileTypeRegExp : ko.unwrap(ths.sectionPattern).fileTypeRegExp
+		};
+	};
+
+	return exports;
+});
