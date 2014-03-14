@@ -15,23 +15,23 @@ define(['jquery',
 		'models/file-spec',
 		'services/wegion',
 		'constants/stage-constants',
-    'helpers/app-helper',
-    'helpers/knockout-lazy'],
-	function ($, 
-    ko, 
-    Wegion, 
-    JobType, 
-    appDatacontext, 
-    modalHelper, 
-    historyHelper,
-		StageBase, 
-    SectionOfCompany, 
-    PropSpec, 
-    companyService, 
-    FileSpec, 
-    wegionService, 
-    stageConstants, 
-    appHelper) {
+		'helpers/app-helper',
+		'helpers/knockout-lazy'],
+	function ($,
+		ko,
+		Wegion,
+		JobType,
+		appDatacontext,
+		modalHelper,
+		historyHelper,
+		StageBase,
+		SectionOfCompany,
+		PropSpec,
+		companyService,
+		FileSpec,
+		wegionService,
+		stageConstants,
+		appHelper) {
 	'use strict';
 
 	/** Import well regions for company */
@@ -147,13 +147,6 @@ define(['jquery',
 			return needWegion;
 		};
 
-		/** Delete well region */
-		this.removeChild = function (wellRegionForDelete) {
-			wegionService.remove(wellRegionForDelete.id).done(function () {
-				ths.wegions.remove(wellRegionForDelete);
-			});
-		};
-
 		/** Create and post new well region */
 		this.postWegion = function () {
 			var inputName = document.createElement('input');
@@ -251,8 +244,16 @@ define(['jquery',
 		this.loadWegions();
 	};
 
-  /** Inherit from a stage base model */
+	/** Inherit from a stage base model */
 	appHelper.inherits(exports, StageBase);
-  
+
+	/** Delete well region */
+	exports.prototype.removeChild = function (wellRegionForDelete) {
+		var ths = this;
+		wegionService.remove(wellRegionForDelete.id).done(function () {
+			ths.wegions.remove(wellRegionForDelete);
+		});
+	};
+
 	return exports;
 });

@@ -346,11 +346,13 @@ define(['knockout',
 	 * Remove child stage with view model (only for stages with children)
 	 */
 	exports.prototype.removeVwmChild = function (vwmChildToRemove) {
+    // In case upro (parent) - company (child)
+    var tmpMdlStage = vwmChildToRemove.mdlStage;
 		// Name - can be uppercase or lowercase
-		var tmpName = vwmChildToRemove.mdlStage.name ? ko.unwrap(vwmChildToRemove.mdlStage.name) : ko.unwrap(vwmChildToRemove.mdlStage.Name);
+		var tmpName = tmpMdlStage.name ? ko.unwrap(tmpMdlStage.name) : ko.unwrap(tmpMdlStage.Name);
 
 		if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + tmpName + '"?')) {
-			this.mdlStage.removeChild(vwmChildToRemove.mdlStage);
+			this.mdlStage.removeChild(tmpMdlStage);
 		}
 	};
 

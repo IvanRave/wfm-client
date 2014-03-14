@@ -161,5 +161,10 @@ define(['knockout',
 		});
 	};
 
+  /** Remove a child stage */
+  exports.prototype.removeChild = function(){
+    throw new Error('Need to override in a subclass');
+  };
+  
 	return exports;
 });

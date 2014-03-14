@@ -44,7 +44,7 @@ define(['knockout',
 	/**
 	 * User profile
 	 * @constructor
-   * @augments {module:base-models/stage-base}
+	 * @augments {module:base-models/stage-base}
 	 * @param {object} data - User profile data
 	 */
 	var exports = function (data, rootMdl) {
@@ -161,6 +161,17 @@ define(['knockout',
 			////        }
 			////    });
 			////}
+		});
+	};
+
+	/** Remove company with employee */
+	exports.prototype.removeChild = function (companyToRemove) {
+		var ths = this;
+		var tmpCompanyId = ko.unwrap(companyToRemove.id);
+		companyService.remove(tmpCompanyId).done(function () {
+			// Reload all employees
+			ths.isLoadedEmployees(false);
+			ths.loadEmployees();
 		});
 	};
 

@@ -39,7 +39,8 @@
   <div data-bind="if: $root.isEmployeeInEditMode">
     <div class="clearfix">
       <div class="pull-right">
-        <button class="btn btn-sm btn-danger" data-bind="click: $parent.removeVwmChild.bind($parent)">
+        <!-- parent: vwmEmployee; parents[1]: vwmUserProfile -->
+        <button class="btn btn-sm btn-danger" data-bind="click: function() { getParentVwm().removeVwmChild($data); }">
           <i class="glyphicon glyphicon-remove-sign"></i>
           {{capitalizeFirst lang.toDelete}}
         </button>

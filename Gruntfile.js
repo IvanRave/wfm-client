@@ -257,7 +257,10 @@ module.exports = function (grunt) {
                     // Viewmodels
                     'viewmodels/workspace',
                     // Models
-                    'models/bases/stage-base',
+                    'base-models/stage-base',
+                    'base-models/widget-base',
+                    'base-viewmodels/stage-base',
+                    'base-viewmodels/widget-base',
                     'models/employee',
                     'models/file-spec',
                     'models/job-type',

@@ -9,12 +9,12 @@ define(['jquery',
 		'services/wegion',
 		'services/wield',
 		'constants/stage-constants',
-    'helpers/app-helper'],
+		'helpers/app-helper'],
 	function ($, ko, datacontext,
-		WellField, StageBase, SectionOfWegion, 
-    PropSpec, 
-    wegionService, wieldService, stageConstants,
-    appHelper) {
+		WellField, StageBase, SectionOfWegion,
+		PropSpec,
+		wegionService, wieldService, stageConstants,
+		appHelper) {
 	'use strict';
 
 	// 2. WellField (convert data objects into array)
@@ -85,12 +85,6 @@ define(['jquery',
 			})[0];
 		};
 
-		this.removeChild = function (wellFieldForDelete) {
-			wieldService.remove(wellFieldForDelete.id).done(function () {
-				ths.wields.remove(wellFieldForDelete);
-			});
-		};
-
 		/** Save well region */
 		this.save = function () {
 			wegionService.put(ths.id, ths.toDto());
@@ -135,8 +129,16 @@ define(['jquery',
 		this.listOfSection(importListOfSectionOfWegionDto(data.ListOfSectionOfWegionDto, ths));
 	};
 
-  /** Inherit from a stage base model */
+	/** Inherit from a stage base model */
 	appHelper.inherits(exports, StageBase);
-  
+
+  /** Remove a child */
+	exports.prototype.removeChild = function (wellFieldForDelete) {
+		var ths = this;
+		wieldService.remove(wellFieldForDelete.id).done(function () {
+			ths.wields.remove(wellFieldForDelete);
+		});
+	};
+
 	return exports;
 });

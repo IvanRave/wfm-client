@@ -1,5 +1,5 @@
 ﻿/** @module */
-define(['knockout','models/company', 'services/company'], function (ko, Company, companyService) {
+define(['knockout','models/company'], function (ko, Company) {
     'use strict';
 
     /**
@@ -59,18 +59,6 @@ define(['knockout','models/company', 'services/company'], function (ko, Company,
         * @type {boolean}
         */
         this.canManageAll = (this.accessLevel & 1) === 1;
-
-        /** Remove company with employee */
-        this.removeChild = function (companyToRemove) {
-            var tmpCompanyId = ko.unwrap(companyToRemove.id);
-            if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(companyToRemove.name) + '"?')) {
-                companyService.remove(tmpCompanyId).done(function () {
-                    // Reload all employees
-                    mdlUserProfile.isLoadedEmployees(false);
-                    mdlUserProfile.loadEmployees();
-                });
-            }
-        };
     };
 
     return exports;
