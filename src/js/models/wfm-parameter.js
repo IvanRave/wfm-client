@@ -30,9 +30,13 @@ define(['knockout'], function (ko) {
 	function getUomCoefFromDict(needUom, needCoefDict) {
 		var result;
 		for (var coefGroup in needCoefDict) {
-			for (var coefItem in needCoefDict[coefGroup]) {
-				if (needUom === coefItem) {
-					result = needCoefDict[coefGroup][coefItem];
+			if (needCoefDict.hasOwnProperty(coefGroup)) {
+				for (var coefItem in needCoefDict[coefGroup]) {
+					if (needCoefDict[coefGroup].hasOwnProperty(coefItem)) {
+						if (needUom === coefItem) {
+							result = needCoefDict[coefGroup][coefItem];
+						}
+					}
 				}
 			}
 		}
@@ -85,14 +89,14 @@ define(['knockout'], function (ko) {
 
 		/**
 		 * Parameter name (Oil rate, water rate, etc.)
-     * @todo feat: redefine in wroup parameters #MM!
+		 * @todo feat: redefine in wroup parameters #MM!
 		 * @type {string}
 		 */
 		this.name = ko.observable(data.Name);
 
 		/**
 		 * Unit of measurement (scf, barrels, etc.)
-     * @todo feat: redefine in wroup parameters #MM!
+		 * @todo feat: redefine in wroup parameters #MM!
 		 * @type {string}
 		 */
 		this.uom = ko.observable(data.Uom);
@@ -102,38 +106,38 @@ define(['knockout'], function (ko) {
 		// For Speed: [[m],[s,s]]
 		// For Gas: [[f, f, f]] or [[scf]] - standard cubic feet
 		this.sourceUomMatrix = convertStrToMatrix(data.Uom);
-    
+
 		this.uomMatrix = ko.computed({
 				read : function () {
 					return convertStrToMatrix(ko.unwrap(self.uom));
 				},
-        deferEvaluation: true
+				deferEvaluation : true
 			});
 
-    /**
-    * Default hex color of this parameter: can be redefined in the wroup parameter
-    * @type {string}
-    */
+		/**
+		 * Default hex color of this parameter: can be redefined in the wroup parameter
+		 * @type {string}
+		 */
 		this.defaultColor = ko.observable(data.DefaultColor);
-    
-    /**
-    * Whether this parameter is cumulative
-    * @todo feat: redefine in wroup parameters #MM!
-    *       during change need to change squad (for example from Rate to Cumulative)
-    * @type {bool}
-    */
+
+		/**
+		 * Whether this parameter is cumulative
+		 * @todo feat: redefine in wroup parameters #MM!
+		 *       during change need to change squad (for example from Rate to Cumulative)
+		 * @type {bool}
+		 */
 		this.isCumulative = ko.observable(data.IsCumulative);
-    
-    /**
-    * Whether this parameter is system: used in program logic and can't be deleted
-    * @type {bool}
-    */
+
+		/**
+		 * Whether this parameter is system: used in program logic and can't be deleted
+		 * @type {bool}
+		 */
 		this.isSystem = ko.observable(data.IsSystem);
 
 		/**
-    * Id of the squad of parameters ('rate', 'cumulative'...)
-    * @type {string}
-    */
+		 * Id of the squad of parameters ('rate', 'cumulative'...)
+		 * @type {string}
+		 */
 		this.wfmParamSquadId = ko.observable(data.WfmParamSquadId);
 
 		// List of possible units of measurements (for choosed uom)
@@ -141,9 +145,13 @@ define(['knockout'], function (ko) {
 			// choose group for need unit of measurement
 			var needGroup;
 			for (var uomCoefGroup in uomCoefDict) {
-				for (var uomCoefItem in uomCoefDict[uomCoefGroup]) {
-					if (uomCoefItem === selectedUom) {
-						needGroup = uomCoefDict[uomCoefGroup];
+				if (uomCoefDict.hasOwnProperty(uomCoefGroup)) {
+					for (var uomCoefItem in uomCoefDict[uomCoefGroup]) {
+						if (uomCoefDict[uomCoefGroup].hasOwnProperty(uomCoefItem)) {
+							if (uomCoefItem === selectedUom) {
+								needGroup = uomCoefDict[uomCoefGroup];
+							}
+						}
 					}
 				}
 			}
@@ -152,8 +160,10 @@ define(['knockout'], function (ko) {
 			// convert group to array (exclude need uom)
 			if (needGroup) {
 				for (var uomCoefMain in needGroup) {
-					if (uomCoefMain !== selectedUom) {
-						resultList.push(uomCoefMain);
+					if (needGroup.hasOwnProperty(uomCoefMain)) {
+						if (uomCoefMain !== selectedUom) {
+							resultList.push(uomCoefMain);
+						}
 					}
 				}
 			}

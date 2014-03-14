@@ -48,22 +48,22 @@ define([
 		this.upsert = function () {
 			// Check dict to numbers
 			// And convert to numbers from string
-      
-      var tmpDict = ko.toJS(ths.dict);
-      
+
+			var tmpDict = ko.toJS(ths.dict);
+
 			for (var tmpKey in tmpDict) {
-        if ($.isNumeric(tmpDict[tmpKey])){
-          tmpDict[tmpKey] = +tmpDict[tmpKey];
-        }
-        else if (!tmpDict[tmpKey]) { // check all exclude zero (zero - is number)
-					tmpDict[tmpKey] = null; // set to null when empty
-				}
-        else {
-					alert('Only numbers for ' + tmpKey + ": " + tmpDict[tmpKey]);
-					return;
+				if (tmpDict.hasOwnProperty(tmpKey)) {
+					if ($.isNumeric(tmpDict[tmpKey])) {
+						tmpDict[tmpKey] = +tmpDict[tmpKey];
+					} else if (!tmpDict[tmpKey]) { // check all exclude zero (zero - is number)
+						tmpDict[tmpKey] = null; // set to null when empty
+					} else {
+						alert('Only numbers for ' + tmpKey + ': ' + tmpDict[tmpKey]);
+						return;
+					}
 				}
 			}
-      
+
 			ths.isSaveProgress(true);
 			monitoringRecordService.upsert(ths.idOfWell, ko.unwrap(ths.unixTime), {
 				IdOfWell : ths.idOfWell,

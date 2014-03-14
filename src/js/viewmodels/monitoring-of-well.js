@@ -126,14 +126,16 @@ define(['jquery',
 		tmpRecords.forEach(function (tmpRecord) {
 			var tmpDict = tmpRecord.dict;
 			for (var paramKey in tmpDict) {
-				var paramVal = ko.unwrap(tmpDict[paramKey]);
-				if ($.isNumeric(paramVal)) {
-					// Set min and max values if they are null
-					if (minVal === null && maxVal === null) {
-						minVal = maxVal = paramVal;
-					} else {
-						minVal = Math.min(minVal, paramVal);
-						maxVal = Math.max(maxVal, paramVal);
+				if (tmpDict.hasOwnProperty(paramKey)) {
+					var paramVal = ko.unwrap(tmpDict[paramKey]);
+					if ($.isNumeric(paramVal)) {
+						// Set min and max values if they are null
+						if (minVal === null && maxVal === null) {
+							minVal = maxVal = paramVal;
+						} else {
+							minVal = Math.min(minVal, paramVal);
+							maxVal = Math.max(maxVal, paramVal);
+						}
 					}
 				}
 			}

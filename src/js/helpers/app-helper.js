@@ -82,11 +82,14 @@ define(['jquery'], function ($) {
 		return Math.abs(area / 2);
 	};
 
+  /**
+  * Get list of years
+  * @returns {Array}
+  */
 	exports.getYearList = function (startYear, endYear) {
-		var tempArr = [],
-		i = startYear;
+		var tempArr = [];
 
-		for (i; i <= endYear; i += 1) {
+		for (var i = startYear; i <= endYear; i += 1) {
 			tempArr.unshift(i);
 		}
 

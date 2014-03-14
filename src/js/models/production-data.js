@@ -150,14 +150,16 @@ define(['jquery',
 
 		// forecast data have no calculated properties, but you can construct forecast by last calculated row (other than last normal row)
 		self.isForecast = data.IsForecast;
-    
+
 		for (var dictItem in data.Dict) {
-			// if param is not calculated
-			if ($.inArray(calcParamIdList, dictItem) === -1) {
-				if ($.isNumeric(data.Dict[dictItem])) {
-					self[dictItem] = ko.observable(+data.Dict[dictItem]);
-				} else {
-          console.log('Production data parameter is not float [' + dictItem + ': ' + data.Dict[dictItem] + ']');
+			if (data.Dict.hasOwnProperty(dictItem)) {
+				// if param is not calculated
+				if ($.inArray(calcParamIdList, dictItem) === -1) {
+					if ($.isNumeric(data.Dict[dictItem])) {
+						self[dictItem] = ko.observable(+data.Dict[dictItem]);
+					} else {
+						console.log('Production data parameter is not float [' + dictItem + ': ' + data.Dict[dictItem] + ']');
+					}
 				}
 			}
 		}
