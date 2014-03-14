@@ -13,34 +13,27 @@ define(['knockout',
 	 * Base for stages
 	 * @constructor
 	 */
-	var exports = function (partOfUnzOfSlcVwmSectionWrk, koUnqOfSlcVwmStage) {
-
-		var ths = this;
+	var exports = function (partOfUnzOfSlcVwmSectionWrk, koUnqOfSlcVwmStage, defaultUnqOfSlcVwmChild) {
+		/**
+		 * Unique value of selected stage in parent stage
+		 */
+		this.koUnqOfSlcVwmStage_ = koUnqOfSlcVwmStage;
 
 		/////** By default: view unique id = model.id */
-		////this.unq = ths.mdlStage.id;
+
+		/** Whether this stage is selected */
+		this.isSlcVwmStage = ko.computed({
+				read : this.calcIsSlcVwmStage,
+				deferEvaluation : true,
+				owner : this
+			});
 
 		/**
 		 * Whether stage content is selected and showed on the page (child object are not selected)
 		 * @type {boolean}
 		 */
 		this.isActiveVwmStage = ko.computed({
-				read : function () {
-					// If stage is selected (or not exists)
-					// isSlcVwmStage = koSlcVwmChild === this
-					// 1. Is this stage is selected
-					if (ko.unwrap(ths.unq) === ko.unwrap(koUnqOfSlcVwmStage)) {
-						// 2. And no selected childs
-						// Well stage is always selected (has no children)
-						if (!ko.unwrap(ths.slcVwmChild)) {
-							console.log('stage is showed', ths.mdlStage.stageKey);
-							// TODO: 3. And all parents are selected
-							return true;
-						}
-					}
-
-					return false;
-				},
+				read : this.calcIsActiveVwmStage,
 				deferEvaluation : true,
 				owner : this
 			});
@@ -105,6 +98,22 @@ define(['knockout',
 
 		//{ #region FORSTAGESWITHCHILDREN
 
+		/** Unique key of viewmodel of selected child, null - for the bottom stage (the Well) */
+		this.unqOfSlcVwmChild = ko.observable(defaultUnqOfSlcVwmChild);
+
+		//// Remove default value to not reuse again
+		//defaultUnqOfSlcVwmChild = null;
+
+		/** Child viewmodel - current selected employee */
+		this.slcVwmChild = ko.computed({
+				read : this.calcSlcVwmChild,
+				deferEvaluation : true,
+				owner : this
+			});
+
+		/** Open child after selection */
+		this.slcVwmChild.subscribe(this.handleSlcVwmChild, this);
+
 		/**
 		 * Whether menu item is opened: showed inner object in menu without main content
 		 *    Only for sections that have children
@@ -112,17 +121,9 @@ define(['knockout',
 		 */
 		this.isOpenedItem = ko.observable(false);
 
-		/** Toggle isOpen state */
-		this.toggleItem = function () {
-			ths.isOpenedItem(!ko.unwrap(ths.isOpenedItem));
-		};
-
 		/** Css class for opened item (open or showed) */
 		this.menuItemCss = ko.computed({
-				read : function () {
-					// { 'glyphicon-circle-arrow-down' : isOpenedItem, 'glyphicon-circle-arrow-right' : !isOpenedItem() }
-					return ko.unwrap(ths.isOpenedItem) ? 'glyphicon-circle-arrow-down' : 'glyphicon-circle-arrow-right';
-				},
+				read : this.calcMenuItemCss,
 				deferEvaluation : true,
 				owner : this
 			});
@@ -307,11 +308,31 @@ define(['knockout',
 	exports.prototype.selectAncestorVwms = function () {
 		// For the upper stage (user profile) no parents - nothing to select
 		var tmpParentVwm = this.getParentVwm();
-		console.log('parent', tmpParentVwm);
 		if (tmpParentVwm) {
+			// Select this stage
 			tmpParentVwm.unqOfSlcVwmChild(this.unq);
+			// Select all parent stages (in asc order)
 			tmpParentVwm.selectAncestorVwms();
 		}
+	};
+
+	/** Calculate, wheter all ancestors are selected */
+	exports.prototype.calcIsSlcAncestorVwms = function () {
+		var result = true;
+		var tmpParentVwm = this.getParentVwm();
+		// If no parent (in first time) that it is a Upro stage (user profile)
+		// In this case - always true
+		while (tmpParentVwm) {
+			// If one of the parent is false, then result will be false;
+			result = ko.unwrap(tmpParentVwm.isSlcVwmStage);
+			if (result === false) {
+				break;
+			}
+
+			tmpParentVwm = tmpParentVwm.getParentVwm();
+		}
+
+		return result;
 	};
 
 	/**
@@ -331,6 +352,109 @@ define(['knockout',
 		if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + tmpName + '"?')) {
 			this.mdlStage.removeChild(vwmChildToRemove.mdlStage);
 		}
+	};
+
+	/** Calculate a selected viewmodel of a child stage */
+	exports.prototype.calcSlcVwmChild = function () {
+		var tmpUnq = ko.unwrap(this.unqOfSlcVwmChild);
+		if (tmpUnq) {
+			return ko.unwrap(this.listOfVwmChild).filter(function (elem) {
+				return elem.unq === tmpUnq;
+			})[0];
+		}
+	};
+
+	/** Make actions (open a stage) after select a new child stage */
+	exports.prototype.handleSlcVwmChild = function (tmpSlcVwmChild) {
+		if (tmpSlcVwmChild) {
+			if (typeof(tmpSlcVwmChild.isOpenedItem) !== 'undefined') {
+				tmpSlcVwmChild.isOpenedItem(true);
+			}
+		}
+	};
+
+	/**
+	 * Activate view of child stage: select all parents
+	 *    1. Unselect all children
+	 *    2. Select this
+	 *    3. Select all parents (For userProfile - employee (company))
+	 *    4. Set url fot this stage
+	 */
+	exports.prototype.activateVwmChild = function (vwmChildToActivate) {
+		// 1. Change a route
+		var navigationArr = historyHelper.getNavigationArr(vwmChildToActivate.mdlStage);
+		historyHelper.pushState('/' + navigationArr.join('/'));
+
+		// 2. Clean
+		if (typeof(vwmChildToActivate.unqOfSlcVwmChild) !== 'undefined') {
+			vwmChildToActivate.unqOfSlcVwmChild(null);
+		}
+
+		// 3. Select section. If not a selected section - show dashboard
+		if (!ko.unwrap(vwmChildToActivate.unzOfSlcVwmSectionWrk)) {
+			vwmChildToActivate.unselectVwmSectionWrk();
+		}
+
+		// 4. Select current child
+		this.unqOfSlcVwmChild(vwmChildToActivate.unq);
+
+		// 5. Select all parents of this stage
+		this.selectAncestorVwms();
+
+		// Unselect all previous sections. If a stage has children, then unselect all children
+		// You can't know a previous selected stage
+		// Just leave it selected, but in next selection - re-calculate
+
+
+		// ths - parent (like company)
+		// vwmChild - child (like wegion)
+		// slcVwmChild - selected child (like wegion)
+		// If parent - it is a child of other parent (company, employee -- it is a child of the userprofile)
+		// UserProflie.slcVwmChild(thisEmployee of this company)
+	};
+
+	/** Unselect: show content of parent node, like WFM logo click: unselect choosed company and show company list */
+	exports.prototype.deactivateVwmChild = function () {
+		this.unqOfSlcVwmChild(null);
+
+		var navigationArr = historyHelper.getNavigationArr(this.mdlStage);
+
+		historyHelper.pushState('/' + navigationArr.join('/'));
+	};
+
+	/** Calculate whether this stage is selected */
+	exports.prototype.calcIsSlcVwmStage = function () {
+		return ko.unwrap(this.koUnqOfSlcVwmStage_) === ko.unwrap(this.unq);
+	};
+
+	/** Calculate, whether this stage is active */
+	exports.prototype.calcIsActiveVwmStage = function () {
+		// If stage is selected (or not exists)
+		// isSlcVwmStage = koSlcVwmChild === this
+		// 1. Is this stage is selected
+		if (ko.unwrap(this.isSlcVwmStage)) {
+			// 2. And no selected childs
+			// Well stage is always selected (has no children)
+			if (!ko.unwrap(this.slcVwmChild)) {
+				console.log('stage is showed', this.mdlStage.stageKey);
+				// TODO: 3. And all parents are selected
+				if (this.calcIsSlcAncestorVwms()) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	};
+
+	/** Toggle isOpen state */
+	exports.prototype.toggleItem = function () {
+		this.isOpenedItem(!ko.unwrap(this.isOpenedItem));
+	};
+
+	/** Css class for a item of a menu */
+	exports.prototype.calcMenuItemCss = function () {
+		return ko.unwrap(this.isOpenedItem) ? 'glyphicon-circle-arrow-down' : 'glyphicon-circle-arrow-right';
 	};
 
 	return exports;

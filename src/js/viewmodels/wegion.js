@@ -4,14 +4,12 @@ define(['jquery',
 		'helpers/modal-helper',
 		'helpers/app-helper',
 		'viewmodels/wield',
-		'base-viewmodels/stage-child-base',
 		'base-viewmodels/stage-base'],
 	function ($,
 		ko,
 		bootstrapModal,
 		appHelper,
 		VwmWield,
-		VwmStageChildBase,
 		VwmStageBase) {
 	'use strict';
 
@@ -28,7 +26,7 @@ define(['jquery',
 		this.mdlStage = mdlWegion;
 
 		/** Default data to select */
-		this.defaultSlcData = defaultSlcData;
+		this.defaultSlcData_ = defaultSlcData;
 
 		/** Unique id for view */
 		this.unq = this.mdlStage.id;
@@ -44,8 +42,7 @@ define(['jquery',
 		/** Link to file manager of company */
 		this.fmgr = parentVwmCompany.fmgr;
 
-		VwmStageChildBase.call(this, defaultSlcData.wieldId);
-		VwmStageBase.call(this, defaultSlcData.wegionSectionId, parentVwmCompany.unqOfSlcVwmChild);
+		VwmStageBase.call(this, this.defaultSlcData_.wegionSectionId, parentVwmCompany.unqOfSlcVwmChild, this.defaultSlcData_.wieldId);
 	};
 
 	/** Inherit from a stage base viewmodel */
@@ -79,7 +76,7 @@ define(['jquery',
 	 */
 	exports.prototype.buildListOfVwmChild = function () {
 		return ko.unwrap(this.mdlStage.wields).map(function (elem) {
-			return new VwmWield(elem, this, this.defaultSlcData);
+			return new VwmWield(elem, this, this.defaultSlcData_);
 		}, this);
 	};
 

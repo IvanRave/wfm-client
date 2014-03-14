@@ -5,7 +5,6 @@ define(['jquery',
 		'helpers/app-helper',
 		'viewmodels/wroup',
 		'viewmodels/map-of-wield',
-		'base-viewmodels/stage-child-base',
 		'base-viewmodels/stage-base'],
 	function ($,
 		ko,
@@ -13,7 +12,6 @@ define(['jquery',
 		appHelper,
 		VwmWroup,
 		VwmMapOfWield,
-		VwmStageChildBase,
 		VwmStageBase) {
 	'use strict';
 
@@ -40,11 +38,9 @@ define(['jquery',
 		/** Link to company file manager */
 		this.fmgr = this.getParentVwm().fmgr;
 
-		// Has a children (wroups)
-		VwmStageChildBase.call(this, defaultSlcData.wroupId);
 		// Has sections and widgets
-		VwmStageBase.call(this, defaultSlcData.wieldSectionId, parentVwmWegion.unqOfSlcVwmChild);
-
+		VwmStageBase.call(this, defaultSlcData.wieldSectionId, parentVwmWegion.unqOfSlcVwmChild, defaultSlcData.wroupId);
+    
 		/** The list of views of maps of this well field view*/
 		this.listOfVwmMapOfWield = ko.computed({
 				read : this.buildListOfVwmMapOfWield,

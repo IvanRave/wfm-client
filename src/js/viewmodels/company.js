@@ -2,13 +2,11 @@
 define(['knockout',
 		'helpers/app-helper',
 		'viewmodels/wegion',
-		'base-viewmodels/stage-base',
-		'base-viewmodels/stage-child-base'],
+		'base-viewmodels/stage-base'],
 	function (ko,
 		appHelper,
 		VwmWegion,
-		VwmStageBase,
-		VwmStageChildBase) {
+		VwmStageBase) {
 	'use strict';
 
 	/**
@@ -66,10 +64,7 @@ define(['knockout',
 		/**
 		 * Base for all stages: with selected view of wegion
 		 */
-		VwmStageBase.call(this, defaultSlcData.companySectionId, vwmUproParent.unqOfSlcVwmChild);
-
-		/** Base for all stages with childs */
-		VwmStageChildBase.call(this, defaultSlcData.wegionId);
+		VwmStageBase.call(this, this.defaultSlcData_.companySectionId, vwmUproParent.unqOfSlcVwmChild, this.defaultSlcData_.wegionId);
 	};
 
 	/** Inherit from a stage base viewmodel */

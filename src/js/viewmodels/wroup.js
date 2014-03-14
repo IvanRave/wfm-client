@@ -5,7 +5,6 @@ define([
 		'helpers/modal-helper',
 		'helpers/app-helper',
 		'viewmodels/well',
-		'base-viewmodels/stage-child-base',
 		'base-viewmodels/stage-base',
 		'viewmodels/wfm-parameter-of-wroup'],
 	function (
@@ -14,7 +13,6 @@ define([
 		modalHelper,
 		appHelper,
 		VwmWell,
-		VwmStageChildBase,
 		VwmStageBase,
 		VwmWfmParameterOfWroup) {
 
@@ -40,11 +38,9 @@ define([
 
 		this.defaultSlcData = defaultSlcData;
 
-		// Has a children (wroups)
-		VwmStageChildBase.call(this, defaultSlcData.wellId);
 		// Has sections and widgets
-		VwmStageBase.call(this, defaultSlcData.wroupSectionId, parentVwmWield.unqOfSlcVwmChild);
-
+		VwmStageBase.call(this, defaultSlcData.wroupSectionId, parentVwmWield.unqOfSlcVwmChild, defaultSlcData.wellId);
+    
 		/**
 		 * List of viewmodels of wfm parameters of well group
 		 * @type {Array.<module:viewmodels/wfm-parameter-of-wroup>}

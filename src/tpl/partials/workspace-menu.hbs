@@ -3,13 +3,13 @@
   <!-- current: slcVwmEmployee (slcVwmChild) -->
   <ul class="list-unstyled">
     <li>
-      <div class="wfm-menu-item wfm-menu-header" data-bind="click: $parent.activateVwmChild">
-        <!-- ko with: vwmCompany-->
-        <span data-bind="css: { 'bld': isActiveVwmStage }">
-          <!-- select company view, using userprofile parent -->
-          <span data-bind="text: mdlStage.name, attr: {title: mdlStage.name}"></span>
-        </span>
-        <!-- /ko -->
+      <div data-bind="with: vwmCompany">
+        <div class="wfm-menu-item wfm-menu-header" data-bind="click: $parents[1].activateVwmChild.bind($parents[1])">
+          <span data-bind="css: { 'bld': isActiveVwmStage }">
+            <!-- select company view, using userprofile parent -->
+            <span data-bind="text: mdlStage.name, attr: {title: mdlStage.name}"></span>
+          </span>
+        </div>
       </div>
     </li>
     <!-- ko with: vwmCompany -->
@@ -25,7 +25,7 @@
     <li>
       <div class="clearfix">
         <i class="glyphicon" data-bind="css: menuItemCss, click: toggleItem"></i>
-        <div class="wfm-menu-item" data-bind="click: $parent.activateVwmChild, css: { 'wfm-slc-menu-item': isActiveVwmStage }">
+        <div class="wfm-menu-item" data-bind="click: $parent.activateVwmChild.bind($parent), css: { 'wfm-slc-menu-item': isActiveVwmStage }">
           <div class="pull-right">
             <small>
               <i class="glyphicon glyphicon-globe"></i>
@@ -42,7 +42,7 @@
         <li>
           <div class="clearfix">
             <i class="glyphicon" data-bind="css: menuItemCss, click: toggleItem"></i>
-            <div class="wfm-menu-item" data-bind="click: $parent.activateVwmChild, css: { 'wfm-slc-menu-item': isActiveVwmStage }">
+            <div class="wfm-menu-item" data-bind="click: $parent.activateVwmChild.bind($parent), css: { 'wfm-slc-menu-item': isActiveVwmStage }">
               <div class="pull-right">
                 <small>
                   <i class="glyphicon glyphicon-home"></i>
@@ -59,7 +59,7 @@
             <li>
               <div class="clearfix">
                 <i class="glyphicon" data-bind="css: menuItemCss, click: toggleItem"></i>
-                <div class="wfm-menu-item" data-bind="click: $parent.activateVwmChild, css: { 'wfm-slc-menu-item': isActiveVwmStage }">
+                <div class="wfm-menu-item" data-bind="click: $parent.activateVwmChild.bind($parent), css: { 'wfm-slc-menu-item': isActiveVwmStage }">
                   <div class="pull-right">
                     <small>
                       <i class="glyphicon glyphicon-list"></i>
@@ -75,7 +75,7 @@
                 <!-- current: well -->
                 <li>
                   <div class="clearfix">
-                    <div class="wfm-menu-item" data-bind="click: $parent.activateVwmChild, css: { 'wfm-slc-menu-item': isActiveVwmStage }">
+                    <div class="wfm-menu-item" data-bind="click: $parent.activateVwmChild.bind($parent), css: { 'wfm-slc-menu-item': isActiveVwmStage }">
                       <div class="pull-right">
                         <small>
                           <i class="glyphicon glyphicon-leaf"></i>

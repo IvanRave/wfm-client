@@ -2,13 +2,11 @@
 define(['knockout',
 		'viewmodels/employee',
     'helpers/app-helper',
-		'base-viewmodels/stage-base',
-		'base-viewmodels/stage-child-base'],
+		'base-viewmodels/stage-base'],
 	function (ko,
 		VwmEmployee,
     appHelper,
-		VwmStageBase,
-		VwmStageChildBase) {
+		VwmStageBase) {
 	'use strict';
 
 	/**
@@ -50,10 +48,7 @@ define(['knockout',
       
 		// 1. null - No default data to selection  (only one per website)
     // 2. If no other userprofiles then this upro is selected always
-		VwmStageBase.call(this, null, ko.observable(this.unq));
-
-		/** Has few children to select */
-		VwmStageChildBase.call(this, this.defaultSlcData_.companyId);
+		VwmStageBase.call(this, null, ko.observable(this.unq), this.defaultSlcData_.companyId);
 
 		// Other stagebase view
 		// Has no sections and widgets - StageChildBase

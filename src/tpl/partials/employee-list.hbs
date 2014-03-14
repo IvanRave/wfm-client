@@ -6,8 +6,9 @@
       <div class="clearfix" data-bind="if: mdlEmployee.canViewAll">
         <div class="pull-left">
           <!-- select employee -->
-          <span class="pointer" data-bind="click: $parent.activateVwmChild">
-            <span data-bind="with: vwmCompany">
+          <span data-bind="with: vwmCompany">
+            <!-- parent: vwmEmployee, parents[1]: vwmUpro -->
+            <span class="pointer" data-bind="click: $parents[1].activateVwmChild.bind($parents[1])">
               <span data-bind="with: mdlStage">
                 <span data-bind="with: fileSpecOfLogo">
                    <img class="company-logo" src="#" data-bind="attr: {src: fileUrl }" title="{{capitalizeFirst lang.toView}} {{lang.wfm}}" /> 
@@ -21,8 +22,8 @@
         </div>
         <div class="pull-left min-left-margin">
           <h4 class="min-left-margin">
-            <span class="link-view" data-bind="click: $parent.activateVwmChild">
-              <span data-bind="with: vwmCompany">
+            <span data-bind="with: vwmCompany">
+              <span class="link-view" data-bind="click: $parents[1].activateVwmChild.bind($parents[1])">
                 <span data-bind="text: mdlStage.name"></span>
               </span>
             </span>

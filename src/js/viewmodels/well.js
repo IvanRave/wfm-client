@@ -81,7 +81,7 @@ define([
 		};
 
 		// Has sections and widgets
-		VwmStageBase.call(this, defaultSlcData.wellSectionId, parentVwmWroup.unqOfSlcVwmChild);
+		VwmStageBase.call(this, defaultSlcData.wellSectionId, parentVwmWroup.unqOfSlcVwmChild, null);
 
 		//mdlSketchOfWell, koWellUnzOfSlcVwmSectionFmg, koSlcVwmSectionFmg,  fmgrLink
 		this.vwmSketchOfWell = new VwmSketchOfWell(ths.mdlStage.sketchOfWell, ths.unzOfSlcVwmSectionFmg, ths.slcVwmSectionFmg, ths.fmgr);
