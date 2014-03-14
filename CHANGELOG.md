@@ -1,3 +1,23 @@
+<a name="0.9.3"></a>
+### 0.9.3 (2014-03-14)
+
+
+#### Bug Fixes
+
+* **menu:** a bug with few hovered items ([384be8b5](https://github.com/IvanRave/wfm-client/commit/384be8b55df3153d2e89ae24e5d74ab8da78792e))
+* **zoom:** fix a zoom-in-out behavior ([357fb642](https://github.com/IvanRave/wfm-client/commit/357fb6420a751c14d50ffb375e5d375d63c496ce))
+
+
+#### Features
+
+* **fileSpec:** add a download method ([11a543b1](https://github.com/IvanRave/wfm-client/commit/11a543b1209b7f4874a47de94dd1de6c9ea21c4f))
+* **icons:** add new icons ([3f188953](https://github.com/IvanRave/wfm-client/commit/3f188953e0369bd6d71afd6fb4a2a2ee723bad15))
+* **map:** draw selection with other color ([e6105689](https://github.com/IvanRave/wfm-client/commit/e6105689cf3e1362541ce69f9035d30dc4e2dfca))
+* **monitoring:** show/hide curves, style ([8866ac0e](https://github.com/IvanRave/wfm-client/commit/8866ac0e3843cad1e06656fbeec84ed074b5b8fa))
+* **wellMap:** add zoom controls (like a graph) ([3cd57800](https://github.com/IvanRave/wfm-client/commit/3cd5780049cd5c4ddf1b22887fd8f9e7489d55ac))
+* **wellMaps:** list of maps for a well ([f7fc2abf](https://github.com/IvanRave/wfm-client/commit/f7fc2abfd5ce1d829f0e780767f0fe780424fba3))
+
+
 <a name="0.9.2"></a>
 ### 0.9.2 (2014-02-26)
 
