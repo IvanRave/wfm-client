@@ -2,7 +2,7 @@
 define(['jquery',
 		'knockout',
 		'helpers/modal-helper',
-    'helpers/app-helper',
+		'helpers/app-helper',
 		'viewmodels/wroup',
 		'viewmodels/map-of-wield',
 		'base-viewmodels/stage-child-base',
@@ -10,7 +10,7 @@ define(['jquery',
 	function ($,
 		ko,
 		modalHelper,
-    appHelper,
+		appHelper,
 		VwmWroup,
 		VwmMapOfWield,
 		VwmStageChildBase,
@@ -20,7 +20,7 @@ define(['jquery',
 	/**
 	 * View for well field maps: contains filtered maps and selected map
 	 * @constructor
-   * @augments {module:base-viewmodels/stage-base}
+	 * @augments {module:base-viewmodels/stage-base}
 	 */
 	var exports = function (mdlWield, parentVwmWegion, defaultSlcData) {
 		////* @param {object} opts - options for this view, like id of selected map, sort direction, filters etc.
@@ -39,16 +39,6 @@ define(['jquery',
 
 		/** Link to company file manager */
 		this.fmgr = this.getParentVwm().fmgr;
-
-		/**
-		 * List of views of well wroups
-		 * @type {Array.<module:viewmodels/wroup>}
-		 */
-		this.listOfVwmChild = ko.computed({
-				read : this.buildListOfVwmChild,
-				deferEvaluation : true,
-				owner : this
-			});
 
 		// Has a children (wroups)
 		VwmStageChildBase.call(this, defaultSlcData.wroupId);
@@ -79,8 +69,8 @@ define(['jquery',
 				owner : this
 			});
 	};
-  
-  /** Inherit from a stage base viewmodel */
+
+	/** Inherit from a stage base viewmodel */
 	appHelper.inherits(exports, VwmStageBase);
 
 	/** Select view */
@@ -128,14 +118,14 @@ define(['jquery',
 		modalHelper.openModalWindow('Well group', innerDiv, submitFunction);
 	};
 
-  /** Remove a viewmodel with model */
-  exports.prototype.removeVwmMapOfWield = function(vwmMapOfWield){
-    var tmpModel = vwmMapOfWield.mdlMapOfWield;
-    if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(tmpModel.name) + '"?')) {
-      this.mdlStage.removeMapOfWield(tmpModel);
-    }
-  };
-  
+	/** Remove a viewmodel with model */
+	exports.prototype.removeVwmMapOfWield = function (vwmMapOfWield) {
+		var tmpModel = vwmMapOfWield.mdlMapOfWield;
+		if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(tmpModel.name) + '"?')) {
+			this.mdlStage.removeMapOfWield(tmpModel);
+		}
+	};
+
 	/**
 	 * Create map from file
 	 */
@@ -199,7 +189,7 @@ define(['jquery',
 	exports.prototype.buildListOfVwmMapOfWield = function () {
 		var ths = this;
 		return ko.unwrap(this.mdlStage.WellFieldMaps).map(function (elem) {
-      // Check if the viewmodel exists, then replace instead creation
+			// Check if the viewmodel exists, then replace instead creation
 			return new VwmMapOfWield(elem, ths.vidOfSlcVwmMapOfWield, ko.observable({
 					scale : 1,
 					translate : [0, 0]
@@ -213,16 +203,6 @@ define(['jquery',
 		return ko.unwrap(this.mdlStage.wroups).map(function (elem) {
 			return new VwmWroup(elem, ths, ths.defaultSlcData);
 		});
-	};
-
-	/**
-	 * Select all ancestor's view models
-	 */
-	exports.prototype.selectAncestorVwms = function () {
-		// 1. take parent view - company
-		// 2. take parent view of employee - userprofile
-		this.getParentVwm().unqOfSlcVwmChild(this.unq);
-		this.getParentVwm().selectAncestorVwms();
 	};
 
 	return exports;

@@ -40,12 +40,6 @@ define([
 
 		this.defaultSlcData = defaultSlcData;
 
-		this.listOfVwmChild = ko.computed({
-				read : this.buildListOfVwmChild,
-				deferEvaluation : true,
-				owner : this
-			});
-
 		// Has a children (wroups)
 		VwmStageChildBase.call(this, defaultSlcData.wellId);
 		// Has sections and widgets
@@ -202,11 +196,6 @@ define([
 
 	/** Inherit from a stage base viewmodel */
 	appHelper.inherits(exports, VwmStageBase);
-
-	exports.prototype.selectAncestorVwms = function () {
-		this.getParentVwm().unqOfSlcVwmChild(this.unq);
-		this.getParentVwm().selectAncestorVwms();
-	};
 
 	/**
 	 * Create well

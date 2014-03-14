@@ -9,7 +9,7 @@ define(['knockout',
 		'constants/stage-constants',
 		'models/prop-spec',
 		'base-models/stage-base',
-    'helpers/app-helper'],
+		'helpers/app-helper'],
 	function (ko,
 		Employee,
 		langHelper,
@@ -20,7 +20,7 @@ define(['knockout',
 		stageConstants,
 		PropSpec,
 		StageBase,
-    appHelper) {
+		appHelper) {
 	'use strict';
 
 	/** Import employees for this user */
@@ -44,6 +44,7 @@ define(['knockout',
 	/**
 	 * User profile
 	 * @constructor
+   * @augments {module:base-models/stage-base}
 	 * @param {object} data - User profile data
 	 */
 	var exports = function (data, rootMdl) {
@@ -82,36 +83,6 @@ define(['knockout',
 		 * @type {boolean}
 		 */
 		this.isLoadedEmployees = ko.observable(false);
-
-		/**
-		 * Load employee list for this user
-		 */
-		this.loadEmployees = function () {
-			if (ko.unwrap(ths.isLoadedEmployees)) {
-				return;
-			}
-
-			companyUserService.getCompanyUserList().done(function (response) {
-
-				////// Set hash, add to history
-				////historyHelper.pushState('/companies');
-
-				ths.employees(importEmployees(response, ths));
-				ths.isLoadedEmployees(true);
-
-				////if (tmpInitialUrlData.companyId) {
-				////    emplArray.forEach(function (arrElem) {
-				////        if (arrElem.companyId === tmpInitialUrlData.companyId) {
-				////            // Select employee = select company
-				////            ths.selectEmployee(arrElem);
-				////            // Clean from initial url data to don't select again
-				////            delete tmpInitialUrlData.companyId;
-				////            rootMdl.initialUrlData(tmpInitialUrlData);
-				////        }
-				////    });
-				////}
-			});
-		};
 
 		/**
 		 * Name of a new company: user can create only one company with manager access level
@@ -157,13 +128,41 @@ define(['knockout',
 				},
 				deferEvaluation : true
 			});
-
-		/** Stare to load inner data after creation user */
-		this.loadEmployees();
 	};
 
-  /** Inherit from a stage base model */
+	/** Inherit from a stage base model */
 	appHelper.inherits(exports, StageBase);
-  
+
+	/**
+	 * Load employee list for this user
+	 */
+	exports.prototype.loadEmployees = function () {
+		if (ko.unwrap(this.isLoadedEmployees)) {
+			return;
+		}
+
+		var ths = this;
+		companyUserService.getCompanyUserList().done(function (response) {
+
+			////// Set hash, add to history
+			////historyHelper.pushState('/companies');
+
+			ths.employees(importEmployees(response, ths));
+			ths.isLoadedEmployees(true);
+
+			////if (tmpInitialUrlData.companyId) {
+			////    emplArray.forEach(function (arrElem) {
+			////        if (arrElem.companyId === tmpInitialUrlData.companyId) {
+			////            // Select employee = select company
+			////            ths.selectEmployee(arrElem);
+			////            // Clean from initial url data to don't select again
+			////            delete tmpInitialUrlData.companyId;
+			////            rootMdl.initialUrlData(tmpInitialUrlData);
+			////        }
+			////    });
+			////}
+		});
+	};
+
 	return exports;
 });

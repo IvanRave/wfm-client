@@ -16,7 +16,7 @@ define(['knockout',
 	var exports = function (partOfUnzOfSlcVwmSectionWrk, koUnqOfSlcVwmStage) {
 
 		var ths = this;
-		
+
 		/////** By default: view unique id = model.id */
 		////this.unq = ths.mdlStage.id;
 
@@ -45,15 +45,35 @@ define(['knockout',
 				owner : this
 			});
 
+		/** Unique id of selected section in file manager */
+		this.unzOfSlcVwmSectionFmg = ko.observable();
+
+		/**
+		 * User profile may contain few employee (with companies)
+		 * @type {Array.<module:viewmodels/employee>}
+		 */
+		this.listOfVwmChild = ko.computed({
+				read : this.buildListOfVwmChild,
+				deferEvaluation : true,
+				owner : this
+			});
+
+		/**
+		 * List of views of widget layouts
+		 * @type {Array.<module:viewmodels/widgout>}
+		 */
+		this.listOfVwmWidgout = ko.computed({
+				read : this.buildListOfVwmWidgout,
+				deferEvaluation : true,
+				owner : this
+			});
+
 		/** List of section views */
 		this.listOfVwmSection = ko.computed({
 				read : this.buildListOfVwmSection,
 				deferEvaluation : true,
 				owner : this
 			});
-
-		/** Unique id of selected section in file manager */
-		this.unzOfSlcVwmSectionFmg = ko.observable();
 
 		/** Selected section in file manager */
 		this.slcVwmSectionFmg = ko.computed({
@@ -80,18 +100,34 @@ define(['knockout',
 		/** When change selected section */
 		this.slcVwmSectionWrk.subscribe(this.handleVwmSectionWrk, this);
 
+		/** Selected widget layouts: may be defined by default from client storage (cookies..) */
+		this.slcVwmWidgout = ko.observable();
+
+		//{ #region FORSTAGESWITHCHILDREN
+
 		/**
-		 * List of views of widget layouts
-		 * @type {Array.<module:viewmodels/widgout>}
+		 * Whether menu item is opened: showed inner object in menu without main content
+		 *    Only for sections that have children
+		 * @type {boolean}
 		 */
-		this.listOfVwmWidgout = ko.computed({
-				read : this.buildListOfVwmWidgout,
+		this.isOpenedItem = ko.observable(false);
+
+		/** Toggle isOpen state */
+		this.toggleItem = function () {
+			ths.isOpenedItem(!ko.unwrap(ths.isOpenedItem));
+		};
+
+		/** Css class for opened item (open or showed) */
+		this.menuItemCss = ko.computed({
+				read : function () {
+					// { 'glyphicon-circle-arrow-down' : isOpenedItem, 'glyphicon-circle-arrow-right' : !isOpenedItem() }
+					return ko.unwrap(ths.isOpenedItem) ? 'glyphicon-circle-arrow-down' : 'glyphicon-circle-arrow-right';
+				},
 				deferEvaluation : true,
 				owner : this
 			});
 
-		/** Selected widget layouts: may be defined by default from client storage (cookies..) */
-		this.slcVwmWidgout = ko.observable();
+		//} #endregion
 
 		// ==================================== Data loading ================================================
 
@@ -103,7 +139,7 @@ define(['knockout',
 
 			// and load
 			// Only once
-			this.unzOfSlcVwmSectionWrk(ths.mdlStage.stageKey + '-' + partOfUnzOfSlcVwmSectionWrk);
+			this.unzOfSlcVwmSectionWrk(this.mdlStage.stageKey + '-' + partOfUnzOfSlcVwmSectionWrk);
 			// Then delete, to not-repeat this value again
 			partOfUnzOfSlcVwmSectionWrk = null;
 
@@ -263,6 +299,38 @@ define(['knockout',
 		return tmpListOfSection.map(function (elem) {
 			return new VwmStageSection(elem, this);
 		}, this);
+	};
+
+	/**
+	 * Select this stage and all ancestors
+	 */
+	exports.prototype.selectAncestorVwms = function () {
+		// For the upper stage (user profile) no parents - nothing to select
+		var tmpParentVwm = this.getParentVwm();
+		console.log('parent', tmpParentVwm);
+		if (tmpParentVwm) {
+			tmpParentVwm.unqOfSlcVwmChild(this.unq);
+			tmpParentVwm.selectAncestorVwms();
+		}
+	};
+
+	/**
+	 * Build list of childrens' viewmodels
+	 */
+	exports.prototype.buildListOfVwmChild = function () {
+		throw new Error('Need to ovveride in a subclass if there are stage children');
+	};
+
+	/**
+	 * Remove child stage with view model (only for stages with children)
+	 */
+	exports.prototype.removeVwmChild = function (vwmChildToRemove) {
+		// Name - can be uppercase or lowercase
+		var tmpName = vwmChildToRemove.mdlStage.name ? ko.unwrap(vwmChildToRemove.mdlStage.name) : ko.unwrap(vwmChildToRemove.mdlStage.Name);
+
+		if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + tmpName + '"?')) {
+			this.mdlStage.removeChild(vwmChildToRemove.mdlStage);
+		}
 	};
 
 	return exports;

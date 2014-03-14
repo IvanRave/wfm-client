@@ -39,7 +39,7 @@
   <div data-bind="if: $root.isEmployeeInEditMode">
     <div class="clearfix">
       <div class="pull-right">
-        <button class="btn btn-sm btn-danger" data-bind="click: $parent.removeVwmChild">
+        <button class="btn btn-sm btn-danger" data-bind="click: $parent.removeVwmChild.bind($parent)">
           <i class="glyphicon glyphicon-remove-sign"></i>
           {{capitalizeFirst lang.toDelete}}
         </button>

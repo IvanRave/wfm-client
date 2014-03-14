@@ -1,136 +1,103 @@
 ﻿/** @module */
 define(['knockout',
-    'helpers/history-helper'],
-    function (ko,
-        historyHelper) {
-        'use strict';
+		'helpers/history-helper'],
+	function (ko,
+		historyHelper) {
+	'use strict';
 
-        /**
-        * Base view for manage childs of main stages: userProfile, company, wegion, wield, wroup (well has no childrens)
-        *    If stage has children
-        * @constructor
-        */
-        var exports = function (defaultUnqOfSlcVwmChild) {
-            // First need to point: listOfVwmChild (children's viewmodels)
-            var ths = this;
+	/**
+	 * Base view for manage childs of main stages: userProfile, company, wegion, wield, wroup (well has no childrens)
+	 *    If stage has children
+	 * @constructor
+	 */
+	var exports = function (defaultUnqOfSlcVwmChild) {
+		// First need to point: listOfVwmChild (children's viewmodels)
+		var ths = this;
 
-            /** Unique key of viewmodel of selected child */
-            this.unqOfSlcVwmChild = ko.observable(defaultUnqOfSlcVwmChild);
+		/** Unique key of viewmodel of selected child */
+		this.unqOfSlcVwmChild = ko.observable(defaultUnqOfSlcVwmChild);
 
-            // Remove default value to not reuse again
-            defaultUnqOfSlcVwmChild = null;
+		// Remove default value to not reuse again
+		defaultUnqOfSlcVwmChild = null;
 
-            /** Child viewmodel - current selected employee */
-            this.slcVwmChild = ko.computed({
-                read: function () {
-                    var tmpUnq = ko.unwrap(ths.unqOfSlcVwmChild);
-                    if (tmpUnq) {
-                        return ko.unwrap(ths.listOfVwmChild).filter(function (elem) {
-                            return elem.unq === tmpUnq;
-                        })[0];
-                    }
-                },
-                deferEvaluation: true
-            });
+		/** Child viewmodel - current selected employee */
+		this.slcVwmChild = ko.computed({
+				read : function () {
+					var tmpUnq = ko.unwrap(ths.unqOfSlcVwmChild);
+					if (tmpUnq) {
+						return ko.unwrap(ths.listOfVwmChild).filter(function (elem) {
+							return elem.unq === tmpUnq;
+						})[0];
+					}
+				},
+				deferEvaluation : true
+			});
 
-            /**
-            * Activate view of child stage: select all parents
-            *    1. Unselect all children
-            *    2. Select this
-            *    3. Select all parents (For userProfile - employee (company))
-            *    4. Set url fot this stage
-            */
-            this.activateVwmChild = function (vwmChildToActivate) {
-                // Unselect previous child: todo: why?
-                ////ths.unqOfSlcVwmChild(null);
+		/**
+		 * Activate view of child stage: select all parents
+		 *    1. Unselect all children
+		 *    2. Select this
+		 *    3. Select all parents (For userProfile - employee (company))
+		 *    4. Set url fot this stage
+		 */
+		this.activateVwmChild = function (vwmChildToActivate) {
+			// Unselect previous child: todo: why?
+			////ths.unqOfSlcVwmChild(null);
 
-                // Unselect 
-                var navigationArr = [];
+			// Unselect
+			var navigationArr = [];
 
-                // For company - stage == employee
-                if (vwmChildToActivate.vwmCompany) {
-                    vwmChildToActivate = vwmChildToActivate.vwmCompany;
-                }
+			// For company - stage == employee
+			if (vwmChildToActivate.vwmCompany) {
+				vwmChildToActivate = vwmChildToActivate.vwmCompany;
+			}
 
-                // If a stage has children, then unselect all children
-                if (typeof (vwmChildToActivate.unqOfSlcVwmChild) !== 'undefined') {
-                    vwmChildToActivate.unqOfSlcVwmChild(null);
-                }
-                
-                // If not a selected section - show dashboard
-                if (!ko.unwrap(vwmChildToActivate.unzOfSlcVwmSectionWrk)){
-                  vwmChildToActivate.unselectVwmSectionWrk();
-                }
+			// If a stage has children, then unselect all children
+			if (typeof(vwmChildToActivate.unqOfSlcVwmChild) !== 'undefined') {
+				vwmChildToActivate.unqOfSlcVwmChild(null);
+			}
 
-                navigationArr = historyHelper.getNavigationArr(vwmChildToActivate.mdlStage);
-                historyHelper.pushState('/' + navigationArr.join('/'));
+			// If not a selected section - show dashboard
+			if (!ko.unwrap(vwmChildToActivate.unzOfSlcVwmSectionWrk)) {
+				vwmChildToActivate.unselectVwmSectionWrk();
+			}
 
-                // Select current child
-                ths.unqOfSlcVwmChild(vwmChildToActivate.unq);
-                
-                // Select all parents of this child
-                if (ths.selectAncestorVwms) {
-                    ths.selectAncestorVwms();
-                }
+			navigationArr = historyHelper.getNavigationArr(vwmChildToActivate.mdlStage);
+			historyHelper.pushState('/' + navigationArr.join('/'));
 
-                // ths - parent (like company)
-                // vwmChild - child (like wegion)
-                // slcVwmChild - selected child (like wegion)
-                // If parent - it is a child of other parent (company, employee -- it is a child of the userprofile)
-                // UserProflie.slcVwmChild(thisEmployee of this company)
-            };
+			// Select current child
+			ths.unqOfSlcVwmChild(vwmChildToActivate.unq);
 
-            /** Unselect: show content of parent node, like WFM logo click: unselect choosed company and show company list */
-            this.deactivateVwmChild = function () {
-                ths.unqOfSlcVwmChild(null);
+			// Select all parents of this child
+			if (ths.selectAncestorVwms) {
+				ths.selectAncestorVwms();
+			}
 
-                var navigationArr = historyHelper.getNavigationArr(ths.mdlStage);
+			// ths - parent (like company)
+			// vwmChild - child (like wegion)
+			// slcVwmChild - selected child (like wegion)
+			// If parent - it is a child of other parent (company, employee -- it is a child of the userprofile)
+			// UserProflie.slcVwmChild(thisEmployee of this company)
+		};
 
-                historyHelper.pushState('/' + navigationArr.join('/'));
-            };
+		/** Unselect: show content of parent node, like WFM logo click: unselect choosed company and show company list */
+		this.deactivateVwmChild = function () {
+			ths.unqOfSlcVwmChild(null);
 
-            /**
-            * Whether menu item is opened: showed inner object in menu without main content
-            *    Only for sections that have children
-            * @type {boolean}
-            */
-            this.isOpenedItem = ko.observable(false);
+			var navigationArr = historyHelper.getNavigationArr(ths.mdlStage);
 
-            /** Toggle isOpen state */
-            this.toggleItem = function () {
-                ths.isOpenedItem(!ko.unwrap(ths.isOpenedItem));
-            };
+			historyHelper.pushState('/' + navigationArr.join('/'));
+		};
 
-            /** Css class for opened item (open or showed) */
-            this.menuItemCss = ko.computed({
-                read: function () {
-                    // { 'glyphicon-circle-arrow-down' : isOpenedItem, 'glyphicon-circle-arrow-right' : !isOpenedItem() }
-                    return ko.unwrap(ths.isOpenedItem) ? 'glyphicon-circle-arrow-down' : 'glyphicon-circle-arrow-right';
-                },
-                deferEvaluation: true
-            });
+		/** Open child after selection */
+		this.slcVwmChild.subscribe(function (tmpSlcVwmChild) {
+			if (tmpSlcVwmChild) {
+				if (typeof(tmpSlcVwmChild.isOpenedItem) !== 'undefined') {
+					tmpSlcVwmChild.isOpenedItem(true);
+				}
+			}
+		});
+	};
 
-            /** Open child after selection */
-            this.slcVwmChild.subscribe(function (tmpSlcVwmChild) {
-                if (tmpSlcVwmChild) {
-                    if (typeof (tmpSlcVwmChild.isOpenedItem) !== 'undefined') {
-                        tmpSlcVwmChild.isOpenedItem(true);
-                    }
-                }
-            });
-
-            /**
-            * Remove child stage with view model
-            */
-            this.removeVwmChild = function (vwmChildToRemove) {
-                // Name - can be uppercase or lowercase
-                var tmpName = vwmChildToRemove.mdlStage.name ? ko.unwrap(vwmChildToRemove.mdlStage.name) : ko.unwrap(vwmChildToRemove.mdlStage.Name);
-
-                if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + tmpName + '"?')) {
-                    ths.mdlStage.removeChild(vwmChildToRemove.mdlStage);
-                }
-            };
-        };
-
-        return exports;
-    });
+	return exports;
+});

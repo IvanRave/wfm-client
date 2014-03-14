@@ -1,52 +1,78 @@
 ﻿/** @module */
 define(['knockout',
-    'viewmodels/employee',
-    'base-viewmodels/stage-child-base'],
-    function (ko,
-        VwmEmployee,
-        VwmStageChildBase) {
-        'use strict';
+		'viewmodels/employee',
+    'helpers/app-helper',
+		'base-viewmodels/stage-base',
+		'base-viewmodels/stage-child-base'],
+	function (ko,
+		VwmEmployee,
+    appHelper,
+		VwmStageBase,
+		VwmStageChildBase) {
+	'use strict';
 
-        /**
-        * User profile (can be as a guest - without logon)
-        * @constructor
-        * @param {object} defaultSlcData - Ids of models, which need to select automatically
-        */
-        var exports = function (mdlUserProfile, defaultSlcData) {
-            /** Alternative for this */
-            var ths = this;
+	/**
+	 * User profile (can be as a guest - without logon)
+	 * @constructor
+	 * @param {object} defaultSlcData - Ids of models, which need to select automatically
+	 */
+	var exports = function (mdlUserProfile, defaultSlcData) {
 
-            // 1. Create model
-            // 2.1 Create viewmodel, using model
-            // 2.2 Start to load data to model (all employees)
+		/**
+		 * Default data to select
+		 * @type {Object}
+		 * @private
+		 */
+		this.defaultSlcData_ = defaultSlcData;
 
-            /**
-            * Link to user profile data model
-            * @type {module:models/user-profile}
-            */
-            this.mdlStage = mdlUserProfile;
+		/**
+		 * No parent in userprofile: need only for StageBase behavior
+		 */
+		this.getParentVwm = function () {
+			return null;
+		};
 
-            /**
-            * User profile may contain few employee (with companies)
-            * @type {Array.<module:viewmodels/employee>}
-            */
-            this.listOfVwmChild = ko.computed({
-                read: function () {
-                    var listOfMdlEmployee = ko.unwrap(ths.mdlStage.employees);
-                    return listOfMdlEmployee.map(function (elem) {
-                        return new VwmEmployee(elem, ths.unqOfSlcVwmChild, defaultSlcData);
-                    });
-                },
-                deferEvaluation: true
-            });
+		// 1. Create model
+		// 2.1 Create viewmodel, using model
+		// 2.2 Start to load data to model (all employees)
 
-            /** Has few children to select */
-            VwmStageChildBase.call(this, defaultSlcData.companyId);
+		/**
+		 * Link to user profile data model
+		 * @type {module:models/user-profile}
+		 */
+		this.mdlStage = mdlUserProfile;
 
-            // Other stagebase view
-            // Has no sections and widgets - StageChildBase
-            // Has no parent with few user profiles - StageParentBase
-        };
+		/**
+		 * Unique value of this viewmodel (user profile's guid)
+		 * @type {string}
+		 */
+		this.unq = this.mdlStage.id;
+      
+		// 1. null - No default data to selection  (only one per website)
+    // 2. If no other userprofiles then this upro is selected always
+		VwmStageBase.call(this, null, ko.observable(this.unq));
 
-        return exports;
-    });
+		/** Has few children to select */
+		VwmStageChildBase.call(this, this.defaultSlcData_.companyId);
+
+		// Other stagebase view
+		// Has no sections and widgets - StageChildBase
+		// Has no parent with few user profiles - StageParentBase
+
+		/** Start to load inner data after creation user */
+		this.mdlStage.loadEmployees();
+	};
+
+  /** Inherit from a stage base viewmodel */
+	appHelper.inherits(exports, VwmStageBase);
+  
+	/** Build a list of children */
+	exports.prototype.buildListOfVwmChild = function () {
+		var listOfMdlEmployee = ko.unwrap(this.mdlStage.employees);
+		return listOfMdlEmployee.map(function (elem) {
+			return new VwmEmployee(elem, this, this.defaultSlcData_);
+		}, this);
+	};
+
+	return exports;
+});

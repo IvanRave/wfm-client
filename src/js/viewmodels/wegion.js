@@ -44,32 +44,12 @@ define(['jquery',
 		/** Link to file manager of company */
 		this.fmgr = parentVwmCompany.fmgr;
 
-		/**
-		 * List of views of well fields
-		 * @type {Array.<module:viewmodels/wield>}
-		 */
-		this.listOfVwmChild = ko.computed({
-				read : this.buildListOfVwmChild,
-				deferEvaluation : true,
-				owner : this
-			});
-
 		VwmStageChildBase.call(this, defaultSlcData.wieldId);
 		VwmStageBase.call(this, defaultSlcData.wegionSectionId, parentVwmCompany.unqOfSlcVwmChild);
 	};
 
 	/** Inherit from a stage base viewmodel */
 	appHelper.inherits(exports, VwmStageBase);
-
-	/**
-	 * Select all ancestor's view models
-	 */
-	exports.prototype.selectAncestorVwms = function () {
-		// 1. take parent view - company
-		// 2. take parent view of employee - userprofile
-		this.getParentVwm().unqOfSlcVwmChild(this.unq);
-		this.getParentVwm().selectAncestorVwms();
-	};
 
 	/** Add new well field model and viewmodel */
 	exports.prototype.addVwmWield = function () {

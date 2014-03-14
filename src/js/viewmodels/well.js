@@ -868,14 +868,6 @@ define([
 
 		return needRec;
 	};
-  
-	/**
-	 * Select all ancestor's view models
-	 */
-	exports.prototype.selectAncestorVwms = function () {
-		this.getParentVwm().unqOfSlcVwmChild(this.unq);
-		this.getParentVwm().selectAncestorVwms();
-	};
 
 	return exports;
 });

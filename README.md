@@ -48,14 +48,18 @@ contains words (with translation) for all WFM services
 
 ### Stages
 
-Each stage contains properties, like name, description, logo
+* Workspace - UserProfile (upro)
+* Employee - Company (company)
+* Well region (wegion)
+* Well field (wield)
+* Well group (wroup)
+* Well (well)
 
-### Models and viewmodels
-* Every data model can be represented as a different view
-Workspace model - Workspace viewmodel (contain one userprofile)
-UserProfile model - UserProfile viewmodel (contains few employees)
-Employee model - Employee viewmodel (contain one company)
-Company -> Wegion -> Wield -> Wroup -> Well
+#### A stage may contain
+* Properties, like name, description, logo
+* Widget layouts with widgets
+* Sections (view sections and file sections)
+* Child stages (for a bottom stage (the Well) - child stages are empty)
 
 ### Sections
 

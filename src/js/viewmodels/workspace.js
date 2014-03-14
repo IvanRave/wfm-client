@@ -1,254 +1,268 @@
 ﻿/** @module */
 define([
-    'jquery',
-    'knockout',
-    'helpers/history-helper',
-    'helpers/lang-helper',
-    'viewmodels/user-profile'], function ($, ko, historyHelper, langHelper, VwmUserProfile) {
-        'use strict';
+		'jquery',
+		'knockout',
+		'helpers/history-helper',
+		'helpers/lang-helper',
+		'viewmodels/user-profile'], function ($, ko, historyHelper, langHelper, VwmUserProfile) {
+	'use strict';
 
-        /**
-        * Demo auth data
-        * @type {object}
-        */
-        var demoAuth = {
-          'email': 'wfm@example.com',
-          'password': '123321'
-        };
-        
-        /**
-        * Workspace view model: root for knockout
-        * @constructor
-        */
-        var exports = function (mdlWorkspace) {
-            /** Alternative for this */
-            var ths = this;
+	/**
+	 * Demo auth data
+	 * @type {object}
+	 */
+	var demoAuth = {
+		'email' : 'wfm@example.com',
+		'password' : '123321'
+	};
 
-            /** Data model for this view */
-            this.mdlWorkspace = mdlWorkspace;
+	/**
+	 * Workspace view model: root for knockout
+	 * @constructor
+	 */
+	var exports = function (mdlWorkspace) {
+		/** Alternative for this */
+		var ths = this;
 
-            /** 
-            * Whether left tree menu with well regions, groups, fields, wells is visible
-            * @type {boolean}
-            */
-            this.isVisibleMenu = ko.observable(true);
+		/** Data model for this view */
+		this.mdlWorkspace = mdlWorkspace;
 
-            // Left tree menu with well regions, groups, fields, wells
-            this.toggleIsVisibleMenu = function () {
-                ths.isVisibleMenu(!ko.unwrap(ths.isVisibleMenu));
-            };
+		/**
+		 * Whether left tree menu with well regions, groups, fields, wells is visible
+		 * @type {boolean}
+		 */
+		this.isVisibleMenu = ko.observable(true);
 
-            this.sidebarWrapCss = ko.computed({
-                read: function () {
-                    return ko.unwrap(ths.isVisibleMenu) ? 'sidebar-wrap-visible' : 'hidden';
-                },
-                deferEvaluation: true
-            });
+		// Left tree menu with well regions, groups, fields, wells
+		this.toggleIsVisibleMenu = function () {
+			ths.isVisibleMenu(!ko.unwrap(ths.isVisibleMenu));
+		};
 
-            this.workAreaCss = ko.computed({
-                read: function () {
-                    return ko.unwrap(ths.isVisibleMenu) ? 'work-area' : '';
-                },
-                deferEvaluation: true
-            });
+		this.sidebarWrapCss = ko.computed({
+				read : function () {
+					return ko.unwrap(ths.isVisibleMenu) ? 'sidebar-wrap-visible' : 'hidden';
+				},
+				deferEvaluation : true
+			});
 
-            this.sidebarToggleCss = ko.computed({
-                read: function () {
-                    return ko.unwrap(ths.isVisibleMenu) ? 'sidebar-toggle-visible' : 'sidebar-toggle-hidden';
-                },
-                deferEvaluation: true
-            });
+		this.workAreaCss = ko.computed({
+				read : function () {
+					return ko.unwrap(ths.isVisibleMenu) ? 'work-area' : '';
+				},
+				deferEvaluation : true
+			});
 
-            /**
-            * Whether current employee in edit mode: fast access for view
-            * @type {boolean}
-            */
-            this.isEmployeeInEditMode = ko.computed({
-                // TODO: change to isVwmEmployeeInEdit mode
-                read: function () {
-                    var tmpVwmUserProfile = ko.unwrap(ths.vwmUserProfile);
-                    if (tmpVwmUserProfile) {
-                        var tmpEmployee = ko.unwrap(tmpVwmUserProfile.slcVwmChild);
-                        if (tmpEmployee) {
-                            return ko.unwrap(tmpEmployee.isEditMode);
-                        }
-                    }
-                },
-                deferEvaluation: true
-            });
+		this.sidebarToggleCss = ko.computed({
+				read : function () {
+					return ko.unwrap(ths.isVisibleMenu) ? 'sidebar-toggle-visible' : 'sidebar-toggle-hidden';
+				},
+				deferEvaluation : true
+			});
 
-            /** Data from url to select need stages and sections: initialUrlData */
-            var defaultSlcData = historyHelper.getInitialData(document.location.hash.substring(1));
+		/**
+		 * Whether current employee in edit mode: fast access for view
+		 * @type {boolean}
+		 */
+		this.isEmployeeInEditMode = ko.computed({
+				// TODO: change to isVwmEmployeeInEdit mode
+				read : function () {
+					var tmpVwmUserProfile = ko.unwrap(ths.vwmUserProfile);
+					if (tmpVwmUserProfile) {
+						var tmpEmployee = ko.unwrap(tmpVwmUserProfile.slcVwmChild);
+						if (tmpEmployee) {
+							return ko.unwrap(tmpEmployee.isEditMode);
+						}
+					}
+				},
+				deferEvaluation : true
+			});
 
-            /**
-            * User profile view model
-            * @type {module:viewmodels/user-profile}
-            */
-            this.vwmUserProfile = ko.computed({
-                read: function () {
-                    var tmpMdlUserProfile = ko.unwrap(ths.mdlWorkspace.userProfile);
-                    if (tmpMdlUserProfile) {
-                        return new VwmUserProfile(tmpMdlUserProfile, defaultSlcData);
-                    }
-                },
-                deferEvaluation: true
-            });
+		/**
+    * Data from url to select need stages and sections: initialUrlData
+    * @private
+    */
+		this.defaultSlcData_ = historyHelper.getInitialData(document.location.hash.substring(1));
 
-            /**
-            * Whether user is registered: define page: logon or register
-            * @type {boolean}
-            */
-            this.isRegisteredPage = ko.observable(true);
+		/**
+		 * User profile view model
+		 * @type {module:viewmodels/user-profile}
+		 */
+		this.vwmUserProfile = ko.computed({
+				read : this.buildVwmUserProfile,
+				deferEvaluation : true,
+				owner : this
+			});
 
-            /** Toggle registered state: login or register page */
-            this.toggleIsRegisteredPage = function () {
-                ths.isRegisteredPage(!ko.unwrap(ths.isRegisteredPage));
-            };
+		/**
+		 * Whether user is registered: define page: logon or register
+		 * @type {boolean}
+		 */
+		this.isRegisteredPage = ko.observable(true);
 
-            /** Demo logon */
-            this.demoLogOn = function () {
-                mdlWorkspace.sendLogOn(demoAuth);
-            };
+		/** Toggle registered state: login or register page */
+		this.toggleIsRegisteredPage = function () {
+			ths.isRegisteredPage(!ko.unwrap(ths.isRegisteredPage));
+		};
 
-            /**
-            * Whether the user in the demo mode
-            * @type {boolean}
-            */
-            this.isUserInDemoMode = ko.computed({
-              read: function(){
-                  var tmpUserProfile = ko.unwrap(mdlWorkspace.userProfile);
-                  
-                  if (!tmpUserProfile){ return false;}
-                  console.log('user profile', ko.unwrap(tmpUserProfile.email));
-                  console.log('user profile', demoAuth.email);
-                  return (ko.unwrap(tmpUserProfile.email) === demoAuth.email);
-              },
-              deferEvaluation: true
-            });
-            
-            this.objToRealLogOn = {
-                email: ko.observable(''),
-                /**
-                * User pwd: need for logon or register or change password features
-                * @type {string}
-                */
-                password: ko.observable(''),
-                /**
-                * Whether browser is remember this user
-                * @type {boolean}
-                */
-                rememberMe: ko.observable(false)
-            };
+		/** Demo logon */
+		this.demoLogOn = function () {
+			mdlWorkspace.sendLogOn(demoAuth);
+		};
 
-            this.errToRealLogOn = ko.observable('');
+		/**
+		 * Whether the user in the demo mode
+		 * @type {boolean}
+		 */
+		this.isUserInDemoMode = ko.computed({
+				read : function () {
+					var tmpUserProfile = ko.unwrap(mdlWorkspace.userProfile);
 
-            this.realLogOn = function () {
-                ths.errToRealLogOn('');
-                // get obj from fields check obj
-                // Convert to object without observables
-                var tmpObj = ko.toJS(ths.objToRealLogOn);
-                mdlWorkspace.sendLogOn(tmpObj, function () {
-                    // Clear added object: if user logoff then need empty fields to logon again (for different user)
-                    ths.objToRealLogOn.email('');
-                    ths.objToRealLogOn.password('');
-                    ths.objToRealLogOn.rememberMe(false);
-                    ths.errToRealLogOn('');
-                }, function (jqXhr) {
-                    if (jqXhr.status === 422) {
-                        var resJson = jqXhr.responseJSON;
-                        ths.errToRealLogOn(langHelper.translate(resJson.errId) || '{{lang.unknownError}}');
-                    }
-                });
-            };
+					if (!tmpUserProfile) {
+						return false;
+					}
+					console.log('user profile', ko.unwrap(tmpUserProfile.email));
+					console.log('user profile', demoAuth.email);
+					return (ko.unwrap(tmpUserProfile.email) === demoAuth.email);
+				},
+				deferEvaluation : true
+			});
 
-            this.objToRegister = {
-                email: ko.observable(''),
-                /**
-                * User password: need for logon or register or change password features
-                * @type {string}
-                */
-                password: ko.observable(''),
-                /**
-                * User password confirmation: need for register purpose
-                * @type {string}
-                */
-                passwordConfirmation: ko.observable('')
-            };
+		this.objToRealLogOn = {
+			email : ko.observable(''),
+			/**
+			 * User pwd: need for logon or register or change password features
+			 * @type {string}
+			 */
+			password : ko.observable(''),
+			/**
+			 * Whether browser is remember this user
+			 * @type {boolean}
+			 */
+			rememberMe : ko.observable(false)
+		};
 
-            /** Messages for registration: error and success */
-            this.msgToRegister = {
-                err: ko.observable(''),
-                scs: ko.observable('')
-            };
+		this.errToRealLogOn = ko.observable('');
 
-            this.register = function () {
-                // Clean msges
-                ths.msgToRegister.err('');
-                ths.msgToRegister.scs('');
+		this.realLogOn = function () {
+			ths.errToRealLogOn('');
+			// get obj from fields check obj
+			// Convert to object without observables
+			var tmpObj = ko.toJS(ths.objToRealLogOn);
+			mdlWorkspace.sendLogOn(tmpObj, function () {
+				// Clear added object: if user logoff then need empty fields to logon again (for different user)
+				ths.objToRealLogOn.email('');
+				ths.objToRealLogOn.password('');
+				ths.objToRealLogOn.rememberMe(false);
+				ths.errToRealLogOn('');
+			}, function (jqXhr) {
+				if (jqXhr.status === 422) {
+					var resJson = jqXhr.responseJSON;
+					ths.errToRealLogOn(langHelper.translate(resJson.errId) || '{{lang.unknownError}}');
+				}
+			});
+		};
 
-                var tmpObjToRegister = ko.toJS(ths.objToRegister);
-                mdlWorkspace.sendRegister(tmpObjToRegister, function () {
-                    ths.msgToRegister.scs('{{capitalizeFirst lang.checkToConfirmationToken}}');
-                }, function (jqXHR) {
-                    if (jqXHR.status === 422) {
-                        var resJson = jqXHR.responseJSON;
-                        var tmpProcessError = (langHelper.translate(resJson.errId) || '{{lang.unknownError}}');
-                        ths.msgToRegister.err(tmpProcessError);
-                    }
-                });
-            };
+		this.objToRegister = {
+			email : ko.observable(''),
+			/**
+			 * User password: need for logon or register or change password features
+			 * @type {string}
+			 */
+			password : ko.observable(''),
+			/**
+			 * User password confirmation: need for register purpose
+			 * @type {string}
+			 */
+			passwordConfirmation : ko.observable('')
+		};
 
-            this.msgToConfirmRegistration = {
-                err: ko.observable(''),
-                scs: ko.observable('')
-            };
+		/** Messages for registration: error and success */
+		this.msgToRegister = {
+			err : ko.observable(''),
+			scs : ko.observable('')
+		};
 
-            this.objToConfirmRegistration = {
-                email: ko.observable(''),
-                /**
-                * Random token to confirm registration: sended to registered user through email
-                * @type {string}
-                */
-                token: ko.observable('')
-            };
+		this.register = function () {
+			// Clean msges
+			ths.msgToRegister.err('');
+			ths.msgToRegister.scs('');
 
-            /** Confirm registration */
-            this.confirmRegistration = function () {
-                ths.msgToConfirmRegistration.err('');
-                ths.msgToConfirmRegistration.scs('');
+			var tmpObjToRegister = ko.toJS(ths.objToRegister);
+			mdlWorkspace.sendRegister(tmpObjToRegister, function () {
+				ths.msgToRegister.scs('{{capitalizeFirst lang.checkToConfirmationToken}}');
+			}, function (jqXHR) {
+				if (jqXHR.status === 422) {
+					var resJson = jqXHR.responseJSON;
+					var tmpProcessError = (langHelper.translate(resJson.errId) || '{{lang.unknownError}}');
+					ths.msgToRegister.err(tmpProcessError);
+				}
+			});
+		};
 
-                var tmpObjToConfirmRegistration = ko.toJS(ths.objToConfirmRegistration);
+		this.msgToConfirmRegistration = {
+			err : ko.observable(''),
+			scs : ko.observable('')
+		};
 
-                // TODO: check obj, using format
+		this.objToConfirmRegistration = {
+			email : ko.observable(''),
+			/**
+			 * Random token to confirm registration: sended to registered user through email
+			 * @type {string}
+			 */
+			token : ko.observable('')
+		};
 
-                mdlWorkspace.sendConfirmRegistration(tmpObjToConfirmRegistration, function () {
-                    ths.msgToConfirmRegistration.scs('{{capitalizeFirst lang.confirmRegistrationSuccessful}}');
-                }, function (jqXhr) {
-                    if (jqXhr.status === 422) {
-                        var resJson = jqXhr.responseJSON;
-                        var tmpProcessError = (langHelper.translate(resJson.errId) || '{{lang.unknownError}}');
-                        ths.msgToConfirmRegistration.err(tmpProcessError);
-                    }
-                });
-            };
-            
-            /** After initialization: try to load user */
-            this.mdlWorkspace.tryToLoadUserProfile();
+		/** Confirm registration */
+		this.confirmRegistration = function () {
+			ths.msgToConfirmRegistration.err('');
+			ths.msgToConfirmRegistration.scs('');
 
-            /** Back, forward, re   fresh browser navigation */
-            // TODO: back
-            ////window.onpopstate = function () {
-            ////    var stateData = historyHelper.getInitialData(document.location.hash.substring(1));
-            ////    // When load any info - do not push info to history again
-            ////    stateData.isHistory = true;
-            ////    // Reload all data
-            ////    ths.initialUrlData(stateData);
+			var tmpObjToConfirmRegistration = ko.toJS(ths.objToConfirmRegistration);
 
-            ////    console.log('location: ' + document.location.hash + ', state: ' + JSON.stringify(stateData));
+			// TODO: check obj, using format
 
-            ////    ths.userProfile.loadUserProfile();
-            ////};
-        };
+			mdlWorkspace.sendConfirmRegistration(tmpObjToConfirmRegistration, function () {
+				ths.msgToConfirmRegistration.scs('{{capitalizeFirst lang.confirmRegistrationSuccessful}}');
+			}, function (jqXhr) {
+				if (jqXhr.status === 422) {
+					var resJson = jqXhr.responseJSON;
+					var tmpProcessError = (langHelper.translate(resJson.errId) || '{{lang.unknownError}}');
+					ths.msgToConfirmRegistration.err(tmpProcessError);
+				}
+			});
+		};
 
-        return exports;
-    });
+		/** After initialization: try to load user */
+		this.mdlWorkspace.tryToLoadUserProfile();
+
+		/** Back, forward, re   fresh browser navigation */
+		// TODO: back
+		////window.onpopstate = function () {
+		////    var stateData = historyHelper.getInitialData(document.location.hash.substring(1));
+		////    // When load any info - do not push info to history again
+		////    stateData.isHistory = true;
+		////    // Reload all data
+		////    ths.initialUrlData(stateData);
+
+		////    console.log('location: ' + document.location.hash + ', state: ' + JSON.stringify(stateData));
+
+		////    ths.userProfile.loadUserProfile();
+		////};
+	};
+
+	/** Log off from a viewmodel */
+	exports.prototype.logOff = function () {
+		this.mdlWorkspace.logOff();
+	};
+
+  /** Build a viewmodel for user profile */
+	exports.prototype.buildVwmUserProfile = function () {
+		var tmpMdlUserProfile = ko.unwrap(this.mdlWorkspace.userProfile);
+		if (tmpMdlUserProfile) {
+			return new VwmUserProfile(tmpMdlUserProfile, this.defaultSlcData_);
+		}
+	};
+
+	return exports;
+});

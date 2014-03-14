@@ -1,11 +1,11 @@
 ﻿/** @module */
 define(['knockout',
-    'helpers/app-helper',
+		'helpers/app-helper',
 		'viewmodels/wegion',
 		'base-viewmodels/stage-base',
 		'base-viewmodels/stage-child-base'],
 	function (ko,
-    appHelper,
+		appHelper,
 		VwmWegion,
 		VwmStageBase,
 		VwmStageChildBase) {
@@ -14,12 +14,17 @@ define(['knockout',
 	/**
 	 * Company view model
 	 * @constructor
-   * @augments {module:base-viewmodels/stage-base}
+	 * @augments {module:base-viewmodels/stage-base}
 	 */
-	var exports = function (mdlCompany, koUnqOfSlcVwmStage, defaultSlcData) {
+	var exports = function (mdlCompany, vwmUproParent, defaultSlcData) {
 
 		/** Alternative of this */
 		var ths = this;
+
+		/** Getter for a parent viewmodel */
+		this.getParentVwm = function () {
+			return vwmUproParent;
+		};
 
 		/**
 		 * Company data model
@@ -27,7 +32,7 @@ define(['knockout',
 		 */
 		this.mdlStage = mdlCompany;
 
-		this.unq = mdlCompany.id;
+		this.unq = this.mdlStage.id;
 
 		/** File manager as modal window for this view: created from modalFileMgr */
 		this.fmgr = {
@@ -53,37 +58,30 @@ define(['knockout',
 		};
 
 		/**
-		 * List of view of well regions
-		 * @type {Array.<module:viewmodels/wegion>}
+		 * Default values for selection
+		 * @private
 		 */
-		this.listOfVwmChild = ko.computed({
-				read : function () {
-					var tmpListOfMdlWegion = ko.unwrap(ths.mdlStage.wegions);
-					return tmpListOfMdlWegion.map(function (elem) {
-						return new VwmWegion(elem, ths, defaultSlcData);
-					});
-				},
-				deferEvaluation : true
-			});
+		this.defaultSlcData_ = defaultSlcData;
 
 		/**
 		 * Base for all stages: with selected view of wegion
 		 */
-		VwmStageBase.call(this, defaultSlcData.companySectionId, koUnqOfSlcVwmStage);
+		VwmStageBase.call(this, defaultSlcData.companySectionId, vwmUproParent.unqOfSlcVwmChild);
 
 		/** Base for all stages with childs */
 		VwmStageChildBase.call(this, defaultSlcData.wegionId);
-
-		// Has no parent with few companies (no VwmParentStageBase)
-
-		this.selectAncestorVwms = function () {
-			////console.log('company select ancestor');
-			koUnqOfSlcVwmStage(ths.unq);
-		};
 	};
 
-  /** Inherit from a stage base viewmodel */
+	/** Inherit from a stage base viewmodel */
 	appHelper.inherits(exports, VwmStageBase);
-  
+
+	/** Build a list of children */
+	exports.prototype.buildListOfVwmChild = function () {
+		var tmpListOfMdlWegion = ko.unwrap(this.mdlStage.wegions);
+		return tmpListOfMdlWegion.map(function (elem) {
+			return new VwmWegion(elem, this, this.defaultSlcData_);
+		}, this);
+	};
+
 	return exports;
 });

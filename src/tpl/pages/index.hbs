@@ -20,7 +20,7 @@
                     <span class="min-left-margin link-view-inverse" data-bind="if: $root.isUserInDemoMode">demo cabinet</span>
                 </div>
                 <div class="pull-right">
-                    <button type="button" class="btn btn-xs btn-inverse" data-bind="click: $parent.mdlWorkspace.logOff">
+                    <button type="button" class="btn btn-xs btn-inverse" data-bind="click: $parent.logOff.bind($parent)">
                         <i class="glyphicon glyphicon-off"></i>
                         {{capitalizeFirst lang.logOut}}
                     </button>

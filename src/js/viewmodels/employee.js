@@ -10,9 +10,11 @@ define(['knockout',
         * @constructor
         * @param {string} koUnqOfSlcVwmStage - Id of Selected view of employee in user-profile
         */
-        var exports = function (mdlEmployee, koUnqOfSlcVwmStage, defaultSlcData) {
+        var exports = function (mdlEmployee, vwmUproParent, defaultSlcData) {
             var ths = this;
 
+            //koUnqOfSlcVwmStage
+            //unqOfSlcVwmChild
             /**
             * Data model for employee
             * @type {module:models/employee}
@@ -23,7 +25,7 @@ define(['knockout',
             * Main view model for company
             * @type {module:viewmodels/company}
             */
-            this.vwmCompany = new VwmCompany(ths.mdlEmployee.company, koUnqOfSlcVwmStage, defaultSlcData);
+            this.vwmCompany = new VwmCompany(ths.mdlEmployee.company, vwmUproParent, defaultSlcData);
 
             /** Unique id of view: id of employee = id of company */
             this.unq = ths.vwmCompany.unq;
