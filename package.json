@@ -33,6 +33,7 @@
     "grunt-jsdoc": "~0.5.1",
     "grunt-contrib-sass": "~0.7.2",
     "grunt-conventional-changelog": "~1.1.0",
-    "grunt-git-log": "git://github.com/IvanRave/grunt-git-log.git"
+    "grunt-git-log": "git://github.com/IvanRave/grunt-git-log.git",
+    "grunt-ftp-deploy": "~0.1.2"
   }
 }

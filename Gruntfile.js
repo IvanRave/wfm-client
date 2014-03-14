@@ -298,6 +298,17 @@ module.exports = function (grunt) {
             // pushTo: 'origin'
           }
         },
+        'ftp-deploy' : {
+          build : {
+            auth : {
+              host : 'waws-prod-am2-001.ftp.azurewebsites.windows.net',
+              port : 21,
+              authKey : 'key1'
+            },
+            src : 'dst',
+            dest : '/site/wwwroot/'
+          }
+        },
         // For development: run tasks when change files
         watch: {
             jshint_gruntfile: {
@@ -422,4 +433,5 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-notify');
     grunt.loadNpmTasks('grunt-contrib-sass');
     grunt.loadNpmTasks('grunt-git-log');
+    grunt.loadNpmTasks('grunt-ftp-deploy');
 };
