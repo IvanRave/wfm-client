@@ -131,15 +131,6 @@ define(['knockout',
 				owner : this
 			});
 
-		/** Whether a selected stage view is a dashboard */
-		this.isSlcStageViewSection = ko.computed({
-				read : function () {
-					return ko.unwrap(this.slcStageView) === stageViewConstants.section.id;
-				},
-				deferEvaluation : true,
-				owner : this
-			});
-
 		/**
 		 * Pattern of a selected section
 		 * @type {string}
@@ -322,6 +313,13 @@ define(['knockout',
 		this.unzOfSlcVwmSectionWrk(null);
 		// Select a stage view
 		this.slcStageView(stageViewConstants.dashboard.id);
+	};
+  
+  /** Choose dashboard (no section) */
+	exports.prototype.showStageViewFmgr = function () {
+		this.unzOfSlcVwmSectionWrk(null);
+		// Select a stage view
+		this.slcStageView(stageViewConstants.fmgr.id);
 	};
 
 	/** Calculate a selected viewmodel of a work section */

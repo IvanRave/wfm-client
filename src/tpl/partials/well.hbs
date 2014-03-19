@@ -1,52 +1,53 @@
-﻿<!-- current: vwmStage (Well) -->
-<div>
-  <div class="tab-content-pad">
-    <div data-bind="if: slcVwmSectionWrk() === null">
-      {{> widget-default-summary}}
-      {{> widget-well-sketch}}
-      {{> widget-well-history}}
-      {{> widget-well-perfomance}}
-      {{> widget-well-monitoring}}
-      {{> widget-well-map}}
-      {{> widget-scope}}
-    </div>
-    <div data-bind="if: slcVwmSectionWrk">
-      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'well-history'">
-        {{> well-history}}
-      </div>
-      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'well-integrity'">
-        {{> well-integrity}}
-      </div>
-      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'well-log'">
-        {{> well-log}}
-      </div>
-      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'well-map'">
-        {{> well-map}}
-      </div>
-      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'well-nodalanalysis'">
-        {{> well-nodalanalysis}}
-      </div>
-      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'well-perfomance'">
-        {{> well-pd}}
-      </div>
-      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'well-report'">
-        {{> well-report}}
-      </div>
-      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'well-monitoring'">
-        {{> well-monitoring}}
-      </div>
-      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'well-sketch'">
-        {{> well-sketch}}
-      </div>
-      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'well-summary'">
-        {{> summary-standard }}
-      </div>
-      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'well-test'">
-        {{> well-test}}
-      </div>
-      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'well-volume'">
-        {{> well-volume}}
-      </div>
-    </div>
+﻿<!-- current: vwmWell -->
+<div data-bind="if: isNullSlcVwmSectionWrk">
+  <div data-bind="if: isSlcStageViewDashboard">
+    {{> widget-default-summary}}
+    {{> widget-well-sketch}}
+    {{> widget-well-history}}
+    {{> widget-well-perfomance}}
+    {{> widget-well-monitoring}}
+    {{> widget-well-map}}
+    {{> widget-scope}}
+  </div>
+  <div data-bind="if: isSlcStageViewFmgr">
+    {{> fmgr-full }}
+  </div>
+</div>
+<div data-bind="if: slcVwmSectionWrk">
+  <div data-bind="if: patternOfSlcVwmSectionWrk() === 'well-history'">
+    {{> well-history}}
+  </div>
+  <div data-bind="if: patternOfSlcVwmSectionWrk() === 'well-integrity'">
+    {{> well-integrity}}
+  </div>
+  <div data-bind="if: patternOfSlcVwmSectionWrk() === 'well-log'">
+    {{> well-log}}
+  </div>
+  <div data-bind="if: patternOfSlcVwmSectionWrk() === 'well-map'">
+    {{> well-map}}
+  </div>
+  <div data-bind="if: patternOfSlcVwmSectionWrk() === 'well-nodalanalysis'">
+    {{> well-nodalanalysis}}
+  </div>
+  <div data-bind="if: patternOfSlcVwmSectionWrk() === 'well-perfomance'">
+    {{> well-pd}}
+  </div>
+  <div data-bind="if: patternOfSlcVwmSectionWrk() === 'well-report'">
+    {{> well-report}}
+  </div>
+  <div data-bind="if: patternOfSlcVwmSectionWrk() === 'well-monitoring'">
+    {{> well-monitoring}}
+  </div>
+  <div data-bind="if: patternOfSlcVwmSectionWrk() === 'well-sketch'">
+    {{> well-sketch}}
+  </div>
+  <div data-bind="if: patternOfSlcVwmSectionWrk() === 'well-summary'">
+    {{> summary-standard }}
+  </div>
+  <div data-bind="if: patternOfSlcVwmSectionWrk() === 'well-test'">
+    {{> well-test}}
+  </div>
+  <div data-bind="if: patternOfSlcVwmSectionWrk() === 'well-volume'">
+    {{> well-volume}}
   </div>
 </div>

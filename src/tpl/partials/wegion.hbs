@@ -1,12 +1,15 @@
-﻿<div class="tab-content-pad">
-  <div data-bind="if: slcVwmSectionWrk() === null">
-    <!-- with wegion view model -->
+﻿<!-- current: vwmWegion -->
+<div data-bind="if: isNullSlcVwmSectionWrk">
+  <div data-bind="if: isSlcStageViewDashboard">
     {{> widget-default-summary }}
     {{> widget-scope}}
   </div>
-  <div data-bind="if: slcVwmSectionWrk">
-    <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'wegion-summary'">
-      {{> summary-standard }}
-    </div>
+  <div data-bind="if: isSlcStageViewFmgr">
+    {{> fmgr-full }}
+  </div>
+</div>
+<div data-bind="if: slcVwmSectionWrk">
+  <div data-bind="if: patternOfSlcVwmSectionWrk() === 'wegion-summary'">
+    {{> summary-standard }}
   </div>
 </div>

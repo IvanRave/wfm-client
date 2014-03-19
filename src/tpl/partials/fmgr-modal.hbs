@@ -2,7 +2,7 @@
 <div class="modal fade" role="dialog" tabindex="-1" aria-hidden="true" data-bind="modalWindow: {isOpenFileMgr: fmgrModal.isShowed, fileMgrHiddenCallback: fmgrModal.hide.bind(fmgrModal)}">
   <div class="modal-dialog modal-fullscreen">
     <div class="modal-content full-min-height">
-      <div class="modal-header clearfix" data-bind="visible: fmgrModal.okCallback">
+      <div class="modal-header clearfix">
         <h4 class="modal-title pull-left" data-bind="text: fmgrModal.okDescription"></h4>
         <div class="pull-right min-right-margin">
           <span class="min-right-margin" style="color:red" data-bind="text: fmgrModal.okError"></span>
@@ -10,7 +10,7 @@
           <button class="btn btn-primary btn-sm" type="button" data-bind="click: fmgrModal.hide.bind(fmgrModal)">Cancel</button>
         </div>
       </div>
-      {{> modal-file-mgr-panel }}
+      {{> fmgr-file-list }}
     </div>
   </div>
 </div>

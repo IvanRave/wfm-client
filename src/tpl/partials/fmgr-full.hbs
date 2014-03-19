@@ -1,0 +1,19 @@
+﻿<!-- current: vwmStage (vwmUpro ... vwmWell) -->
+<div class="modal-header clearfix">
+  <div class="clearfix">
+    <div class="pull-left">
+      <div class="btn-group" data-bind="foreach: listOfVwmSection">
+        <!-- ko if: mdlSection.sectionPattern -->
+        <!-- ko if: mdlSection.sectionPattern().isFolder -->
+        <button class="btn btn-sm btn-default" data-bind="css: {'active': isSlcVwmSectionFmg }, click: $parent.selectVwmSectionFmg.bind($parent)">
+          <span data-bind="with: mdlSection.sectionPattern">
+            <span data-bind="text: name"></span>
+          </span>
+        </button>
+        <!-- /ko -->
+        <!-- /ko -->
+      </div>
+    </div>
+  </div>
+</div>
+{{> fmgr-file-list }}

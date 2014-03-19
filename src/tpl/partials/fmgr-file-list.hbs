@@ -1,4 +1,60 @@
 ﻿<!-- current: vwmStage (vwmUpro ... vwmWell) -->
-<div>
-  A file list, buttons: add a file, remove a file, download...
+<div class="modal-body">
+  <!-- ko with: slcVwmSectionFmg -->
+  <!-- ko if: mdlSection.sectionPattern -->
+  <div data-bind="with: mdlSection">
+    <span class="btn btn-sm btn-inverse fileinput-button">
+      <i class="glyphicon glyphicon-plus"></i>
+      <span>Add file...</span>
+      <input data-bind="filoader: getSectionFiloader()" type="file"></input>
+    </span>
+    <button class="btn btn-sm btn-inverse" data-bind="click: deleteSelectedFileSpecs, enable: isSelectedAnyFile">
+      <i class="glyphicon glyphicon-remove"></i> {{capitalizeFirst lang.toDelete}}
+    </button>
+  </div>
+  <div class="text-center" data-bind="hidden: mdlSection.readyListOfFileSpec.hasItems">
+    <span>No files</span>
+  </div>
+  <div class="clearfix" data-bind="visible: mdlSection.readyListOfFileSpec.hasItems">
+    <div class="col-sm-8">
+      <span class="bld" title="File name">Name</span>
+    </div>
+    <div class="col-sm-1 hidden-xs">
+      <span class="bld" title="Extension">Ext</span>
+    </div>
+    <div class="col-sm-2 hidden-xs">
+      <span class="bld" title="Created date and time">Created</span>
+    </div>
+    <div class="col-sm-1 hidden-xs">
+      <span class="bld" title="Size, kilobytes">kB</span>
+    </div>
+  </div>
+  <div data-bind="foreach: mdlSection.readyListOfFileSpec">
+    <div class="clearfix">
+      <div class="col-sm-8">
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" data-bind="checked: isSelected"></input>
+            <span>
+              <span class="break-word" data-bind="text: name, attr: {title: fullTitle }"></span>
+            </span>
+          </label>
+        </div>
+      </div>
+      <div class="col-sm-1">
+        <span data-bind="text: extension"></span>
+      </div>
+      <div class="col-sm-2">
+        <span data-bind="unixTime: createdUnixTime"></span>
+      </div>
+      <div class="col-sm-1">
+        <button class="btn btn-default btn-xs" data-bind="click: download">
+          <i class="glyphicon glyphicon-download-alt"></i>
+        </button>
+        <span data-bind="text: lengthInKb, attr:{title: length + ' bytes'}"></span>
+      </div>
+    </div>
+  </div>
+  <!-- /ko -->
+  <!-- /ko -->
 </div>

@@ -1,15 +1,18 @@
 ﻿<!-- current: vwmCompany -->
-<div class="tab-content-pad">
-  <div data-bind="if: slcVwmSectionWrk() === null">
+<div data-bind="if: isNullSlcVwmSectionWrk">
+  <div data-bind="if: isSlcStageViewDashboard">
     {{> widget-default-summary}}
     {{> widget-scope}}
   </div>
-  <div data-bind="if: slcVwmSectionWrk">
-    <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'company-summary'">
-      {{> summary-standard}}
-    </div>
-    <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'company-report'">
-      No reports
-    </div>
+  <div data-bind="if: isSlcStageViewFmgr">
+    {{> fmgr-full }}
+  </div>
+</div>
+<div data-bind="if: slcVwmSectionWrk">
+  <div data-bind="if: patternOfSlcVwmSectionWrk() === 'company-summary'">
+    {{> summary-standard}}
+  </div>
+  <div data-bind="if: patternOfSlcVwmSectionWrk() === 'company-report'">
+    No reports
   </div>
 </div>

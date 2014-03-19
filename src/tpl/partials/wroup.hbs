@@ -1,24 +1,24 @@
-﻿<div>
-  <!-- current: vwmStage (wroup) -->
-  <div class="tab-content-pad">
-    <div data-bind="if: slcVwmSectionWrk() === null">
-      <!-- with wroup model -->
-      {{> widget-default-summary }}
-      {{> widget-scope}}
-    </div>
-    <div data-bind="if: slcVwmSectionWrk">
-      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'wroup-summary'">
-        {{> summary-standard}}
-      </div>
-      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'wroup-potential'">
-        {{> wroup-potential}}
-      </div>
-      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'wroup-monitoring'">
-        {{> wroup-monitoring}}
-      </div>
-      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'wroup-unit'">
-        {{> wroup-unit}}
-      </div>
-    </div>
+﻿<!-- current: vwmWroup -->
+<div data-bind="if: isNullSlcVwmSectionWrk">
+  <div data-bind="if: isSlcStageViewDashboard">
+    {{> widget-default-summary }}
+    {{> widget-scope}}
+  </div>
+  <div data-bind="if: isSlcStageViewFmgr">
+    {{> fmgr-full }}
+  </div>
+</div>
+<div data-bind="if: slcVwmSectionWrk">
+  <div data-bind="if: patternOfSlcVwmSectionWrk() === 'wroup-summary'">
+    {{> summary-standard}}
+  </div>
+  <div data-bind="if: patternOfSlcVwmSectionWrk() === 'wroup-potential'">
+    {{> wroup-potential}}
+  </div>
+  <div data-bind="if: patternOfSlcVwmSectionWrk() === 'wroup-monitoring'">
+    {{> wroup-monitoring}}
+  </div>
+  <div data-bind="if: patternOfSlcVwmSectionWrk() === 'wroup-unit'">
+    {{> wroup-unit}}
   </div>
 </div>

@@ -17,12 +17,12 @@ define([], function () {
 		fmgr : {
 			id : 'fmgr',
 			name : 'File manager'
-		},
-    /** Any section view */
-		section : {
-			id : 'section',
-			name : 'Section'
 		}
+    // /** Any section view */
+		// section : {
+			// id : 'section',
+			// name : 'Section'
+		// }
 	};
 
 	return exports;

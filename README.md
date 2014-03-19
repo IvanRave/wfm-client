@@ -111,7 +111,7 @@ Allows to select a file for user's needs.
 Only one folder corresponding a selected section.
 No quickview (no download), because only one modal window can be runned.
 
-#### Well sections
+### Well sections
 
 * Summary (main well parameters)
 * Sketch and volumes
