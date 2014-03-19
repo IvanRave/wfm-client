@@ -1,5 +1,5 @@
 ﻿<!-- current: vwmStage (vwmCompany) -->
-<div class="modal fade" role="dialog" tabindex="-1" aria-hidden="true" data-bind="modalWindow: {isOpenFileMgr: fmgr.isOpen, fileMgrHiddenCallback: fmgr.hiddenCallback}">
+<div class="modal fade" role="dialog" tabindex="-1" aria-hidden="true" data-bind="modalWindow: {isOpenFileMgr: fmgr.isShowed, fileMgrHiddenCallback: fmgr.hide.bind(fmgr)}">
   <div class="modal-dialog modal-fullscreen">
     <div class="modal-content full-min-height">
       <div class="modal-header clearfix" data-bind="visible: fmgr.okCallback">
@@ -7,7 +7,7 @@
         <div class="pull-right min-right-margin">
           <span class="min-right-margin" style="color:red" data-bind="text: fmgr.okError"></span>
           <button class="btn btn-primary btn-sm" type="button" data-bind="click: fmgr.okCallback()">OK</button>
-          <button class="btn btn-primary btn-sm" type="button" data-bind="click: fmgr.hide">Cancel</button>
+          <button class="btn btn-primary btn-sm" type="button" data-bind="click: fmgr.hide.bind(fmgr)">Cancel</button>
         </div>
       </div>
       <!-- ko ifnot: slcVwmChild -->

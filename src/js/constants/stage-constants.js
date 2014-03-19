@@ -1,19 +1,51 @@
 ﻿/** @module */
 define([], function () {
-    'use strict';
+	'use strict';
 
-    /**
-    * Stage constants: id == key (to use without strings, only by keys, like: stageConstants[stageKey])
-    * @constructor
-    */
-    var exports = {
-        upro: { id: 'upro', single: 'user-profile', plural: 'user-profiles' },
-        company: { id: 'company', single: 'company', plural: 'companies' },
-        wegion: { id: 'wegion', single: 'well-region', plural: 'well-regions' },
-        wield: { id: 'wield', single: 'well-field', plural: 'well-fields' },
-        wroup: { id: 'wroup', single: 'well-group', plural: 'well-groups' },
-        well: { id: 'well', single: 'well', plural: 'wells' }
-    };
+	/**
+	 * Enum for stages 
+   *    id == key to use without strings, only by keys, like: stageConstants[stageKey]
+	 * @readonly
+	 * @enum {Object.<string, string>}
+	 */
+	var exports = {
+		/** User profile */
+		upro : {
+			id : 'upro',
+			single : 'user-profile',
+			plural : 'user-profiles'
+		},
+		/** Company */
+		company : {
+			id : 'company',
+			single : 'company',
+			plural : 'companies'
+		},
+		/** Well region */
+		wegion : {
+			id : 'wegion',
+			single : 'well-region',
+			plural : 'well-regions'
+		},
+		/** Well field */
+		wield : {
+			id : 'wield',
+			single : 'well-field',
+			plural : 'well-fields'
+		},
+		/** Well group (platform) */
+		wroup : {
+			id : 'wroup',
+			single : 'well-group',
+			plural : 'well-groups'
+		},
+		/** Well */
+		well : {
+			id : 'well',
+			single : 'well',
+			plural : 'wells'
+		}
+	};
 
-    return exports;
+	return exports;
 });

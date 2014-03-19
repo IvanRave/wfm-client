@@ -1,26 +1,31 @@
 ﻿<div>
   <!-- current: vwmStage (vwmWieldStage) -->
   <div class="tab-content-pad">
-    <div data-bind="if: slcVwmSectionWrk() === null">
-        {{> widget-default-summary }}
-        {{> widget-wield-map }}
+    <div data-bind="if: isNullSlcVwmSectionWrk">
+        <div data-bind="if: isSlcStageViewDashboard">
+          {{> widget-default-summary }}
+          {{> widget-wield-map }}
 
-        {{> widget-scope}}
+          {{> widget-scope}}
+        </div>
+        <div data-bind="if: isSlcStageViewFmgr">
+          {{> fmgr-view }}
+        </div>
     </div>
     <div data-bind="if: slcVwmSectionWrk">
-      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'wield-summary'">
+      <div data-bind="if: patternOfSlcVwmSectionWrk() === 'wield-summary'">
         {{> summary-standard }}
       </div>
-      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'wield-map'">
+      <div data-bind="if: patternOfSlcVwmSectionWrk() === 'wield-map'">
         {{> wield-map}}
       </div>
-      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'wield-pvt'">
+      <div data-bind="if: patternOfSlcVwmSectionWrk() === 'wield-pvt'">
         {{> wield-pvt}}
       </div>      
-      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'wield-reservoir'">
+      <div data-bind="if: patternOfSlcVwmSectionWrk() === 'wield-reservoir'">
         {{> wield-reservoir}}
       </div>
-      <div data-bind="if: slcVwmSectionWrk().mdlSection.sectionPatternId === 'wield-potential'">
+      <div data-bind="if: patternOfSlcVwmSectionWrk() === 'wield-potential'">
         {{> wield-potential}}
       </div>
     </div>

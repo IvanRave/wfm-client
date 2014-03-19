@@ -69,43 +69,44 @@
                                                 </div>
                                                 <div class="workspace-container" data-bind="css: $root.workAreaCss, with: vwmCompany">
                                                     <!-- current: vwmCompany-->
-                                                    <div class="wfm-top-tab-panel file-mgr-block">                                                      
-                                                      <button class="btn btn-inverse btn-sm" type="button" data-bind="click: fmgr.show">
-                                                          <i class="glyphicon glyphicon-folder-open"></i>&nbsp;&nbsp;<span>{{capitalizeFirst lang.fileManager}}</span>
-                                                      </button>
-                                                    </div>
+                                                    {{> fmgr-arousal }}
                                                     {{> modal-file-mgr }}
                                                     <div data-bind="ifnot: slcVwmChild">
                                                         <!-- if no selected wegion -->
                                                         {{> section-panel-standard }}
-                                                        {{> dashboard-block }}
+                                                        {{> dashboard-arousal }}
+                                                        {{> fmgr-modal }}
                                                         {{> company }}
                                                     </div>
                                                     <div data-bind="with: slcVwmChild">
                                                         <!-- current: vwmWegion -->
                                                         <div data-bind="ifnot: slcVwmChild">
                                                             {{> section-panel-standard }}
-                                                            {{> dashboard-block }}
+                                                            {{> dashboard-arousal }}
+                                                            {{> fmgr-modal }}
                                                             {{> wegion }}
                                                         </div>
                                                         <div data-bind="with: slcVwmChild">
                                                             <!-- current: vwmWield-->
                                                             <div data-bind="ifnot: slcVwmChild">
                                                                 {{> section-panel-standard }}
-                                                                {{> dashboard-block }}
+                                                                {{> dashboard-arousal }}
+                                                                {{> fmgr-modal }}
                                                                 {{> wield }}
                                                             </div>
                                                             <div data-bind="with: slcVwmChild">
                                                                 <!-- current: vwmWroup -->
                                                                 <div data-bind="ifnot: slcVwmChild">
                                                                     {{> section-panel-standard }}
-                                                                    {{> dashboard-block }}
+                                                                    {{> dashboard-arousal }}
+                                                                    {{> fmgr-modal }}
                                                                     {{> wroup }}
                                                                 </div>
                                                                 <div data-bind="with: slcVwmChild">
                                                                     <!-- current: vwmWell -->
                                                                     {{> section-panel-well }}
-                                                                    {{> dashboard-block }}
+                                                                    {{> dashboard-arousal }}
+                                                                    {{> fmgr-modal }}
                                                                     {{> well }}
                                                                 </div>
                                                             </div>

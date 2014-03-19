@@ -2,11 +2,16 @@
 define(['knockout',
 		'helpers/history-helper',
 		'viewmodels/section-of-stage',
-		'viewmodels/widgout'],
+		'viewmodels/widgout',
+    'constants/stage-view-constants',
+    'viewmodels/fmgr-modal'],
 	function (ko,
 		historyHelper,
 		VwmStageSection,
-		VwmWidgout) {
+		VwmWidgout,
+    stageViewConstants,
+    FmgrModal) {
+
 	'use strict';
 
 	/**
@@ -16,8 +21,9 @@ define(['knockout',
 	var exports = function (partOfUnzOfSlcVwmSectionWrk, koUnqOfSlcVwmStage, defaultUnqOfSlcVwmChild) {
 		/**
 		 * Unique value of selected stage in parent stage
+		 * @private
 		 */
-		this.koUnqOfSlcVwmStage_ = koUnqOfSlcVwmStage;
+		this.koUnqOfSlcVwmStage = koUnqOfSlcVwmStage;
 
 		/////** By default: view unique id = model.id */
 
@@ -90,11 +96,71 @@ define(['knockout',
 				owner : this
 			});
 
+		/**
+		 * Whether is no selected section
+		 * @type {boolean}
+		 */
+		this.isNullSlcVwmSectionWrk = ko.computed({
+				read : this.calcIsNullSlcVwmSectionWrk,
+				deferEvaluation : true,
+				owner : this
+			});
+
+		/**
+		 * Current stage view
+		 *    an id string from constants/stage-view-constants
+		 * @type {string}
+		 */
+		this.slcStageView = ko.observable();
+    
+    /** Whether a selected stage view is a dashboard */
+    this.isSlcStageViewDashboard = ko.computed({
+      read: function() {
+        return ko.unwrap(this.slcStageView) === stageViewConstants.dashboard.id;
+      },
+      deferEvaluation: true,
+      owner: this
+    });
+    
+    /** Whether a selected stage view is a dashboard */
+    this.isSlcStageViewFmgr = ko.computed({
+      read: function() {
+        return ko.unwrap(this.slcStageView) === stageViewConstants.fmgr.id;
+      },
+      deferEvaluation: true,
+      owner: this
+    });
+    
+    /** Whether a selected stage view is a dashboard */
+    this.isSlcStageViewSection = ko.computed({
+      read: function() {
+        return ko.unwrap(this.slcStageView) === stageViewConstants.section.id;
+      },
+      deferEvaluation: true,
+      owner: this
+    });
+
+		/**
+		 * Pattern of a selected section
+		 * @type {string}
+		 */
+		this.patternOfSlcVwmSectionWrk = ko.computed({
+				read : this.calcPatternOfSlcVwmSectionWrk,
+				deferEvaluation : true,
+				owner : this
+			});
+
 		/** When change selected section */
 		this.slcVwmSectionWrk.subscribe(this.handleVwmSectionWrk, this);
-
+    
 		/** Selected widget layouts: may be defined by default from client storage (cookies..) */
 		this.slcVwmWidgout = ko.observable();
+    
+    //{ #region FMGR
+    
+    this.fmgrModal = new FmgrModal();
+    
+    //} #endregion FMGR
 
 		//{ #region FORSTAGESWITHCHILDREN
 
@@ -153,9 +219,6 @@ define(['knockout',
 		}
 		////else {
 		////    // Select dashboard
-		////    this.unzOfSlcVwmSectionWrk(null);
-		////    ////this.unzOfSlcVwmSectionWrk(null);
-		////    ////this.unselectVwmSectionWrk();
 		////}
 	};
 
@@ -202,7 +265,7 @@ define(['knockout',
 		// Every stage has property fmgr, which is link to company fmgr
 		// Get file manager object from company view
 		// Show file manager
-		// Select file
+		// Select a file
 		// Send to need function
 
 		ths.unzOfSlcVwmSectionFmg(ths.mdlStage.stageKey + '-summary');
@@ -250,10 +313,13 @@ define(['knockout',
 		this.unzOfSlcVwmSectionWrk(vwmSectionToSelect.unz);
 	};
 
-	/** Choose dashboard (no section */
-	exports.prototype.unselectVwmSectionWrk = function () {
+	/** Choose dashboard (no section) */
+	exports.prototype.showStageViewDashboard = function () {
 		this.unzOfSlcVwmSectionWrk(null);
+    // Select a stage view
+		this.slcStageView(stageViewConstants.dashboard.id);
 	};
+ 
 
 	/** Calculate a selected viewmodel of a work section */
 	exports.prototype.calcSlcVwmSectionWrk = function () {
@@ -346,8 +412,8 @@ define(['knockout',
 	 * Remove child stage with view model (only for stages with children)
 	 */
 	exports.prototype.removeVwmChild = function (vwmChildToRemove) {
-    // In case upro (parent) - company (child)
-    var tmpMdlStage = vwmChildToRemove.mdlStage;
+		// In case upro (parent) - company (child)
+		var tmpMdlStage = vwmChildToRemove.mdlStage;
 		// Name - can be uppercase or lowercase
 		var tmpName = tmpMdlStage.name ? ko.unwrap(tmpMdlStage.name) : ko.unwrap(tmpMdlStage.Name);
 
@@ -394,7 +460,7 @@ define(['knockout',
 
 		// 3. Select section. If not a selected section - show dashboard
 		if (!ko.unwrap(vwmChildToActivate.unzOfSlcVwmSectionWrk)) {
-			vwmChildToActivate.unselectVwmSectionWrk();
+			vwmChildToActivate.showStageViewDashboard();
 		}
 
 		// 4. Select current child
@@ -426,7 +492,7 @@ define(['knockout',
 
 	/** Calculate whether this stage is selected */
 	exports.prototype.calcIsSlcVwmStage = function () {
-		return ko.unwrap(this.koUnqOfSlcVwmStage_) === ko.unwrap(this.unq);
+		return ko.unwrap(this.koUnqOfSlcVwmStage) === ko.unwrap(this.unq);
 	};
 
 	/** Calculate, whether this stage is active */
@@ -439,7 +505,7 @@ define(['knockout',
 			// Well stage is always selected (has no children)
 			if (!ko.unwrap(this.slcVwmChild)) {
 				console.log('stage is showed', this.mdlStage.stageKey);
-				// TODO: 3. And all parents are selected
+				// 3. And all parents are selected
 				if (this.calcIsSlcAncestorVwms()) {
 					return true;
 				}
@@ -459,5 +525,18 @@ define(['knockout',
 		return ko.unwrap(this.isOpenedItem) ? 'glyphicon-circle-arrow-down' : 'glyphicon-circle-arrow-right';
 	};
 
+	/** Calculate pattern id */
+	exports.prototype.calcPatternOfSlcVwmSectionWrk = function () {
+		var tmpSlcVwmSectionWrk = ko.unwrap(this.slcVwmSectionWrk);
+		if (tmpSlcVwmSectionWrk) {
+			return tmpSlcVwmSectionWrk.mdlSection.sectionPatternId;
+		}
+	};
+
+	/** Calculate whether is no selected section (is null) */
+	exports.prototype.calcIsNullSlcVwmSectionWrk = function () {
+		return ko.unwrap(this.slcVwmSectionWrk) === null;
+	};
+  
 	return exports;
 });

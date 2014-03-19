@@ -2,7 +2,7 @@
 <div class="modal-header clearfix" data-bind="hidden: fmgr.okCallback">
   <div class="clearfix">
     <div class="pull-right min-right-margin">
-      <button class="btn btn-primary btn-sm" type="button" data-bind="click: fmgr.hide">Close</button>
+      <button class="btn btn-primary btn-sm" type="button" data-bind="click: fmgr.hide.bind(fmgr)">Close</button>
     </div>
     <div class="pull-left">
       <div class="btn-group" data-bind="foreach: listOfVwmSection">

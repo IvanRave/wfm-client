@@ -2,11 +2,13 @@
 define(['knockout',
 		'helpers/app-helper',
 		'viewmodels/wegion',
-		'base-viewmodels/stage-base'],
+		'base-viewmodels/stage-base',
+		'viewmodels/fmgr-modal'],
 	function (ko,
 		appHelper,
 		VwmWegion,
-		VwmStageBase) {
+		VwmStageBase,
+		FmgrModal) {
 	'use strict';
 
 	/**
@@ -15,9 +17,6 @@ define(['knockout',
 	 * @augments {module:base-viewmodels/stage-base}
 	 */
 	var exports = function (mdlCompany, vwmUproParent, defaultSlcData) {
-
-		/** Alternative of this */
-		var ths = this;
 
 		/** Getter for a parent viewmodel */
 		this.getParentVwm = function () {
@@ -32,28 +31,11 @@ define(['knockout',
 
 		this.unq = this.mdlStage.id;
 
-		/** File manager as modal window for this view: created from modalFileMgr */
-		this.fmgr = {
-			isOpen : ko.observable(false),
-			okDescription : ko.observable(''),
-			okError : ko.observable(''),
-			// Callback for Ok button
-			okCallback : ko.observable(),
-			// When click from view using data-bind click event, then first argument - it is context
-			show : function () {
-				// TODO: add ok callback description: 'choose map file...'
-				ths.fmgr.isOpen(true);
-			},
-			hide : function () {
-				ths.fmgr.isOpen(false);
-			},
-			hiddenCallback : function () {
-				ths.fmgr.isOpen(false);
-				ths.fmgr.okDescription('');
-				ths.fmgr.okError('');
-				ths.fmgr.okCallback(null);
-			}
-		};
+		/**
+		 * File manager as modal window for this view: created from modalFileMgr
+		 * @type {module:viewmodels/fmgr-modal}
+		 */
+		this.fmgr = new FmgrModal();
 
 		/**
 		 * Default values for selection
