@@ -191,19 +191,31 @@ define(['jquery',
 		// show with header select (column name match, column format (divided to volume/time))
 		var submitFunction = function () {
 			// calculate beginRowIndex
-			var $selectedRowList = $(fragmentTable).find('tr.selected-row');
+			var jqrSelectedRowList = $(fragmentTable).find('tr.selected-row');
 
-			if ($selectedRowList.length === 0) {
+			if (jqrSelectedRowList.length === 0) {
 				alert('Please select a row, where data begins');
 				return;
 			}
 			// end calculate
 
+			// get all previous siblings before selected row
+			var tmpCountOfRows = jqrSelectedRowList.prevAll().length;
+
+			var isDateColumnExists = false;
+
 			var needColumnListSelected = $.map(matchSelectList, function (arrElem, arrIndex) {
-					if ($(arrElem.matchNameElem).val()) {
+					var tmpNameElem = $(arrElem.matchNameElem).val();
+
+					if (tmpNameElem) {
+
+						if (tmpNameElem === 'Date') {
+							isDateColumnExists = true;
+						}
+
 						var pdColumnAttr = new ColumnAttribute({
 								Id : arrIndex,
-								Name : $(arrElem.matchNameElem).val(),
+								Name : tmpNameElem,
 								Format : $(arrElem.matchFormatElem).val() + ($(arrElem.matchFormatElemDenominator).val() ? ("/" + $(arrElem.matchFormatElemDenominator).val()) : '')
 							});
 
@@ -211,8 +223,10 @@ define(['jquery',
 					}
 				});
 
-			// get all previous siblings before selected row
-			var tmpCountOfRows = $selectedRowList.prevAll().length;
+			if (isDateColumnExists === false) {
+				alert('Please choose a column for Date');
+        return;
+			}
 
 			callbackToSend(needColumnListSelected, tmpCountOfRows);
 			modalHelper.closeModalWideWindow();
@@ -226,8 +240,15 @@ define(['jquery',
 	 * @constructor
 	 */
 	var exports = function (mdlPerfomanceOfWell, vwmWell,
-		koStartYear, koEndYear, koStartMonth, koEndMonth, koSlcAttrGroupId, koIsVisibleForecastData) {
+		koStartYear, koEndYear, koStartMonth, koEndMonth,
+		koSlcAttrGroupId, koIsVisibleForecastData) {
+
 		var vw = this;
+
+		/** Getter for a parent */
+		this.getVwmWell = function () {
+			return vwmWell;
+		};
 
 		this.mdlPerfomanceOfWell = mdlPerfomanceOfWell;
 
@@ -257,16 +278,16 @@ define(['jquery',
 			}
 		}
 
-		vw.WPDDateStartYear.subscribe(updateSelectedPrfTableYear);
-		vw.WPDDateEndYear.subscribe(updateSelectedPrfTableYear);
+		this.WPDDateStartYear.subscribe(updateSelectedPrfTableYear);
+		this.WPDDateEndYear.subscribe(updateSelectedPrfTableYear);
 
 		/**
 		 * Id of group (squad) of wfm parameters
 		 * @type {string}
 		 */
-		vw.selectedAttrGroupId = koSlcAttrGroupId;
+		this.selectedAttrGroupId = koSlcAttrGroupId;
 
-		vw.selectedAttrGroup = ko.computed({
+		this.selectedAttrGroup = ko.computed({
 				read : function () {
 					var tmpWfmParamSquadList = ko.unwrap(mdlPerfomanceOfWell.getWellObj().getRootMdl().wfmParamSquadList);
 
@@ -294,12 +315,13 @@ define(['jquery',
 		this.listOfVwmWfmParameterOfWroup = ko.computed({
 				read : function () {
 					// List of params from a wroup model
-					var tmpParams = ko.unwrap(vwmWell.getParentVwm().mdlStage.listOfWfmParameterOfWroup);
+					var tmpParams = ko.unwrap(this.getVwmWell().getParentVwm().mdlStage.listOfWfmParameterOfWroup);
 					return tmpParams.map(function (paramItem) {
 						return new VwmWfmParameterOfWroup(paramItem);
 					});
 				},
-				deferEvaluation : true
+				deferEvaluation : true,
+				owner : this
 			});
 
 		/**
@@ -347,7 +369,7 @@ define(['jquery',
 		 * Real time border: min and max values in unix time format
 		 *    This time border other than WPDDateStartYear, EndYear (ant other selectable values)
 		 */
-		vw.filteredByDateProductionDataSetTimeBorder = ko.computed({
+		this.filteredByDateProductionDataSetTimeBorder = ko.computed({
 				read : this.calcTimeBorder,
 				deferEvaluation : true,
 				owner : this
@@ -367,7 +389,7 @@ define(['jquery',
 		 * Update perfomance graph data: graph path for selected regions (d3 line objects in one json object)
 		 *    <return>{'WaterRate': d3Line, ...}</return>
 		 */
-		vw.perfomancePaths = ko.computed({
+		this.perfomancePaths = ko.computed({
 				read : this.generatePerfomancePaths,
 				deferEvaluation : true,
 				owner : this
@@ -377,9 +399,9 @@ define(['jquery',
 		 * A perfomance graph
 		 * @type {module:viewmodels/svg-graph}
 		 */
-		vw.prfmGraph = new SvgGraph(vw.filteredByDateProductionDataSetTimeBorder, vw.filteredByDateProductionDataSetValueBorder, vw.perfomancePaths);
+		this.prfmGraph = new SvgGraph(vw.filteredByDateProductionDataSetTimeBorder, vw.filteredByDateProductionDataSetValueBorder, vw.perfomancePaths);
 
-		vw.joinedYearList = ko.computed({
+		this.joinedYearList = ko.computed({
 				read : function () {
 					if (ko.unwrap(vw.isVisibleForecastData)) {
 						return ko.unwrap(mdlPerfomanceOfWell.forecastYearList).concat(ko.unwrap(mdlPerfomanceOfWell.histYearList));
@@ -387,86 +409,9 @@ define(['jquery',
 						return ko.unwrap(mdlPerfomanceOfWell.histYearList);
 					}
 				},
-				deferEvaluation : true
+				deferEvaluation : true,
+				owner : this
 			});
-
-		/**
-		 * Select file and import perfomance data
-		 */
-		vw.importPerfomanceData = function () {
-			// Open file manager
-			vwmWell.unzOfSlcVwmSectionFmg(vwmWell.mdlStage.stageKey + '-perfomance');
-
-			// Calback for selected file
-			function mgrCallback() {
-				vwmWell.fmgr.okError('');
-
-				var tmpSlcVwmSection = ko.unwrap(vwmWell.slcVwmSectionFmg);
-
-				if (!tmpSlcVwmSection) {
-					throw new Error('No selected section');
-				}
-
-				// Select file from file manager
-				var selectedFileSpecs = ko.unwrap(tmpSlcVwmSection.mdlSection.listOfFileSpec).filter(function (elem) {
-						return ko.unwrap(elem.isSelected);
-					});
-
-				if (selectedFileSpecs.length !== 1) {
-					vwmWell.fmgr.okError('need to select one file');
-					return;
-				}
-
-				var tmpSlcFileSpec = selectedFileSpecs[0];
-
-				//console.log('slcSection', tmpSlcVwmSection.mdlSection.id);
-				mdlPerfomanceOfWell.getPerfomanceFragment(vwmWell.mdlStage.stageKey, tmpSlcVwmSection.mdlSection.id, tmpSlcFileSpec.id, 0, 10, function (response) {
-					var columnAttrList = ko.unwrap(mdlPerfomanceOfWell.prdColumnAttributeList);
-					console.log('clean columns: ', columnAttrList);
-					// remove calculated attributes
-					columnAttrList = columnAttrList.filter(function (arrElem) {
-							return ko.unwrap(arrElem.IsCalc) === false;
-						});
-
-					var jsColumnAttrList = columnAttrList.map(function (elem) {
-							return ko.toJS(elem);
-						});
-					// Hide window with files
-					vwmWell.fmgr.hide();
-					// Open window with match table
-					buildMatchTable(response, tmpSlcFileSpec.extension, jsColumnAttrList, function (tmpSlcColumnAttrList, tmpIndexOfStartRow) {
-						console.log(tmpSlcColumnAttrList, tmpIndexOfStartRow);
-						mdlPerfomanceOfWell.postPerfomanceData(vwmWell.mdlStage.stageKey,
-							tmpSlcVwmSection.mdlSection.id,
-							tmpSlcFileSpec.id,
-							tmpIndexOfStartRow,
-							tmpSlcColumnAttrList,
-							function () {
-							// update data after import
-							mdlPerfomanceOfWell.isLoadedHstProductionData(false);
-							mdlPerfomanceOfWell.getHstProductionDataSet();
-						}, function (jqXhr) {
-							if (jqXhr.status === 422) {
-								var resJson = jqXhr.responseJSON;
-								require(['helpers/lang-helper'], function (langHelper) {
-									var tmpProcessError = (langHelper.translate(resJson.errId) || resJson.errId);
-									alert(tmpProcessError);
-								});
-							}
-						});
-					});
-				});
-			}
-
-			// Add to observable
-			vwmWell.fmgr.okCallback(mgrCallback);
-
-			// Notification
-			vwmWell.fmgr.okDescription('Please select a file to import');
-
-			// Open file manager
-			vwmWell.fmgr.show();
-		};
 
 		/**
 		 * Remove all production data
@@ -476,6 +421,92 @@ define(['jquery',
 				mdlPerfomanceOfWell.deleteWellProductionData();
 			}
 		};
+	};
+
+	/**
+	 * Select file and import perfomance data
+	 */
+	exports.prototype.importPerfomanceData = function () {
+		var tmpStageKey = this.getVwmWell().mdlStage.stageKey;
+		// Open file manager
+		this.getVwmWell().unzOfSlcVwmSectionFmg(tmpStageKey + '-perfomance');
+
+		var tmpFmgrModal = this.getVwmWell().fmgrModal;
+
+		var ths = this;
+
+		// Calback for selected file
+		function mgrCallback() {
+			tmpFmgrModal.okError('');
+
+			var tmpSlcVwmSection = ko.unwrap(ths.getVwmWell().slcVwmSectionFmg);
+
+			if (!tmpSlcVwmSection) {
+				throw new Error('No selected section');
+			}
+
+			// Select file from file manager
+			var selectedFileSpecs = ko.unwrap(tmpSlcVwmSection.mdlSection.listOfFileSpec).filter(function (elem) {
+					return ko.unwrap(elem.isSelected);
+				});
+
+			if (selectedFileSpecs.length !== 1) {
+				tmpFmgrModal.okError('need to select one file');
+				return;
+			}
+
+			var tmpSlcFileSpec = selectedFileSpecs[0];
+
+			//console.log('slcSection', tmpSlcVwmSection.mdlSection.id);
+			ths.mdlPerfomanceOfWell.getPerfomanceFragment(tmpStageKey, tmpSlcVwmSection.mdlSection.id, tmpSlcFileSpec.id, 0, 10, function (response) {
+				var columnAttrList = ko.unwrap(ths.mdlPerfomanceOfWell.prdColumnAttributeList);
+				console.log('clean columns: ', columnAttrList);
+				// remove calculated attributes
+				columnAttrList = columnAttrList.filter(function (arrElem) {
+						return ko.unwrap(arrElem.IsCalc) === false;
+					});
+
+				var jsColumnAttrList = columnAttrList.map(function (elem) {
+						return ko.toJS(elem);
+					});
+
+				// Hide window with files
+				tmpFmgrModal.hide();
+
+				// Open window with match table
+				buildMatchTable(response, tmpSlcFileSpec.extension, jsColumnAttrList, function (tmpSlcColumnAttrList, tmpIndexOfStartRow) {
+					console.log(tmpSlcColumnAttrList, tmpIndexOfStartRow);
+					ths.mdlPerfomanceOfWell.postPerfomanceData(tmpStageKey,
+						tmpSlcVwmSection.mdlSection.id,
+						tmpSlcFileSpec.id,
+						tmpIndexOfStartRow,
+						tmpSlcColumnAttrList,
+						function () {
+						// update data after import
+						ths.mdlPerfomanceOfWell.isLoadedHstProductionData(false);
+						ths.mdlPerfomanceOfWell.getHstProductionDataSet();
+					},
+						function (jqXhr) {
+						if (jqXhr.status === 422) {
+							var resJson = jqXhr.responseJSON;
+							require(['helpers/lang-helper'], function (langHelper) {
+								var tmpProcessError = (langHelper.translate(resJson.errId) || resJson.errId);
+								alert(tmpProcessError);
+							});
+						}
+					});
+				});
+			});
+		}
+
+		// Add to observable
+		tmpFmgrModal.okCallback(mgrCallback);
+
+		// Notification
+		tmpFmgrModal.okDescription('Please select a file to import');
+
+		// Open file manager
+		tmpFmgrModal.show();
 	};
 
 	/** Generate paths for a graph */
@@ -577,6 +608,7 @@ define(['jquery',
 		return [arr[arr.length - 1].unixTime, arr[0].unixTime];
 	};
 
+  /** Calculate data, filtered by date */
 	exports.prototype.calcFilteredByDatePD = function () {
 		var resultArr = [];
 

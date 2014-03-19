@@ -7,7 +7,7 @@ define([
 		'jquery',
 		'knockout',
 		'helpers/modal-helper',
-    'helpers/app-helper',
+		'helpers/app-helper',
 		'base-viewmodels/stage-base',
 		'viewmodels/sketch-of-well',
 		'viewmodels/volume-of-well',
@@ -18,13 +18,13 @@ define([
 		'viewmodels/perfomance-of-well',
 		'viewmodels/test-scope',
 		'viewmodels/monitoring-of-well',
-    'viewmodels/map-of-wield',
-    'viewmodels/well-marker-of-map-of-wield'],
+		'viewmodels/map-of-wield',
+		'viewmodels/well-marker-of-map-of-wield'],
 	function (
 		$,
 		ko,
 		bootstrapModal,
-    appHelper,
+		appHelper,
 		VwmStageBase,
 		VwmSketchOfWell,
 		VwmVolumeOfWell,
@@ -35,8 +35,8 @@ define([
 		VwmPerfomanceOfWell,
 		VwmTestScope,
 		VwmMonitoringOfWell,
-    VwmMapOfWield,
-    VwmWellMarkerOfMapOfWield) {
+		VwmMapOfWield,
+		VwmWellMarkerOfMapOfWield) {
 	'use strict';
 
 	/**
@@ -62,7 +62,7 @@ define([
 	/**
 	 * Well view model
 	 * @constructor
-   * @augments {module:base-viewmodels/stage-base}
+	 * @augments {module:base-viewmodels/stage-base}
 	 */
 	var exports = function (mdlWell, parentVwmWroup, defaultSlcData) {
 		var ths = this;
@@ -70,8 +70,6 @@ define([
 		this.mdlStage = mdlWell;
 
 		this.unq = mdlWell.id;
-
-		this.fmgr = parentVwmWroup.fmgr;
 
 		/**
 		 * Get parent viewmodel (wroup)
@@ -84,7 +82,7 @@ define([
 		VwmStageBase.call(this, defaultSlcData.wellSectionId, parentVwmWroup.unqOfSlcVwmChild, null);
 
 		//mdlSketchOfWell, koWellUnzOfSlcVwmSectionFmg, koSlcVwmSectionFmg,  fmgrLink
-		this.vwmSketchOfWell = new VwmSketchOfWell(ths.mdlStage.sketchOfWell, ths.unzOfSlcVwmSectionFmg, ths.slcVwmSectionFmg, ths.fmgr);
+		this.vwmSketchOfWell = new VwmSketchOfWell(ths.mdlStage.sketchOfWell, ths.unzOfSlcVwmSectionFmg, ths.slcVwmSectionFmg, ths.fmgrModal);
 
 		//{ #region VOLUME
 
@@ -137,55 +135,6 @@ define([
 			ths.vidOfSlcVwmVolumeOfWell(tmpVwm.vid);
 		};
 
-		/** Create volume from file: select file and create volume */
-		this.createVolumeFromFile = function () {
-			ths.unzOfSlcVwmSectionFmg(ths.mdlStage.stageKey + '-volume');
-
-			// Calback for selected file
-			function mgrCallback() {
-				ths.fmgr.okError('');
-
-				var tmpSlcVwmSection = ko.unwrap(ths.slcVwmSectionFmg);
-
-				if (!tmpSlcVwmSection) {
-					throw new Error('No selected section');
-				}
-
-				// Select file from file manager
-				var selectedFileSpecs = ko.unwrap(tmpSlcVwmSection.mdlSection.listOfFileSpec).filter(function (elem) {
-						return ko.unwrap(elem.isSelected);
-					});
-
-				if (selectedFileSpecs.length !== 1) {
-					ths.fmgr.okError('need to select one file');
-					return;
-				}
-
-				ths.mdlStage.postVolumeOfWell(selectedFileSpecs[0].id, ko.unwrap(selectedFileSpecs[0].name), function () {
-					// Success
-					ths.fmgr.hide();
-				}, function (jqXhr) {
-					// Error
-					if (jqXhr.status === 422) {
-						var resJson = jqXhr.responseJSON;
-						require(['helpers/lang-helper'], function (langHelper) {
-							var tmpProcessError = (langHelper.translate(resJson.errId) || '{{lang.unknownError}}');
-							ths.fmgr.okError(tmpProcessError);
-						});
-					}
-				});
-			}
-
-			// Add to observable
-			ths.fmgr.okCallback(mgrCallback);
-
-			// Notification
-			ths.fmgr.okDescription('Please select a file for a volume');
-
-			// Open file manager
-			ths.fmgr.show();
-		};
-
 		/**
 		 * Remove viewmodel and model of volume
 		 */
@@ -219,11 +168,12 @@ define([
 		 */
 		this.listOfVwmLogOfWell = ko.computed({
 				read : function () {
-					return ko.unwrap(mdlWell.logsOfWell).map(function (elem) {
+					return ko.unwrap(ths.mdlStage.logsOfWell).map(function (elem) {
 						return new VwmLogOfWell(elem, ths.vidOfSlcVwmLogOfWell);
 					});
 				},
-				deferEvaluation : true
+				deferEvaluation : true,
+				owner : this
 			});
 
 		/**
@@ -260,122 +210,6 @@ define([
 		 */
 		this.selectVwmLogOfWell = function (vwmLogOfWellToSelect) {
 			ths.vidOfSlcVwmLogOfWell(vwmLogOfWellToSelect.vid);
-		};
-
-		/**
-		 * Create log of well
-		 */
-		this.createLogOfWellFromFileSpec = function () {
-			ths.unzOfSlcVwmSectionFmg(ths.mdlStage.stageKey + '-log');
-
-			// 1. Select file
-			// 2. Show column attributes modal window
-
-			// Calback for selected file
-			function mgrCallback() {
-				ths.fmgr.okError('');
-
-				var tmpSlcVwmSection = ko.unwrap(ths.slcVwmSectionFmg);
-
-				if (!tmpSlcVwmSection) {
-					throw new Error('No selected section');
-				}
-
-				// Select file from file manager
-				var selectedFileSpecs = ko.unwrap(tmpSlcVwmSection.mdlSection.listOfFileSpec).filter(function (elem) {
-						return ko.unwrap(elem.isSelected);
-					});
-
-				if (selectedFileSpecs.length !== 1) {
-					ths.fmgr.okError('need to select one file');
-					return;
-				}
-
-				var tmpFileSpec = selectedFileSpecs[0];
-
-				ths.mdlStage.getLogColumnAttributes(tmpSlcVwmSection.mdlSection.id, tmpFileSpec.id, function (columnAttributes) {
-					ths.fmgr.hide();
-
-					// TODO: Style decor for attribute selection
-					var selectDepth = document.createElement('select');
-					$(selectDepth).addClass('pd-parameter');
-
-					var selectSP = document.createElement('select');
-					$(selectSP).addClass('pd-parameter');
-
-					var selectGR = document.createElement('select');
-					$(selectGR).addClass('pd-parameter');
-
-					var selectRS = document.createElement('select');
-					$(selectRS).addClass('pd-parameter');
-
-					for (var caIndex = 0, caMaxIndex = columnAttributes.length; caIndex < caMaxIndex; caIndex++) {
-						var optionColumnAttribute = document.createElement('option');
-						$(optionColumnAttribute)
-						.val(columnAttributes[caIndex].Id)
-						.html(columnAttributes[caIndex].Name + (columnAttributes[caIndex].Format() ? (', ' + columnAttributes[caIndex].Format()) : ''));
-
-						switch (columnAttributes[caIndex].Name) {
-						case 'DEPTH':
-						case 'DEPT':
-							selectDepth.appendChild(optionColumnAttribute);
-							break;
-						case 'SP':
-						case 'SPC':
-							selectSP.appendChild(optionColumnAttribute);
-							break;
-						case 'GR':
-						case 'HGRT':
-						case 'GRDS':
-						case 'SGR':
-						case 'NGRT':
-							selectGR.appendChild(optionColumnAttribute);
-							break;
-						case 'RS':
-						case 'RES':
-						case 'RESD':
-							selectRS.appendChild(optionColumnAttribute);
-							break;
-						}
-					}
-
-					var innerDiv = document.createElement('div');
-					$(innerDiv).addClass('form-horizontal').append(
-						bootstrapModal.gnrtDom('Depth', selectDepth),
-						bootstrapModal.gnrtDom('GR', selectGR),
-						bootstrapModal.gnrtDom('SP', selectSP),
-						bootstrapModal.gnrtDom('Resistivity', selectRS));
-
-					function submitFunction() {
-						var selectedArray = $(innerDiv).find('.pd-parameter').map(function () {
-								return $(this).val();
-							}).get();
-
-						if (selectedArray.length < 4) {
-							alert('All fields required');
-							return;
-						}
-
-						// 3. Select column attributes
-						// 4. Add new log
-
-						mdlWell.postLogOfWell(tmpFileSpec.id, ko.unwrap(tmpFileSpec.name), selectedArray);
-
-						bootstrapModal.closeModalWindow();
-					}
-
-					bootstrapModal.openModalWindow('Column match', innerDiv, submitFunction);
-				});
-			}
-
-			// Add to observable
-			ths.fmgr.okCallback(mgrCallback);
-
-			// Notification
-			ths.fmgr.okDescription('Please select a file for a log');
-
-			// Open file manager
-			ths.fmgr.show();
 		};
 
 		//} #endregion LOG
@@ -427,57 +261,6 @@ define([
 		 */
 		this.selectVwmNodalAnalysis = function (vwmToSelect) {
 			ths.vidOfSlcVwmNodalAnalysis(vwmToSelect.vid);
-		};
-
-		/**
-		 * Create model and viewmodel of nodal analysis
-		 */
-		this.postVwmNodalAnalysis = function () {
-			ths.unzOfSlcVwmSectionFmg(ths.mdlStage.stageKey + '-nodalanalysis');
-
-			// Calback for selected file
-			function mgrCallback() {
-				ths.fmgr.okError('');
-
-				var tmpSlcVwmSection = ko.unwrap(ths.slcVwmSectionFmg);
-
-				if (!tmpSlcVwmSection) {
-					throw new Error('No selected section');
-				}
-
-				// Select file from file manager
-				var selectedFileSpecs = ko.unwrap(tmpSlcVwmSection.mdlSection.listOfFileSpec).filter(function (elem) {
-						return ko.unwrap(elem.isSelected);
-					});
-
-				if (selectedFileSpecs.length !== 1) {
-					ths.fmgr.okError('need to select one file');
-					return;
-				}
-
-				ths.mdlStage.postNodalAnalysis(selectedFileSpecs[0].id, ko.unwrap(selectedFileSpecs[0].name), '', function () {
-					// Success
-					ths.fmgr.hide();
-				}, function (jqXhr) {
-					// Error
-					if (jqXhr.status === 422) {
-						var resJson = jqXhr.responseJSON;
-						require(['helpers/lang-helper'], function (langHelper) {
-							var tmpProcessError = (langHelper.translate(resJson.errId) || '{{lang.unknownError}}');
-							ths.fmgr.okError(tmpProcessError);
-						});
-					}
-				});
-			}
-
-			// Add to observable
-			ths.fmgr.okCallback(mgrCallback);
-
-			// Notification
-			ths.fmgr.okDescription('Please select a file for a nodal analysis');
-
-			// Open file manager
-			ths.fmgr.show();
 		};
 
 		/**
@@ -538,57 +321,6 @@ define([
 		 */
 		this.selectVwmIntegrity = function (vwmToSelect) {
 			ths.vidOfSlcVwmIntegrity(vwmToSelect.vid);
-		};
-
-		/**
-		 * Create model and viewmodel of integrity
-		 */
-		this.postVwmIntegrity = function () {
-			ths.unzOfSlcVwmSectionFmg(ths.mdlStage.stageKey + '-integrity');
-
-			// Calback for selected file
-			function mgrCallback() {
-				ths.fmgr.okError('');
-
-				var tmpSlcVwmSection = ko.unwrap(ths.slcVwmSectionFmg);
-
-				if (!tmpSlcVwmSection) {
-					throw new Error('No selected section');
-				}
-
-				// Select file from file manager
-				var selectedFileSpecs = ko.unwrap(tmpSlcVwmSection.mdlSection.listOfFileSpec).filter(function (elem) {
-						return ko.unwrap(elem.isSelected);
-					});
-
-				if (selectedFileSpecs.length !== 1) {
-					ths.fmgr.okError('need to select one file');
-					return;
-				}
-
-				ths.mdlStage.postIntegrity(selectedFileSpecs[0].id, ko.unwrap(selectedFileSpecs[0].name), '', function () {
-					// Success
-					ths.fmgr.hide();
-				}, function (jqXhr) {
-					// Error
-					if (jqXhr.status === 422) {
-						var resJson = jqXhr.responseJSON;
-						require(['helpers/lang-helper'], function (langHelper) {
-							var tmpProcessError = (langHelper.translate(resJson.errId) || '{{lang.unknownError}}');
-							ths.fmgr.okError(tmpProcessError);
-						});
-					}
-				});
-			}
-
-			// Add to observable
-			ths.fmgr.okCallback(mgrCallback);
-
-			// Notification
-			ths.fmgr.okDescription('Please select a file for a integrity');
-
-			// Open file manager
-			ths.fmgr.show();
 		};
 
 		/**
@@ -663,74 +395,74 @@ define([
 			});
 
 		//} #endregion MONITORING
-    
-    //{ #region MAP
-    
-    /**
-    * A list of viewmodels of map markers
-    * @type {Array.<module:viewmodels/well-marker-of-map-of-wield>}
-    */
-    this.listOfVwmMapMarker = ko.computed({
-      read: this.buildListOfVwmMapMarker,
-      deferEvaluation: true,
-      owner: this
-    });
-    
-    /**
-    * Id of the map
-    * @type {number}
-    */
-    this.idOfMapOfSlcVwmMapMarker = ko.observable();
-    
-    /**
-    * A selected viewmodel of a map marker
-    * @type {module:viewmodels/well-marker-of-map-of-wield}
-    */
-    this.slcVwmMapMarker = ko.computed({
-      read: this.calcSlcVwmMapMarker,
-      deferEvaluation: true,
-      owner: this
-    });
-    
-    //} #endregion MAP
+
+		//{ #region MAP
+
+		/**
+		 * A list of viewmodels of map markers
+		 * @type {Array.<module:viewmodels/well-marker-of-map-of-wield>}
+		 */
+		this.listOfVwmMapMarker = ko.computed({
+				read : this.buildListOfVwmMapMarker,
+				deferEvaluation : true,
+				owner : this
+			});
+
+		/**
+		 * Id of the map
+		 * @type {number}
+		 */
+		this.idOfMapOfSlcVwmMapMarker = ko.observable();
+
+		/**
+		 * A selected viewmodel of a map marker
+		 * @type {module:viewmodels/well-marker-of-map-of-wield}
+		 */
+		this.slcVwmMapMarker = ko.computed({
+				read : this.calcSlcVwmMapMarker,
+				deferEvaluation : true,
+				owner : this
+			});
+
+		//} #endregion MAP
 	};
 
-  /** Inherit from a stage base viewmodel */
+	/** Inherit from a stage base viewmodel */
 	appHelper.inherits(exports, VwmStageBase);
-  
-  /** Calculate a selected marker, using id of map */
-  exports.prototype.calcSlcVwmMapMarker = function(){
-    var tmpIdOfMap = ko.unwrap(this.idOfMapOfSlcVwmMapMarker);
-    if (tmpIdOfMap){
-      var tmpList = ko.unwrap(this.listOfVwmMapMarker);
-      return tmpList.filter(function(vwmElem){
-        return vwmElem.mdlWellMarker.idOfMapOfWield === tmpIdOfMap;
-      })[0];
-    }
-  };
-  
-  /** Select marker */
-  exports.prototype.selectVwmMapMarker = function(vwmToSelect){
-    this.idOfMapOfSlcVwmMapMarker(vwmToSelect.mdlWellMarker.idOfMapOfWield);
-  };
 
-  /** Build viewmodels for map markers */
-  exports.prototype.buildListOfVwmMapMarker = function(){
-    var tmpList = ko.unwrap(this.mdlStage.listOfMapMarker);
-    
-    var tmpSlcVwmMapMarker = this.slcVwmMapMarker;
-    
-    return tmpList.map(function(markerModel){
-      //mdlMapOfWield, koVidOfSlcVwmMapOfWield, koTransform
-      var tmpVwmMap = new VwmMapOfWield(markerModel.getWellFieldMap(), null, ko.observable({
-        scale: 1,
-        translate: [0, 0]
-      }));
-      
-      return new VwmWellMarkerOfMapOfWield(markerModel, tmpSlcVwmMapMarker, tmpVwmMap);
-    }, this);
-  };
-  
+	/** Calculate a selected marker, using id of map */
+	exports.prototype.calcSlcVwmMapMarker = function () {
+		var tmpIdOfMap = ko.unwrap(this.idOfMapOfSlcVwmMapMarker);
+		if (tmpIdOfMap) {
+			var tmpList = ko.unwrap(this.listOfVwmMapMarker);
+			return tmpList.filter(function (vwmElem) {
+				return vwmElem.mdlWellMarker.idOfMapOfWield === tmpIdOfMap;
+			})[0];
+		}
+	};
+
+	/** Select marker */
+	exports.prototype.selectVwmMapMarker = function (vwmToSelect) {
+		this.idOfMapOfSlcVwmMapMarker(vwmToSelect.mdlWellMarker.idOfMapOfWield);
+	};
+
+	/** Build viewmodels for map markers */
+	exports.prototype.buildListOfVwmMapMarker = function () {
+		var tmpList = ko.unwrap(this.mdlStage.listOfMapMarker);
+
+		var tmpSlcVwmMapMarker = this.slcVwmMapMarker;
+
+		return tmpList.map(function (markerModel) {
+			//mdlMapOfWield, koVidOfSlcVwmMapOfWield, koTransform
+			var tmpVwmMap = new VwmMapOfWield(markerModel.getWellFieldMap(), null, ko.observable({
+						scale : 1,
+						translate : [0, 0]
+					}));
+
+			return new VwmWellMarkerOfMapOfWield(markerModel, tmpSlcVwmMapMarker, tmpVwmMap);
+		}, this);
+	};
+
 	/**
 	 * Load content of the section
 	 * @param {string} idOfSectionPattern - Section
@@ -867,6 +599,277 @@ define([
 			})[0];
 
 		return needRec;
+	};
+
+	/** Create volume from file: select file and create volume */
+	exports.prototype.createVolumeFromFile = function () {
+		var ths = this;
+		ths.unzOfSlcVwmSectionFmg(ths.mdlStage.stageKey + '-volume');
+
+		// Calback for selected file
+		function mgrCallback() {
+			ths.fmgrModal.okError('');
+
+			var tmpSlcVwmSection = ko.unwrap(ths.slcVwmSectionFmg);
+
+			if (!tmpSlcVwmSection) {
+				throw new Error('No selected section');
+			}
+
+			// Select file from file manager
+			var selectedFileSpecs = ko.unwrap(tmpSlcVwmSection.mdlSection.listOfFileSpec).filter(function (elem) {
+					return ko.unwrap(elem.isSelected);
+				});
+
+			if (selectedFileSpecs.length !== 1) {
+				ths.fmgrModal.okError('need to select one file');
+				return;
+			}
+
+			ths.mdlStage.postVolumeOfWell(selectedFileSpecs[0].id, ko.unwrap(selectedFileSpecs[0].name), function () {
+				// Success
+				ths.fmgrModal.hide();
+			}, function (jqXhr) {
+				// Error
+				if (jqXhr.status === 422) {
+					var resJson = jqXhr.responseJSON;
+					require(['helpers/lang-helper'], function (langHelper) {
+						var tmpProcessError = (langHelper.translate(resJson.errId) || '{{lang.unknownError}}');
+						ths.fmgrModal.okError(tmpProcessError);
+					});
+				}
+			});
+		}
+
+		// Add to observable
+		ths.fmgrModal.okCallback(mgrCallback);
+
+		// Notification
+		ths.fmgrModal.okDescription('Please select a file for a volume');
+
+		// Open file manager
+		ths.fmgrModal.show();
+	};
+
+	/**
+	 * Create log of well
+	 */
+	exports.prototype.createLogOfWellFromFileSpec = function () {
+		var ths = this;
+		ths.unzOfSlcVwmSectionFmg(ths.mdlStage.stageKey + '-log');
+
+		// 1. Select file
+		// 2. Show column attributes modal window
+
+		// Calback for selected file
+		function mgrCallback() {
+			ths.fmgrModal.okError('');
+
+			var tmpSlcVwmSection = ko.unwrap(ths.slcVwmSectionFmg);
+
+			if (!tmpSlcVwmSection) {
+				throw new Error('No selected section');
+			}
+
+			// Select file from file manager
+			var selectedFileSpecs = ko.unwrap(tmpSlcVwmSection.mdlSection.listOfFileSpec).filter(function (elem) {
+					return ko.unwrap(elem.isSelected);
+				});
+
+			if (selectedFileSpecs.length !== 1) {
+				ths.fmgrModal.okError('need to select one file');
+				return;
+			}
+
+			var tmpFileSpec = selectedFileSpecs[0];
+
+			ths.mdlStage.getLogColumnAttributes(tmpSlcVwmSection.mdlSection.id, tmpFileSpec.id, function (columnAttributes) {
+				ths.fmgrModal.hide();
+
+				// TODO: Style decor for attribute selection
+				var selectDepth = document.createElement('select');
+				$(selectDepth).addClass('pd-parameter');
+
+				var selectSP = document.createElement('select');
+				$(selectSP).addClass('pd-parameter');
+
+				var selectGR = document.createElement('select');
+				$(selectGR).addClass('pd-parameter');
+
+				var selectRS = document.createElement('select');
+				$(selectRS).addClass('pd-parameter');
+
+				for (var caIndex = 0, caMaxIndex = columnAttributes.length; caIndex < caMaxIndex; caIndex++) {
+					var optionColumnAttribute = document.createElement('option');
+					$(optionColumnAttribute)
+					.val(columnAttributes[caIndex].Id)
+					.html(columnAttributes[caIndex].Name + (columnAttributes[caIndex].Format() ? (', ' + columnAttributes[caIndex].Format()) : ''));
+
+					switch (columnAttributes[caIndex].Name) {
+					case 'DEPTH':
+					case 'DEPT':
+						selectDepth.appendChild(optionColumnAttribute);
+						break;
+					case 'SP':
+					case 'SPC':
+						selectSP.appendChild(optionColumnAttribute);
+						break;
+					case 'GR':
+					case 'HGRT':
+					case 'GRDS':
+					case 'SGR':
+					case 'NGRT':
+						selectGR.appendChild(optionColumnAttribute);
+						break;
+					case 'RS':
+					case 'RES':
+					case 'RESD':
+						selectRS.appendChild(optionColumnAttribute);
+						break;
+					}
+				}
+
+				var innerDiv = document.createElement('div');
+				$(innerDiv).addClass('form-horizontal').append(
+					bootstrapModal.gnrtDom('Depth', selectDepth),
+					bootstrapModal.gnrtDom('GR', selectGR),
+					bootstrapModal.gnrtDom('SP', selectSP),
+					bootstrapModal.gnrtDom('Resistivity', selectRS));
+
+				function submitFunction() {
+					var selectedArray = $(innerDiv).find('.pd-parameter').map(function () {
+							return $(this).val();
+						}).get();
+
+					if (selectedArray.length < 4) {
+						alert('All fields required');
+						return;
+					}
+
+					// 3. Select column attributes
+					// 4. Add new log
+
+					ths.mdlStage.postLogOfWell(tmpFileSpec.id, ko.unwrap(tmpFileSpec.name), selectedArray);
+
+					bootstrapModal.closeModalWindow();
+				}
+
+				bootstrapModal.openModalWindow('Column match', innerDiv, submitFunction);
+			});
+		}
+
+		// Add to observable
+		ths.fmgrModal.okCallback(mgrCallback);
+
+		// Notification
+		ths.fmgrModal.okDescription('Please select a file for a log');
+
+		// Open file manager
+		ths.fmgrModal.show();
+	};
+
+	/**
+	 * Create model and viewmodel of nodal analysis
+	 */
+	exports.prototype.postVwmNodalAnalysis = function () {
+		var ths = this;
+		ths.unzOfSlcVwmSectionFmg(ths.mdlStage.stageKey + '-nodalanalysis');
+
+		// Calback for selected file
+		function mgrCallback() {
+			ths.fmgrModal.okError('');
+
+			var tmpSlcVwmSection = ko.unwrap(ths.slcVwmSectionFmg);
+
+			if (!tmpSlcVwmSection) {
+				throw new Error('No selected section');
+			}
+
+			// Select file from file manager
+			var selectedFileSpecs = ko.unwrap(tmpSlcVwmSection.mdlSection.listOfFileSpec).filter(function (elem) {
+					return ko.unwrap(elem.isSelected);
+				});
+
+			if (selectedFileSpecs.length !== 1) {
+				ths.fmgrModal.okError('need to select one file');
+				return;
+			}
+
+			ths.mdlStage.postNodalAnalysis(selectedFileSpecs[0].id, ko.unwrap(selectedFileSpecs[0].name), '', function () {
+				// Success
+				ths.fmgrModal.hide();
+			}, function (jqXhr) {
+				// Error
+				if (jqXhr.status === 422) {
+					var resJson = jqXhr.responseJSON;
+					require(['helpers/lang-helper'], function (langHelper) {
+						var tmpProcessError = (langHelper.translate(resJson.errId) || '{{lang.unknownError}}');
+						ths.fmgrModal.okError(tmpProcessError);
+					});
+				}
+			});
+		}
+
+		// Add to observable
+		ths.fmgrModal.okCallback(mgrCallback);
+
+		// Notification
+		ths.fmgrModal.okDescription('Please select a file for a nodal analysis');
+
+		// Open file manager
+		ths.fmgrModal.show();
+	};
+
+	/**
+	 * Create model and viewmodel of integrity
+	 */
+	exports.prototype.postVwmIntegrity = function () {
+		var ths = this;
+		ths.unzOfSlcVwmSectionFmg(ths.mdlStage.stageKey + '-integrity');
+
+		// Calback for selected file
+		function mgrCallback() {
+			ths.fmgrModal.okError('');
+
+			var tmpSlcVwmSection = ko.unwrap(ths.slcVwmSectionFmg);
+
+			if (!tmpSlcVwmSection) {
+				throw new Error('No selected section');
+			}
+
+			// Select file from file manager
+			var selectedFileSpecs = ko.unwrap(tmpSlcVwmSection.mdlSection.listOfFileSpec).filter(function (elem) {
+					return ko.unwrap(elem.isSelected);
+				});
+
+			if (selectedFileSpecs.length !== 1) {
+				ths.fmgrModal.okError('need to select one file');
+				return;
+			}
+
+			ths.mdlStage.postIntegrity(selectedFileSpecs[0].id, ko.unwrap(selectedFileSpecs[0].name), '', function () {
+				// Success
+				ths.fmgrModal.hide();
+			}, function (jqXhr) {
+				// Error
+				if (jqXhr.status === 422) {
+					var resJson = jqXhr.responseJSON;
+					require(['helpers/lang-helper'], function (langHelper) {
+						var tmpProcessError = (langHelper.translate(resJson.errId) || '{{lang.unknownError}}');
+						ths.fmgrModal.okError(tmpProcessError);
+					});
+				}
+			});
+		}
+
+		// Add to observable
+		ths.fmgrModal.okCallback(mgrCallback);
+
+		// Notification
+		ths.fmgrModal.okDescription('Please select a file for a integrity');
+
+		// Open file manager
+		ths.fmgrModal.show();
 	};
 
 	return exports;

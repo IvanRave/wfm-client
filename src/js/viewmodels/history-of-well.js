@@ -55,10 +55,10 @@ define([
 		// Select file section with history files (load and unselect files)
 		var tmpVwmWell = this.getVwmWell();
 		tmpVwmWell.unzOfSlcVwmSectionFmg(tmpVwmWell.mdlStage.stageKey + '-history');
-		var fmgr = tmpVwmWell.fmgr;
+		var fmgrModal = tmpVwmWell.fmgrModal;
 		// Calback for selected file
 		function mgrCallback() {
-			fmgr.okError('');
+			fmgrModal.okError('');
 
 			var tmpSlcVwmSection = ko.unwrap(tmpVwmWell.slcVwmSectionFmg);
 
@@ -72,31 +72,31 @@ define([
 				});
 
 			if (selectedFileSpecs.length !== 1) {
-				fmgr.okError('need to select one file');
+				fmgrModal.okError('need to select one file');
 				return;
 			}
 
 			ths.mdlHistoryOfWell.postFileSpecOfHistoryOfWell(selectedFileSpecs[0].id, function () {
-				fmgr.hide();
+				fmgrModal.hide();
 			}, function (jqXhr) {
 				if (jqXhr.status === 422) {
 					var resJson = jqXhr.responseJSON;
 					require(['helpers/lang-helper'], function (langHelper) {
 						var tmpProcessError = (langHelper.translate(resJson.errId) || '{{lang.unknownError}}');
-						fmgr.okError(tmpProcessError);
+						fmgrModal.okError(tmpProcessError);
 					});
 				}
 			});
 		}
 
 		// Add to observable
-		fmgr.okCallback(mgrCallback);
+		fmgrModal.okCallback(mgrCallback);
 
 		// Notification
-		fmgr.okDescription('Please select a file for this history record');
+		fmgrModal.okDescription('Please select a file for this history record');
 
 		// Open file manager
-		fmgr.show();
+		fmgrModal.show();
 	};
 
 	/**
@@ -106,10 +106,10 @@ define([
 		var ths = this;
 		var tmpVwmWell = this.getVwmWell();
 		tmpVwmWell.unzOfSlcVwmSectionFmg(tmpVwmWell.mdlStage.stageKey + '-history');
-		var fmgr = this.getVwmWell().fmgr;
+		var fmgrModal = this.getVwmWell().fmgrModal;
 
 		function mgrCallback() {
-			fmgr.okError('');
+			fmgrModal.okError('');
 
 			var tmpSlcVwmSection = ko.unwrap(tmpVwmWell.slcVwmSectionFmg);
 
@@ -123,13 +123,13 @@ define([
 				});
 
 			if (selectedFileSpecs.length !== 1) {
-				fmgr.okError('need to select one file');
+				fmgrModal.okError('need to select one file');
 				return;
 			}
 
 			var imageFileSpec = selectedFileSpecs[0];
 
-			fmgr.hide();
+			fmgrModal.hide();
 
 			// history image src
 			var innerDiv = document.createElement('div');
@@ -163,17 +163,17 @@ define([
 				});
 			};
 
-			// start load image
+			// Start load an image
 			historyImgElem.src = imageFileSpec.fileUrl;
 		}
 		// Add to observable
-		fmgr.okCallback(mgrCallback);
+		fmgrModal.okCallback(mgrCallback);
 
 		// Notification
-		fmgr.okDescription('Please select a history image to crop');
+		fmgrModal.okDescription('Please select a history image to crop');
 
 		// Open file manager
-		fmgr.show();
+		fmgrModal.show();
 	};
 
   /**

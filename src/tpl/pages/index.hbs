@@ -69,12 +69,11 @@
                                                 </div>
                                                 <div class="workspace-container" data-bind="css: $root.workAreaCss, with: vwmCompany">
                                                     <!-- current: vwmCompany-->
-                                                    {{> fmgr-arousal }}
-                                                    {{> modal-file-mgr }}
                                                     <div data-bind="ifnot: slcVwmChild">
                                                         <!-- if no selected wegion -->
                                                         {{> section-panel-standard }}
                                                         {{> dashboard-arousal }}
+                                                        {{> fmgr-arousal }}
                                                         {{> fmgr-modal }}
                                                         {{> company }}
                                                     </div>
@@ -83,6 +82,7 @@
                                                         <div data-bind="ifnot: slcVwmChild">
                                                             {{> section-panel-standard }}
                                                             {{> dashboard-arousal }}
+                                                            {{> fmgr-arousal }}
                                                             {{> fmgr-modal }}
                                                             {{> wegion }}
                                                         </div>
@@ -91,6 +91,7 @@
                                                             <div data-bind="ifnot: slcVwmChild">
                                                                 {{> section-panel-standard }}
                                                                 {{> dashboard-arousal }}
+                                                                {{> fmgr-arousal }}
                                                                 {{> fmgr-modal }}
                                                                 {{> wield }}
                                                             </div>
@@ -99,6 +100,7 @@
                                                                 <div data-bind="ifnot: slcVwmChild">
                                                                     {{> section-panel-standard }}
                                                                     {{> dashboard-arousal }}
+                                                                    {{> fmgr-arousal }}
                                                                     {{> fmgr-modal }}
                                                                     {{> wroup }}
                                                                 </div>
@@ -106,6 +108,7 @@
                                                                     <!-- current: vwmWell -->
                                                                     {{> section-panel-well }}
                                                                     {{> dashboard-arousal }}
+                                                                    {{> fmgr-arousal }}
                                                                     {{> fmgr-modal }}
                                                                     {{> well }}
                                                                 </div>

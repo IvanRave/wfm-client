@@ -39,9 +39,6 @@ define(['jquery',
 			return parentVwmCompany;
 		};
 
-		/** Link to file manager of company */
-		this.fmgr = parentVwmCompany.fmgr;
-
 		VwmStageBase.call(this, this.defaultSlcData_.wegionSectionId, parentVwmCompany.unqOfSlcVwmChild, this.defaultSlcData_.wieldId);
 	};
 

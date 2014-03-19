@@ -35,9 +35,6 @@ define(['jquery',
 
 		this.unq = this.mdlStage.id;
 
-		/** Link to company file manager */
-		this.fmgr = this.getParentVwm().fmgr;
-
 		// Has sections and widgets
 		VwmStageBase.call(this, defaultSlcData.wieldSectionId, parentVwmWegion.unqOfSlcVwmChild, defaultSlcData.wroupId);
     
@@ -129,7 +126,7 @@ define(['jquery',
 		this.unzOfSlcVwmSectionFmg(this.mdlStage.stageKey + '-map');
 		var ths = this;
 		function mgrCallback() {
-			ths.fmgr.okError('');
+			ths.fmgrModal.okError('');
 
 			var tmpSlcVwmSection = ko.unwrap(ths.slcVwmSectionFmg);
 
@@ -143,23 +140,23 @@ define(['jquery',
 				});
 
 			if (selectedFileSpecs.length !== 1) {
-				ths.fmgr.okError('need to select one file');
+				ths.fmgrModal.okError('need to select one file');
 				return;
 			}
 
 			ths.mdlStage.postMapOfWield(selectedFileSpecs[0].id, ko.unwrap(selectedFileSpecs[0].name), function () {
-				ths.fmgr.hide();
+				ths.fmgrModal.hide();
 			});
 		}
 
 		// Add to observable
-		ths.fmgr.okCallback(mgrCallback);
+		ths.fmgrModal.okCallback(mgrCallback);
 
 		// Notification
-		ths.fmgr.okDescription('Please select a file for a map');
+		ths.fmgrModal.okDescription('Please select a file for a map');
 
 		// Open file manager
-		ths.fmgr.show();
+		ths.fmgrModal.show();
 	};
 
 	/** Get the selected viewmodel of a map of a well field */

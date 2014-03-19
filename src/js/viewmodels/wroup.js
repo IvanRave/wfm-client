@@ -34,8 +34,6 @@ define([
 
 		this.unq = mdlWroup.id;
 
-		this.fmgr = this.getParentVwm().fmgr;
-
 		this.defaultSlcData = defaultSlcData;
 
 		// Has sections and widgets

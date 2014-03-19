@@ -3,14 +3,14 @@ define(['knockout',
 		'helpers/history-helper',
 		'viewmodels/section-of-stage',
 		'viewmodels/widgout',
-    'constants/stage-view-constants',
-    'viewmodels/fmgr-modal'],
+		'constants/stage-view-constants',
+		'viewmodels/fmgr-modal'],
 	function (ko,
 		historyHelper,
 		VwmStageSection,
 		VwmWidgout,
-    stageViewConstants,
-    FmgrModal) {
+		stageViewConstants,
+		FmgrModal) {
 
 	'use strict';
 
@@ -112,33 +112,33 @@ define(['knockout',
 		 * @type {string}
 		 */
 		this.slcStageView = ko.observable();
-    
-    /** Whether a selected stage view is a dashboard */
-    this.isSlcStageViewDashboard = ko.computed({
-      read: function() {
-        return ko.unwrap(this.slcStageView) === stageViewConstants.dashboard.id;
-      },
-      deferEvaluation: true,
-      owner: this
-    });
-    
-    /** Whether a selected stage view is a dashboard */
-    this.isSlcStageViewFmgr = ko.computed({
-      read: function() {
-        return ko.unwrap(this.slcStageView) === stageViewConstants.fmgr.id;
-      },
-      deferEvaluation: true,
-      owner: this
-    });
-    
-    /** Whether a selected stage view is a dashboard */
-    this.isSlcStageViewSection = ko.computed({
-      read: function() {
-        return ko.unwrap(this.slcStageView) === stageViewConstants.section.id;
-      },
-      deferEvaluation: true,
-      owner: this
-    });
+
+		/** Whether a selected stage view is a dashboard */
+		this.isSlcStageViewDashboard = ko.computed({
+				read : function () {
+					return ko.unwrap(this.slcStageView) === stageViewConstants.dashboard.id;
+				},
+				deferEvaluation : true,
+				owner : this
+			});
+
+		/** Whether a selected stage view is a dashboard */
+		this.isSlcStageViewFmgr = ko.computed({
+				read : function () {
+					return ko.unwrap(this.slcStageView) === stageViewConstants.fmgr.id;
+				},
+				deferEvaluation : true,
+				owner : this
+			});
+
+		/** Whether a selected stage view is a dashboard */
+		this.isSlcStageViewSection = ko.computed({
+				read : function () {
+					return ko.unwrap(this.slcStageView) === stageViewConstants.section.id;
+				},
+				deferEvaluation : true,
+				owner : this
+			});
 
 		/**
 		 * Pattern of a selected section
@@ -152,15 +152,19 @@ define(['knockout',
 
 		/** When change selected section */
 		this.slcVwmSectionWrk.subscribe(this.handleVwmSectionWrk, this);
-    
+
 		/** Selected widget layouts: may be defined by default from client storage (cookies..) */
 		this.slcVwmWidgout = ko.observable();
-    
-    //{ #region FMGR
-    
-    this.fmgrModal = new FmgrModal();
-    
-    //} #endregion FMGR
+
+		//{ #region FMGR
+
+		/**
+		 * File manager as modal window for this view: created from modalFileMgr
+		 * @type {module:viewmodels/fmgr-modal}
+		 */
+		this.fmgrModal = new FmgrModal();
+
+		//} #endregion FMGR
 
 		//{ #region FORSTAGESWITHCHILDREN
 
@@ -270,8 +274,8 @@ define(['knockout',
 
 		ths.unzOfSlcVwmSectionFmg(ths.mdlStage.stageKey + '-summary');
 
-		ths.fmgr.okCallback(function () {
-			ths.fmgr.okError('');
+		ths.fmgrModal.okCallback(function () {
+			ths.fmgrModal.okError('');
 			// Select file from file manager
 			var slcVwmSection = ko.unwrap(ths.slcVwmSectionFmg);
 
@@ -284,19 +288,19 @@ define(['knockout',
 				});
 
 			if (selectedFileSpecs.length !== 1) {
-				ths.fmgr.okError('need to select one file');
+				ths.fmgrModal.okError('need to select one file');
 				return;
 			}
 
 			// Get prop id
 			ths.mdlStage[fileSpecProp.addtData.nestedClientId](selectedFileSpecs[0].id);
 			ths.mdlStage.save();
-			ths.fmgr.hide();
+			ths.fmgrModal.hide();
 		});
 
-		ths.fmgr.okDescription('Please select one image');
+		ths.fmgrModal.okDescription('Please select one image');
 
-		ths.fmgr.show();
+		ths.fmgrModal.show();
 	};
 
 	/** Remove widget layout from this stage */
@@ -316,10 +320,9 @@ define(['knockout',
 	/** Choose dashboard (no section) */
 	exports.prototype.showStageViewDashboard = function () {
 		this.unzOfSlcVwmSectionWrk(null);
-    // Select a stage view
+		// Select a stage view
 		this.slcStageView(stageViewConstants.dashboard.id);
 	};
- 
 
 	/** Calculate a selected viewmodel of a work section */
 	exports.prototype.calcSlcVwmSectionWrk = function () {
@@ -537,6 +540,6 @@ define(['knockout',
 	exports.prototype.calcIsNullSlcVwmSectionWrk = function () {
 		return ko.unwrap(this.slcVwmSectionWrk) === null;
 	};
-  
+
 	return exports;
 });

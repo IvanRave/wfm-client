@@ -2,13 +2,11 @@
 define(['knockout',
 		'helpers/app-helper',
 		'viewmodels/wegion',
-		'base-viewmodels/stage-base',
-		'viewmodels/fmgr-modal'],
+		'base-viewmodels/stage-base'],
 	function (ko,
 		appHelper,
 		VwmWegion,
-		VwmStageBase,
-		FmgrModal) {
+		VwmStageBase) {
 	'use strict';
 
 	/**
@@ -30,12 +28,6 @@ define(['knockout',
 		this.mdlStage = mdlCompany;
 
 		this.unq = this.mdlStage.id;
-
-		/**
-		 * File manager as modal window for this view: created from modalFileMgr
-		 * @type {module:viewmodels/fmgr-modal}
-		 */
-		this.fmgr = new FmgrModal();
 
 		/**
 		 * Default values for selection
