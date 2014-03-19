@@ -81,6 +81,36 @@ If needed, properties can be moved from pattern to the section level: for exampl
 * IsVisibleAsFolder {boolean} - Is visible in a file manager (as a folder). Some sections (like summary) can't include files: do not show as a folders
 * FileFormatRegularExpression {string} - Regular expression for available file formats
 
+### Section files
+
+* A section may contain a list of files
+* There are two variants of representation of a list of files
+    - Full view, *fmgr-full*
+    - Modal view, *fmgr-modal*
+* A selected stage contains partials:
+    - *fmgr-arousal* (button to show a stage view - on the top panel)
+    - *fmgr-modal* (a modal window, hided by default)
+* A tab of a selected stage (the main workspace) contains partials:
+    - *fmgr-full* (list of folders and files)
+    - widget layouts
+    - selected section
+* *fmgr-full* and *fmgr-modal* partials contains *fmgr-file-list* partial, which contains:
+    - list of files
+    - buttons to upload and remove files
+    - and other features, like sorting, filtering...
+
+#### A full file view (like an explorer in Windows)
+
+Allows to see all files and folders for a current stage. 
+There is a simple navigation between folders (sections).
+Allows to download files (or quickview, if possible).
+
+#### A modal file view (like an 'Open file' modal in Windows)
+
+Allows to select a file for user's needs.
+Only one folder corresponding a selected section.
+No quickview (no download), because only one modal window can be runned.
+
 #### Well sections
 
 * Summary (main well parameters)
