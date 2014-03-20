@@ -1,10 +1,11 @@
 ﻿/** @module */
 define(['knockout',
+		'helpers/app-helper',
 		'models/file-spec',
 		'services/file-spec',
 		'models/pre-file'],
-	function (
-		ko,
+	function (ko,
+		appHelper,
 		FileSpec,
 		fileSpecService,
 		PreFile) {
@@ -128,6 +129,18 @@ define(['knockout',
 				deferEvaluation : true,
 				owner : this
 			});
+
+		/**
+		 * Max size of a file, in bytes (10MB)
+		 * @type {number}
+		 */
+		this.maxSizeOfFile = 10485760;
+
+		/**
+		 * Max size in megabytes
+		 * @type {number}
+		 */
+		this.maxSizeOfFileInMb = this.maxSizeOfFile / 1024 / 1024;
 	};
 
 	/** Calculate whether any file is selected */
@@ -283,9 +296,8 @@ define(['knockout',
 	/** Get settings for file loader: only after defining of SectionPattern */
 	exports.prototype.getSectionFiloader = function () {
 		var ths = this;
-		var maxSizeOfFile = 10485760; // bytes - 10MB
+		var progressInterval = 100; //https://github.com/blueimp/jQuery-File-Upload/wiki/Options
 		var regExpString = ko.unwrap(ths.sectionPattern).fileTypeRegExp;
-		var tmpRegExp = new RegExp(regExpString);
 		return {
 			url : fileSpecService.getUrl(ths.stageKey, this.id),
 			addCallback : function (data) {
@@ -294,38 +306,52 @@ define(['knockout',
 					throw new Error('No file is selected');
 				}
 
-        // data._progress is changed automatically
-				var tmpPreFile = new PreFile(tmpFile.name, tmpFile.size, tmpFile.type, data._progress);
+				// data._progress is changed automatically
+				var tmpPreFile = new PreFile(tmpFile.name, tmpFile.size, tmpFile.type, regExpString);
+
 				ths.listOfPreFile.push(tmpPreFile);
 
-				// Error scope
-				var errScope = [];
-				// Check size of all files
-				data.files.forEach(function (tmpFile) {
-					if (tmpFile.size > maxSizeOfFile) {
-						errScope.push('Max size of file: 10MB (' + tmpFile.name + ')');
-					}
+				console.log('tmpPreFile', tmpPreFile);
 
-					if (tmpRegExp.test(tmpFile.type) === false) {
-						// Alert. Remove metacharacters from regexp and divide to normal representation
-						errScope.push(tmpFile.name + ': file type (' + (tmpFile.type || 'empty') + ') is not supported. Supported types: ' + regExpString.replace(/[\\,\$,\^]/g, '').split('|').join(', '));
-					}
-				});
+				// If a file is success
+				if (tmpPreFile.isSuccess) {
+					// Update progress percent
+					var progressIntervalId = window.setInterval(function () {
+							var tmpProgressPercent = parseInt((data._progress.loaded / data._progress.total) * 100, 10);
 
-				if (errScope.length > 0) {
-					alert('File errors: \n' + errScope.join('\n'));
-					return;
+							if (appHelper.isNumeric(tmpProgressPercent)) {
+								tmpPreFile.progressPercent(tmpProgressPercent);
+							} else {
+								// Check warnings, may be Nan
+								console.log(tmpProgressPercent + ' is not a number');
+							}
+
+							if (tmpProgressPercent === 100) {
+								window.clearInterval(progressIntervalId);
+							}
+						}, progressInterval);
+
+					data.submit()
+					.done(function (result) {
+						// Remove from pre files
+						ths.listOfPreFile.remove(tmpPreFile);
+						// Insert to the main list of files
+						ths.listOfFileSpec.push(new FileSpec(result[0]));
+					})
+					.fail(function (jqXHR, textStatus, errorThrown) {
+						alert(textStatus + ': ' + jqXHR.responseText + ' (' + errorThrown + ')');
+					});
 				}
-
-				data.submit()
-				.done(function (result) {
-					ths.listOfFileSpec.push(new FileSpec(result[0]));
-				})
-				.fail(function (jqXHR, textStatus, errorThrown) {
-					alert(textStatus + ': ' + jqXHR.responseText + ' (' + errorThrown + ')');
-				});
 			}
 		};
+	};
+
+	/**
+	 * Remove a pre-file
+	 */
+	exports.prototype.removePreFile = function (preFileToRemove) {
+		console.log('remove a pre file');
+		this.listOfPreFile.remove(preFileToRemove);
 	};
 
 	return exports;

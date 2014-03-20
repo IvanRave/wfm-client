@@ -4,6 +4,16 @@ define(['jquery'], function ($) {
 
 	var exports = {};
 
+	/**
+	 * Whether is value numeric
+	 *    https://api.jquery.com/jQuery.isNumeric/
+	 * @returns {boolean}
+	 */
+	exports.isNumeric = function (value) {
+		// may be additional check
+		return $.isNumeric(value);
+	};
+
 	// Hidden Iframe for file loading (to the client comp)
 	exports.downloadURL = function (url) {
 		var hiddenIFrameID = 'hiddenDownloader';
@@ -82,10 +92,10 @@ define(['jquery'], function ($) {
 		return Math.abs(area / 2);
 	};
 
-  /**
-  * Get list of years
-  * @returns {Array}
-  */
+	/**
+	 * Get list of years
+	 * @returns {Array}
+	 */
 	exports.getYearList = function (startYear, endYear) {
 		var tempArr = [];
 
