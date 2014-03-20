@@ -620,7 +620,7 @@ define(['jquery', 'knockout', 'moment', 'helpers/modal-helper', 'helpers/file-he
 	ko.bindingHandlers.filoader = {
 		init : function (element, valueAccessor) {
 			var tmpFiloader = valueAccessor();
-			fileHelper.initRegExpFileUpload(element, tmpFiloader.url, tmpFiloader.fileTypeRegExp, tmpFiloader.callback);
+			fileHelper.initRegExpFileUpload($(element), tmpFiloader.url, tmpFiloader.addCallback);
 		}
 	};
 

@@ -1,7 +1,13 @@
 ﻿/** @module */
 define(['knockout',
 		'models/file-spec',
-		'services/file-spec'], function (ko, FileSpec, fileSpecService) {
+		'services/file-spec',
+		'models/pre-file'],
+	function (
+		ko,
+		FileSpec,
+		fileSpecService,
+		PreFile) {
 	'use strict';
 
 	/**
@@ -80,6 +86,12 @@ define(['knockout',
 		 * @type {Array.<module:models/file-spec>}
 		 */
 		this.listOfFileSpec = ko.observableArray();
+
+		/**
+		 * A list of uploading files
+		 * @type {Array.<module:models/pre-file>}
+		 */
+		this.listOfPreFile = ko.observableArray();
 
 		/**
 		 * Sorted and filtered list of files: ready to view
@@ -185,7 +197,7 @@ define(['knockout',
 			return elem.id === idOfFileSpec;
 		})[0];
 	};
-  
+
 	/**
 	 * Delete file spec by id
 	 * @param {string} idOfFileSpec
@@ -271,12 +283,48 @@ define(['knockout',
 	/** Get settings for file loader: only after defining of SectionPattern */
 	exports.prototype.getSectionFiloader = function () {
 		var ths = this;
+		var maxSizeOfFile = 10485760; // bytes - 10MB
+		var regExpString = ko.unwrap(ths.sectionPattern).fileTypeRegExp;
+		var tmpRegExp = new RegExp(regExpString);
 		return {
-			callback : function (result) {
-				ths.listOfFileSpec.push(new FileSpec(result[0]));
-			},
 			url : fileSpecService.getUrl(ths.stageKey, this.id),
-			fileTypeRegExp : ko.unwrap(ths.sectionPattern).fileTypeRegExp
+			addCallback : function (data) {
+				var tmpFile = data.files[0];
+				if (!tmpFile) {
+					throw new Error('No file is selected');
+				}
+
+        // data._progress is changed automatically
+				var tmpPreFile = new PreFile(tmpFile.name, tmpFile.size, tmpFile.type, data._progress);
+				ths.listOfPreFile.push(tmpPreFile);
+
+				// Error scope
+				var errScope = [];
+				// Check size of all files
+				data.files.forEach(function (tmpFile) {
+					if (tmpFile.size > maxSizeOfFile) {
+						errScope.push('Max size of file: 10MB (' + tmpFile.name + ')');
+					}
+
+					if (tmpRegExp.test(tmpFile.type) === false) {
+						// Alert. Remove metacharacters from regexp and divide to normal representation
+						errScope.push(tmpFile.name + ': file type (' + (tmpFile.type || 'empty') + ') is not supported. Supported types: ' + regExpString.replace(/[\\,\$,\^]/g, '').split('|').join(', '));
+					}
+				});
+
+				if (errScope.length > 0) {
+					alert('File errors: \n' + errScope.join('\n'));
+					return;
+				}
+
+				data.submit()
+				.done(function (result) {
+					ths.listOfFileSpec.push(new FileSpec(result[0]));
+				})
+				.fail(function (jqXHR, textStatus, errorThrown) {
+					alert(textStatus + ': ' + jqXHR.responseText + ' (' + errorThrown + ')');
+				});
+			}
 		};
 	};
 

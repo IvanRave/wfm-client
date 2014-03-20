@@ -6,7 +6,7 @@
     <span class="btn btn-sm btn-inverse fileinput-button">
       <i class="glyphicon glyphicon-plus"></i>
       <span>Add file...</span>
-      <input data-bind="filoader: getSectionFiloader()" type="file"></input>
+      <input data-bind="filoader: getSectionFiloader()" type="file" multiple></input>
     </span>
     <button class="btn btn-sm btn-inverse" data-bind="click: deleteSelectedFileSpecs, enable: isSelectedAnyFile">
       <i class="glyphicon glyphicon-remove"></i> {{capitalizeFirst lang.toDelete}}
@@ -29,6 +29,12 @@
       <span class="bld" title="Size, kilobytes">kB</span>
     </div>
   </div>
+  <!-- <div data-bind="foreach: mdlSection.listOfPreFile">
+    <div>
+      <span data-bind="text: name"></span> - 
+      <span data-bind="text: ko.toJSON(progress)"></span>
+    </div>
+  </div> -->
   <div data-bind="foreach: mdlSection.readyListOfFileSpec">
     <div class="clearfix">
       <div class="col-sm-8">
