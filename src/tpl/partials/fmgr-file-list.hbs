@@ -4,14 +4,19 @@
   <!-- ko if: mdlSection.sectionPattern -->
   <div data-bind="with: mdlSection" class="clearfix">
     <div class="pull-left">
+      <div class="checkbox">
+        <label>
+          <input type="checkbox" data-bind="checked: isSlcAllFiles" />
+          <span>all</span>
+        </label>
+      </div>
+    </div>
+    <div class="pull-left min-left-margin">
       <span class="btn btn-sm btn-inverse fileinput-button">
         <i class="glyphicon glyphicon-plus"></i>
         <span>Add file...</span>
         <input data-bind="filoader: getSectionFiloader()" type="file" multiple></input>
       </span>
-      <!-- <span>
-        * max size: <span data-bind="text: maxSizeOfFileInMb"></span>MB
-      </span> -->
     </div>
     <div class="pull-right">
       <button class="btn btn-sm btn-inverse" data-bind="click: deleteSelectedFileSpecs, enable: isSelectedAnyFile">
@@ -36,12 +41,12 @@
   <div data-bind="with: mdlSection">
     <div data-bind="foreach: listOfPreFile">
       <div class="clearfix">
-        <div class="col-sm-8">
+        <div class="col-sm-4">
           <div class="checkbox">
             <label>
               <input type="checkbox" disabled></input>
+              <span data-bind="text: name"></span>
             </label>
-            <span data-bind="text: name"></span>
           </div>
         </div>
         <div class="col-sm-4">
@@ -65,7 +70,17 @@
                 Supported types: <span data-bind="text: supportedTypes"></span>
               </span>
             </div>
-          </div>        
+          </div>
+        </div>
+        <div class="col-sm-2">
+          <div data-bind="if: isSuccess">
+            <button class="btn btn-sm btn-default" data-bind="click: abortUploading">
+              Cancel
+            </button>
+          </div>
+        </div>
+        <div class="col-sm-2">
+          <span data-bind="text: sizeInKb"></span>
         </div>
       </div>
     </div>

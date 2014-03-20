@@ -141,6 +141,25 @@ define(['knockout',
 		 * @type {number}
 		 */
 		this.maxSizeOfFileInMb = this.maxSizeOfFile / 1024 / 1024;
+
+		/**
+		 * Whether are selected all files
+		 * @type {boolean}
+		 */
+		this.isSlcAllFiles = ko.computed({
+				read : function () {
+          return ko.unwrap(this.listOfFileSpec).filter(function(tmpFileSpec){
+            return (ko.unwrap(tmpFileSpec.isSelected) === false);
+          }).length === 0;
+        },
+				write : function (newVal) {
+					ko.unwrap(this.listOfFileSpec).forEach(function(tmpFileSpec){
+            tmpFileSpec.isSelected(newVal);
+          });
+				},
+				deferEvaluation : true,
+				owner : this
+			});
 	};
 
 	/** Calculate whether any file is selected */
@@ -298,6 +317,7 @@ define(['knockout',
 		var ths = this;
 		var progressInterval = 100; //https://github.com/blueimp/jQuery-File-Upload/wiki/Options
 		var regExpString = ko.unwrap(ths.sectionPattern).fileTypeRegExp;
+		var tmpMaxSizeOfFile = this.maxSizeOfFile;
 		return {
 			url : fileSpecService.getUrl(ths.stageKey, this.id),
 			addCallback : function (data) {
@@ -307,14 +327,20 @@ define(['knockout',
 				}
 
 				// data._progress is changed automatically
-				var tmpPreFile = new PreFile(tmpFile.name, tmpFile.size, tmpFile.type, regExpString);
+				var tmpPreFile = new PreFile(tmpFile.name,
+						tmpFile.size,
+						tmpFile.type,
+						regExpString,
+						tmpMaxSizeOfFile,
+						data.abort);
 
 				ths.listOfPreFile.push(tmpPreFile);
 
-				console.log('tmpPreFile', tmpPreFile);
+				console.log('tmpPreFile', tmpPreFile, data);
 
 				// If a file is success
 				if (tmpPreFile.isSuccess) {
+					console.log('successful file');
 					// Update progress percent
 					var progressIntervalId = window.setInterval(function () {
 							var tmpProgressPercent = parseInt((data._progress.loaded / data._progress.total) * 100, 10);
