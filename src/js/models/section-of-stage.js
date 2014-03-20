@@ -147,15 +147,11 @@ define(['knockout',
 		 * @type {boolean}
 		 */
 		this.isSlcAllFiles = ko.computed({
-				read : function () {
-          return ko.unwrap(this.listOfFileSpec).filter(function(tmpFileSpec){
-            return (ko.unwrap(tmpFileSpec.isSelected) === false);
-          }).length === 0;
-        },
+				read : this.calcIsSlcAllFiles,
 				write : function (newVal) {
-					ko.unwrap(this.listOfFileSpec).forEach(function(tmpFileSpec){
-            tmpFileSpec.isSelected(newVal);
-          });
+					ko.unwrap(this.listOfFileSpec).forEach(function (tmpFileSpec) {
+						tmpFileSpec.isSelected(newVal);
+					});
 				},
 				deferEvaluation : true,
 				owner : this
@@ -332,42 +328,53 @@ define(['knockout',
 						tmpFile.type,
 						regExpString,
 						tmpMaxSizeOfFile,
-						data.abort);
+						function () {
+						data.abort();
+					});
 
 				ths.listOfPreFile.push(tmpPreFile);
 
 				console.log('tmpPreFile', tmpPreFile, data);
 
-				// If a file is success
-				if (tmpPreFile.isSuccess) {
-					console.log('successful file');
-					// Update progress percent
-					var progressIntervalId = window.setInterval(function () {
-							var tmpProgressPercent = parseInt((data._progress.loaded / data._progress.total) * 100, 10);
-
-							if (appHelper.isNumeric(tmpProgressPercent)) {
-								tmpPreFile.progressPercent(tmpProgressPercent);
-							} else {
-								// Check warnings, may be Nan
-								console.log(tmpProgressPercent + ' is not a number');
-							}
-
-							if (tmpProgressPercent === 100) {
-								window.clearInterval(progressIntervalId);
-							}
-						}, progressInterval);
-
-					data.submit()
-					.done(function (result) {
-						// Remove from pre files
-						ths.listOfPreFile.remove(tmpPreFile);
-						// Insert to the main list of files
-						ths.listOfFileSpec.push(new FileSpec(result[0]));
-					})
-					.fail(function (jqXHR, textStatus, errorThrown) {
-						alert(textStatus + ': ' + jqXHR.responseText + ' (' + errorThrown + ')');
-					});
+				// If a file is not success
+				if (tmpPreFile.isSuccess === false) {
+					return;
 				}
+
+				console.log('successful upload');
+
+				// Update progress percent
+				var progressIntervalId = window.setInterval(function () {
+						var tmpProgressPercent = parseInt((data._progress.loaded / data._progress.total) * 100, 10);
+
+						if (appHelper.isNumeric(tmpProgressPercent)) {
+							tmpPreFile.progressPercent(tmpProgressPercent);
+						} else {
+							// Check warnings, may be Nan
+							console.log(tmpProgressPercent + ' is not a number');
+						}
+
+						if (tmpProgressPercent === 100) {
+							window.clearInterval(progressIntervalId);
+						}
+					}, progressInterval);
+
+				data.submit()
+				.done(function (result) {
+					// Remove from pre files
+					ths.listOfPreFile.remove(tmpPreFile);
+					// Insert to the main list of files
+					ths.listOfFileSpec.push(new FileSpec(result[0]));
+				})
+				.fail(function (jqXhr, textStatus, errorThrown) {
+					if (textStatus === 'abort') {
+						ths.listOfPreFile.remove(tmpPreFile);
+					} else {
+						console.log(jqXhr, textStatus, errorThrown);
+						alert(textStatus + ': ' + jqXhr.responseText + ' (' + errorThrown + ')');
+					}
+				});
+
 			}
 		};
 	};
@@ -378,6 +385,20 @@ define(['knockout',
 	exports.prototype.removePreFile = function (preFileToRemove) {
 		console.log('remove a pre file');
 		this.listOfPreFile.remove(preFileToRemove);
+	};
+
+	/** Calculate, whether all file are selected */
+	exports.prototype.calcIsSlcAllFiles = function () {
+		var tmpList = ko.unwrap(this.listOfFileSpec);
+		// If no files - false
+		if (tmpList.length === 0) {
+			return false;
+		}
+
+		// If there is at least one unselected file - false
+		return (tmpList.filter(function (tmpFileSpec) {
+				return (ko.unwrap(tmpFileSpec.isSelected) === false);
+			}).length === 0);
 	};
 
 	return exports;

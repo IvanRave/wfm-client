@@ -9,7 +9,7 @@ define(['knockout'], function (ko) {
 	 * @param {number} optSize - A size of the file
 	 * @param {string} optContentType - A type of the file
 	 */
-	var exports = function (optName, optSize, optContentType, regExpString, maxSizeOfFile, abortFunction) {
+	var exports = function (optName, optSize, optContentType, regExpString, maxSizeOfFile, abortCallback) {
 		/**
 		 * A name of the file
 		 * @type {string}
@@ -23,11 +23,17 @@ define(['knockout'], function (ko) {
 		this.size = optSize;
 
 		/**
-		 * File size, kilobytes
+		 * File size, kilobytes (2 after point)
 		 * @type {number}
 		 */
-		this.sizeInKb = parseInt(this.size / 1024, 10);
+		this.sizeInKb = parseInt((this.size * 100) / 1024, 10) / 100;
 
+    /**
+    * File size, megabytes
+    * @type {number}
+    */
+    this.sizeInMb = parseInt((this.size * 100) / 1024 / 1024, 10) / 100;
+    
 		/**
 		 * A content type of the file
 		 * @type {string}
@@ -88,7 +94,8 @@ define(['knockout'], function (ko) {
 
 		/** Abort uploading */
 		this.abortUploading = function () {
-			abortFunction();
+      console.log('abort callback');
+			abortCallback();
 			// remove this pre-file
 		};
 	};

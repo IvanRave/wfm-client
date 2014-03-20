@@ -100,7 +100,7 @@ define(['knockout',
 		 * Whether file is selected (in file manager): TODO: create view for non-model properties
 		 * @type {boolean}
 		 */
-		this.isSelected = ko.observable();
+		this.isSelected = ko.observable(false);
 	};
 
 	/** Download file */

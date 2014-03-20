@@ -2,40 +2,41 @@
 <div class="modal-body">
   <!-- ko with: slcVwmSectionFmg -->
   <!-- ko if: mdlSection.sectionPattern -->
-  <div data-bind="with: mdlSection" class="clearfix">
-    <div class="pull-left">
-      <div class="checkbox">
-        <label>
-          <input type="checkbox" data-bind="checked: isSlcAllFiles" />
-          <span>all</span>
-        </label>
+  <div data-bind="if: $root.isEmployeeInEditMode">
+    <div data-bind="with: mdlSection" class="clearfix">
+      <div class="pull-left min-left-margin">
+        <span class="btn btn-sm btn-inverse fileinput-button">
+          <i class="glyphicon glyphicon-plus"></i>
+          <span>Add file...</span>
+          <input data-bind="filoader: getSectionFiloader()" type="file" multiple></input>
+        </span>
       </div>
-    </div>
-    <div class="pull-left min-left-margin">
-      <span class="btn btn-sm btn-inverse fileinput-button">
-        <i class="glyphicon glyphicon-plus"></i>
-        <span>Add file...</span>
-        <input data-bind="filoader: getSectionFiloader()" type="file" multiple></input>
-      </span>
-    </div>
-    <div class="pull-right">
-      <button class="btn btn-sm btn-inverse" data-bind="click: deleteSelectedFileSpecs, enable: isSelectedAnyFile">
-        <i class="glyphicon glyphicon-remove"></i> {{capitalizeFirst lang.toDelete}}
-      </button>
+      <div class="pull-left min-left-margin">
+        <button class="btn btn-sm btn-inverse" data-bind="click: deleteSelectedFileSpecs, enable: isSelectedAnyFile">
+          <i class="glyphicon glyphicon-remove"></i> {{capitalizeFirst lang.toDelete}}
+        </button>
+      </div>
     </div>
   </div>
   <div class="text-center" data-bind="hidden: mdlSection.readyListOfFileSpec.hasItems">
     <span>No files</span>
   </div>
-  <div class="clearfix" data-bind="visible: mdlSection.readyListOfFileSpec.hasItems">
-    <div class="col-sm-8">
-      <span class="bld" title="File name">Name</span>
-    </div>
-    <div class="col-sm-2 hidden-xs">
-      <span class="bld" title="Created date and time">Created</span>
-    </div>
-    <div class="col-sm-2 hidden-xs">
-      <span class="bld" title="Size, kilobytes">kB</span>
+  <div data-bind="with: mdlSection">
+    <div class="clearfix" data-bind="visible: readyListOfFileSpec.hasItems">
+      <div class="col-sm-8">
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" data-bind="checked: isSlcAllFiles" />
+            <span class="bld">Files</span>
+          </label>
+        </div>
+      </div>
+      <div class="col-sm-2 hidden-xs">
+        <span class="bld" title="Created date and time">Created</span>
+      </div>
+      <div class="col-sm-2 hidden-xs">
+        <span class="bld" title="Size, kilobytes">kB</span>
+      </div>
     </div>
   </div>
   <div data-bind="with: mdlSection">
@@ -49,26 +50,12 @@
             </label>
           </div>
         </div>
+        <!-- ko if: isSuccess -->
         <div class="col-sm-4">
-          <div data-bind="if: isSuccess">
-            <div class="progress progress-striped">
-              <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"
-                   data-bind="attr: { 'aria-valuenow' : progressPercent }, style: {'width': progressPercentString }">
-                <span data-bind="text: progressPercentString"></span>
-              </div>
-            </div>
-          </div>
-          <div data-bind="ifnot: isSuccess">
-            <div class="alert alert-danger">
-              <button type="button" class="close" data-bind="click: $parent.removePreFile.bind($parent)">
-                &times;
-              </button>
-              <span data-bind="ifnot: isSuccessSize">
-                Size of the file is more than 10MB
-              </span>
-              <span data-bind="ifnot: isSuccessType">
-                Supported types: <span data-bind="text: supportedTypes"></span>
-              </span>
+          <div class="progress progress-striped">
+            <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"
+                 data-bind="attr: { 'aria-valuenow' : progressPercent }, style: {'width': progressPercentString }">
+              <span data-bind="text: progressPercentString"></span>
             </div>
           </div>
         </div>
@@ -82,6 +69,22 @@
         <div class="col-sm-2">
           <span data-bind="text: sizeInKb"></span>
         </div>
+        <!-- /ko -->
+        <!-- ko ifnot: isSuccess -->
+        <div class="col-sm-8">
+          <div class="alert alert-danger">
+            <button type="button" class="close" data-bind="click: $parent.removePreFile.bind($parent)">
+              &times;
+            </button>
+            <span data-bind="ifnot: isSuccessSize">
+              Size of the file <span class="bld" data-bind="text: sizeInMb"></span> is more than 10MB
+            </span>
+            <span data-bind="ifnot: isSuccessType">
+              Supported types: <span data-bind="text: supportedTypes"></span>
+            </span>
+          </div>
+        </div>
+        <!-- /ko -->
       </div>
     </div>
     <div data-bind="foreach: readyListOfFileSpec">
