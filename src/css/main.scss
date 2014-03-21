@@ -1016,3 +1016,26 @@ ul.wfm-light-list {
 .stage-folder__name {
   font-weight: bold;
 }
+
+/* A header of a list of file */
+.lf-header {
+  padding-bottom: 4px;
+}
+
+.lf-header-column {
+  padding: 4px 4px 6px 12px;
+  border: 1px solid #cecece;
+  background-color: #efefef;
+  position: relative;
+}
+
+.lf-header-column__select-all {
+  margin: 0 0 0 0 !important;
+  position: absolute;
+  top: 8px;
+  left: 14px;
+}
+
+.lf-header-column__name-header {
+  margin-left: 26px;
+}

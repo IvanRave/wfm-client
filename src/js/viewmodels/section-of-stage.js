@@ -100,17 +100,51 @@ define(['knockout',
 		if (tmpSortProp) {
 			var tmpSortOrder = ko.unwrap(this.fileSortOrder);
 
-			var tmpList = ko.unwrap(this.listOfVwmFileSpec);
+			var tmpListOfVwmFileSpec = ko.unwrap(this.listOfVwmFileSpec);
       
-			return tmpList.sort(function (a, b) {
-				if (b.mdlFileSpec[tmpSortProp] > a.mdlFileSpec[tmpSortProp]) {
+      // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
+      var tmpListForSorting = tmpListOfVwmFileSpec.map(function(vwmItem, i){
+          var tmpValue = ko.unwrap(vwmItem.mdlFileSpec[tmpSortProp]);
+          
+          if (tmpSortProp === 'name'){
+            tmpValue = tmpValue.toLowerCase();
+          }
+          
+          return {
+            index: i,
+            value: tmpValue
+          };
+      });
+      
+			var sortedList = tmpListForSorting.sort(function (a, b) {
+				if (a.value > b.value) {
 					return tmpSortOrder;
 				} else {
 					return -tmpSortOrder;
 				}
 			});
+      
+      // A ready list
+      return sortedList.map(function(sortedItem){
+        return tmpListOfVwmFileSpec[sortedItem.index];
+      });
 		}
 	};
 
+  exports.prototype.sortByName = function(){
+    this.fileSortProp('name');
+    this.fileSortOrder(1);
+  };
+  
+  exports.prototype.sortBySize = function(){
+    this.fileSortProp('length');
+    this.fileSortOrder(1);
+  };
+  
+  exports.prototype.sortByCreated = function(){
+    this.fileSortProp('createdUnixTime');
+    this.fileSortOrder(-1);
+  };
+  
 	return exports;
 });
