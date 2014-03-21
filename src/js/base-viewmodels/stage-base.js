@@ -318,6 +318,7 @@ define(['knockout',
   /** Choose dashboard (no section) */
 	exports.prototype.showStageViewFmgr = function () {
 		this.unzOfSlcVwmSectionWrk(null);
+    this.unselectVwmSectionFmg();
 		// Select a stage view
 		this.slcStageView(stageViewConstants.fmgr.id);
 	};
@@ -340,6 +341,11 @@ define(['knockout',
 		// Set as a selected to show files
 		this.unzOfSlcVwmSectionFmg(vwmSectionToSelect.unz);
 	};
+  
+  /** Unselect all sections, show folders */
+  exports.prototype.unselectVwmSectionFmg = function(){
+    this.unzOfSlcVwmSectionFmg(null);
+  };
 
 	/** Build a list with widget layout viewmodels */
 	exports.prototype.buildListOfVwmWidgout = function () {

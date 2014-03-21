@@ -1,18 +1,25 @@
 ﻿<!-- current: vwmStage (vwmUpro ... vwmWell) -->
-<div class="modal-header clearfix">
-  <div class="clearfix">
-    <div class="pull-left">
-      <div class="btn-group" data-bind="foreach: listOfVwmSection">
-        <!-- ko if: mdlSection.sectionPattern -->
-        <!-- ko if: mdlSection.sectionPattern().isFolder -->
-        <button class="btn btn-sm btn-default" data-bind="css: {'active': isSlcVwmSectionFmg }, click: $parent.selectVwmSectionFmg.bind($parent)">
+<div class="clearfix" data-bind="hidden: slcVwmSectionFmg">
+  <div data-bind="foreach: listOfVwmSection">
+    <div class="pull-left min-margin">
+      <!-- ko if: mdlSection.sectionPattern -->
+      <!-- ko if: mdlSection.sectionPattern().isFolder -->
+      <button class="btn btn-sm btn-default stage-folder" data-bind="css: {'active': isSlcVwmSectionFmg }, click: $parent.selectVwmSectionFmg.bind($parent)">
+        <span>
           <span data-bind="with: mdlSection.sectionPattern">
-            <span data-bind="text: name"></span>
+            <i class="wfm-icon stage-folder__wfm-icon" data-bind="css: iconClass"></i>
           </span>
-        </button>
-        <!-- /ko -->
-        <!-- /ko -->
-      </div>
+          <span class="stage-folder__folder-icon">
+            <i class="glyphicon glyphicon-folder-open"></i>
+          </span>
+        </span>
+        <br />
+        <span data-bind="with: mdlSection.sectionPattern">
+          <span class="stage-folder__name" data-bind="text: name"></span>
+        </span>
+      </button>
+      <!-- /ko -->
+      <!-- /ko -->
     </div>
   </div>
 </div>

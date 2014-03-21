@@ -996,3 +996,23 @@ ul.wfm-light-list {
     fill: #f00;
     stroke: #000;
   }
+  
+.stage-folder {
+  width: 70px;
+  position: relative;
+}
+
+.stage-folder__wfm-icon {
+  font-size: 1.8em;
+}
+
+.stage-folder__folder-icon {
+  font-size: 0.9em;
+  position: absolute;
+  top: 2px;
+  right: 6px;
+}
+
+.stage-folder__name {
+  font-weight: bold;
+}
