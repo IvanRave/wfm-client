@@ -133,10 +133,10 @@
               <span data-bind="hidden: isEditView">
                 <span class="break-word" data-bind="text: mdlFileSpec.namePlusExtension, attr: {title: mdlFileSpec.fullTitle }"></span>
               </span>
-              <span data-bind="visible: isEditView">
-                <input class="form-control input-sm" type="text" data-bind="value: $parent.nameForEdit, event: { keydown: $parent.saveVwmFileSpec.bind($parent) }" />
-              </span>
             </label>
+            <span data-bind="visible: isEditView">
+              <input class="form-control input-sm" type="text" data-bind="value: $parent.nameForEdit, event: { keydown: $parent.saveVwmFileSpec.bind($parent) }" />
+            </span>
           </div>
         </div>
         <div class="col-sm-2">

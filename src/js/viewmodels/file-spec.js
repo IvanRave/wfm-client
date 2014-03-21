@@ -1,4 +1,6 @@
-﻿/** @module */
+﻿/**
+* @module
+*/
 define(['knockout',
 		'helpers/app-helper'],
 	function (ko,

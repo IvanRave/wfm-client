@@ -231,8 +231,7 @@ define(['knockout',
 	};
 
 	/** Save a name of the file spec */
-	exports.prototype.saveVwmFileSpec = function (vwmFileSpecToSave, e) {    
-    console.log(e);
+	exports.prototype.saveVwmFileSpec = function (vwmFileSpecToSave, e) {
 		// Escape
 		if (((e.type === 'keydown') && (e.keyCode === 27)) || (e.type === 'blur')) {
 			vwmFileSpecToSave.isEditView(false);

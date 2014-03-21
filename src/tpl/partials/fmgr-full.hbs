@@ -1,26 +1,26 @@
 ﻿<!-- current: vwmStage (vwmUpro ... vwmWell) -->
 <div class="clearfix" data-bind="hidden: slcVwmSectionFmg">
   <div data-bind="foreach: listOfVwmSection">
+    <!-- ko if: mdlSection.sectionPattern -->
+    <!-- ko if: mdlSection.sectionPattern().isFolder -->
     <div class="pull-left min-margin">
-      <!-- ko if: mdlSection.sectionPattern -->
-      <!-- ko if: mdlSection.sectionPattern().isFolder -->
-      <button class="btn btn-sm btn-default stage-folder" data-bind="css: {'active': isSlcVwmSectionFmg }, click: $parent.selectVwmSectionFmg.bind($parent)">
-        <span>
+      <button class="btn btn-sm btn-default stage-folder" 
+              data-bind="css: {'active': isSlcVwmSectionFmg }, click: $parent.selectVwmSectionFmg.bind($parent)">
+        <div>
           <span data-bind="with: mdlSection.sectionPattern">
             <i class="wfm-icon stage-folder__wfm-icon" data-bind="css: iconClass"></i>
           </span>
           <span class="stage-folder__folder-icon">
             <i class="glyphicon glyphicon-folder-open"></i>
           </span>
-        </span>
-        <br />
-        <span data-bind="with: mdlSection.sectionPattern">
+        </div>
+        <div data-bind="with: mdlSection.sectionPattern">
           <span class="stage-folder__name" data-bind="text: name"></span>
-        </span>
+        </div>
       </button>
-      <!-- /ko -->
-      <!-- /ko -->
     </div>
+    <!-- /ko -->
+    <!-- /ko -->
   </div>
 </div>
 {{> fmgr-file-list }}
