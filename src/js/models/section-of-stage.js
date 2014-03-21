@@ -121,16 +121,6 @@ define(['knockout',
 			});
 
 		/**
-		 * Whether any file is selected: to activate delete button or smth else
-		 * @type {boolean}
-		 */
-		this.isSelectedAnyFile = ko.computed({
-				read : this.calcIsSelectedAnyFile,
-				deferEvaluation : true,
-				owner : this
-			});
-
-		/**
 		 * Max size of a file, in bytes (10MB)
 		 * @type {number}
 		 */
@@ -156,11 +146,6 @@ define(['knockout',
 				deferEvaluation : true,
 				owner : this
 			});
-	};
-
-	/** Calculate whether any file is selected */
-	exports.prototype.calcIsSelectedAnyFile = function () {
-		return ko.unwrap(this.listOfSlcFileSpec).length > 0;
 	};
 
 	/**
@@ -191,10 +176,7 @@ define(['knockout',
 	};
 
 	/** Delete selected files from this section */
-	exports.prototype.deleteSelectedFileSpecs = function () {
-		// Choose selected files
-		var tmpSelectedList = ko.unwrap(this.listOfSlcFileSpec);
-
+	exports.prototype.removeSlcFileSpecs = function (tmpSelectedList) {
 		// Need to send to the server (only ids - to define and remove files on the server)
 		var tmpIdList = tmpSelectedList.map(function (elem) {
 				return {
@@ -250,6 +232,11 @@ define(['knockout',
 			}
 		});
 	};
+  
+  /** Save a file specification */
+  exports.prototype.saveFileSpec = function(fileSpecToSave){
+    fileSpecService.put(this.stageKey, this.id, fileSpecToSave.id, fileSpecToSave.toPlainFileSpec());
+  };
 
 	/** Load list of file spec from the server */
 	exports.prototype.loadListOfFileSpec = function () {
@@ -348,15 +335,15 @@ define(['knockout',
 						//var tmpProgressPercent = parseInt((data._progress.loaded / data._progress.total) * 100, 10);
 
 						// if (appHelper.isNumeric(tmpProgressPercent)) {
-							// tmpPreFile.progressPercent(tmpProgressPercent);
+						// tmpPreFile.progressPercent(tmpProgressPercent);
 						// } else {
-							// // Check warnings, may be Nan
-							// console.log(tmpProgressPercent + ' is not a number');
+						// // Check warnings, may be Nan
+						// console.log(tmpProgressPercent + ' is not a number');
 						// }
 
-            tmpPreFile.bytesLoaded(data._progress.loaded);
-            
-            // Stop the time when fully loaded 
+						tmpPreFile.bytesLoaded(data._progress.loaded);
+
+						// Stop the time when fully loaded
 						if (data._progress.loaded === tmpPreFile.size) {
 							window.clearInterval(progressIntervalId);
 						}
@@ -370,7 +357,7 @@ define(['knockout',
 					ths.listOfFileSpec.push(new FileSpec(result[0]));
 				})
 				.fail(function (jqXhr, textStatus, errorThrown) {
-          window.clearInterval(progressIntervalId);
+					window.clearInterval(progressIntervalId);
 					if (textStatus === 'abort') {
 						ths.listOfPreFile.remove(tmpPreFile);
 					} else {

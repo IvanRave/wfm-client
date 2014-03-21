@@ -30,6 +30,9 @@ define(['constants/stage-constants', 'helpers/ajax-request'], function (stageCon
       // {idOfFileSpec:guid}/perfomance-data/{indexOfStartRow:int}
       return ajaxRequest('POST', url(stageKey, idOfSection, idOfFileSpec) + '/perfomance-data/' + indexOfStartRow, listOfColumnAttrData);
     },
+    put: function(stageKey, idOfSection, idOfFileSpec, mdlData){
+      return ajaxRequest('PUT', url(stageKey, idOfSection, idOfFileSpec), mdlData);
+    },
 		// Delete few files in one request
 		deleteArray : function (stageKey, idOfSection, listOfFileSpec) {
 			return ajaxRequest('DELETE', url(stageKey, idOfSection), listOfFileSpec);

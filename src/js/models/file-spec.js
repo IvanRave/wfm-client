@@ -1,14 +1,12 @@
-﻿/** 
-* @module 
-* @todo #33! Update filter by typing with delay
-*       update knockout to 3.1 firstly with a new method
-*/
+﻿/**
+ * @module
+ * @todo #33! Update filter by typing with delay
+ *       update knockout to 3.1 firstly with a new method
+ */
 define(['knockout',
-		'moment',
-		'helpers/app-helper'],
+		'moment'],
 	function (ko,
-		appMoment,
-		appHelper) {
+		appMoment) {
 	'use strict';
 
 	/**
@@ -62,12 +60,6 @@ define(['knockout',
 		this.length = data.Length;
 
 		/**
-		 * File size, kilobytes
-		 * @type {number}
-		 */
-		this.lengthInKb = parseInt(this.length / 1024, 10);
-
-		/**
 		 * Image width, in pixels (null for non-images)
 		 * @type {number}
 		 */
@@ -78,6 +70,12 @@ define(['knockout',
 		 * @type {number}
 		 */
 		this.imgHeight = data.ImgHeight;
+
+		/**
+		 * File size, kilobytes
+		 * @type {number}
+		 */
+		this.lengthInKb = parseInt(this.length / 1024, 10);
 
 		/////**
 		////* Image ratio, like 3*4 (null for non-images)
@@ -107,14 +105,22 @@ define(['knockout',
 		this.isSelected = ko.observable(false);
 	};
 
-	/** Download file */
-	exports.prototype.download = function () {
-		appHelper.downloadURL(this.fileUrl);
-	};
-
-  /** Calculate a full name of the file */
+	/** Calculate a full name of the file */
 	exports.prototype.calcNamePlusExtension = function () {
 		return ko.unwrap(this.name) + ko.unwrap(this.extension);
+	};
+
+	/** Convert to plain js */
+	exports.prototype.toPlainFileSpec = function () {
+		return {
+			Id : this.id,
+			Name : ko.unwrap(this.name),
+			Extension : ko.unwrap(this.extension),
+			CreatedUnixTime : ko.unwrap(this.createdUnixTime),
+			Length : ko.unwrap(this.length),
+      ImgWidth: ko.unwrap(this.imgWidth),
+      ImgHeight: ko.unwrap(this.imgHeight)
+		};
 	};
 
 	return exports;

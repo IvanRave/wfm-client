@@ -1,139 +1,157 @@
 ﻿<!-- current: vwmStage (vwmUpro ... vwmWell) -->
-<div class="modal-body">
-  <!-- ko with: slcVwmSectionFmg -->
-  <!-- ko if: mdlSection.sectionPattern -->
-  <div>
-    <div class="row">
-      <div class="col-sm-2">
-        <!-- folder switching only for full view -->
-        <span data-bind="ifnot: $parent.fmgrModal.isShowed">
-          <button class="btn btn-default btn-xs" 
-                  data-bind="click: $parent.unselectVwmSectionFmg.bind($parent)">
-            <i class="glyphicon glyphicon-circle-arrow-up"></i>
+<!-- ko with: slcVwmSectionFmg -->
+<!-- ko if: mdlSection.sectionPattern -->
+<div>
+  <div class="row">
+    <div class="col-sm-2">
+      <div class="clearfix">
+        <div class="pull-left">
+          <!-- folder switching only for full view -->
+          <span data-bind="ifnot: $parent.fmgrModal.isShowed">
+            <button class="btn btn-default btn-sm" 
+                    data-bind="click: $parent.unselectVwmSectionFmg.bind($parent)">
+              <i class="glyphicon glyphicon-circle-arrow-up"></i>
+            </button>
+          </span>
+        </div>
+        <div class="pull-left min-left-margin">
+          <h4 data-bind="with: mdlSection.sectionPattern">
+            <span data-bind="text: name"></span>
+          </h4>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 text-right">
+      <div data-bind="if: $root.isEmployeeInEditMode">
+        <span data-bind="with: oneVisibleSlcVwmFileSpec">
+          <button class="btn btn-inverse btn-sm" data-bind="click: download">
+            <i class="glyphicon glyphicon-download-alt"></i>
+          </button>
+          <button class="btn btn-inverse btn-sm" data-bind="click: $parent.editVwmFileSpec.bind($parent)">
+            <i class="glyphicon glyphicon-edit"></i>
           </button>
         </span>
-        <span data-bind="with: mdlSection.sectionPattern">
-          <span class="bld" data-bind="text: name"></span>
+        <span data-bind="visible: isVisibleSlcAnyFile">
+          <button class="btn btn-sm btn-inverse" data-bind="click: removeSlcVwmFileSpecs">
+            <i class="glyphicon glyphicon-trash"></i>
+          </button>
         </span>
-      </div>
-      <div class="col-sm-6 text-right" data-bind="with: mdlSection">
-        <div data-bind="if: $root.isEmployeeInEditMode">
+        <span data-bind="with: mdlSection">
           <span class="btn btn-sm btn-inverse fileinput-button">
             <i class="glyphicon glyphicon-plus"></i>
             <span>Add...</span>
             <input data-bind="filoader: getSectionFiloader()" type="file" multiple></input>
           </span>
-          <button class="btn btn-sm btn-inverse" data-bind="click: deleteSelectedFileSpecs, enable: isSelectedAnyFile">
-            <i class="glyphicon glyphicon-trash"></i>
+        </span>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="input-group input-group-sm">
+        <input type="text" class="form-control" data-bind="value: fileFilterName">
+        <span class="input-group-btn">
+          <button class="btn btn-default" type="button">
+            <i class="glyphicon glyphicon-search"></i>
           </button>
-        </div>
-      </div>
-      <div class="col-sm-4">
-        <div class="input-group input-group-sm">
-          <input type="text" class="form-control" data-bind="value: fileFilterName">
-          <span class="input-group-btn">
-            <button class="btn btn-default" type="button">
-              <i class="glyphicon glyphicon-search"></i>
-            </button>
-          </span>
-        </div>
+        </span>
       </div>
     </div>
   </div>
-  <div class="min-top-margin">
-    <div class="text-center" data-bind="hidden: sortedListOfVwmFileSpec.hasItems">
-      <span>No files</span>
-    </div>
-    <div class="row lf-header" data-bind="visible: sortedListOfVwmFileSpec.hasItems">
-      <div class="col-sm-8 lf-header-column">
-        <input class="lf-header-column__select-all" type="checkbox" data-bind="checked: mdlSection.isSlcAllFiles" />
-        <span class="link-view lf-header-column__name-header" data-bind="click: sortByName, css: {'bld': fileSortProp() === 'name'}">File name</span>
-      </div>
-      <div class="col-sm-2 hidden-xs lf-header-column">
-        <span class="link-view" data-bind="click: sortByCreated, css: {'bld': fileSortProp() === 'createdUnixTime'}">Created</span>
-      </div>
-      <div class="col-sm-2 hidden-xs lf-header-column">
-        <span class="link-view" data-bind="click: sortBySize, css: {'bld': fileSortProp() === 'length'}">Size, KB</span>
-      </div>
-    </div>
-    <div data-bind="with: mdlSection">
-      <div data-bind="foreach: listOfPreFile">
-        <div class="row">
-          <div class="col-sm-4">
-            <div class="checkbox">
-              <label>
-                <input type="checkbox" disabled></input>
-                <span data-bind="text: name"></span>
-              </label>
-            </div>
-          </div>
-          <!-- ko if: isSuccess -->
-          <div class="col-sm-4">
-            <div class="progress progress-striped">
-              <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"
-                   data-bind="attr: { 'aria-valuenow' : progressPercent }, style: {'width': progressPercentString }">
-                <span data-bind="text: bytesLoadedInKb"></span>KB
-              </div>
-            </div>
-          </div>
-          <div class="col-sm-2">
-            <div data-bind="if: isSuccess">
-              <button class="btn btn-sm btn-default" data-bind="click: abortUploading">
-                Cancel
-              </button>
-            </div>
-          </div>
-          <div class="col-sm-2">
-            <span data-bind="text: sizeInKb"></span>
-          </div>
-          <!-- /ko -->
-          <!-- ko ifnot: isSuccess -->
-          <div class="col-sm-8">
-            <div class="alert alert-danger">
-              <button type="button" class="close" data-bind="click: $parent.removePreFile.bind($parent)">
-                &times;
-              </button>
-              <span data-bind="ifnot: isSuccessSize">
-                Size of the file <span class="bld" data-bind="text: sizeInMb"></span> is more than 10MB
-              </span>
-              <span data-bind="ifnot: isSuccessType">
-                Supported types: <span data-bind="text: supportedTypes"></span>
-              </span>
-            </div>
-          </div>
-          <!-- /ko -->
-        </div>
-      </div>
-    </div>
-    <!-- end model section pre files -->
-    <div data-bind="foreach: sortedListOfVwmFileSpec">
-      <div data-bind="slideVisible: isVisible">
-        <div class="row">
-          <div class="col-sm-8">
-            <div class="checkbox">
-              <label data-bind="with: mdlFileSpec">
-                <input type="checkbox" data-bind="checked: isSelected"></input>
-                <span class="break-word" data-bind="text: namePlusExtension, attr: {title: fullTitle }"></span>
-              </label>
-            </div>
-          </div>
-          <div class="col-sm-2">
-            <div data-bind="with: mdlFileSpec">
-              <span data-bind="unixTime: createdUnixTime"></span>
-            </div>
-          </div>
-          <div class="col-sm-2">
-            <div data-bind="with: mdlFileSpec">
-              <button class="btn btn-default btn-xs" data-bind="click: download">
-                <i class="glyphicon glyphicon-download-alt"></i>
-              </button>
-              <span data-bind="text: lengthInKb, attr:{title: length + ' bytes'}"></span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- /ko -->
-  <!-- /ko -->
 </div>
+<div class="min-top-margin">
+  <div class="text-center" data-bind="hidden: sortedListOfVwmFileSpec.hasItems">
+    <span>No files</span>
+  </div>
+  <div class="row lf-header" data-bind="visible: sortedListOfVwmFileSpec.hasItems">
+    <div class="col-sm-8 lf-header-column">
+      <input class="lf-header-column__select-all" type="checkbox" data-bind="checked: mdlSection.isSlcAllFiles" />
+      <span class="link-view lf-header-column__name-header" data-bind="click: sortByName, css: {'bld': fileSortProp() === 'name'}">File name</span>
+    </div>
+    <div class="col-sm-2 hidden-xs lf-header-column">
+      <span class="link-view" data-bind="click: sortByCreated, css: {'bld': fileSortProp() === 'createdUnixTime'}">Created</span>
+    </div>
+    <div class="col-sm-2 hidden-xs lf-header-column">
+      <span class="link-view" data-bind="click: sortBySize, css: {'bld': fileSortProp() === 'length'}">Size, KB</span>
+    </div>
+  </div>
+  <div data-bind="with: mdlSection">
+    <div data-bind="foreach: listOfPreFile">
+      <div class="row">
+        <div class="col-sm-4">
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" disabled></input>
+              <span data-bind="text: name"></span>
+            </label>
+          </div>
+        </div>
+        <!-- ko if: isSuccess -->
+        <div class="col-sm-4">
+          <div class="progress progress-striped">
+            <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"
+                 data-bind="attr: { 'aria-valuenow' : progressPercent }, style: {'width': progressPercentString }">
+              <span data-bind="text: bytesLoadedInKb"></span>KB
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-2">
+          <div data-bind="if: isSuccess">
+            <button class="btn btn-sm btn-default" data-bind="click: abortUploading">
+              Cancel
+            </button>
+          </div>
+        </div>
+        <div class="col-sm-2">
+          <span data-bind="text: sizeInKb"></span>
+        </div>
+        <!-- /ko -->
+        <!-- ko ifnot: isSuccess -->
+        <div class="col-sm-8">
+          <div class="alert alert-danger">
+            <button type="button" class="close" data-bind="click: $parent.removePreFile.bind($parent)">
+              &times;
+            </button>
+            <span data-bind="ifnot: isSuccessSize">
+              Size of the file <span class="bld" data-bind="text: sizeInMb"></span> is more than 10MB
+            </span>
+            <span data-bind="ifnot: isSuccessType">
+              Supported types: <span data-bind="text: supportedTypes"></span>
+            </span>
+          </div>
+        </div>
+        <!-- /ko -->
+      </div>
+    </div>
+  </div>
+  <!-- end model section pre files -->
+  <div data-bind="foreach: sortedListOfVwmFileSpec">
+    <div data-bind="slideVisible: isVisible">
+      <div class="row">
+        <div class="col-sm-8">
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" data-bind="checked: mdlFileSpec.isSelected"></input>
+              <span data-bind="hidden: isEditView">
+                <span class="break-word" data-bind="text: mdlFileSpec.namePlusExtension, attr: {title: mdlFileSpec.fullTitle }"></span>
+              </span>
+              <span data-bind="visible: isEditView">
+                <input class="form-control input-sm" type="text" data-bind="value: $parent.nameForEdit, event: { keydown: $parent.saveVwmFileSpec.bind($parent) }" />
+              </span>
+            </label>
+          </div>
+        </div>
+        <div class="col-sm-2">
+          <div data-bind="with: mdlFileSpec" style="margin-top:10px">
+            <span data-bind="unixTime: createdUnixTime"></span>
+          </div>
+        </div>
+        <div class="col-sm-2">
+          <div data-bind="with: mdlFileSpec" style="margin-top:10px">
+            <span data-bind="text: lengthInKb, attr:{title: length + ' bytes'}"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /ko -->
+<!-- /ko -->
