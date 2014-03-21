@@ -1,4 +1,8 @@
-﻿/** @module */
+﻿/** 
+* @module 
+* @todo #33! Update filter by typing with delay
+*       update knockout to 3.1 firstly with a new method
+*/
 define(['knockout',
 		'moment',
 		'helpers/app-helper'],

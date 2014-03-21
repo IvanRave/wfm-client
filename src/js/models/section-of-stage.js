@@ -370,8 +370,8 @@ define(['knockout',
 					ths.listOfFileSpec.push(new FileSpec(result[0]));
 				})
 				.fail(function (jqXhr, textStatus, errorThrown) {
+          window.clearInterval(progressIntervalId);
 					if (textStatus === 'abort') {
-            window.clearInterval(progressIntervalId);
 						ths.listOfPreFile.remove(tmpPreFile);
 					} else {
 						console.log(jqXhr, textStatus, errorThrown);
