@@ -1,3 +1,27 @@
+<a name="0.9.4"></a>
+### 0.9.4 (2014-03-21)
+
+
+#### Bug Fixes
+
+* **forIn:** add hasOwnProperty checking ([cb4268ae](https://github.com/IvanRave/wfm-client/commit/cb4268ae4906b00a2c84f7c1f0590d2bde3ca547))
+* **userProfile:** fix removing a child company ([b7039d8f](https://github.com/IvanRave/wfm-client/commit/b7039d8fe0409c10d5f24fec5c84b9b57fd4fa75))
+
+
+#### Features
+
+* **fileManager:**
+  * file name editing ([1e44110f](https://github.com/IvanRave/wfm-client/commit/1e44110fae4898fc61c085119d7b3aab58039333))
+  * add sorting for main props ([a5af1c56](https://github.com/IvanRave/wfm-client/commit/a5af1c56828fdce44938ca50d4b3a02c19ebc679))
+  * add filtering by name ([4ce4a171](https://github.com/IvanRave/wfm-client/commit/4ce4a1711edd17ce6b2d510bd18a5ca9a23f24a8))
+  * show count of uploaded KB ([528a07fd](https://github.com/IvanRave/wfm-client/commit/528a07fd89847d99ae208b5c2532d9de2350bd76))
+  * add folders for a full view ([5479bccd](https://github.com/IvanRave/wfm-client/commit/5479bccdc14144efe38a1cecb3354d66680a5bbd))
+  * cancel uploading feature ([699a96db](https://github.com/IvanRave/wfm-client/commit/699a96db0b1d2345f0b82bde41fdae407e3e1dcd))
+  * select all files one click ([87cd58a5](https://github.com/IvanRave/wfm-client/commit/87cd58a5329e8b248c7c09f785140c75e36d8bb6))
+  * add progress bars and errors ([cd185b67](https://github.com/IvanRave/wfm-client/commit/cd185b67b6b14275190a5d6b85589643302d2283))
+  * multiple file upload ([ced90656](https://github.com/IvanRave/wfm-client/commit/ced90656208a7a5ef2e62c309cbb866db9ede0e5))
+
+
 <a name="0.9.3"></a>
 ### 0.9.3 (2014-03-14)
 
