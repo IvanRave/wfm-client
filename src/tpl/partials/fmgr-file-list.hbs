@@ -57,7 +57,7 @@
         <span class="bld" title="Created date and time">Created</span>
       </div>
       <div class="col-sm-2 hidden-xs">
-        <span class="bld" title="Size, kilobytes">kB</span>
+        <span class="bld" title="Size, kilobytes">KB</span>
       </div>
     </div>
     <div data-bind="foreach: listOfPreFile">
@@ -75,7 +75,7 @@
           <div class="progress progress-striped">
             <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"
                  data-bind="attr: { 'aria-valuenow' : progressPercent }, style: {'width': progressPercentString }">
-              <span data-bind="text: progressPercentString"></span>
+              <span data-bind="text: bytesLoadedInKb"></span>KB
             </div>
           </div>
         </div>

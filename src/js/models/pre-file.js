@@ -40,11 +40,31 @@ define(['knockout'], function (ko) {
 		 */
 		this.contentType = optContentType;
 
+    /**
+    * Count of loaded bytes
+    * @type {number}
+    */
+    this.bytesLoaded = ko.observable(0);
+    
+    /**
+    * Loaded in KB
+    * @type {number}
+    */
+    this.bytesLoadedInKb = ko.computed({
+      read: this.calcBytesLoadedInKb,
+      deferEvaluation: true,
+      owner: this
+    });
+    
 		/**
 		 * Progress of uploading, percents
 		 * @type {number}
 		 */
-		this.progressPercent = ko.observable(0);
+		this.progressPercent = ko.computed({
+      read: this.calcProgressPercent,
+      deferEvaluation: true,
+      owner: this
+    });
 
 		/**
 		 * A string, like 60% for a bar title and a width property
@@ -100,10 +120,23 @@ define(['knockout'], function (ko) {
 		};
 	};
 
+  /** Calculate percent of loading progress */
+  exports.prototype.calcProgressPercent = function(){
+    return parseInt((ko.unwrap(this.bytesLoaded) / this.size) * 100, 10);
+  };
+  
+  /** 
+  * Calculate a loading progress in KB (123.45)
+  * @returns {number}
+  */
+  exports.prototype.calcBytesLoadedInKb = function(){
+    return (parseInt((ko.unwrap(this.bytesLoaded) / 1024) * 100, 10) / 100);
+  };
+  
 	/** Calculate string of percent */
 	exports.prototype.calcProgressPercentString = function () {
 		return ko.unwrap(this.progressPercent) + '%';
 	};
-
+  
 	return exports;
 });

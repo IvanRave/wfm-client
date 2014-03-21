@@ -345,16 +345,19 @@ define(['knockout',
 
 				// Update progress percent
 				var progressIntervalId = window.setInterval(function () {
-						var tmpProgressPercent = parseInt((data._progress.loaded / data._progress.total) * 100, 10);
+						//var tmpProgressPercent = parseInt((data._progress.loaded / data._progress.total) * 100, 10);
 
-						if (appHelper.isNumeric(tmpProgressPercent)) {
-							tmpPreFile.progressPercent(tmpProgressPercent);
-						} else {
-							// Check warnings, may be Nan
-							console.log(tmpProgressPercent + ' is not a number');
-						}
+						// if (appHelper.isNumeric(tmpProgressPercent)) {
+							// tmpPreFile.progressPercent(tmpProgressPercent);
+						// } else {
+							// // Check warnings, may be Nan
+							// console.log(tmpProgressPercent + ' is not a number');
+						// }
 
-						if (tmpProgressPercent === 100) {
+            tmpPreFile.bytesLoaded(data._progress.loaded);
+            
+            // Stop the time when fully loaded 
+						if (data._progress.loaded === tmpPreFile.size) {
 							window.clearInterval(progressIntervalId);
 						}
 					}, progressInterval);
@@ -368,6 +371,7 @@ define(['knockout',
 				})
 				.fail(function (jqXhr, textStatus, errorThrown) {
 					if (textStatus === 'abort') {
+            window.clearInterval(progressIntervalId);
 						ths.listOfPreFile.remove(tmpPreFile);
 					} else {
 						console.log(jqXhr, textStatus, errorThrown);
