@@ -80,6 +80,9 @@ $input-width-xs: 16px;
 $input-width-sm: 32px;
 $input-width-md: 48px;
 
+//-- A footer and a section panel
+$footer-height: 50px;
+
 
 //-- Main css
 
@@ -110,7 +113,7 @@ html, body {
 
 /* Set the fixed height of the footer here */
 footer {
-    height: 50px;
+    height: $footer-height;
     padding: 0;
     z-index: $zindex-fixed-panel;
 }
@@ -476,15 +479,17 @@ input.input-width-md {
     background-color: #222;
 }
 
-/* Block with icon and caption */
+/* Block with icon and caption in a footer panel*/
 .wfm-section-item {
     border-radius: 0;
-    padding: 0;
+    padding: 4px 0 0 0;
+    margin: 0;
     color: #a1a1a1;
     width: 70px;
-    /*height:48px;*/
+    height: $footer-height;
     text-align: center;
     cursor: pointer;
+    position: relative;
 }
 
 /** A modificator for active blocks */
@@ -1046,4 +1051,13 @@ ul.wfm-light-list {
 
 .lf-header-column__name-header {
   margin-left: 26px;
+}
+
+.stencil-img {
+  height: 400px;
+  border: 2px outset #ccc;
+  text-align: center;
+  padding-top:180px;
+  font-size: 1.4em;
+  @include gradient-line(#efefef, #fefefe);
 }
