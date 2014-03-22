@@ -23,13 +23,13 @@
   <div data-bind="if: patternOfSlcVwmSectionWrk() === 'well-log'">
     {{> well-log}}
   </div>
-  <div data-bind="if: patternOfSlcVwmSectionWrk() === 'well-map'">
+  <div data-bind="if: isSlcPtrnWellMap">
     {{> well-map}}
   </div>
   <div data-bind="if: patternOfSlcVwmSectionWrk() === 'well-nodalanalysis'">
     {{> well-nodalanalysis}}
   </div>
-  <div data-bind="if: patternOfSlcVwmSectionWrk() === 'well-perfomance'">
+  <div data-bind="if: isSlcPtrnWellPerfomance">
     {{> well-pd}}
   </div>
   <div data-bind="if: patternOfSlcVwmSectionWrk() === 'well-report'">

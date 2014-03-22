@@ -140,7 +140,7 @@ define(['knockout',
 				deferEvaluation : true,
 				owner : this
 			});
-
+    
 		/** When change selected section */
 		this.slcVwmSectionWrk.subscribe(this.handleVwmSectionWrk, this);
 

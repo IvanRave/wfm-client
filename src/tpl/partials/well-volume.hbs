@@ -4,7 +4,12 @@
     <span>{{lang.loading}}...</span>
   </div>
   <div data-bind="if: mdlStage.isLoadedVolumes">
-    <div class="col-sm-8">
+    <div class="col-sm-6">
+      <div data-bind="ifnot: listOfVwmVolumeOfWell.hasItems">
+        <div class="stencil-img">
+          No volume
+        </div>
+      </div>
       <div data-bind="with: slcVwmVolumeOfWell">
         <!-- ko with: mdlVolumeOfWell -->
         <span data-bind="with: fileSpec">
@@ -16,9 +21,9 @@
         <!-- /ko -->
       </div>
     </div>
-    <div class="col-sm-4">
+    <div class="col-sm-6">
       <div class="clearfix">
-        <div class="pull-left">
+        <div class="pull-left" data-bind="if: listOfVwmVolumeOfWell.hasItems">
           <h4>Volumes:</h4>
         </div>
         <div class="pull-right" data-bind="if: $root.isEmployeeInEditMode">
@@ -29,18 +34,15 @@
           </div>
         </div>
       </div>
-      <div data-bind="ifnot: slcVwmVolumeOfWell">
-        No volumes
-      </div>
       <ul class="wfm-light-list" data-bind="foreach: listOfVwmVolumeOfWell">
         <li class="clearfix">
           <div class="pull-left">
-            <span class="pointer link-view" data-bind="click: $parent.selectVwmVolumeOfWell">
+            <span class="pointer link-view" data-bind="click: $parent.selectVwmVolumeOfWell.bind($parent)">
               <span data-bind="text: mdlVolumeOfWell.name, css: { 'bld': isSlcVwmVolumeOfWell }"></span>
             </span>
           </div>
           <div class="pull-right" data-bind="if: $root.isEmployeeInEditMode">
-            <button class="btn btn-xs btn-default" data-bind="click: $parent.removeVwmVolumeOfWell">
+            <button class="btn btn-xs btn-default" data-bind="click: $parent.removeVwmVolumeOfWell.bind($parent)">
               <i class="glyphicon glyphicon-remove"></i>
             </button>
           </div>

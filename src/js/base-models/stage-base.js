@@ -18,8 +18,10 @@ define(['knockout',
 
 	/**
 	 * Base for all stages: well, group, region etc.
+	 *    every stage contains stageKey
 	 */
 	var exports = function (data) {
+
 		/** Props values: all observables */
 		this.propSpecList.forEach(function (prop) {
 			if (prop.tpe === 'FileLine') {
@@ -36,7 +38,7 @@ define(['knockout',
 
 		/** List of sections */
 		this.listOfSection = ko.observableArray();
-
+    
 		/**
 		 * List of section patterns for current stage (names, ids, etc.)
 		 *    Section patterns where idOfStage === stageKey
@@ -161,10 +163,10 @@ define(['knockout',
 		});
 	};
 
-  /** Remove a child stage */
-  exports.prototype.removeChild = function(){
-    throw new Error('Need to override in a subclass');
-  };
-  
+	/** Remove a child stage */
+	exports.prototype.removeChild = function () {
+		throw new Error('Need to override in a subclass');
+	};
+
 	return exports;
 });

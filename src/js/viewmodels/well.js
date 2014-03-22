@@ -8,6 +8,7 @@ define([
 		'knockout',
 		'helpers/modal-helper',
 		'helpers/app-helper',
+		'constants/stage-constants',
 		'base-viewmodels/stage-base',
 		'viewmodels/sketch-of-well',
 		'viewmodels/volume-of-well',
@@ -25,6 +26,7 @@ define([
 		ko,
 		bootstrapModal,
 		appHelper,
+		stageCnst,
 		VwmStageBase,
 		VwmSketchOfWell,
 		VwmVolumeOfWell,
@@ -84,20 +86,17 @@ define([
 		//mdlSketchOfWell, koWellUnzOfSlcVwmSectionFmg, koSlcVwmSectionFmg,  fmgrLink
 		this.vwmSketchOfWell = new VwmSketchOfWell(ths.mdlStage.sketchOfWell, ths.unzOfSlcVwmSectionFmg, ths.slcVwmSectionFmg, ths.fmgrModal);
 
-		//{ #region VOLUME
+		//{ #region VOLUME-PROPS
 
 		/**
 		 * List of views of volume of well
 		 * @type {Array.<viewmodels/volume-of-well>}
 		 */
 		this.listOfVwmVolumeOfWell = ko.computed({
-				read : function () {
-					return ko.unwrap(ths.mdlStage.volumes).map(function (elem) {
-						return new VwmVolumeOfWell(elem, ths.vidOfSlcVwmVolumeOfWell);
-					});
-				},
-				deferEvaluation : true
-			});
+				read : this.buildListOfVwmVolumeOfWell,
+				deferEvaluation : true,
+				owner : this
+			}).trackHasItems();
 
 		/**
 		 * Id of selected view, equals id of file spec (guid)
@@ -107,44 +106,15 @@ define([
 
 		/**
 		 * Selected view
+		 * @type {module:viewmodels/volume-of-well}
 		 */
 		this.slcVwmVolumeOfWell = ko.computed({
-				read : function () {
-					var tmpVid = ko.unwrap(ths.vidOfSlcVwmVolumeOfWell);
-					console.log('computed: volume', tmpVid);
-					var tmpList = ko.unwrap(ths.listOfVwmVolumeOfWell);
-					if (tmpVid) {
-						return tmpList.filter(function (elem) {
-							return elem.vid === tmpVid;
-						})[0];
-					} else {
-						if (tmpList.length > 0) {
-							// Computed observables doesn't execute from themself
-							ths.vidOfSlcVwmVolumeOfWell(tmpList[0].vid);
-							return tmpList[0];
-						}
-						// Select first element, if no selected
-						//   return tmpList[0];
-					}
-				},
-				deferEvaluation : true
+				read : this.calcSlcVwmVolumeOfWell,
+				deferEvaluation : true,
+				owner : this
 			});
 
-		/** Select view for volume of well */
-		this.selectVwmVolumeOfWell = function (tmpVwm) {
-			ths.vidOfSlcVwmVolumeOfWell(tmpVwm.vid);
-		};
-
-		/**
-		 * Remove viewmodel and model of volume
-		 */
-		this.removeVwmVolumeOfWell = function (vwmToRemove) {
-			if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(vwmToRemove.mdlVolumeOfWell.name) + '"?')) {
-				ths.mdlStage.removeVolumeOfWell(vwmToRemove.mdlVolumeOfWell);
-			}
-		};
-
-		//} #endregion VOLUME
+		//} #endregion VOLUME-PROPS
 
 		//{ #region HISTORY
 
@@ -350,11 +320,12 @@ define([
 
 		this.listOfVwmTestScope = ko.computed({
 				read : function () {
-					return ko.unwrap(ths.mdlStage.listOfTestScope).map(function (elem) {
+					return ko.unwrap(this.mdlStage.listOfTestScope).map(function (elem) {
 						return new VwmTestScope(elem);
 					});
 				},
-				deferEvaluation : true
+				deferEvaluation : true,
+        owner: this
 			});
 
 		/**
@@ -425,6 +396,26 @@ define([
 			});
 
 		//} #endregion MAP
+    
+    //{ #region SWITCHER overwriting to remove hard-code strings and ko() props in html
+    
+    this.isSlcPtrnWellPerfomance = ko.computed({
+      read: function(){
+        return ko.unwrap(this.patternOfSlcVwmSectionWrk) === stageCnst.well.ptrn.perfomance;
+      },
+      deferEvaluation: true,
+      owner: this
+    });
+    
+    this.isSlcPtrnWellMap = ko.computed({
+      read: function(){
+        return ko.unwrap(this.patternOfSlcVwmSectionWrk) === stageCnst.well.ptrn.map;
+      },
+      deferEvaluation: true,
+      owner: this
+    });
+    
+    //{ #endregion SWITCHER
 	};
 
 	/** Inherit from a stage base viewmodel */
@@ -482,7 +473,7 @@ define([
 				this.mdlStage.loadVolumes();
 				break;
 			}
-		case 'well-perfomance': {
+		case stageCnst.well.ptrn.perfomance: {
 				this.mdlStage.getWellGroup().loadListOfWfmParameterOfWroup();
 				this.mdlStage.perfomanceOfWell.forecastEvolution.getDict();
 				this.mdlStage.perfomanceOfWell.getHstProductionDataSet();
@@ -866,11 +857,62 @@ define([
 		ths.fmgrModal.okCallback(mgrCallback);
 
 		// Notification
-		ths.fmgrModal.okDescription('Please select a file for a integrity');
+		ths.fmgrModal.okDescription('Please select an integrity file');
 
 		// Open file manager
 		ths.fmgrModal.show();
 	};
+
+	//{ #region VOLUME-METHODS
+
+	/**
+	 * Build a list of viewmodels of volumes
+	 * @returns {Array.<viewmodels/volume-of-well>}
+	 */
+	exports.prototype.buildListOfVwmVolumeOfWell = function () {
+		return ko.unwrap(this.mdlStage.volumes).map(function (elem) {
+			return new VwmVolumeOfWell(elem, this.vidOfSlcVwmVolumeOfWell);
+		}, this);
+	};
+
+	/**
+	 * Calculate a selected volume
+	 * @returns {module:viewmodels/volume-of-well}
+	 */
+	exports.prototype.calcSlcVwmVolumeOfWell = function () {
+		var tmpVid = ko.unwrap(this.vidOfSlcVwmVolumeOfWell);
+
+		var tmpList = ko.unwrap(this.listOfVwmVolumeOfWell);
+		if (tmpVid) {
+			return tmpList.filter(function (elem) {
+				return elem.vid === tmpVid;
+			})[0];
+		} else {
+			if (tmpList.length > 0) {
+				// Computed observables doesn't execute from themself
+				this.vidOfSlcVwmVolumeOfWell(tmpList[0].vid);
+				return tmpList[0];
+			}
+			// Select first element, if no selected
+			//   return tmpList[0];
+		}
+	};
+
+	/** Select view for volume of well */
+	exports.prototype.selectVwmVolumeOfWell = function (tmpVwm) {
+		this.vidOfSlcVwmVolumeOfWell(tmpVwm.vid);
+	};
+
+	/**
+	 * Remove viewmodel and model of volume
+	 */
+	exports.prototype.removeVwmVolumeOfWell = function (vwmToRemove) {
+		if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(vwmToRemove.mdlVolumeOfWell.name) + '"?')) {
+			this.mdlStage.removeVolumeOfWell(vwmToRemove.mdlVolumeOfWell);
+		}
+	};
+
+	//} #endregion VOLUME-METHODS
 
 	return exports;
 });

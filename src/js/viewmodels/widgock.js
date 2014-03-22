@@ -1,5 +1,6 @@
 ﻿/** @module */
 define(['knockout',
+		'constants/stage-constants',
 		'viewmodels/widget-default-summary',
 		'viewmodels/widget-well-perfomance',
 		'viewmodels/widget-well-monitoring',
@@ -8,6 +9,7 @@ define(['knockout',
 		'viewmodels/widget-wield-map',
 		'viewmodels/widget-well-map'],
 	function (ko,
+		stageCnst,
 		VwmWidgetDefaultSummary,
 		VwmWidgetWellPerfomance,
 		VwmWidgetWellMonitoring,
@@ -17,7 +19,7 @@ define(['knockout',
 		VwmWidgetWellMap) {
 	'use strict';
 
-  /** Create a viewmodel for a widget from a widget model */
+	/** Create a viewmodel for a widget from a widget model */
 	function buildVwmWidget(elem, tmpParentVwmStage) {
 		switch (elem.idOfSectionPattern) {
 		case 'well-summary':
@@ -26,7 +28,7 @@ define(['knockout',
 		case 'wegion-summary':
 		case 'company-summary':
 			return new VwmWidgetDefaultSummary(elem);
-		case 'well-perfomance':
+		case stageCnst.well.ptrn.perfomance:
 			return new VwmWidgetWellPerfomance(elem, tmpParentVwmStage);
 		case 'well-monitoring':
 			return new VwmWidgetWellMonitoring(elem, tmpParentVwmStage);

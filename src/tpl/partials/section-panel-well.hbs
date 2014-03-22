@@ -3,43 +3,51 @@
   <div class="pull-left">
     <ul class="nav nav-pills" data-bind="foreach: listOfVwmSection">
       <!-- ko if: mdlSection.isVisibleAsView -->
-      <!-- ko if: (mdlSection.sectionPatternId !== 'well-perfomance') -->
-      <li>
-        <div class="wfm-section-item" data-bind="click: $parent.selectVwmSectionWrk.bind($parent), css: {'wfm-section-item_state_active' : isSlcVwmSectionWrk }">
-          <span data-bind="with: mdlSection.sectionPattern">
-            <span class="wfm-section-item__caption" data-bind="text: name"></span>
-            <br />
-            <i class="wfm-icon" data-bind="css: iconClass"></i>
-          </span>
-        </div>
-      </li>
-      <!-- /ko -->
-      <!-- ko if: (mdlSection.sectionPatternId === 'well-perfomance') -->
-      <li class="dropup">
-        <div class="dropdown-toggle" data-toggle="dropdown" data-bind="drpdwn: {}">
-          <div class="wfm-section-item" data-bind="css: {'wfm-section-item_state_active' : isSlcVwmSectionWrk }">
-            <span data-bind="with: mdlSection.sectionPattern">
-              <span class="wfm-section-item__caption" data-bind="text: name"></span>
-              <br />
-              <i class="wfm-icon" data-bind="css: iconClass"></i>
-            </span>
-            <span class="wfm-section-item__caret">
-              <span class="caret"></span>
-            </span>
-          </div>
-        </div>
-        <ul class="dropdown-menu" data-bind="foreach: $root.mdlWorkspace.wfmParamSquadList">
+        <!-- ko if: (mdlSection.sectionPatternId !== 'well-perfomance') -->
           <li>
-            <!-- current: squad -->
-            <!-- parent: vwmWellSection -->
-            <!-- parents[1]: vwmWell -->
-            <div data-bind="click: function() { $parents[1].selectVwmSectionWrk($parent); $parents[1].mainVwmPerfomanceOfWell.selectAttrGroupId($data.id); }">
-              <span data-bind="text: id"></span>
+            <div class="wfm-section-item" 
+                 data-bind="click: $parent.selectVwmSectionWrk.bind($parent), css: {'wfm-section-item_state_active' : isSlcVwmSectionWrk }">
+              <div data-bind="with: mdlSection.sectionPattern">
+                <div class="wfm-section-item__caption">
+                  <span data-bind="text: name"></span>
+                </div>
+                <div>
+                  <i class="wfm-icon" data-bind="css: iconClass"></i>
+                </div>
+              </div>
             </div>
           </li>
-        </ul>
-      </li>
-      <!-- /ko -->
+        <!-- /ko -->
+        <!-- ko if: (mdlSection.sectionPatternId === 'well-perfomance') -->
+          <li class="dropup">
+            <div class="dropdown-toggle" data-toggle="dropdown" data-bind="drpdwn: {}">
+              <div class="wfm-section-item" 
+                   data-bind="css: {'wfm-section-item_state_active' : isSlcVwmSectionWrk }">
+                <div data-bind="with: mdlSection.sectionPattern">
+                  <div class="wfm-section-item__caption">
+                    <span data-bind="text: name"></span>
+                  </div>
+                  <div>
+                    <i class="wfm-icon" data-bind="css: iconClass"></i>
+                  </div>
+                </div>
+                <div class="wfm-section-item__caret">
+                  <span class="caret"></span>
+                </div>
+              </div>
+            </div>
+            <ul class="dropdown-menu" data-bind="foreach: $root.mdlWorkspace.wfmParamSquadList">
+              <li>
+                <!-- current: squad -->
+                <!-- parent: vwmWellSection -->
+                <!-- parents[1]: vwmWell -->
+                <div data-bind="click: function() { $parents[1].selectVwmSectionWrk($parent); $parents[1].mainVwmPerfomanceOfWell.selectAttrGroupId($data.id); }">
+                  <span data-bind="text: id"></span>
+                </div>
+              </li>
+            </ul>
+          </li>
+        <!-- /ko -->
       <!-- /ko -->
     </ul>
   </div>

@@ -2,9 +2,13 @@
 define(['jquery',
 		'knockout',
 		'd3',
-		'helpers/map-helper'],
-	function ($, ko, d3,
-		mapHelper) {
+		'helpers/map-helper',
+		'helpers/app-helper'],
+	function ($,
+		ko,
+		d3,
+		mapHelper,
+		appHelper) {
 	'use strict';
 
 	/**
@@ -122,7 +126,7 @@ define(['jquery',
 
 				// Send to the server in PUT method (change well marker data)
 				console.log('realMarkerPos', realMarkerPos);
-				vwmWellMarkerToAdd.coords([realMarkerPos.x, realMarkerPos.y]);
+				vwmWellMarkerToAdd.coords([appHelper.toFloatDec(realMarkerPos.x, 1), appHelper.toFloatDec(realMarkerPos.y, 1)]);
 			});
 
 			// Redraw all well markers: user can remove/add/change coords or any actions with markers outside of svg block
@@ -139,7 +143,9 @@ define(['jquery',
 					d3GroupWrap,
 					wellMarkerRadius,
 					function (endCoordX, endCoordY) {
-					elem.mdlWellMarker.coords([endCoordX / widthCoefVgToPx, endCoordY / heightCoefVgToPx]);
+					elem.mdlWellMarker.coords([
+							appHelper.toFloatDec(endCoordX / widthCoefVgToPx, 1),
+							appHelper.toFloatDec(endCoordY / heightCoefVgToPx, 1)]);
 				});
 			});
 
@@ -154,7 +160,9 @@ define(['jquery',
 					d3GroupWrap,
 					wellMarkerRadius,
 					function (endCoordX, endCoordY) {
-					vwmWellMarkerToAdd.coords([endCoordX / widthCoefVgToPx, endCoordY / heightCoefVgToPx]);
+					vwmWellMarkerToAdd.coords([
+							appHelper.toFloatDec(endCoordX / widthCoefVgToPx, 1),
+							appHelper.toFloatDec(endCoordY / heightCoefVgToPx, 1)]);
 				});
 			}
 		}

@@ -70,7 +70,7 @@ define(['jquery',
 		 * @type {string}
 		 */
 		this.stageKey = stageConstants.wegion.id;
-
+    
 		/** Base for all stages */
 		StageBase.call(this, data);
 

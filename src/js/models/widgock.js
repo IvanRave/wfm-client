@@ -21,14 +21,9 @@ define(['jquery',
 		MdlWidgetWieldMap) {
 	'use strict';
 
-	/** Create a model for a widget from widget data */
-	function buildWidget(widgetData, widgockItem) {
+	function buildWidgetForWell(widgetData, widgockItem) {
 		switch (widgetData.IdOfSectionPattern) {
 		case 'well-summary':
-		case 'wroup-summary':
-		case 'wield-summary':
-		case 'wegion-summary':
-		case 'company-summary':
 			return new MdlWidgetDefaultSummary(widgetData, widgockItem);
 		case 'well-perfomance':
 			return new MdlWidgetWellPerfomance(widgetData, widgockItem);
@@ -36,8 +31,6 @@ define(['jquery',
 			return new MdlWidgetWellMonitoring(widgetData, widgockItem);
 		case 'well-history':
 			return new MdlWidgetWellHistory(widgetData, widgockItem);
-		case 'wield-map':
-			return new MdlWidgetWieldMap(widgetData, widgockItem);
 		case 'well-map':
 			return new MdlWidgetWellMap(widgetData, widgockItem);
 		case 'well-sketch':
@@ -45,11 +38,30 @@ define(['jquery',
 		}
 	}
 
+	/** Create a model for a widget from widget data */
+	function buildWidget(widgetData, widgockItem) {
+		switch (widgetData.IdOfSectionPattern) {
+		case 'wroup-summary':
+		case 'wield-summary':
+		case 'wegion-summary':
+		case 'company-summary':
+			return new MdlWidgetDefaultSummary(widgetData, widgockItem);
+		case 'wield-map':
+			return new MdlWidgetWieldMap(widgetData, widgockItem);
+		}
+	}
+
 	/** Fill the well widget layout list */
-	function importWidgetList(data, widgockItem) {
-		return (data || []).map(function (item) {
-			return buildWidget(item, widgockItem);
-		});
+	function importWidgetList(data, widgockItem, stageKey) {
+		if (stageKey === 'well') {
+			return (data || []).map(function (item) {
+				return buildWidgetForWell(item, widgockItem);
+			});
+		} else {
+			return (data || []).map(function (item) {
+				return buildWidget(item, widgockItem);
+			});
+		}
 	}
 
 	/**
@@ -105,7 +117,7 @@ define(['jquery',
 		this.widgetList = ko.observableArray();
 
 		// Fill a widget list
-		this.widgetList(importWidgetList(data.WidgetDtoList, this));
+		this.widgetList(importWidgetList(data.WidgetDtoList, this, this.getWidgout().getParent().stageKey));
 	};
 
 	/** Remove widget from widget block */

@@ -3,15 +3,19 @@
   <div class="pull-left">
     <ul class="nav nav-pills" data-bind="foreach: listOfVwmSection">
       <!-- ko if: mdlSection.isVisibleAsView -->
-      <li>
-        <div class="wfm-section-item" data-bind="click: $parent.selectVwmSectionWrk.bind($parent), css: {'wfm-section-item_state_active' : isSlcVwmSectionWrk }">
-          <span data-bind="with: mdlSection.sectionPattern">
-            <span class="wfm-section-item__caption" data-bind="text: name"></span>
-            <br />
-            <i class="wfm-icon" data-bind="css: iconClass"></i>
-          </span>
-        </div>
-      </li>
+        <li>
+          <div class="wfm-section-item" 
+               data-bind="click: $parent.selectVwmSectionWrk.bind($parent), css: {'wfm-section-item_state_active' : isSlcVwmSectionWrk }">
+            <div data-bind="with: mdlSection.sectionPattern">
+              <div class="wfm-section-item__caption">
+                <span data-bind="text: name"></span>
+              </div>
+              <div>
+                <i class="wfm-icon" data-bind="css: iconClass"></i>
+              </div>
+            </div>
+          </div>
+        </li>
       <!-- /ko -->
     </ul>
   </div>

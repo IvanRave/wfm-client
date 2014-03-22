@@ -43,7 +43,12 @@ define([], function () {
 		well : {
 			id : 'well',
 			single : 'well',
-			plural : 'wells'
+			plural : 'wells',
+      ptrn: {
+        'summary': 'well-summary',
+        'map': 'well-map',
+        'perfomance': 'well-perfomance'
+      }
 		}
 	};
 
