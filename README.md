@@ -3,6 +3,7 @@
 * [Environment] (#environment)
 * [Cabinet structure] (#cabinet-structure)
 * [Write notes] (#write-notes)
+* [Separate client development] (#separate-client-development)
 * [Build notes] (#build-notes)
 * [Publish notes] (#publish-notes)
 
@@ -240,7 +241,7 @@ To check "Whether the user has access to edit (or manage, or view..)?", you may 
 * Add json object with required language to wfm-dict helper
 * Change settings in Gruntfile.js
 
-### Tasks
+### TODO tasks
 
 * JS: @todo fix: some method #23!
 * HTML: <!-- TODO: feat: to do something good #12! -->
@@ -261,6 +262,26 @@ Use a search (in all files) to find a need priority (search by a regular express
 
 * Do not use in production (IE9 doesn't support requests with json type and cookies)
 * Only for development (in modern browsers) and other project types (IOS, desktop etc.)
+
+## Separate client development
+
+This is an example of a request to the WFM: http://jsfiddle.net/IvanRave/bkF48
+
+Tools for building new independent features (only last versions of tools):
+* pseudo classical pattern to organize JS code
+* http://jquery.com/ for requests to the WFM API and other needs
+* http://knockoutjs.com/ for two-way bindings, etc.
+* http://getbootstrap.com/ for a markup
+* CSS or SCSS for a style
+
+* Use http://jsfiddle.net/ or your local server to send request to the WFM API
+* The WFM API https://wfm-client.azurewebsites.net/api allows an access for next origins:
+    - http://127.0.0.1:12345
+    - http://fiddle.jshell.net
+* WFM API Help: https://wfm-client.azurewebsites.net/help
+* If you need new API methods, firstly try to construct a test data as a simple JS object and use it for your purposes.
+
+* After realization of your feauture we will integrate it to the main source
 
 ## Build notes
 
