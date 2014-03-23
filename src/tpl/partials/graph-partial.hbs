@@ -16,7 +16,8 @@
           </g>
         </g>
         <!-- add zoom functionality: rect with zoom -->
-        <rect class="graph-zoom-rect" x="0" y="0" data-bind="attr: { width: vboxSize.width, height: vboxSize.height }, svgZoomBehavior: baseZoomBhvr">
+        <rect class="graph-zoom-rect" x="0" y="0" width="0" height="0" 
+              data-bind="attr: { width: vboxSize.width, height: vboxSize.height }, svgZoomBehavior: baseZoomBhvr">
         </rect>
         {{> zoom-controls}}
       </g>

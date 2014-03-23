@@ -23,7 +23,7 @@
                 </span>
                 <span data-bind="if: tpe === 'FileLine'">
                   <span data-bind="if: $parent[clientId]">
-                    <img data-bind="attr: {width: addtData.width, src: $parent[clientId]().fileUrl }"></img>
+                    <img data-bind="attr: {width: addtData.width, src: $parent[clientId]().fileUrl }" alt="image" />
                   </span>
                 </span>
                 <span data-bind="if: tpe === 'BoolLine'">
@@ -64,7 +64,7 @@
           <div class="col-sm-9">
             <div class="well well-sm">
               <span data-bind="if: tpe === 'SingleLine'">
-                <input class="form-control" type="text" data-bind="value: $parent[clientId], attr: {maxlength: addtData.maxLength}"></input>
+                <input class="form-control" type="text" data-bind="value: $parent[clientId], attr: {maxlength: addtData.maxLength}" />
               </span>
               <span data-bind="if: tpe === 'MultiLine'">
                 <textarea class="form-control" rows="5" data-bind="value: $parent[clientId]"></textarea>
@@ -77,7 +77,7 @@
               </span>
               <span data-bind="if: tpe === 'FileLine'">
                 <span data-bind="if: $parent[clientId]">
-                  <img data-bind="attr: {width: addtData.width, src: $parent[clientId]().fileUrl }"></img>
+                  <img data-bind="attr: {width: addtData.width, src: $parent[clientId]().fileUrl }" alt="image" />
                 </span>
                 <!-- parent: mdlStage (only for stages with image types, like company logo) -->
                 <!-- parents[1]: vwmStage -->

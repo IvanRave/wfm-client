@@ -147,6 +147,7 @@
             <div class="footer-logo"></div>
         </div>
     </footer>
+    {{> widget-default-summary }}
     <!-- Load main script file for page or default (with auth logic only) -->
     {{#if conf.isProd}}
     <script data-main="js/main-bundle-{{package.version}}" src="js/require.js"></script>

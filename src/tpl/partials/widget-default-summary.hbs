@@ -27,7 +27,8 @@
         </span>
         <span data-bind="if: tpe === 'FileLine'">
           <span data-bind="if: $parent[clientId]">
-            <img data-bind="attr: {width: addtData.width, src: $parent[clientId]().fileUrl }"></img>
+            <img src="#" alt="image"
+                 data-bind="attr: {width: addtData.width, src: $parent[clientId]().fileUrl }" />
           </span>
         </span>
       </div>

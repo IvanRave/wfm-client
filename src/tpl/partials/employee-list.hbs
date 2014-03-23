@@ -14,7 +14,7 @@
                    <img class="company-logo" src="#" data-bind="attr: {src: fileUrl }" title="{{capitalizeFirst lang.toView}} {{lang.wfm}}" /> 
                 </span>
                 <span data-bind="ifnot: fileSpecOfLogo">
-                  <img class="company-logo" src="img/question.jpg"></img>
+                  <img class="company-logo" src="img/question.jpg" alt="company logo"/>
                 </span>
               </span>
             </span>
@@ -44,7 +44,7 @@
         <div class="form-group">
           <label class="control-label col-md-3">{{capitalizeFirst lang.companyName}}</label>
           <div class="col-md-9">
-            <input class="form-control" type="text" pattern=".{3,255}" title="From 3 to 255 characters" data-bind="value: mdlStage.nameOfCreatedCompany" required="" placeholder="{{lang.companyName}}"></input>
+            <input class="form-control" type="text" pattern=".{3,255}" title="From 3 to 255 characters" data-bind="value: mdlStage.nameOfCreatedCompany" required="" placeholder="{{lang.companyName}}"/>
           </div>
         </div>
         <div class="form-group">

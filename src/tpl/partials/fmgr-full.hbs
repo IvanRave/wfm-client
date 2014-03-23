@@ -4,7 +4,7 @@
     <!-- ko if: mdlSection.sectionPattern -->
     <!-- ko if: mdlSection.sectionPattern().isFolder -->
     <div class="pull-left min-margin">
-      <button class="btn btn-sm btn-default stage-folder" 
+      <div class="stage-folder" 
               data-bind="css: {'active': isSlcVwmSectionFmg }, click: $parent.selectVwmSectionFmg.bind($parent)">
         <div>
           <span data-bind="with: mdlSection.sectionPattern">
@@ -17,7 +17,7 @@
         <div data-bind="with: mdlSection.sectionPattern">
           <span class="stage-folder__name" data-bind="text: name"></span>
         </div>
-      </button>
+      </div>
     </div>
     <!-- /ko -->
     <!-- /ko -->

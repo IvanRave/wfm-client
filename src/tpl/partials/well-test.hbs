@@ -9,11 +9,11 @@
       </div>
       <div class="pull-left min-left-margin">
         {{capitalizeFirst lang.hours}}:
-        <input class="input-sm" type="number" min="0" max="23" data-bind="value: hour" placeholder="{{lang.hours}}"></input>
+        <input class="input-sm" type="number" min="0" max="23" data-bind="value: hour" placeholder="{{lang.hours}}" />
       </div>
       <div class="pull-left min-left-margin">
         {{capitalizeFirst lang.minutes}}:
-        <input class="input-sm" type="number" min="0" max="59" data-bind="value: minute" placeholder="{{lang.minutes}}"></input>
+        <input class="input-sm" type="number" min="0" max="59" data-bind="value: minute" placeholder="{{lang.minutes}}" />
       </div>
       <!-- /ko -->
       <div class="pull-left">
@@ -116,7 +116,7 @@
             </tr>
             <!-- /ko -->
             <tr>
-              <td colspan="100">
+              <td colspan="4">
                 <button type="button" class="btn btn-xs btn-default" data-bind="click: vwmTestScope.mdlTestScope.addTestData">
                   {{capitalizeFirst lang.toAddHour}}
                 </button>
