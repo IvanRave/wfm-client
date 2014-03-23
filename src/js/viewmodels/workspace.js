@@ -21,9 +21,6 @@ define([
 	 * @constructor
 	 */
 	var exports = function (mdlWorkspace) {
-		/** Alternative for this */
-		var ths = this;
-
 		/** Data model for this view */
 		this.mdlWorkspace = mdlWorkspace;
 
@@ -33,30 +30,22 @@ define([
 		 */
 		this.isVisibleMenu = ko.observable(true);
 
-		// Left tree menu with well regions, groups, fields, wells
-		this.toggleIsVisibleMenu = function () {
-			ths.isVisibleMenu(!ko.unwrap(ths.isVisibleMenu));
-		};
-
 		this.sidebarWrapCss = ko.computed({
-				read : function () {
-					return ko.unwrap(ths.isVisibleMenu) ? 'sidebar-wrap-visible' : 'hidden';
-				},
-				deferEvaluation : true
+				read : this.calcSidebarWrapCss,
+				deferEvaluation : true,
+				owner : this
 			});
 
 		this.workAreaCss = ko.computed({
-				read : function () {
-					return ko.unwrap(ths.isVisibleMenu) ? 'work-area' : '';
-				},
-				deferEvaluation : true
+				read : this.calcWorkAreaCss,
+				deferEvaluation : true,
+				owner : this
 			});
 
 		this.sidebarToggleCss = ko.computed({
-				read : function () {
-					return ko.unwrap(ths.isVisibleMenu) ? 'sidebar-toggle-visible' : 'sidebar-toggle-hidden';
-				},
-				deferEvaluation : true
+				read : this.calcSidebarToggleCss,
+				deferEvaluation : true,
+				owner : this
 			});
 
 		/**
@@ -64,23 +53,15 @@ define([
 		 * @type {boolean}
 		 */
 		this.isEmployeeInEditMode = ko.computed({
-				// TODO: change to isVwmEmployeeInEdit mode
-				read : function () {
-					var tmpVwmUserProfile = ko.unwrap(ths.vwmUserProfile);
-					if (tmpVwmUserProfile) {
-						var tmpEmployee = ko.unwrap(tmpVwmUserProfile.slcVwmChild);
-						if (tmpEmployee) {
-							return ko.unwrap(tmpEmployee.isEditMode);
-						}
-					}
-				},
-				deferEvaluation : true
+				read : this.calcIsEmployeeInEditMode,
+				deferEvaluation : true,
+				owner : this
 			});
 
 		/**
-    * Data from url to select need stages and sections: initialUrlData
-    * @private
-    */
+		 * Data from url to select need stages and sections: initialUrlData
+		 * @private
+		 */
 		this.defaultSlcData_ = historyHelper.getInitialData(document.location.hash.substring(1));
 
 		/**
@@ -99,32 +80,14 @@ define([
 		 */
 		this.isRegisteredPage = ko.observable(true);
 
-		/** Toggle registered state: login or register page */
-		this.toggleIsRegisteredPage = function () {
-			ths.isRegisteredPage(!ko.unwrap(ths.isRegisteredPage));
-		};
-
-		/** Demo logon */
-		this.demoLogOn = function () {
-			mdlWorkspace.sendLogOn(demoAuth);
-		};
-
 		/**
 		 * Whether the user in the demo mode
 		 * @type {boolean}
 		 */
 		this.isUserInDemoMode = ko.computed({
-				read : function () {
-					var tmpUserProfile = ko.unwrap(mdlWorkspace.userProfile);
-
-					if (!tmpUserProfile) {
-						return false;
-					}
-					console.log('user profile', ko.unwrap(tmpUserProfile.email));
-					console.log('user profile', demoAuth.email);
-					return (ko.unwrap(tmpUserProfile.email) === demoAuth.email);
-				},
-				deferEvaluation : true
+				read : this.calcIsUserInDemoMode,
+				deferEvaluation : true,
+				owner : this
 			});
 
 		this.objToRealLogOn = {
@@ -142,25 +105,6 @@ define([
 		};
 
 		this.errToRealLogOn = ko.observable('');
-
-		this.realLogOn = function () {
-			ths.errToRealLogOn('');
-			// get obj from fields check obj
-			// Convert to object without observables
-			var tmpObj = ko.toJS(ths.objToRealLogOn);
-			mdlWorkspace.sendLogOn(tmpObj, function () {
-				// Clear added object: if user logoff then need empty fields to logon again (for different user)
-				ths.objToRealLogOn.email('');
-				ths.objToRealLogOn.password('');
-				ths.objToRealLogOn.rememberMe(false);
-				ths.errToRealLogOn('');
-			}, function (jqXhr) {
-				if (jqXhr.status === 422) {
-					var resJson = jqXhr.responseJSON;
-					ths.errToRealLogOn(langHelper.translate(resJson.errId) || '{{lang.unknownError}}');
-				}
-			});
-		};
 
 		this.objToRegister = {
 			email : ko.observable(''),
@@ -182,23 +126,6 @@ define([
 			scs : ko.observable('')
 		};
 
-		this.register = function () {
-			// Clean msges
-			ths.msgToRegister.err('');
-			ths.msgToRegister.scs('');
-
-			var tmpObjToRegister = ko.toJS(ths.objToRegister);
-			mdlWorkspace.sendRegister(tmpObjToRegister, function () {
-				ths.msgToRegister.scs('{{capitalizeFirst lang.checkToConfirmationToken}}');
-			}, function (jqXHR) {
-				if (jqXHR.status === 422) {
-					var resJson = jqXHR.responseJSON;
-					var tmpProcessError = (langHelper.translate(resJson.errId) || '{{lang.unknownError}}');
-					ths.msgToRegister.err(tmpProcessError);
-				}
-			});
-		};
-
 		this.msgToConfirmRegistration = {
 			err : ko.observable(''),
 			scs : ko.observable('')
@@ -211,26 +138,6 @@ define([
 			 * @type {string}
 			 */
 			token : ko.observable('')
-		};
-
-		/** Confirm registration */
-		this.confirmRegistration = function () {
-			ths.msgToConfirmRegistration.err('');
-			ths.msgToConfirmRegistration.scs('');
-
-			var tmpObjToConfirmRegistration = ko.toJS(ths.objToConfirmRegistration);
-
-			// TODO: check obj, using format
-
-			mdlWorkspace.sendConfirmRegistration(tmpObjToConfirmRegistration, function () {
-				ths.msgToConfirmRegistration.scs('{{capitalizeFirst lang.confirmRegistrationSuccessful}}');
-			}, function (jqXhr) {
-				if (jqXhr.status === 422) {
-					var resJson = jqXhr.responseJSON;
-					var tmpProcessError = (langHelper.translate(resJson.errId) || '{{lang.unknownError}}');
-					ths.msgToConfirmRegistration.err(tmpProcessError);
-				}
-			});
 		};
 
 		/** After initialization: try to load user */
@@ -256,11 +163,142 @@ define([
 		this.mdlWorkspace.logOff();
 	};
 
-  /** Build a viewmodel for user profile */
+	/** Build a viewmodel for user profile */
 	exports.prototype.buildVwmUserProfile = function () {
 		var tmpMdlUserProfile = ko.unwrap(this.mdlWorkspace.userProfile);
 		if (tmpMdlUserProfile) {
 			return new VwmUserProfile(tmpMdlUserProfile, this.defaultSlcData_);
+		}
+	};
+
+	// Left tree menu with well regions, groups, fields, wells
+	exports.prototype.toggleIsVisibleMenu = function () {
+		this.isVisibleMenu(!ko.unwrap(this.isVisibleMenu));
+	};
+
+	/**
+	 * Calculate, whether the employee in an edit mode
+	 * @returns {boolean}
+	 */
+	exports.prototype.calcIsEmployeeInEditMode = function () {
+		var tmpVwmUserProfile = ko.unwrap(this.vwmUserProfile);
+		if (tmpVwmUserProfile) {
+			var tmpEmployee = ko.unwrap(tmpVwmUserProfile.slcVwmChild);
+			if (tmpEmployee) {
+				return ko.unwrap(tmpEmployee.isEditMode);
+			}
+		}
+	};
+
+	/**
+	 * Calculate css for sidebar
+	 * @returns {string}
+	 */
+	exports.prototype.calcSidebarToggleCss = function () {
+		return ko.unwrap(this.isVisibleMenu) ? 'sidebar-toggle-visible' : 'sidebar-toggle-hidden';
+	};
+
+	/**
+	 * Calculate css for a work area
+	 * @returns {string}
+	 */
+	exports.prototype.calcWorkAreaCss = function () {
+		return ko.unwrap(this.isVisibleMenu) ? 'work-area' : '';
+	};
+
+	/**
+	 * Calculate css for a sidebar wrap
+	 * @returns {string}
+	 */
+	exports.prototype.calcSidebarWrapCss = function () {
+		return ko.unwrap(this.isVisibleMenu) ? 'sidebar-wrap-visible' : 'hidden';
+	};
+
+	/** Toggle registered state: login or register page */
+	exports.prototype.toggleIsRegisteredPage = function () {
+		this.isRegisteredPage(!ko.unwrap(this.isRegisteredPage));
+	};
+
+	/** Demo logon */
+	exports.prototype.demoLogOn = function () {
+		this.mdlWorkspace.sendLogOn(demoAuth);
+	};
+
+	/**
+	 * Calculate, whether the user in a demo mode
+	 * @returns {boolean}
+	 */
+	exports.prototype.calcIsUserInDemoMode = function () {
+		var tmpUserProfile = ko.unwrap(this.mdlWorkspace.userProfile);
+
+		if (!tmpUserProfile) {
+			return false;
+		}
+
+		return (ko.unwrap(tmpUserProfile.email) === demoAuth.email);
+	};
+
+	/** Confirm registration */
+	exports.prototype.confirmRegistration = function () {
+		this.msgToConfirmRegistration.err('');
+		this.msgToConfirmRegistration.scs('');
+
+		// TODO: check obj, using format
+		this.mdlWorkspace.sendConfirmRegistration(ko.toJS(this.objToConfirmRegistration),
+			this.confirmRegistrationSuccess.bind(this),
+			this.confirmRegistrationError.bind(this));
+	};
+
+	exports.prototype.confirmRegistrationSuccess = function () {
+		this.msgToConfirmRegistration.scs('{{capitalizeFirst lang.confirmRegistrationSuccessful}}');
+	};
+
+	exports.prototype.confirmRegistrationError = function (jqXhr) {
+		if (jqXhr.status === 422) {
+			this.msgToConfirmRegistration.err(langHelper.translate(jqXhr.responseJSON.errId) || '{{lang.unknownError}}');
+		}
+	};
+
+	exports.prototype.register = function () {
+		// Clean msges
+		this.msgToRegister.err('');
+		this.msgToRegister.scs('');
+
+		this.mdlWorkspace.sendRegister(ko.toJS(this.objToRegister),
+			this.handleRegisterSuccess.bind(this),
+			this.handleRegisterError.bind(this));
+	};
+
+	exports.prototype.handleRegisterSuccess = function () {
+		this.msgToRegister.scs('{{capitalizeFirst lang.checkToConfirmationToken}}');
+	};
+
+	exports.prototype.handleRegisterError = function (jqXHR) {
+		if (jqXHR.status === 422) {
+			this.msgToRegister.err(langHelper.translate(jqXHR.responseJSON.errId) || '{{lang.unknownError}}');
+		}
+	};
+
+	exports.prototype.realLogOn = function () {
+		this.errToRealLogOn('');
+		// get obj from fields check obj
+		// Convert to object without observables
+		this.mdlWorkspace.sendLogOn(ko.toJS(this.objToRealLogOn), 
+      this.handleRealLogOnSuccess.bind(this),
+			this.handleRealLogOnError.bind(this));
+	};
+
+	exports.prototype.handleRealLogOnSuccess = function () {
+		// Clear added object: if user logoff then need empty fields to logon again (for different user)
+		this.objToRealLogOn.email('');
+		this.objToRealLogOn.password('');
+		this.objToRealLogOn.rememberMe(false);
+		this.errToRealLogOn('');
+	};
+
+	exports.prototype.handleRealLogOnError = function (jqXhr) {
+		if (jqXhr.status === 422) {
+			this.errToRealLogOn(langHelper.translate(jqXhr.responseJSON.errId) || '{{lang.unknownError}}');
 		}
 	};
 

@@ -56,7 +56,7 @@
                                         <div>
                                             <div class="clearfix">
                                                 <div class="sidebar-toggle" data-bind="css: $root.sidebarToggleCss">
-                                                    <button type="button" data-bind="click: $root.toggleIsVisibleMenu" title="Hide/show menu">
+                                                    <button type="button" data-bind="click: $root.toggleIsVisibleMenu.bind($root)" title="Hide/show menu">
                                                         <i class="glyphicon glyphicon-chevron-left" data-bind="visible: $root.isVisibleMenu"></i>
                                                         <i class="glyphicon glyphicon-chevron-right" data-bind="hidden: $root.isVisibleMenu"></i>
                                                     </button>
