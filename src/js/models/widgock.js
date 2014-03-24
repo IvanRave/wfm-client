@@ -1,6 +1,6 @@
 ﻿/** @module */
-define(['jquery',
-		'knockout',
+define(['knockout',
+		'constants/stage-constants',
 		'services/widget',
 		'models/widget-default-summary',
 		'models/widget-well-history',
@@ -9,8 +9,8 @@ define(['jquery',
 		'models/widget-well-perfomance',
 		'models/widget-well-sketch',
 		'models/widget-wield-map'],
-	function ($,
-		ko,
+	function (ko,
+		stageCnst,
 		widgetService,
 		MdlWidgetDefaultSummary,
 		MdlWidgetWellHistory,
@@ -24,24 +24,23 @@ define(['jquery',
 	/** Create a model for a widget from widget data */
 	function buildWidget(widgetData, widgockItem) {
 		switch (widgetData.IdOfSectionPattern) {
-		case 'wroup-summary':
-		case 'wield-summary':
-		case 'wegion-summary':
-		case 'company-summary':
+		case stageCnst.well.ptrn.summary:
+		case stageCnst.wroup.ptrn.summary:
+		case stageCnst.wield.ptrn.summary:
+		case stageCnst.wegion.ptrn.summary:
+		case stageCnst.company.ptrn.summary:
 			return new MdlWidgetDefaultSummary(widgetData, widgockItem);
-		case 'well-summary':
-			return new MdlWidgetDefaultSummary(widgetData, widgockItem);
-		case 'well-perfomance':
+		case stageCnst.well.ptrn.perfomance:
 			return new MdlWidgetWellPerfomance(widgetData, widgockItem);
-		case 'well-monitoring':
+		case stageCnst.well.ptrn.monitoring:
 			return new MdlWidgetWellMonitoring(widgetData, widgockItem);
-		case 'well-history':
+		case stageCnst.well.ptrn.history:
 			return new MdlWidgetWellHistory(widgetData, widgockItem);
-		case 'well-map':
+		case stageCnst.well.ptrn.map:
 			return new MdlWidgetWellMap(widgetData, widgockItem);
-		case 'well-sketch':
+		case stageCnst.well.ptrn.sketch:
 			return new MdlWidgetWellSketch(widgetData, widgockItem);
-		case 'wield-map':
+		case stageCnst.wield.ptrn.map:
 			return new MdlWidgetWieldMap(widgetData, widgockItem);
 		}
 	}
@@ -110,11 +109,15 @@ define(['jquery',
 	};
 
 	/** Remove a widget from a widget block */
-	exports.prototype.removeWidget = function (widgetToDelete) {  
-		var ths = this;
-		widgetService.remove(ths.getWidgout().getParent().stageKey, ths.id, widgetToDelete.id).done(function () {
-			ths.widgetList.remove(widgetToDelete);
-		});
+	exports.prototype.removeWidget = function (widgetToDelete) {
+		widgetService.remove(this.getWidgout().getParent().stageKey, this.id, widgetToDelete.id)
+		.done(this.removeWidgetFromList.bind(this, widgetToDelete));
+	};
+
+	/** Remove a widget from the main list */
+	exports.prototype.removeWidgetFromList = function (widgetToDelete) {
+		this.widgetList.remove(widgetToDelete);
+		// Some message or some changes in a view
 	};
 
 	/** Create a widget */

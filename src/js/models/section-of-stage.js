@@ -1,10 +1,12 @@
 ﻿/** @module */
 define(['knockout',
+		'constants/stage-constants',
 		'helpers/app-helper',
 		'models/file-spec',
 		'services/file-spec',
 		'models/pre-file'],
 	function (ko,
+		stageCnst,
 		appHelper,
 		FileSpec,
 		fileSpecService,
@@ -72,6 +74,31 @@ define(['knockout',
 				owner : this
 			});
 
+    //{ #region HACK-VIEW-PROPS
+    
+		/**
+		 * A hack property, needed for the section-panel-well partial
+		 *    to show a perfomance menu with groups (a select input)
+		 * @type {boolean}
+		 */
+		this.isSectionPatternIdIsWellPerfomance = this.sectionPatternId === stageCnst.well.ptrn.perfomance;
+
+		/**
+		 * A hack property, needed for the section-panel-well partial
+		 *    to show a joined menu: volume and sketch
+		 * @type {boolean}
+		 */
+		this.isSectionPatternIdIsWellSketch = this.sectionPatternId === stageCnst.well.ptrn.sketch;
+
+		/**
+		 * A hack property, needed for the section-panel-well partial
+		 *    to show a joined menu: volume and sketch
+		 * @type {boolean}
+		 */
+		this.isSectionPatternIdIsWellVolume = this.sectionPatternId === stageCnst.well.ptrn.volume;
+
+    //} #endregion HACK-VIEW-PROPS
+    
 		/**
 		 * Whether section is visible as view: calculated using section checkbox and pattern checkbox
 		 * @type {boolean}
@@ -138,14 +165,17 @@ define(['knockout',
 		 */
 		this.isSlcAllFiles = ko.computed({
 				read : this.calcIsSlcAllFiles,
-				write : function (newVal) {
-					ko.unwrap(this.listOfFileSpec).forEach(function (tmpFileSpec) {
-						tmpFileSpec.isSelected(newVal);
-					});
-				},
+				write : this.setIsSlcAllFiles,
 				deferEvaluation : true,
 				owner : this
 			});
+	};
+
+	/** Select or unselect all files */
+	exports.prototype.setIsSlcAllFiles = function (isSlc) {
+		ko.unwrap(this.listOfFileSpec).forEach(function (tmpFileSpec) {
+			tmpFileSpec.isSelected(isSlc);
+		});
 	};
 
 	/**
@@ -232,11 +262,11 @@ define(['knockout',
 			}
 		});
 	};
-  
-  /** Save a file specification */
-  exports.prototype.saveFileSpec = function(fileSpecToSave){
-    fileSpecService.put(this.stageKey, this.id, fileSpecToSave.id, fileSpecToSave.toPlainFileSpec());
-  };
+
+	/** Save a file specification */
+	exports.prototype.saveFileSpec = function (fileSpecToSave) {
+		fileSpecService.put(this.stageKey, this.id, fileSpecToSave.id, fileSpecToSave.toPlainFileSpec());
+	};
 
 	/** Load list of file spec from the server */
 	exports.prototype.loadListOfFileSpec = function () {

@@ -304,10 +304,18 @@ define(['knockout',
 
 	/** Select section */
 	exports.prototype.selectVwmSectionWrk = function (vwmSectionToSelect) {
-		// Select id -> auto selection for view
+		// Set id -> auto selection for view
 		this.unzOfSlcVwmSectionWrk(vwmSectionToSelect.unz);
 	};
 
+  /**
+  * Select section by pattern id
+  */
+  exports.prototype.selectVwmSectionWrkById = function(tmpUnz){
+    // Set id -> auto selection for view
+		this.unzOfSlcVwmSectionWrk(tmpUnz);
+  };
+  
 	/** Choose dashboard (no section) */
 	exports.prototype.showStageViewDashboard = function () {
 		this.unzOfSlcVwmSectionWrk(null);

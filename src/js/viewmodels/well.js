@@ -67,8 +67,6 @@ define([
 	 * @augments {module:base-viewmodels/stage-base}
 	 */
 	var exports = function (mdlWell, parentVwmWroup, defaultSlcData) {
-		var ths = this;
-
 		this.mdlStage = mdlWell;
 
 		this.unq = mdlWell.id;
@@ -82,9 +80,9 @@ define([
 
 		// Has sections and widgets
 		VwmStageBase.call(this, defaultSlcData.wellSectionId, parentVwmWroup.unqOfSlcVwmChild, null);
-
+    
 		//mdlSketchOfWell, koWellUnzOfSlcVwmSectionFmg, koSlcVwmSectionFmg,  fmgrLink
-		this.vwmSketchOfWell = new VwmSketchOfWell(ths.mdlStage.sketchOfWell, ths.unzOfSlcVwmSectionFmg, ths.slcVwmSectionFmg, ths.fmgrModal);
+		this.vwmSketchOfWell = new VwmSketchOfWell(this.mdlStage.sketchOfWell, this.unzOfSlcVwmSectionFmg, this.slcVwmSectionFmg, this.fmgrModal);
 
 		//{ #region VOLUME-PROPS
 
@@ -122,7 +120,7 @@ define([
 		 * A viewmodel for history records (order from newer to older)
 		 * @type {module:viewmodels/history-of-well}
 		 */
-		this.vwmScopeOfHistoryOfWell = new VwmScopeOfHistoryOfWell(ths,
+		this.vwmScopeOfHistoryOfWell = new VwmScopeOfHistoryOfWell(this,
 				ko.observable(null),
 				ko.observable(null),
 				ko.observable(null),
@@ -132,6 +130,8 @@ define([
 
 		//{ #region LOG
 
+    var ths = this;
+    
 		/**
 		 * List of viewmodels of log of well
 		 * @type {Array.<module:viewmodels/log-of-well>}
@@ -399,18 +399,38 @@ define([
     
     //{ #region SWITCHER overwriting to remove hard-code strings and ko() props in html
     
+    this.isSlcPtrnWellHistory = ko.computed({
+      read: this.calcIsSlcPtrn.bind(this, stageCnst.well.ptrn.history),
+      deferEvaluation: true,
+      owner: this
+    });
+    
+    this.isSlcPtrnWellIntegrity = ko.computed({
+      read: this.calcIsSlcPtrn.bind(this, stageCnst.well.ptrn.integrity),
+      deferEvaluation: true,
+      owner: this
+    });
+    
+    this.isSlcPtrnWellLog = ko.computed({
+      read: this.calcIsSlcPtrn.bind(this, stageCnst.well.ptrn.log),
+      deferEvaluation: true,
+      owner: this
+    });
+    
+    this.isSlcPtrnWellNodalAnalysis = ko.computed({
+      read: this.calcIsSlcPtrn.bind(this, stageCnst.well.ptrn.nodalAnalysis),
+      deferEvaluation: true,
+      owner: this
+    });
+    
     this.isSlcPtrnWellPerfomance = ko.computed({
-      read: function(){
-        return ko.unwrap(this.patternOfSlcVwmSectionWrk) === stageCnst.well.ptrn.perfomance;
-      },
+      read: this.calcIsSlcPtrn.bind(this, stageCnst.well.ptrn.perfomance),
       deferEvaluation: true,
       owner: this
     });
     
     this.isSlcPtrnWellMap = ko.computed({
-      read: function(){
-        return ko.unwrap(this.patternOfSlcVwmSectionWrk) === stageCnst.well.ptrn.map;
-      },
+      read: this.calcIsSlcPtrn.bind(this, stageCnst.well.ptrn.map),
       deferEvaluation: true,
       owner: this
     });
@@ -421,6 +441,10 @@ define([
 	/** Inherit from a stage base viewmodel */
 	appHelper.inherits(exports, VwmStageBase);
 
+  exports.prototype.calcIsSlcPtrn = function(ptrnStr){
+    return ko.unwrap(this.patternOfSlcVwmSectionWrk) === ptrnStr;
+  };
+  
 	/** Calculate a selected marker, using id of map */
 	exports.prototype.calcSlcVwmMapMarker = function () {
 		var tmpIdOfMap = ko.unwrap(this.idOfMapOfSlcVwmMapMarker);

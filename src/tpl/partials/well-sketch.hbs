@@ -1,7 +1,7 @@
 ﻿<!-- current: vwmWell -->
 <div data-bind="with: vwmSketchOfWell">
   <div class="row">
-    <div class="col-sm-6 text-center">
+    <div class="col-sm-7 text-center">
       <div data-bind="if: $root.isEmployeeInEditMode">
         <button class="btn btn-default btn-sm btn-block" data-bind="click: createSketchFromFile">Choose a sketch...</button>
       </div>
@@ -18,7 +18,7 @@
         </span>
       </div>
     </div>
-    <div class="col-sm-6">
+    <div class="col-sm-5">
       <!-- ko with: mdlSketchOfWell -->
       <div data-bind="if: fileSpec">
         <div data-bind="if: $root.isEmployeeInEditMode">

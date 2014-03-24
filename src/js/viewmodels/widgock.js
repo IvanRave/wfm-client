@@ -22,23 +22,23 @@ define(['knockout',
 	/** Create a viewmodel for a widget from a widget model */
 	function buildVwmWidget(elem, tmpParentVwmStage) {
 		switch (elem.idOfSectionPattern) {
-		case 'well-summary':
-		case 'wroup-summary':
-		case 'wield-summary':
-		case 'wegion-summary':
-		case 'company-summary':
+		case stageCnst.well.ptrn.summary:
+		case stageCnst.wroup.ptrn.summary:
+		case stageCnst.wield.ptrn.summary:
+		case stageCnst.wegion.ptrn.summary:
+		case stageCnst.company.ptrn.summary:
 			return new VwmWidgetDefaultSummary(elem);
 		case stageCnst.well.ptrn.perfomance:
 			return new VwmWidgetWellPerfomance(elem, tmpParentVwmStage);
-		case 'well-monitoring':
+		case stageCnst.well.ptrn.monitoring:
 			return new VwmWidgetWellMonitoring(elem, tmpParentVwmStage);
-		case 'well-history':
+		case stageCnst.well.ptrn.history:
 			return new VwmWidgetWellHistory(elem, tmpParentVwmStage);
-		case 'wield-map':
+		case stageCnst.wield.ptrn.map:
 			return new VwmWidgetWieldMap(elem);
-		case 'well-map':
+		case stageCnst.well.ptrn.map:
 			return new VwmWidgetWellMap(elem);
-		case 'well-sketch':
+		case stageCnst.well.ptrn.sketch:
 			return new VwmWidgetWellSketch(elem);
 		}
 	}

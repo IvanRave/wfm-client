@@ -13,24 +13,25 @@
   </div>
 </div>
 <div data-bind="if: slcVwmSectionWrk">
-  <div data-bind="if: patternOfSlcVwmSectionWrk() === 'well-history'">
+  <div data-bind="if: isSlcPtrnWellHistory">
     {{> well-history}}
   </div>
-  <div data-bind="if: patternOfSlcVwmSectionWrk() === 'well-integrity'">
+  <div data-bind="if: isSlcPtrnWellIntegrity">
     {{> well-integrity}}
   </div>
-  <div data-bind="if: patternOfSlcVwmSectionWrk() === 'well-log'">
+  <div data-bind="if: isSlcPtrnWellLog">
     {{> well-log}}
   </div>
   <div data-bind="if: isSlcPtrnWellMap">
     {{> well-map}}
   </div>
-  <div data-bind="if: patternOfSlcVwmSectionWrk() === 'well-nodalanalysis'">
+  <div data-bind="if: isSlcPtrnWellNodalAnalysis">
     {{> well-nodalanalysis}}
   </div>
   <div data-bind="if: isSlcPtrnWellPerfomance">
     {{> well-pd}}
   </div>
+  <!-- TODO: move to js to decrease rendering calculation when choosing stage -->
   <div data-bind="if: patternOfSlcVwmSectionWrk() === 'well-report'">
     {{> well-report}}
   </div>

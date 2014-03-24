@@ -3,7 +3,10 @@
   <div class="pull-left">
     <ul class="nav nav-pills" data-bind="foreach: listOfVwmSection">
       <!-- ko if: mdlSection.isVisibleAsView -->
-        <!-- ko if: (mdlSection.sectionPatternId !== 'well-perfomance') -->
+          <!-- Ugly hack to join few sections -->
+        <!-- ko ifnot: mdlSection.isSectionPatternIdIsWellPerfomance -->
+        <!-- ko ifnot: mdlSection.isSectionPatternIdIsWellSketch -->
+        <!-- ko ifnot: mdlSection.isSectionPatternIdIsWellVolume -->
           <li>
             <div class="wfm-section-item" 
                  data-bind="click: $parent.selectVwmSectionWrk.bind($parent), css: {'wfm-section-item_state_active' : isSlcVwmSectionWrk }">
@@ -18,7 +21,39 @@
             </div>
           </li>
         <!-- /ko -->
-        <!-- ko if: (mdlSection.sectionPatternId === 'well-perfomance') -->
+        <!-- /ko -->
+        <!-- /ko -->
+        <!-- ko if: mdlSection.isSectionPatternIdIsWellSketch -->
+          <li class="dropup">
+            <div class="dropdown-toggle" data-toggle="dropdown" data-bind="drpdwn: {}">
+              <div class="wfm-section-item" 
+                   data-bind="css: {'wfm-section-item_state_active' : isSlcVwmSectionWrk }">
+                <div data-bind="with: mdlSection.sectionPattern">
+                  <div class="wfm-section-item__caption">
+                    <span data-bind="text: name"></span>
+                  </div>
+                  <div>
+                    <i class="wfm-icon" data-bind="css: iconClass"></i>
+                  </div>
+                </div>
+                <div class="wfm-section-item__caret">
+                  <span class="caret"></span>
+                </div>
+              </div>
+            </div>
+            <ul class="dropdown-menu">
+              <li>
+                <div data-bind="click: $parent.selectVwmSectionWrkById.bind($parent, 'well-volume')">
+                  <span>Volumes</span>
+                </div>
+                <div data-bind="click: $parent.selectVwmSectionWrk.bind($parent)">
+                  <span>Sketch</span>
+                </div>
+              </li>
+            </ul>
+          </li>
+        <!-- /ko -->
+        <!-- ko if: mdlSection.isSectionPatternIdIsWellPerfomance -->
           <li class="dropup">
             <div class="dropdown-toggle" data-toggle="dropdown" data-bind="drpdwn: {}">
               <div class="wfm-section-item" 
