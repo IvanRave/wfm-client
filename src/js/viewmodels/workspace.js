@@ -1,23 +1,18 @@
 ﻿/** @module */
-define([
-		'jquery',
-		'knockout',
+define(['knockout',
 		'helpers/history-helper',
 		'helpers/lang-helper',
-		'viewmodels/user-profile'], function ($, ko, historyHelper, langHelper, VwmUserProfile) {
+		'constants/demo-auth-constants',
+		'viewmodels/user-profile'],
+	function (ko,
+		historyHelper,
+		langHelper,
+		demoAuthConstants,
+		VwmUserProfile) {
 	'use strict';
 
 	/**
-	 * Demo auth data
-	 * @type {object}
-	 */
-	var demoAuth = {
-		'email' : 'wfm@example.com',
-		'password' : '123321'
-	};
-
-	/**
-	 * Workspace view model: root for knockout
+	 * A workspace view model: a root for knockout
 	 * @constructor
 	 */
 	var exports = function (mdlWorkspace) {
@@ -219,11 +214,6 @@ define([
 		this.isRegisteredPage(!ko.unwrap(this.isRegisteredPage));
 	};
 
-	/** Demo logon */
-	exports.prototype.demoLogOn = function () {
-		this.mdlWorkspace.sendLogOn(demoAuth);
-	};
-
 	/**
 	 * Calculate, whether the user in a demo mode
 	 * @returns {boolean}
@@ -235,7 +225,7 @@ define([
 			return false;
 		}
 
-		return (ko.unwrap(tmpUserProfile.email) === demoAuth.email);
+		return (ko.unwrap(tmpUserProfile.email) === demoAuthConstants.email);
 	};
 
 	/** Confirm registration */
@@ -279,16 +269,24 @@ define([
 		}
 	};
 
+  /** Demo logon */
+	exports.prototype.demoLogOn = function () {
+		this.mdlWorkspace.sendLogOn(demoAuthConstants,
+      this.handleLogOnSuccess.bind(this),
+			this.handleLogOnError.bind(this));
+	};
+  
 	exports.prototype.realLogOn = function () {
 		this.errToRealLogOn('');
 		// get obj from fields check obj
 		// Convert to object without observables
-		this.mdlWorkspace.sendLogOn(ko.toJS(this.objToRealLogOn), 
-      this.handleRealLogOnSuccess.bind(this),
-			this.handleRealLogOnError.bind(this));
+		this.mdlWorkspace.sendLogOn(ko.toJS(this.objToRealLogOn),
+			this.handleLogOnSuccess.bind(this),
+			this.handleLogOnError.bind(this));
 	};
 
-	exports.prototype.handleRealLogOnSuccess = function () {
+	exports.prototype.handleLogOnSuccess = function (userProfileData) {
+    this.mdlWorkspace.setUserProfile(userProfileData);
 		// Clear added object: if user logoff then need empty fields to logon again (for different user)
 		this.objToRealLogOn.email('');
 		this.objToRealLogOn.password('');
@@ -296,7 +294,7 @@ define([
 		this.errToRealLogOn('');
 	};
 
-	exports.prototype.handleRealLogOnError = function (jqXhr) {
+	exports.prototype.handleLogOnError = function (jqXhr) {
 		if (jqXhr.status === 422) {
 			this.errToRealLogOn(langHelper.translate(jqXhr.responseJSON.errId) || '{{lang.unknownError}}');
 		}

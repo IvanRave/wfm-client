@@ -21,53 +21,28 @@ define([
 		registerService) {
 	'use strict';
 
-	function importWfmParamSquadList(data) {
-		return (data || []).map(function (item) {
-			return new WfmParamSquad(item);
-		});
-	}
-
-	function importListOfSectionPattern(data) {
-		return (data || []).map(function (item) {
-			return new SectionPattern(item);
-		});
-	}
-
 	/**
 	 * Root view model
 	 * @constructor
 	 */
 	var exports = function () {
-		/** Alternative for this */
-		var ths = this;
+		/**
+    * Param squads
+    */
+		this.wfmParamSquadList = ko.lazyObservableArray(this.loadParamSquadList, this);
 
-		// =====================================Wfm parameters begin==========================================================
-		this.wfmParamSquadList = ko.lazyObservableArray(function () {
-				wfmParamSquadService.getInclusive().done(function (r) {
-					ths.wfmParamSquadList(importWfmParamSquadList(r));
-				});
-			}, this);
+		/**
+    * A list of section patterns: lazy loading by first request
+    */
+		this.ListOfSectionPatternDto = ko.lazyObservableArray(this.loadListOfSectionPattern, this);
 
-		/** Get list of section patterns: lazy loading by first request */
-		this.ListOfSectionPatternDto = ko.lazyObservableArray(function () {
-				sectionPatternService.get().done(function (r) {
-					ths.ListOfSectionPatternDto(importListOfSectionPattern(r));
-				});
-			}, this);
-
-		/** Get all parameters from all groups as one dimensional array */
+		/** 
+    * All parameters from all groups as one dimensional array
+    */
 		this.wfmParameterList = ko.computed({
-				read : function () {
-					var outArr = [];
-					var tmpSquadList = ko.unwrap(ths.wfmParamSquadList);
-					tmpSquadList.forEach(function (sqdElem) {
-						ko.unwrap(sqdElem.wfmParameterList).forEach(function (prmElem) {
-							outArr.push(prmElem);
-						});
-					});
-					return outArr;
-				},
-				deferEvaluation : true
+				read : this.calcWfmParameterList,
+				deferEvaluation : true,
+				owner : this
 			});
 
 		/**
@@ -82,46 +57,98 @@ define([
 		 * @type {boolean}
 		 */
 		this.isTriedToLoadUserProfile = ko.observable(false);
+	};
 
-		this.sendLogOn = function (logOnData, scsCallback, errCallback) {
-			userProfileService.accountLogon(logOnData).done(function (r) {
-				ths.userProfile(new UserProfile(r, ths));
-				if (scsCallback) {
-					scsCallback();
-				}
-			}).fail(errCallback);
-		};
+	exports.prototype.sendLogOn = function (logOnData, scsCallback, errCallback) {
+		userProfileService.accountLogon(logOnData).done(scsCallback).fail(errCallback);
+	};
 
-		this.sendRegister = function (objToRegister, scsCallback, errCallback) {
-			registerService.accountRegister(objToRegister).done(scsCallback).fail(errCallback);
-		};
+	exports.prototype.setUserProfile = function (r) {
+		this.userProfile(new UserProfile(r, this));
+	};
 
-		this.sendConfirmRegistration = function (objToConfirmRegistration, scsCallback, errCallback) {
-			registerService.accountRegisterConfirmation(objToConfirmRegistration).done(scsCallback).fail(errCallback);
-		};
+	exports.prototype.cleanUserProfile = function () {
+		this.userProfile(null);
+		// automatically cleaned all child companies, wegions etc.
 	};
 
 	/** Log out from app: clean objects, set isLogged to false */
 	exports.prototype.logOff = function () {
-		var ths = this;
-		userProfileService.accountLogoff().done(function () {
-			// clean user profile with cookies
-			ths.userProfile(null);
-			// automatically cleaned all child companies, wegions etc.
-		});
+		userProfileService.accountLogoff().done(this.cleanUserProfile.bind(this));
+	};
+
+	exports.prototype.sendRegister = function (objToRegister, scsCallback, errCallback) {
+		registerService.accountRegister(objToRegister).done(scsCallback).fail(errCallback);
+	};
+
+	exports.prototype.sendConfirmRegistration = function (objToConfirmRegistration, scsCallback, errCallback) {
+		registerService.accountRegisterConfirmation(objToConfirmRegistration).done(scsCallback).fail(errCallback);
 	};
 
 	/**
 	 * Try to get user profile: Email, Roles, IsLogged
 	 */
 	exports.prototype.tryToLoadUserProfile = function () {
-		var ths = this;
 		// Send auth cookies to the server
-		userProfileService.getUserProfile().done(function (r) {
-			ths.userProfile(new UserProfile(r, ths));
-		}).always(function () {
-			ths.isTriedToLoadUserProfile(true);
+		userProfileService.getUserProfile()
+		.done(this.setUserProfile.bind(this))
+		.always(this.setTryStatus.bind(this));
+	};
+
+	exports.prototype.setTryStatus = function () {
+		this.isTriedToLoadUserProfile(true);
+	};
+
+	/**
+	 * Calculate parameters from squads
+	 * @private
+	 * @returns {module:models/wfm-parameter}
+	 */
+	exports.prototype.calcWfmParameterList = function () {
+		var outArr = [];
+
+		ko.unwrap(this.wfmParamSquadList).forEach(function (sqdElem) {
+			ko.unwrap(sqdElem.wfmParameterList).forEach(function (prmElem) {
+				outArr.push(prmElem);
+			});
 		});
+
+		return outArr;
+	};
+
+	/** Load squads */
+	exports.prototype.loadParamSquadList = function () {
+		wfmParamSquadService.getInclusive().done(this.applyParamSquadList.bind(this));
+	};
+
+	/**
+	 * Apply squads after loading
+	 * @private
+	 */
+	exports.prototype.applyParamSquadList = function (data) {
+		data = data || [];
+		this.wfmParamSquadList(data.map(function (item) {
+				return new WfmParamSquad(item);
+			}));
+	};
+
+	/**
+	 * Load a list of patterns
+	 * @private
+	 */
+	exports.prototype.loadListOfSectionPattern = function () {
+		sectionPatternService.get().done(this.applyListOfSectionPattern.bind(this));
+	};
+
+	/**
+	 * Apply patterns
+	 * @private
+	 */
+	exports.prototype.applyListOfSectionPattern = function (data) {
+		data = data || [];
+		this.ListOfSectionPatternDto(data.map(function (item) {
+				return new SectionPattern(item);
+			}));
 	};
 
 	return exports;

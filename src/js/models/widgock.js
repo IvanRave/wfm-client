@@ -109,8 +109,8 @@ define(['jquery',
 		this.widgetList(importWidgetList(data.WidgetDtoList, this));
 	};
 
-	/** Remove widget from widget block */
-	exports.prototype.removeWidget = function (widgetToDelete) {
+	/** Remove a widget from a widget block */
+	exports.prototype.removeWidget = function (widgetToDelete) {  
 		var ths = this;
 		widgetService.remove(ths.getWidgout().getParent().stageKey, ths.id, widgetToDelete.id).done(function () {
 			ths.widgetList.remove(widgetToDelete);

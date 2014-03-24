@@ -102,10 +102,9 @@ define(['knockout',
 	 * Remove the widget model and viewmodel
 	 */
 	exports.prototype.removeVwmWidget = function (vwmWidgetToRemove) {
-		var ths = this;
 		var tmpMdl = vwmWidgetToRemove.mdlWidget;
 		if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(tmpMdl.name) + '"?')) {
-			ths.mdlWidgock.removeWidget(tmpMdl);
+			this.mdlWidgock.removeWidget(tmpMdl);
 		}
 	};
 
