@@ -96,7 +96,7 @@
                       <img class="img-thumbnail elem-shadow" src="" data-bind="attr: { src: croppedImageUrl }" alt="History image" />
                     </span>
                     <span data-bind="if: $root.isEmployeeInEditMode">
-                      <i class="glyphicon glyphicon-remove link-icon" data-bind="click: $parent.removeWfmImage"></i>
+                      <i class="glyphicon glyphicon-remove link-icon" data-bind="click: $parent.removeWfmImage.bind($parent)"></i>
                     </span>
                   </div>
                 </div>
@@ -111,7 +111,7 @@
                       </span>
                     </span>
                     <span data-bind="if: $root.isEmployeeInEditMode">
-                      <i class="glyphicon glyphicon-remove link-icon" data-bind="click: $parent.removeFileSpecOfHistoryOfWell"></i>
+                      <i class="glyphicon glyphicon-remove link-icon" data-bind="click: $parent.removeFileSpecOfHistoryOfWell.bind($parent)"></i>
                     </span>
                   </div>
                 </div>
