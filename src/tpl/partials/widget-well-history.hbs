@@ -11,10 +11,10 @@
     <div data-bind="with: $parents[3].mdlStage">
       <div data-bind="if: isLoadedHistoryList">
         <div data-bind="with: vwmWidget.vwmScopeOfHistoryOfWell">
-          <div data-bind="if: listOfVwmHistoryOfWell().length === 0">
+          <div data-bind="ifnot: listOfVwmHistoryOfWell.hasItems">
             <small>{{capitalizeFirst lang.noWellHistoryList}}</small>
           </div>
-          <div data-bind="if: listOfVwmHistoryOfWell().length > 0">
+          <div data-bind="if: listOfVwmHistoryOfWell.hasItems">
             <div data-bind="foreach: sortedListOfVwmHistoryOfWell">
               <div data-bind="slideVisible: isVisible">
                 <div class="wfm-well-history-wrap" data-bind="with: mdlHistoryOfWell">
@@ -39,7 +39,8 @@
                   <div class="clearfix" data-bind="foreach: WellHistoryFiles">
                     <div class="img-thumbnail pull-left" data-bind="with: fileSpec">
                       <span class="link-view pointer">
-                        <span data-bind="text: namePlusExtension, click: download"></span>
+                        <!-- TODO: #33! bug - download feat in a view - back: click: download -->
+                        <span data-bind="text: namePlusExtension"></span>
                       </span>
                     </div>
                   </div>

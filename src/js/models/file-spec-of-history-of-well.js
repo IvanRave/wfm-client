@@ -9,8 +9,6 @@ define(['knockout', 'models/file-spec'], function (ko, FileSpec) {
     var exports = function (data) {
         data = data || {};
 
-        ////var ths = this;
-
         this.idOfHistoryOfWell = data.IdOfHistoryOfWell;
         this.idOfFileSpec = data.IdOfFileSpec;
         this.description = ko.observable(data.Description);

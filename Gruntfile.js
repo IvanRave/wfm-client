@@ -251,9 +251,10 @@ module.exports = function (grunt) {
 					mainConfigFile : '<%= trgt %>/js/require-config.js',
 					optimize : 'uglify2',
 					// http://requirejs.org/docs/optimization.html#sourcemaps
-					////generateSourceMaps: true,
-					////preserveLicenseComments: false,
+					generateSourceMaps: true,
+					preserveLicenseComments: false,
 					////useSourceUrl: true,
+          wrapShim: true,
 					//  wrap: true, // wrap in closure
 					// jQuery automatically excluded if it's loaded from CDN
 					include : ['es5-shim', 'es5-sham', 'console-shim', 'jquery',

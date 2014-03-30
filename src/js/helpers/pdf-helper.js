@@ -1,4 +1,23 @@
-﻿////define(['jquery', 'moment',
+﻿// // define(['jspdf'], function () {
+// // 'use strict';
+
+// // /**
+// // * A PDF helper
+// // */
+// // var exports = {};
+
+// // exports.createPdf = function () {
+// // return new jsPDF();
+// // };
+
+// // exports.savePdf = function(pdfDoc){
+// // pdfDoc.save('Test.pdf');
+// // };
+
+// // return exports;
+// // });
+
+////define(['jquery', 'moment',
 ////    'blob-js', 'blob-builder', 'filesaver'
 ////], function ($, appMoment) {
 ////    'use strict';
@@ -107,7 +126,7 @@
 ////            counterDate = new Date(counterDate.setMonth(counterDate.getMonth() + 1));
 ////        }
 
-////        // vertical data 
+////        // vertical data
 ////        // get min and max values (exclude zero index - date)
 ////        var minValue = 0;
 ////        var maxValue = graphData[0][1];
@@ -461,7 +480,7 @@
 ////        };
 
 ////        img.onload = function () {
-////            // inner data: 
+////            // inner data:
 ////            // img.width
 ////            // img.height
 
@@ -470,7 +489,7 @@
 
 ////            // img 700*900
 ////            // pdf 400*600
-////            // if 700 > 400 
+////            // if 700 > 400
 ////            // scale = 400/700
 ////            // height = 900 * 400/700
 ////            // width = 700 * 400/700

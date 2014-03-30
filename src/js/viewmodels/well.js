@@ -117,7 +117,7 @@ define([
 		//{ #region HISTORY
 
 		/**
-		 * A viewmodel for history records (order from newer to older)
+		 * A viewmodel for the main list of history records (order from newer to older)
 		 * @type {module:viewmodels/history-of-well}
 		 */
 		this.vwmScopeOfHistoryOfWell = new VwmScopeOfHistoryOfWell(this,
@@ -398,7 +398,7 @@ define([
 		//} #endregion MAP
     
     //{ #region SWITCHER overwriting to remove hard-code strings and ko() props in html
-    
+    console.log('history pattern', stageCnst.well.ptrn.history);
     this.isSlcPtrnWellHistory = ko.computed({
       read: this.calcIsSlcPtrn.bind(this, stageCnst.well.ptrn.history),
       deferEvaluation: true,

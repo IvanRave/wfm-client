@@ -31,7 +31,8 @@ define([
 		'models/monitoring-record',
 		'services/monitoring-record'
 	], function ($, ko, datacontext, fileHelper,
-		appHelper, appMoment,
+		appHelper,
+    appMoment,
 		StageBase,
 		PerfomanceOfWell,
 		SectionOfWell, SketchOfWell,
@@ -1014,5 +1015,13 @@ define([
     this.getWellGroup().getWellField().loadMapsOfWield();
 	};
 
+  // /**
+  // * Create a PDF report
+  // */
+  // exports.prototype.createReport = function(){
+      // var pdfDoc = pdfHelper.createPdf();
+      // pdfHelper.savePdf(pdfDoc);
+  // };
+  
 	return exports;
 });

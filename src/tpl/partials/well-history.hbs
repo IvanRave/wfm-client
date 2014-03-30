@@ -3,11 +3,11 @@
   <span data-bind="ifnot: mdlStage.isLoadedHistoryList">{{capitalizeFirst lang.loading}}...</span>
   <div data-bind="if: mdlStage.isLoadedHistoryList">
     <div data-bind="with: vwmScopeOfHistoryOfWell">
-      <div data-bind="if: listOfVwmHistoryOfWell().length === 0">
+      <div data-bind="ifnot: listOfVwmHistoryOfWell.hasItems">
         <small>{{capitalizeFirst lang.noWellHistoryList}}</small>
       </div>
       <div class="clearfix">
-        <div class="pull-left" data-bind="if: listOfVwmHistoryOfWell().length > 0">
+        <div class="pull-left" data-bind="if: listOfVwmHistoryOfWell.hasItems">
           {{> well-history-filter-panel }}
         </div>
         <div class="pull-right" data-bind="if: $root.isEmployeeInEditMode">
@@ -77,38 +77,43 @@
                 </div>
               </div>
             </div>
-            <div class="col-md-10" data-bind="with: mdlHistoryOfWell">
-              <div data-bind="ifnot: $root.isEmployeeInEditMode">
-                <div data-bind="visible: historyText">
-                  <p class="wfm-well-history-record pre-wrap-text" data-bind="text: historyText"></p>
+            <div class="col-md-10">
+              <div data-bind="with: mdlHistoryOfWell">
+                <div data-bind="ifnot: $root.isEmployeeInEditMode">
+                  <div data-bind="visible: historyText">
+                    <p class="wfm-well-history-record pre-wrap-text" data-bind="text: historyText"></p>
+                  </div>
                 </div>
-              </div>
-              <div data-bind="if: $root.isEmployeeInEditMode">
-                <textarea class="form-control" rows="3" style="resize: vertical" data-bind="value: historyText"></textarea>
-                <button class="btn btn-default btn-sm" type="button" data-bind="click: putWellHistory">
-                  <i class="glyphicon glyphicon-saved"></i> {{capitalizeFirst lang.toSave}}
-                </button>
-              </div>
-              <div data-bind="foreach: WfmImages">
-                <div>
-                  <span class="pointer" data-bind="panzoomImg: {src: croppedImageUrl}">
-                    <img class="img-thumbnail elem-shadow" src="" data-bind="attr: { src: croppedImageUrl }" alt="History image" />
-                  </span>
-                  <span data-bind="if: $root.isEmployeeInEditMode">
-                    <i class="glyphicon glyphicon-remove link-icon" data-bind="click: $parent.removeWfmImage"></i>
-                  </span>
+                <div data-bind="if: $root.isEmployeeInEditMode">
+                  <textarea class="form-control" rows="3" style="resize: vertical" data-bind="value: historyText"></textarea>
+                  <button class="btn btn-default btn-sm" type="button" data-bind="click: putWellHistory">
+                    <i class="glyphicon glyphicon-saved"></i> {{capitalizeFirst lang.toSave}}
+                  </button>
                 </div>
-              </div>
-              <div data-bind="foreach: WellHistoryFiles" class="clearfix">
-                <div class="img-thumbnail pull-left">
-                  <span class="link-view pointer">
-                    <span data-bind="with: fileSpec">
-                      <span data-bind="text: namePlusExtension, click: download"></span>
+                <div data-bind="foreach: WfmImages">
+                  <div>
+                    <span class="pointer" data-bind="panzoomImg: {src: croppedImageUrl}">
+                      <img class="img-thumbnail elem-shadow" src="" data-bind="attr: { src: croppedImageUrl }" alt="History image" />
                     </span>
-                  </span>
-                  <span data-bind="if: $root.isEmployeeInEditMode">
-                    <i class="glyphicon glyphicon-remove link-icon" data-bind="click: $parent.removeFileSpecOfHistoryOfWell"></i>
-                  </span>
+                    <span data-bind="if: $root.isEmployeeInEditMode">
+                      <i class="glyphicon glyphicon-remove link-icon" data-bind="click: $parent.removeWfmImage"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div data-bind="with: mdlHistoryOfWell">
+                <div class="clearfix" data-bind="foreach: WellHistoryFiles">
+                  <div class="img-thumbnail pull-left">
+                    <span class="link-view pointer">
+                      <span data-bind="with: fileSpec">
+                        <!-- TODO: #33! bug - download feat in a view - back: click: download -->
+                        <span data-bind="text: namePlusExtension"></span>
+                      </span>
+                    </span>
+                    <span data-bind="if: $root.isEmployeeInEditMode">
+                      <i class="glyphicon glyphicon-remove link-icon" data-bind="click: $parent.removeFileSpecOfHistoryOfWell"></i>
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

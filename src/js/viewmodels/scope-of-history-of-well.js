@@ -54,10 +54,10 @@ define(['knockout',
 			});
 
 		this.listOfVwmHistoryOfWell = ko.computed({
-				read : this.getListOfVwmHistoryOfWell,
+				read : this.buildListOfVwmHistoryOfWell,
 				deferEvaluation : true,
 				owner : this
-			});
+			}).trackHasItems();
 
 		/**
 		 * Sorted list of history records
@@ -65,7 +65,7 @@ define(['knockout',
 		 * @type {Array.<module:viewmodels/history-of-well>}
 		 */
 		this.sortedListOfVwmHistoryOfWell = ko.computed({
-				read : this.getSortedListOfVwmHistoryOfWell,
+				read : this.buildSortedListOfVwmHistoryOfWell,
 				deferEvaluation : true,
 				owner : this
 			});
@@ -127,8 +127,9 @@ define(['knockout',
 
 	/**
 	 * Get sorted list
+   * @private
 	 */
-	exports.prototype.getSortedListOfVwmHistoryOfWell = function () {
+	exports.prototype.buildSortedListOfVwmHistoryOfWell = function () {
 		var tmpVwmList = ko.unwrap(this.listOfVwmHistoryOfWell);
 
 		var tmpOrder = parseInt(ko.unwrap(this.sortByDateOrder), 10);
@@ -140,12 +141,18 @@ define(['knockout',
 	};
 
 	/** Get list of viewmodels */
-	exports.prototype.getListOfVwmHistoryOfWell = function () {
-		var ths = this;
+	exports.prototype.buildListOfVwmHistoryOfWell = function () {
 		var tmpMdlList = ko.unwrap(this.mdlWell.historyList);
-		return tmpMdlList.map(function (elem) {
-			return new VwmHistoryOfWell(elem, ths.getVwmWell(), ths.startDate, ths.endDate, ths.jobTypeId);
-		});
+		var readyList = tmpMdlList.map(function (elem) {
+			return new VwmHistoryOfWell(elem,
+				this.getVwmWell(),
+				this.startDate,
+				this.endDate,
+				this.jobTypeId);
+		}, this);
+    
+    console.log('Ready history list:', readyList);
+    return readyList;
 	};
 
 	/** Get css for the button with a date filter */

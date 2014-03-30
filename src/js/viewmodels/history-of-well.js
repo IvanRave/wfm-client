@@ -13,8 +13,8 @@ define([
 	 * Viewmodel: history of well
 	 * @constructor
 	 */
-	var exports = function (mdlHistoryOfWell, vwmWell, 
-    koStartUnixTime, koEndUnixTime, koIdOfSlcJobType) {
+	var exports = function (mdlHistoryOfWell, vwmWell,
+		koStartUnixTime, koEndUnixTime, koIdOfSlcJobType) {
 
 		/**
 		 * Getter for a well viewmodel
@@ -45,7 +45,29 @@ define([
 				deferEvaluation : true,
 				owner : this
 			});
+
+		// /**
+		// * A list of viewmodels of history files
+		// * @type {Array.<module:viewmodels/file-spec>}
+		// */
+		// this.listOfVwmHistoryFile = ko.computed({
+		// read : this.buildListOfVwmHistoryFile,
+		// deferEvaluation : true,
+		// owner : this
+		// });
 	};
+
+	// /**
+	// * Build a list of viewmodels of history files
+	// * @returns {Array.<module:viewmodels/file-spec>}
+	// */
+	// exports.prototype.buildListOfVwmHistoryFile = function () {
+	// var tmpList = ko.unwrap(this.mdlHistoryOfWell.WellHistoryFiles);
+	// return tmpList.map(function (elem) {
+	// // Create viewmodel with an empty filter
+	// return new VwmFileSpec(elem, '');
+	// });
+	// };
 
 	/**
 	 * Create file spec for history of well
@@ -176,9 +198,9 @@ define([
 		fmgrModal.show();
 	};
 
-  /**
-  * Check whether is this record visible
-  */
+	/**
+	 * Check whether is this record visible
+	 */
 	exports.prototype.checkIsVisibleRecord = function () {
 		var ths = this;
 		var tmpFilterUnixTime = ko.toJS(this.filterUnixTime);
