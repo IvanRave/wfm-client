@@ -51,6 +51,13 @@ define(['knockout',
 		 * @type {module:models/section-pattern}
 		 */
 		this.slcStagePatternForWidget = ko.observable();
+
+		/**
+		 * Id of seclected context of a stage
+		 *    When user add a widget from other stage
+		 * @type {string}
+		 */
+		this.idOfSlcCntxStage = ko.observable('7004');
 	};
 
 	/**
@@ -59,8 +66,21 @@ define(['knockout',
 	exports.prototype.addVwmWidget = function () {
 		var tmpStagePattern = ko.unwrap(this.slcStagePatternForWidget);
 		if (tmpStagePattern) {
-			this.mdlWidgock.addWidget(ko.unwrap(tmpStagePattern.name), tmpStagePattern.id,
-				this.afterAddingVwmWidget.bind(this));
+			var tmpIdOfSlcCntxStage = ko.unwrap(this.idOfSlcCntxStage);
+      
+      // This is a hack for company GUIDs and other stage INTEGERS ids
+      var typeOfCntxStage = tmpStagePattern.id.split('-')[0]; // 'wegion'; //'company';
+      
+      if (typeOfCntxStage !== 'company') {
+        tmpIdOfSlcCntxStage = parseInt(tmpIdOfSlcCntxStage); //6002;
+      }
+      
+			if (tmpIdOfSlcCntxStage) {
+				this.mdlWidgock.addWidget(ko.unwrap(tmpStagePattern.name), 
+          tmpStagePattern.id,
+          tmpIdOfSlcCntxStage,
+					this.afterAddingVwmWidget.bind(this));
+			}
 		}
 	};
 
@@ -105,9 +125,9 @@ define(['knockout',
 	/** Create a viewmodel for a widget from a widget model */
 	exports.prototype.buildVwmWidget = function (mdlWidget) {
 		var tmpParentVwmStage = this.getVwmWidgout().getParentVwmStage();
-    
+
 		switch (mdlWidget.idOfSectionPattern) {
-		case stageCnst.well.ptrn.summary: 
+		case stageCnst.well.ptrn.summary:
 		case stageCnst.wroup.ptrn.summary:
 		case stageCnst.wield.ptrn.summary:
 		case stageCnst.wegion.ptrn.summary:

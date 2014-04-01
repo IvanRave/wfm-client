@@ -12,8 +12,8 @@ define(['knockout',
 	 * @constuctor
 	 * @augments {module:base-models/widget-base}
 	 */
-	var exports = function (data, widgockItem, mdlStageContext) {
-		Widget.call(this, data, widgockItem, mdlStageContext);
+	var exports = function (data, widgockItem) {
+		Widget.call(this, data, widgockItem);
 
 		var tmpOpts = JSON.parse(data.Opts);
 

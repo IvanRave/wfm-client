@@ -101,7 +101,10 @@ define(['knockout',
 	};
 
 	/** Create a widget */
-	exports.prototype.addWidget = function (tmpWidgetName, tmpIdOfSectionPattern, scsCallback) {
+	exports.prototype.addWidget = function (tmpWidgetName, 
+    tmpIdOfSectionPattern, 
+    tmpIdOfCntxStage,
+    scsCallback) {
 		var tmpWidgetList = ko.unwrap(this.widgetList);
 
 		// Get order number of last widget
@@ -113,14 +116,15 @@ define(['knockout',
 			lastOrderNumber = 0;
 		}
 
-		var ths = this;
-
-		widgetService.post(ths.getWidgout().getParent().stageKey, ths.id, {
+    var tmpParentStage = this.getWidgout().getParent();
+    
+		widgetService.post(tmpParentStage.stageKey, this.id, {
 			Name : tmpWidgetName,
 			IdOfSectionPattern : tmpIdOfSectionPattern,
 			OrderNumber : lastOrderNumber + 1,
 			Opts : '{}',
-			WidgockId : ths.id
+			WidgockId : this.id,
+      IdOfCntxStage: tmpIdOfCntxStage
 		}).done(scsCallback);
 	};
 
@@ -129,12 +133,6 @@ define(['knockout',
 	 */
 	exports.prototype.buildWidget = function (widgetData) {
 		var widgockItem = this;
-		var mdlStageParent = widgockItem.getWidgout().getParent();
-
-		var cntxStageType = 'well'; // 'wegion'; //'company';
-		var cntxStageId =  7004; //6002; // 'd14f9c04-4875-4519-9acb-dfe6046355e0';
-		// Find this stage
-		var cntxStage = mdlStageParent.findCognateStage(cntxStageType, cntxStageId);
 
 		switch (widgetData.IdOfSectionPattern) {
 		case stageCnst.well.ptrn.summary:
@@ -142,19 +140,19 @@ define(['knockout',
 		case stageCnst.wield.ptrn.summary:
 		case stageCnst.wegion.ptrn.summary:
 		case stageCnst.company.ptrn.summary:
-			return new MdlWidgetDefaultSummary(widgetData, widgockItem, cntxStage);
+			return new MdlWidgetDefaultSummary(widgetData, widgockItem);
 		case stageCnst.well.ptrn.perfomance:
-			return new MdlWidgetWellPerfomance(widgetData, widgockItem, cntxStage);
+			return new MdlWidgetWellPerfomance(widgetData, widgockItem);
 		case stageCnst.well.ptrn.monitoring:
-			return new MdlWidgetWellMonitoring(widgetData, widgockItem, cntxStage);
+			return new MdlWidgetWellMonitoring(widgetData, widgockItem);
 		case stageCnst.well.ptrn.history:
-			return new MdlWidgetWellHistory(widgetData, widgockItem, cntxStage);
+			return new MdlWidgetWellHistory(widgetData, widgockItem);
 		case stageCnst.well.ptrn.map:
-			return new MdlWidgetWellMap(widgetData, widgockItem, cntxStage);
+			return new MdlWidgetWellMap(widgetData, widgockItem);
 		case stageCnst.well.ptrn.sketch:
-			return new MdlWidgetWellSketch(widgetData, widgockItem, cntxStage);
+			return new MdlWidgetWellSketch(widgetData, widgockItem);
 		case stageCnst.wield.ptrn.map:
-			return new MdlWidgetWieldMap(widgetData, widgockItem, cntxStage);
+			return new MdlWidgetWieldMap(widgetData, widgockItem);
 		}
 	};
 

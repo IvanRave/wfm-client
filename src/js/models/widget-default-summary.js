@@ -12,8 +12,8 @@ define(['knockout',
 	 * @constructor
 	 * @augments {module:base-models/widget-base}
 	 */
-	var exports = function (data, widgockItem, mdlStageContext) {
-		Widget.call(this, data, widgockItem, mdlStageContext);
+	var exports = function (data, widgockItem) {
+		Widget.call(this, data, widgockItem);
     
 		/**
 		 * Options for widget, like {isVisName: true, ...}
@@ -23,10 +23,8 @@ define(['knockout',
 		 */
 		this.tmpOpts = JSON.parse(data.Opts);
 
-		console.log('mdlStageContext', mdlStageContext);
-
 		/** All summary properties for current stage */
-		var propSpecList = mdlStageContext.propSpecList;
+		var propSpecList = this.mdlStageContext.propSpecList;
 
 		/**
 		 * Fill properties
