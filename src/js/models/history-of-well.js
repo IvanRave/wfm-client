@@ -179,7 +179,7 @@ define(['jquery',
 	/**
 	 * Create cropped well history image from file spec
 	 */
-	this.postImageOfHistoryOfWell = function (tmpIdOfFileSpec, coords, scsCallback) {
+	exports.prototype.postImageOfHistoryOfWell = function (tmpIdOfFileSpec, coords, scsCallback) {
     var ths = this;
 		imageOfHistoryOfWellService.post(ths.id, {
 			IdOfFileSpec : tmpIdOfFileSpec,

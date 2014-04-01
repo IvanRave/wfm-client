@@ -26,18 +26,18 @@
     </div>
   </div>
   <div class="widget-content">
-      <div data-bind="with: vwmWidget.vwmPerfomanceOfWell">
-          <div data-bind="ifnot: mdlPerfomanceOfWell.isLoadedHstProductionData">{{lang.loading}}...</div>
-          <div data-bind="if: mdlPerfomanceOfWell.isLoadedHstProductionData">
-              <div data-bind="if: mdlPerfomanceOfWell.hstProductionDataSet().length === 0">No data.</div>
-              <div data-bind="if: mdlPerfomanceOfWell.hstProductionDataSet().length > 0">
-                  <div data-bind="if: selectedAttrGroup">
-                      <!-- ko with: prfmGraph -->
-                      {{> graph-partial }}
-                      <!-- /ko -->
-                  </div>
-              </div>
+    <div data-bind="with: vwmWidget.vwmPerfomanceOfWell">
+      <div data-bind="ifnot: mdlPerfomanceOfWell.isLoadedHstProductionData">{{lang.loading}}...</div>
+      <div data-bind="if: mdlPerfomanceOfWell.isLoadedHstProductionData">
+        <div data-bind="if: mdlPerfomanceOfWell.hstProductionDataSet().length === 0">No data.</div>
+        <div data-bind="if: mdlPerfomanceOfWell.hstProductionDataSet().length > 0">
+          <div data-bind="if: selectedAttrGroup">
+            <!-- ko with: prfmGraph -->
+            {{> graph-partial }}
+            <!-- /ko -->
           </div>
+        </div>
       </div>
+    </div>
   </div>
 </script>

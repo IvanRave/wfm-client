@@ -1,7 +1,7 @@
 ﻿<script type="text/html" id="widget-tpl-well-sketch">
   <!-- current: vwmWidget -->
-  <div data-bind="if: vwmWidget.isVisSettingPanel">
-    <div class="widget-setting-panel" data-bind="with: vwmWidget.mdlWidget">
+  <div data-bind="if: isVisSettingPanel">
+    <div class="widget-setting-panel" data-bind="with: mdlWidget">
       <label>
         <input type="checkbox" data-bind="checked: opts.isVisImg" /> Image
       </label>
@@ -11,20 +11,20 @@
     </div>
   </div>
   <div class="widget-content">
-    <div data-bind="with: $parents[3].mdlStage">
-      <div data-bind="if: vwmWidget.mdlWidget.opts.isVisImg">
-        <div data-bind="with: sketchOfWell">
-          <div data-bind="with: fileSpec">
-            <span class="pointer" data-bind="panzoomImg: { src: fileUrl }">
-              <img class="img-responsive" src="#" data-bind="attr: { src: fileUrl }" alt="Sketch image" />
-            </span>
-          </div>
+    <div data-bind="if: mdlWidget.opts.isVisImg">
+      <div data-bind="with: mdlWidget.mdlStageContext.sketchOfWell">
+        <div data-bind="with: fileSpec">
+          <span class="pointer" data-bind="panzoomImg: { src: fileUrl }">
+            <img class="img-responsive" src="#" alt="Sketch image"
+                 data-bind="attr: { src: fileUrl }" />
+          </span>
         </div>
       </div>
-      <div data-bind="if: vwmWidget.mdlWidget.opts.isVisDescription">
-        <div data-bind="with: sketchOfWell">
-          <div class="break-word pre-wrap-text" data-bind="text: description" style="padding: 8px 2px;"></div>
-        </div>
+    </div>
+    <div data-bind="if: mdlWidget.opts.isVisDescription">
+      <div data-bind="with: mdlWidget.mdlStageContext.sketchOfWell">
+        <div class="break-word pre-wrap-text" style="padding: 8px 2px;"
+             data-bind="text: description"></div>
       </div>
     </div>
   </div>

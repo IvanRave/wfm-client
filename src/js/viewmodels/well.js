@@ -121,6 +121,7 @@ define([
 		 * @type {module:viewmodels/history-of-well}
 		 */
 		this.vwmScopeOfHistoryOfWell = new VwmScopeOfHistoryOfWell(this,
+        this.mdlStage,
 				ko.observable(null),
 				ko.observable(null),
 				ko.observable(null),
@@ -310,7 +311,7 @@ define([
 		 * Viewmodel for the perfomance section
 		 * @type {module:viewmodels/perfomance-of-well}
 		 */
-		this.mainVwmPerfomanceOfWell = new VwmPerfomanceOfWell(ths.mdlStage.perfomanceOfWell, ths,
+		this.mainVwmPerfomanceOfWell = new VwmPerfomanceOfWell(ths.mdlStage, ths,
 				ko.observable(null), ko.observable(null), ko.observable(null), ko.observable(null),
 				ko.observable(null), ko.observable(false));
 

@@ -14,10 +14,14 @@ define(['knockout',
 	 * @constructor
 	 * @augments {module:base-viewmodels/widget-base}
 	 */
-	var exports = function (mdlWidget, vwmWell) {
+	var exports = function (mdlWidget) {
+    //, parentVwmStage
 		VwmWidget.call(this, mdlWidget);
 
-		this.vwmScopeOfHistoryOfWell = new VwmScopeOfHistoryOfWell(vwmWell,
+    // parentVwmStage may be is not a Well Stage, -> set to null (first argument)
+    // VwmStage need only for id of selected fmg section (to add files of parts of an image)
+		this.vwmScopeOfHistoryOfWell = new VwmScopeOfHistoryOfWell(null,
+        mdlWidget.mdlStageContext,
 				mdlWidget.opts.startDate,
 				mdlWidget.opts.endDate,
 				mdlWidget.opts.jobTypeId,

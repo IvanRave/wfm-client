@@ -30,7 +30,7 @@ define(['jquery',
 		companyService,
 		FileSpec,
 		wegionService,
-		stageConstants,
+		stageCnst,
 		appHelper) {
 	'use strict';
 
@@ -97,7 +97,7 @@ define(['jquery',
 		 * Stage key: equals file name
 		 * @type {string}
 		 */
-		this.stageKey = stageConstants.company.id;
+		this.stageKey = stageCnst.company.id;
 
 		/** Base for all stages */
 		StageBase.call(this, data);
@@ -253,6 +253,118 @@ define(['jquery',
 		wegionService.remove(wellRegionForDelete.id).done(function () {
 			ths.wegions.remove(wellRegionForDelete);
 		});
+	};
+
+  /**
+  * Find a cognate stage
+  */
+	exports.prototype.findCognateStage = function (typeOfStage, idOfStage) {
+		// find a stage
+		switch (typeOfStage) {
+		case stageCnst.company.id:
+			return this.id === idOfStage ? this : null;
+		case stageCnst.wegion.id:
+      console.log('wegion cognate from a company', this.findWegionById(idOfStage));
+			return this.findWegionById(idOfStage);
+		case stageCnst.wield.id:
+			return this.findWieldById(idOfStage);
+		case stageCnst.wroup.id:
+			return this.findWroupById(idOfStage);
+		case stageCnst.well.id:
+			return this.findWellById(idOfStage);
+		}
+	};
+
+	/** Find a well region by id */
+	exports.prototype.findWegionById = function (idOfWegion) {
+		return ko.unwrap(this.wegions).filter(function (elem) {
+			return elem.id === idOfWegion;
+		})[0];
+	};
+
+	/** Find a well field by id */
+	exports.prototype.findWieldById = function (idOfWield) {
+		var needWield;
+
+		ko.unwrap(this.wegions).some(function (wegionItem) {
+			ko.unwrap(wegionItem.wields).some(function (wieldItem) {
+				if (wieldItem.id === idOfWield) {
+					needWield = wieldItem;
+					// Exit from cycle
+					return true;
+				}
+			});
+
+			if (needWield) {
+				// Exit from cycle
+				return true;
+			}
+		});
+
+		return needWield;
+	};
+
+	/** Find a well group by id */
+	exports.prototype.findWroupById = function (idOfWroup) {
+		var needWroup;
+
+		ko.unwrap(this.wegions).some(function (wegionItem) {
+			ko.unwrap(wegionItem.wields).some(function (wieldItem) {
+				ko.unwrap(wieldItem.wroups).some(function (wroupItem) {
+					if (wroupItem.id === idOfWroup) {
+						needWroup = wroupItem;
+						return true;
+					}
+				});
+
+				if (needWroup) {
+					// Exit from cycle
+					return true;
+				}
+			});
+
+			if (needWroup) {
+				// Exit from cycle
+				return true;
+			}
+		});
+
+		return needWroup;
+	};
+
+	/** Find a well by id */
+	exports.prototype.findWellById = function (idOfWell) {
+		var needWell;
+
+		ko.unwrap(this.wegions).some(function (wegionItem) {
+			ko.unwrap(wegionItem.wields).some(function (wieldItem) {
+				ko.unwrap(wieldItem.wroups).some(function (wroupItem) {
+					ko.unwrap(wroupItem.wells).some(function (wellItem) {
+						if (wellItem.id === idOfWell) {
+							needWell = wellItem;
+							return true;
+						}
+					});
+
+					if (needWell) {
+						// Exit from cycle
+						return true;
+					}
+				});
+
+				if (needWell) {
+					// Exit from cycle
+					return true;
+				}
+			});
+
+			if (needWell) {
+				// Exit from cycle
+				return true;
+			}
+		});
+
+		return needWell;
 	};
 
 	return exports;

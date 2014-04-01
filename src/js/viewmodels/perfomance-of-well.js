@@ -239,10 +239,10 @@ define(['jquery',
 	 * Perfomance of well viewmodel (one well - one perfomance)
 	 * @constructor
 	 */
-	var exports = function (mdlPerfomanceOfWell, vwmWell,
+	var exports = function (mdlWell, vwmWell,
 		koStartYear, koEndYear, koStartMonth, koEndMonth,
 		koSlcAttrGroupId, koIsVisibleForecastData) {
-
+     
 		var vw = this;
 
 		/** Getter for a parent */
@@ -250,7 +250,9 @@ define(['jquery',
 			return vwmWell;
 		};
 
-		this.mdlPerfomanceOfWell = mdlPerfomanceOfWell;
+    this.mdlWell = mdlWell;
+    
+		this.mdlPerfomanceOfWell = mdlWell.perfomanceOfWell;
 
 		this.isVisibleForecastData = koIsVisibleForecastData;
 
@@ -289,7 +291,7 @@ define(['jquery',
 
 		this.selectedAttrGroup = ko.computed({
 				read : function () {
-					var tmpWfmParamSquadList = ko.unwrap(mdlPerfomanceOfWell.getWellObj().getRootMdl().wfmParamSquadList);
+					var tmpWfmParamSquadList = ko.unwrap(vw.mdlPerfomanceOfWell.getWellObj().getRootMdl().wfmParamSquadList);
 
 					var tmpAttrGroup = $.grep(tmpWfmParamSquadList, function (elemValue) {
 							return elemValue.id === ko.unwrap(vw.selectedAttrGroupId);
@@ -315,7 +317,7 @@ define(['jquery',
 		this.listOfVwmWfmParameterOfWroup = ko.computed({
 				read : function () {
 					// List of params from a wroup model
-					var tmpParams = ko.unwrap(this.getVwmWell().getParentVwm().mdlStage.listOfWfmParameterOfWroup);
+					var tmpParams = ko.unwrap(this.mdlWell.getWellGroup().listOfWfmParameterOfWroup);
 					return tmpParams.map(function (paramItem) {
 						return new VwmWfmParameterOfWroup(paramItem);
 					});
@@ -404,9 +406,9 @@ define(['jquery',
 		this.joinedYearList = ko.computed({
 				read : function () {
 					if (ko.unwrap(vw.isVisibleForecastData)) {
-						return ko.unwrap(mdlPerfomanceOfWell.forecastYearList).concat(ko.unwrap(mdlPerfomanceOfWell.histYearList));
+						return ko.unwrap(vw.mdlPerfomanceOfWell.forecastYearList).concat(ko.unwrap(vw.mdlPerfomanceOfWell.histYearList));
 					} else {
-						return ko.unwrap(mdlPerfomanceOfWell.histYearList);
+						return ko.unwrap(vw.mdlPerfomanceOfWell.histYearList);
 					}
 				},
 				deferEvaluation : true,
@@ -418,7 +420,7 @@ define(['jquery',
 		 */
 		vw.removeWellProductionData = function () {
 			if (confirm('{{capitalizeFirst lang.confirmToDelete}} all production data from well?')) {
-				mdlPerfomanceOfWell.deleteWellProductionData();
+				vw.mdlPerfomanceOfWell.deleteWellProductionData();
 			}
 		};
 	};
@@ -427,7 +429,7 @@ define(['jquery',
 	 * Select file and import perfomance data
 	 */
 	exports.prototype.importPerfomanceData = function () {
-		var tmpStageKey = this.getVwmWell().mdlStage.stageKey;
+		var tmpStageKey = this.mdlWell.stageKey;
 		// Open file manager
 		this.getVwmWell().unzOfSlcVwmSectionFmg(tmpStageKey + '-perfomance');
 

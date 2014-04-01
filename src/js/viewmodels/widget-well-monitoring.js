@@ -14,10 +14,10 @@ define(['knockout',
 	 * @constructor
 	 * @augments {module:base-viewmodels/widget-base}
 	 */
-	var exports = function (mdlWidget, vwmWell) {
+	var exports = function (mdlWidget) {
 		VwmWidget.call(this, mdlWidget);
     
-		this.widgetVwmMonitoringOfWell = new VwmMonitoringOfWell(vwmWell.mdlStage,
+		this.widgetVwmMonitoringOfWell = new VwmMonitoringOfWell(mdlWidget.mdlStageContext,
       mdlWidget.opts.startUnixTime, 
       mdlWidget.opts.endUnixTime);
     

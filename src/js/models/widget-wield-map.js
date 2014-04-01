@@ -12,8 +12,8 @@ define(['knockout',
 	 * @constuctor
 	 * @augments {module:base-models/widget-base}
 	 */
-	var exports = function (data, widgockItem) {
-		Widget.call(this, data, widgockItem);
+	var exports = function (data, widgockItem, mdlStageContext) {
+		Widget.call(this, data, widgockItem, mdlStageContext);
 
 		var tmpOpts = JSON.parse(data.Opts);
 
@@ -61,7 +61,9 @@ define(['knockout',
 	 * Get a dictionary for a select box (select map)
 	 */
 	exports.prototype.getDictOfMap = function () {
-    var allMaps = ko.unwrap(this.getWidgock().getWidgout().getParent().WellFieldMaps);
+    // getWidgock().getWidgout().getParent()
+    console.log('mdl stage context from dict of map', this.mdlStageContext);
+    var allMaps = ko.unwrap(this.mdlStageContext.WellFieldMaps);
 		return allMaps.map(function (elem) {
 			return {
         optValue : ko.unwrap(elem.id),

@@ -12,11 +12,11 @@ define(['knockout',
 	 * @constructor
 	 * @augments {module:base-viewmodels/widget-base}
 	 */
-	var exports = function (mdlWidget) {    
+	var exports = function (mdlWidget) {
 		VwmWidget.call(this, mdlWidget);
 	};
 
-  /** Inherit from a widget viewmodel */
+	/** Inherit from a widget viewmodel */
 	appHelper.inherits(exports, VwmWidget);
 
 	return exports;

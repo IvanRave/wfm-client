@@ -19,30 +19,6 @@ define(['knockout',
 		VwmWidgetWellMap) {
 	'use strict';
 
-	/** Create a viewmodel for a widget from a widget model */
-	function buildVwmWidget(elem, tmpParentVwmStage) {
-		switch (elem.idOfSectionPattern) {
-		case stageCnst.well.ptrn.summary:
-		case stageCnst.wroup.ptrn.summary:
-		case stageCnst.wield.ptrn.summary:
-		case stageCnst.wegion.ptrn.summary:
-		case stageCnst.company.ptrn.summary:
-			return new VwmWidgetDefaultSummary(elem);
-		case stageCnst.well.ptrn.perfomance:
-			return new VwmWidgetWellPerfomance(elem, tmpParentVwmStage);
-		case stageCnst.well.ptrn.monitoring:
-			return new VwmWidgetWellMonitoring(elem, tmpParentVwmStage);
-		case stageCnst.well.ptrn.history:
-			return new VwmWidgetWellHistory(elem, tmpParentVwmStage);
-		case stageCnst.wield.ptrn.map:
-			return new VwmWidgetWieldMap(elem);
-		case stageCnst.well.ptrn.map:
-			return new VwmWidgetWellMap(elem);
-		case stageCnst.well.ptrn.sketch:
-			return new VwmWidgetWellSketch(elem);
-		}
-	}
-
 	/**
 	 * Viewmodel: widget block
 	 * @constructor
@@ -81,20 +57,31 @@ define(['knockout',
 	 * Add a viewmodel for a widget
 	 */
 	exports.prototype.addVwmWidget = function () {
-		var ths = this;
-		var tmpStagePattern = ko.unwrap(ths.slcStagePatternForWidget);
+		var tmpStagePattern = ko.unwrap(this.slcStagePatternForWidget);
 		if (tmpStagePattern) {
-			ths.mdlWidgock.addWidget(ko.unwrap(tmpStagePattern.name), tmpStagePattern.id, function (idOfCreatedWidget) {
-				// Find created widget
-				var createdVwmWidget = ko.unwrap(ths.listOfVwmWidget).filter(function (elem) {
-						return elem.mdlWidget.id === idOfCreatedWidget;
-					})[0];
+			this.mdlWidgock.addWidget(ko.unwrap(tmpStagePattern.name), tmpStagePattern.id,
+				this.afterAddingVwmWidget.bind(this));
+		}
+	};
 
-				// Open settings
-				if (createdVwmWidget) {
-					createdVwmWidget.showVisSettingPanel();
-				}
-			});
+	/**
+	 * Find and open a setting panel
+	 */
+	exports.prototype.afterAddingVwmWidget = function (createdWidgetData) {
+		var widgetNew = this.mdlWidgock.buildWidget(createdWidgetData);
+		this.mdlWidgock.widgetList.push(widgetNew);
+
+		// Open settings after creation
+		var idOfCreatedWidget = widgetNew.id;
+
+		// Find created widget
+		var createdVwmWidget = ko.unwrap(this.listOfVwmWidget).filter(function (elem) {
+				return elem.mdlWidget.id === idOfCreatedWidget;
+			})[0];
+
+		// Open settings
+		if (createdVwmWidget) {
+			createdVwmWidget.showVisSettingPanel();
 		}
 	};
 
@@ -112,11 +99,33 @@ define(['knockout',
 	 * Get all viewmodels for widgets
 	 */
 	exports.prototype.getListOfVwmWidget = function () {
-		var tmpParentVwmStage = this.getVwmWidgout().getParentVwmStage();
+		return ko.unwrap(this.mdlWidgock.widgetList).map(this.buildVwmWidget, this);
+	};
 
-		return ko.unwrap(this.mdlWidgock.widgetList).map(function (elem) {
-			return buildVwmWidget(elem, tmpParentVwmStage);
-		});
+	/** Create a viewmodel for a widget from a widget model */
+	exports.prototype.buildVwmWidget = function (mdlWidget) {
+		var tmpParentVwmStage = this.getVwmWidgout().getParentVwmStage();
+    
+		switch (mdlWidget.idOfSectionPattern) {
+		case stageCnst.well.ptrn.summary: 
+		case stageCnst.wroup.ptrn.summary:
+		case stageCnst.wield.ptrn.summary:
+		case stageCnst.wegion.ptrn.summary:
+		case stageCnst.company.ptrn.summary:
+			return new VwmWidgetDefaultSummary(mdlWidget, tmpParentVwmStage);
+		case stageCnst.well.ptrn.perfomance:
+			return new VwmWidgetWellPerfomance(mdlWidget, tmpParentVwmStage);
+		case stageCnst.well.ptrn.monitoring:
+			return new VwmWidgetWellMonitoring(mdlWidget, tmpParentVwmStage);
+		case stageCnst.well.ptrn.history:
+			return new VwmWidgetWellHistory(mdlWidget, tmpParentVwmStage);
+		case stageCnst.wield.ptrn.map:
+			return new VwmWidgetWieldMap(mdlWidget, tmpParentVwmStage);
+		case stageCnst.well.ptrn.map:
+			return new VwmWidgetWellMap(mdlWidget, tmpParentVwmStage);
+		case stageCnst.well.ptrn.sketch:
+			return new VwmWidgetWellSketch(mdlWidget, tmpParentVwmStage);
+		}
 	};
 
 	return exports;

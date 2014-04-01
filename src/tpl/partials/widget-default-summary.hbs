@@ -1,7 +1,7 @@
 ﻿<script type="text/html" id="widget-tpl-default-summary">
   <!-- current: vwmWidget('as') -> vwmWidget(view) -> vwmWidgock -> vwmWidgout -> vwmStage (with mdlStage) -->
   <!-- parent[3]: vwmStage -->
-  <div data-bind="with: $parents[3].mdlStage">
+  <div data-bind="with: mdlWidget.mdlStageContext">
     <div data-bind="if: vwmWidget.isVisSettingPanel">
       <div class="widget-setting-panel" data-bind="foreach: propSpecList">
         <span data-bind="if: tpe">

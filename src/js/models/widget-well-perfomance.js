@@ -12,8 +12,8 @@ define(['knockout',
 	 * @constructor
 	 * @augments {module:base-models/widget-base}
 	 */
-	var exports = function (data, widgockItem) {
-		Widget.call(this, data, widgockItem);
+	var exports = function (data, widgockItem, mdlStageContext) {
+		Widget.call(this, data, widgockItem, mdlStageContext);
 
     /**
 		 * Options for widget, like {isVisName: true, ...}

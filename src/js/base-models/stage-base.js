@@ -38,7 +38,7 @@ define(['knockout',
 
 		/** List of sections */
 		this.listOfSection = ko.observableArray();
-    
+
 		/**
 		 * List of section patterns for current stage (names, ids, etc.)
 		 *    Section patterns where idOfStage === stageKey
@@ -61,7 +61,7 @@ define(['knockout',
 			});
 
 		/** Widget layouts of this stage */
-		this.widgouts = ko.observableArray();
+		this.widgouts = ko.observableArray([]).trackHasItems();
 
 		/**
 		 * Is loaded widget layouts
@@ -156,11 +156,32 @@ define(['knockout',
 	/** Calculate patterns for this stage */
 	exports.prototype.calcStagePatterns = function () {
 		// List of all section patterns
-		var ths = this;
-		var tmpAllPatterns = ko.unwrap(ths.getRootMdl().ListOfSectionPatternDto);
-		return tmpAllPatterns.filter(function (elem) {
-			return elem.idOfStage === ths.stageKey;
-		});
+		var tmpAllPatterns = ko.unwrap(this.getRootMdl().ListOfSectionPatternDto);
+		return tmpAllPatterns;
+		// return tmpAllPatterns.filter(function (elem) {
+		// return elem.idOfStage === this.stageKey;
+		// }, this);
+	};
+
+	// typeOfStage, idOfStage
+	exports.prototype.findCognateStage = function () {
+    return this;
+		// throw new Error('Please define this method in sub-classes with params: ' +
+			// typeOfStage + ', ' + idOfStage);
+		// for example - this - wield
+		//switch typeOfStage {
+		//case 'well': this.wroups().wells().find...
+		//case 'wield': thisWield only
+		//case 'company': only parent company
+		//}
+
+		// if this.stageKey = wroup
+		// switch typeOfStage
+		// case 'well': this.wells().find..
+
+		// if this.stageKey = company
+		// switch typeOfStage
+		// case 'wroup':
 	};
 
 	/** Remove a child stage */

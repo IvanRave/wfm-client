@@ -4,7 +4,7 @@
     Dashboard loading...
   </div>
   <div data-bind="if: mdlStage.isLoadedWidgouts">
-    <div data-bind="if: mdlStage.widgouts().length === 0">
+    <div data-bind="ifnot: mdlStage.widgouts.hasItems">
       {{ capitalizeFirst lang.dashboard }} is empty
     </div>
     <div class="clearfix" >
@@ -49,16 +49,21 @@
                 </div>
                 <div class="pull-right" data-bind="if: $root.isEmployeeInEditMode">
                   <div data-bind="ifnot: isVisSettingPanel">
-                    <button class="btn btn-xs" type="button" data-bind="click: showVisSettingPanel">
-                      <i class="glyphicon glyphicon-cog" title="{{capitalizeFirst lang.settings}}"></i>
+                    <button class="btn btn-xs" type="button" 
+                            data-bind="click: showVisSettingPanel">
+                      <i class="glyphicon glyphicon-cog" 
+                         title="{{capitalizeFirst lang.settings}}"></i>
                     </button>
                     <!-- parent: vwmWidgock -->
-                    <button class="btn btn-xs" type="button" data-bind="click: $parent.removeVwmWidget.bind($parent)">
-                      <i class="glyphicon glyphicon-remove" title="{{capitalizeFirst lang.toDelete}}"></i>
+                    <button class="btn btn-xs" type="button" 
+                            data-bind="click: $parent.removeVwmWidget.bind($parent)">
+                      <i class="glyphicon glyphicon-remove" 
+                         title="{{capitalizeFirst lang.toDelete}}"></i>
                     </button>
                   </div>
                   <div data-bind="if: isVisSettingPanel">
-                    <button class="btn btn-sm btn-success" type="button" data-bind="click: saveVwmWidget">
+                    <button class="btn btn-sm btn-success" type="button"
+                            data-bind="click: saveVwmWidget">
                       {{capitalizeFirst lang.toSave}}
                     </button>
                   </div>

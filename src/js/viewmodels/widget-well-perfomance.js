@@ -14,16 +14,16 @@ define(['knockout',
 	 * @constructor
 	 * @augments {module:base-viewmodels/widget-base}
 	 */
-	var exports = function (mdlWidget, vwmWell) {
-		
-		VwmWidget.call(this, mdlWidget);
-
+	var exports = function (mdlWidget) {
+		VwmWidget.call(this, mdlWidget);    
+    
 		/**
 		 * A viewmodel for perfomance
      *    Viewmodel can't be in a model: any viewmodel initializes only in other viewmodels
 		 * @type {module:viewmodels/perfomance-of-well}
 		 */
-		this.vwmPerfomanceOfWell = new VwmPerfomanceOfWell(vwmWell.mdlStage.perfomanceOfWell, vwmWell,
+		this.vwmPerfomanceOfWell = new VwmPerfomanceOfWell(mdlWidget.mdlStageContext,
+        null,
 				mdlWidget.opts.startYear,
 				mdlWidget.opts.endYear,
 				mdlWidget.opts.startMonth,

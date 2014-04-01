@@ -104,9 +104,10 @@
               <div data-bind="with: mdlHistoryOfWell">
                 <div class="clearfix" data-bind="foreach: WellHistoryFiles">
                   <div class="img-thumbnail pull-left">
-                    <span class="link-view pointer">
+                    <span>
                       <span data-bind="with: fileSpec">
-                        <!-- TODO: #33! bug - download feat in a view - back: click: download -->
+                        <!-- TODO: #33! bug - download feat in a view - back: click: download 
+                        class="link-view pointer" -->
                         <span data-bind="text: namePlusExtension"></span>
                       </span>
                     </span>

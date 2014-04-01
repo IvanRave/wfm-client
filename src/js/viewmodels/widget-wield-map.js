@@ -19,7 +19,7 @@ define(['knockout',
 
 		/**
 		 * Selected view map
-     * @type {module:viewmodels/map-of-wield}
+		 * @type {module:viewmodels/map-of-wield}
 		 */
 		this.slcVwmMapOfWield = ko.computed({
 				read : this.getSlcVwmMapOfWield,
@@ -38,20 +38,20 @@ define(['knockout',
 		console.log('getSlcVwmMapOfWield has executed');
 		var tmpVid = ko.unwrap(this.mdlWidget.opts.idOfSlcMapOfWield);
 		if (tmpVid) {
-      var allMaps = ko.unwrap(this.mdlWidget.getWidgock().getWidgout().getParent().WellFieldMaps);
-      
+			var allMaps = ko.unwrap(this.mdlWidget.mdlStageContext.WellFieldMaps);
+
 			var needMapModel = allMaps.filter(function (elem) {
 					return elem.id === tmpVid;
 				})[0];
 
 			if (needMapModel) {
-				// TODO: #32! Set a transform option to the default value, 
-        //            when a selected map is not equals the map from options
+				// TODO: #32! Set a transform option to the default value,
+				//            when a selected map is not equals the map from options
 				// // if (needMapModel.id !== this.mdlWidget.widgetOpts['IdOfSlcMapOfWield']) {
-					// // this.mdlWidget.opts.transform({
-						// // scale : 1,
-						// // translate : [0, 0]
-					// // });
+				// // this.mdlWidget.opts.transform({
+				// // scale : 1,
+				// // translate : [0, 0]
+				// // });
 				// // }
 
 				var needVwm = new VwmMapOfWield(needMapModel,

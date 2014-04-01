@@ -13,20 +13,21 @@ define(['knockout'], function (ko) {
 		 */
 		this.mdlWidget = mdlWidget;
 
-    /**
-    * Whether the setting panel is visible
-    * @type {boolean}
-    */
+		/**
+		 * Whether the setting panel is visible
+		 * @type {boolean}
+		 */
 		this.isVisSettingPanel = ko.observable(false);
 	};
 
 	/** Save model through viewmodel */
 	exports.prototype.saveVwmWidget = function () {
-		var ths = this;
-		this.mdlWidget.putWidget(function () {
-			// Close settings after saving
-			ths.isVisSettingPanel(false);
-		});
+		this.mdlWidget.putWidget(this.hideVisSettingPanel.bind(this));
+	};
+
+	/** Hide a setting panel */
+	exports.prototype.hideVisSettingPanel = function () {
+		this.isVisSettingPanel(false);
 	};
 
 	/** Show setting panel */

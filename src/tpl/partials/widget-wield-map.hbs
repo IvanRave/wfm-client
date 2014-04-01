@@ -1,7 +1,7 @@
 ﻿<script type="text/html" id="widget-tpl-wield-map">
   <!-- current: vwmWidget -->
-  <div data-bind="if: vwmWidget.isVisSettingPanel">
-    <div class="widget-setting-panel" data-bind="with: vwmWidget.mdlWidget">
+  <div data-bind="if: isVisSettingPanel">
+    <div class="widget-setting-panel" data-bind="with: mdlWidget">
       <label>
         {{capitalizeFirst lang.toSelectMapOfWield}}:
         <select class="input-sm" data-bind="options: dictOfMap, optionsText: 'optText', optionsValue: 'optValue', value: opts.idOfSlcMapOfWield"></select>
@@ -14,14 +14,14 @@
       </label>
     </div>
   </div>
-  <div class="widget-content" data-bind="with: vwmWidget.slcVwmMapOfWield">
-    <div data-bind="if: vwmWidget.mdlWidget.opts.isVisName">
-      <div class="text-center">
+  <div class="widget-content">
+    <div data-bind="if: mdlWidget.opts.isVisName">
+      <div class="text-center" data-bind="with: slcVwmMapOfWield">
         <span data-bind="text: name"></span>
       </div>
     </div>
-    <div data-bind="if: vwmWidget.mdlWidget.opts.isVisImg">
-      <div>
+    <div data-bind="if: mdlWidget.opts.isVisImg">
+      <div data-bind="with: slcVwmMapOfWield">
         {{> oil-map }}
       </div>
     </div>

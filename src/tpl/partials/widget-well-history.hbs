@@ -8,7 +8,7 @@
   </div>
   <div class="widget-content">
     <!-- with well -->
-    <div data-bind="with: $parents[3].mdlStage">
+    <div data-bind="with: mdlWidget.mdlStageContext">
       <div data-bind="if: isLoadedHistoryList">
         <div data-bind="with: vwmWidget.vwmScopeOfHistoryOfWell">
           <div data-bind="ifnot: listOfVwmHistoryOfWell.hasItems">
@@ -38,7 +38,7 @@
                   </div>
                   <div class="clearfix" data-bind="foreach: WellHistoryFiles">
                     <div class="img-thumbnail pull-left" data-bind="with: fileSpec">
-                      <span class="link-view pointer">
+                      <span>
                         <!-- TODO: #33! bug - download feat in a view - back: click: download -->
                         <span data-bind="text: namePlusExtension"></span>
                       </span>

@@ -9,7 +9,8 @@ define(['knockout',
 	 * Well history view for history section, report section and history widgets
 	 * @constructor
 	 */
-	var exports = function (vwmWell, koFilteredStartUnixTime, koFilteredEndUnixTime, koIdOfSlcJobType, koSortByDateOrder) {
+	var exports = function (vwmWell, mdlWell, koFilteredStartUnixTime,
+		koFilteredEndUnixTime, koIdOfSlcJobType, koSortByDateOrder) {
 		/**
 		 * Getter for a parent viewmodel
 		 *    Not defined as a property to exclude loop between a parent child and a child parent
@@ -22,7 +23,7 @@ define(['knockout',
 		 * A well model
 		 * @type {module:models/well}
 		 */
-		this.mdlWell = vwmWell.mdlStage;
+		this.mdlWell = mdlWell;
 
 		/** Company model for this well */
 		var mdlCompany = this.mdlWell.getWellGroup().getWellField().getWellRegion().getCompany();
@@ -127,7 +128,7 @@ define(['knockout',
 
 	/**
 	 * Get sorted list
-   * @private
+	 * @private
 	 */
 	exports.prototype.buildSortedListOfVwmHistoryOfWell = function () {
 		var tmpVwmList = ko.unwrap(this.listOfVwmHistoryOfWell);
@@ -144,15 +145,15 @@ define(['knockout',
 	exports.prototype.buildListOfVwmHistoryOfWell = function () {
 		var tmpMdlList = ko.unwrap(this.mdlWell.historyList);
 		var readyList = tmpMdlList.map(function (elem) {
-			return new VwmHistoryOfWell(elem,
-				this.getVwmWell(),
-				this.startDate,
-				this.endDate,
-				this.jobTypeId);
-		}, this);
-    
-    console.log('Ready history list:', readyList);
-    return readyList;
+				return new VwmHistoryOfWell(elem,
+					this.getVwmWell(),
+					this.startDate,
+					this.endDate,
+					this.jobTypeId);
+			}, this);
+
+		console.log('Ready history list:', readyList);
+		return readyList;
 	};
 
 	/** Get css for the button with a date filter */

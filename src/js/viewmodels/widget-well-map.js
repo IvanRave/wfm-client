@@ -39,7 +39,7 @@ define(['knockout',
 		if (tmpIdOfMap) {
 
 			// List of map markers from a parent well
-			var tmpList = ko.unwrap(this.mdlWidget.getWidgock().getWidgout().getParent().listOfMapMarker);
+			var tmpList = ko.unwrap(this.mdlWidget.mdlStageContext.listOfMapMarker);
 
 			// Find a model for a marker by id of the map
 			var markerModel = tmpList.filter(function (markerItem) {

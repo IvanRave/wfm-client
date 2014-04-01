@@ -12,33 +12,40 @@ define(['knockout',
 	 * @constructor
 	 * @augments {module:base-models/widget-base}
 	 */
-	var exports = function (data, widgockItem) {
-		Widget.call(this, data, widgockItem);
-
-    /**
+	var exports = function (data, widgockItem, mdlStageContext) {
+		Widget.call(this, data, widgockItem, mdlStageContext);
+    
+		/**
 		 * Options for widget, like {isVisName: true, ...}
-     *    data.Opts cannot be null or undefined
-     *    it is a temporary string for a quick access to set observable parameters
+		 *    data.Opts cannot be null or undefined
+		 *    it is a temporary string for a quick access to set observable parameters
 		 * @type {Object}
 		 */
-		var tmpOpts = JSON.parse(data.Opts);
+		this.tmpOpts = JSON.parse(data.Opts);
 
-    /** All summary properties for current stage */
-    var propSpecList = widgockItem.getWidgout().getParent().propSpecList;
-    
+		console.log('mdlStageContext', mdlStageContext);
+
+		/** All summary properties for current stage */
+		var propSpecList = mdlStageContext.propSpecList;
+
 		/**
 		 * Fill properties
 		 */
-		propSpecList.forEach(function (propSpec) {
-			// Properties without type not needed
-			if (propSpec.tpe) {
-				this.opts['isVis' + propSpec.serverId] = ko.observable(tmpOpts['isVis' + propSpec.serverId]);
-			}
-		}, this);
+		propSpecList.forEach(this.setPropSpec, this);
 	};
 
 	/** Inherit from a widget model */
 	appHelper.inherits(exports, Widget);
+
+	/**
+	 * Set prop specs for a summary
+	 */
+	exports.prototype.setPropSpec = function (propSpec) {
+		// Properties without type not needed, like a helpfull prop for a company logo
+		if (propSpec.tpe) {
+			this.opts['isVis' + propSpec.serverId] = ko.observable(this.tmpOpts['isVis' + propSpec.serverId]);
+		}
+	};
 
 	/**
 	 * Convert to the option string

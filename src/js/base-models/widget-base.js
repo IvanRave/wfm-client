@@ -7,16 +7,20 @@ define(['knockout',
 	 * Widget: a base class for all widgets
 	 * @constructor
 	 */
-	var exports = function (data, widgockItem) {
-		var ths = this;
+	var exports = function (data, widgockItem, mdlStageContext) {
 		data = data || {};
 
     /** Getter for a parent */
 		this.getWidgock = function () {
 			return widgockItem;
 		};
+    
+    this.mdlStageContext = mdlStageContext;
 
-		// Properties
+		/**
+    * Widget id
+    * @type {string}
+    */
 		this.id = data.Id;
 		this.name = ko.observable(data.Name);
 		this.idOfSectionPattern = data.IdOfSectionPattern;
@@ -32,19 +36,17 @@ define(['knockout',
 		 * Widget template name: for summary - default summary section
 		 * @type {string}
 		 */
-		this.widgetTpl = 'widget-tpl-' + (ths.idOfSectionPattern.indexOf('-summary') > 0 ? 'default-summary' : ths.idOfSectionPattern);
+		this.widgetTpl = 'widget-tpl-' + (this.idOfSectionPattern.indexOf('-summary') > 0 ? 'default-summary' : this.idOfSectionPattern);
 	};
 
   /** Save widget */
 	exports.prototype.putWidget = function (scsCallback) {
-		var ths = this;
-    
-		widgetService.put(ths.getWidgock().getWidgout().getParent().stageKey, ths.widgockId, ths.id, {
-			id : ko.unwrap(ths.id),
-			name : ko.unwrap(ths.name),
-			idOfSectionPattern : ko.unwrap(ths.idOfSectionPattern),
-			widgockId : ko.unwrap(ths.widgockId),
-			orderNumber : ko.unwrap(ths.orderNumber),
+		widgetService.put(this.getWidgock().getWidgout().getParent().stageKey, this.widgockId, this.id, {
+			id : ko.unwrap(this.id),
+			name : ko.unwrap(this.name),
+			idOfSectionPattern : ko.unwrap(this.idOfSectionPattern),
+			widgockId : ko.unwrap(this.widgockId),
+			orderNumber : ko.unwrap(this.orderNumber),
 			opts : this.toPlainOpts()
 		}).done(scsCallback);
 	};

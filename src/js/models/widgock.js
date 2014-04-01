@@ -21,37 +21,6 @@ define(['knockout',
 		MdlWidgetWieldMap) {
 	'use strict';
 
-	/** Create a model for a widget from widget data */
-	function buildWidget(widgetData, widgockItem) {
-		switch (widgetData.IdOfSectionPattern) {
-		case stageCnst.well.ptrn.summary:
-		case stageCnst.wroup.ptrn.summary:
-		case stageCnst.wield.ptrn.summary:
-		case stageCnst.wegion.ptrn.summary:
-		case stageCnst.company.ptrn.summary:
-			return new MdlWidgetDefaultSummary(widgetData, widgockItem);
-		case stageCnst.well.ptrn.perfomance:
-			return new MdlWidgetWellPerfomance(widgetData, widgockItem);
-		case stageCnst.well.ptrn.monitoring:
-			return new MdlWidgetWellMonitoring(widgetData, widgockItem);
-		case stageCnst.well.ptrn.history:
-			return new MdlWidgetWellHistory(widgetData, widgockItem);
-		case stageCnst.well.ptrn.map:
-			return new MdlWidgetWellMap(widgetData, widgockItem);
-		case stageCnst.well.ptrn.sketch:
-			return new MdlWidgetWellSketch(widgetData, widgockItem);
-		case stageCnst.wield.ptrn.map:
-			return new MdlWidgetWieldMap(widgetData, widgockItem);
-		}
-	}
-
-	/** Fill the well widget layout list */
-	function importWidgetList(data, widgockItem) {
-		return (data || []).map(function (item) {
-			return buildWidget(item, widgockItem);
-		});
-	}
-
 	/**
 	 * Widget block of widget layout; Widget layout divides to widget blocks; Widget block divibed to widgets
 	 * @param {object} data - Widget block data
@@ -92,9 +61,7 @@ define(['knockout',
 		 * @type {string}
 		 */
 		this.columnStyle = ko.computed({
-				read : function () {
-					return 'col-md-' + ko.unwrap(this.columnCount);
-				},
+				read : this.calcColumnStyle,
 				deferEvaluation : true,
 				owner : this
 			});
@@ -102,10 +69,23 @@ define(['knockout',
 		/**
 		 * A list of widgets
 		 */
-		this.widgetList = ko.observableArray();
+		this.widgetList = ko.observableArray([]);
 
 		// Fill a widget list
-		this.widgetList(importWidgetList(data.WidgetDtoList, this));
+		this.importWidgetList(data.WidgetDtoList);
+	};
+
+	/** Fill the well widget layout list */
+	exports.prototype.importWidgetList = function (data) {
+		this.widgetList((data || []).map(this.buildWidget, this));
+	};
+
+	/**
+	 * Calc a column style
+	 * @returns {string}
+	 */
+	exports.prototype.calcColumnStyle = function () {
+		return 'col-md-' + ko.unwrap(this.columnCount);
 	};
 
 	/** Remove a widget from a widget block */
@@ -141,13 +121,41 @@ define(['knockout',
 			OrderNumber : lastOrderNumber + 1,
 			Opts : '{}',
 			WidgockId : ths.id
-		}).done(function (createdWidgetData) {
-			var widgetNew = buildWidget(createdWidgetData, ths);
-			ths.widgetList.push(widgetNew);
+		}).done(scsCallback);
+	};
 
-			// Open settings after creation
-			scsCallback(widgetNew.id);
-		});
+	/**
+	 * Create a model for a widget from widget data
+	 */
+	exports.prototype.buildWidget = function (widgetData) {
+		var widgockItem = this;
+		var mdlStageParent = widgockItem.getWidgout().getParent();
+
+		var cntxStageType = 'well'; // 'wegion'; //'company';
+		var cntxStageId =  7004; //6002; // 'd14f9c04-4875-4519-9acb-dfe6046355e0';
+		// Find this stage
+		var cntxStage = mdlStageParent.findCognateStage(cntxStageType, cntxStageId);
+
+		switch (widgetData.IdOfSectionPattern) {
+		case stageCnst.well.ptrn.summary:
+		case stageCnst.wroup.ptrn.summary:
+		case stageCnst.wield.ptrn.summary:
+		case stageCnst.wegion.ptrn.summary:
+		case stageCnst.company.ptrn.summary:
+			return new MdlWidgetDefaultSummary(widgetData, widgockItem, cntxStage);
+		case stageCnst.well.ptrn.perfomance:
+			return new MdlWidgetWellPerfomance(widgetData, widgockItem, cntxStage);
+		case stageCnst.well.ptrn.monitoring:
+			return new MdlWidgetWellMonitoring(widgetData, widgockItem, cntxStage);
+		case stageCnst.well.ptrn.history:
+			return new MdlWidgetWellHistory(widgetData, widgockItem, cntxStage);
+		case stageCnst.well.ptrn.map:
+			return new MdlWidgetWellMap(widgetData, widgockItem, cntxStage);
+		case stageCnst.well.ptrn.sketch:
+			return new MdlWidgetWellSketch(widgetData, widgockItem, cntxStage);
+		case stageCnst.wield.ptrn.map:
+			return new MdlWidgetWieldMap(widgetData, widgockItem, cntxStage);
+		}
 	};
 
 	return exports;

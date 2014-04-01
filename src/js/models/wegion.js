@@ -13,7 +13,7 @@ define(['jquery',
 	function ($, ko, datacontext,
 		WellField, StageBase, SectionOfWegion,
 		PropSpec,
-		wegionService, wieldService, stageConstants,
+		wegionService, wieldService, stageCnst,
 		appHelper) {
 	'use strict';
 
@@ -69,8 +69,8 @@ define(['jquery',
 		 * Stage key: equals file name
 		 * @type {string}
 		 */
-		this.stageKey = stageConstants.wegion.id;
-    
+		this.stageKey = stageCnst.wegion.id;
+
 		/** Base for all stages */
 		StageBase.call(this, data);
 
@@ -132,13 +132,31 @@ define(['jquery',
 	/** Inherit from a stage base model */
 	appHelper.inherits(exports, StageBase);
 
-  /** Remove a child */
+	/** Remove a child */
 	exports.prototype.removeChild = function (wellFieldForDelete) {
 		var ths = this;
 		wieldService.remove(wellFieldForDelete.id).done(function () {
 			ths.wields.remove(wellFieldForDelete);
 		});
 	};
+  
+  // exports.prototype.findCognateStage = function(typeOfStage, idOfStage){
+    // switch(typeOfStage){
+      // case stageCnst.company.id: 
+        // var tmpCompany = this.getCompany();
+        // return tmpCompany.id === idOfStage ? tmpCompany : null;
+      // case stageCnst.wegion.id: 
+        // return this.id === idOfStage ? this : null;
+      // case stageCnst.wield.id:
+        // return this.findWieldById(idOfStage);
+    // }
+  // };
 
+  // exports.prototype.findWieldById = function(idOfWield){
+    // return ko.unwrap(this.wields).filter(function(wieldItem){
+      // return wieldItem.id === idOfWield;
+    // })[0];
+  // };
+  
 	return exports;
 });

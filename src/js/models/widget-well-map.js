@@ -12,8 +12,8 @@ define(['knockout',
 	 * @constuctor
 	 * @augments {module:base-models/widget-base}
 	 */
-	var exports = function (data, widgockItem) {
-		Widget.call(this, data, widgockItem);
+	var exports = function (data, widgockItem, mdlStageContext) {
+		Widget.call(this, data, widgockItem, mdlStageContext);
 
     var tmpOpts = JSON.parse(data.Opts);
     
@@ -53,7 +53,7 @@ define(['knockout',
 	/** Build a dictionary with key-values */
 	exports.prototype.buildDictOfMapMarker = function () {
 		// Markers from the well (filtered by IdOfWell and IsDrilled)
-		var tmpMarkers = ko.unwrap(this.getWidgock().getWidgout().getParent().listOfMapMarker);
+		var tmpMarkers = ko.unwrap(this.mdlStageContext.listOfMapMarker);
 		return tmpMarkers.map(function (markerItem) {
 			return {
 				optValue : ko.unwrap(markerItem.idOfMapOfWield),

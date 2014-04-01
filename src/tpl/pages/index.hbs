@@ -9,145 +9,153 @@
     <link href="css/main.min.css" rel="stylesheet" />
 </head>
 <body>
-    <!--[if lt IE 9]><p class="chromeframe">You are using an <strong>outdated</strong> browser. Please upgrade your browser.</p><![endif]-->
+    <!--[if lt IE 10]><p class="chromeframe">You are using an <strong>outdated</strong> browser. Please upgrade your browser.</p><![endif]-->
     <div class="hide" id="workspace-project">
-        <div class="loader-main"></div>
-        <div>
-            <!-- current: vwmWorkspace-->
-            <nav class="wfm-nav clearfix navbar-inverse" data-bind="with: vwmUserProfile">
-                <div class="pull-left">
-                    <span class="link-view-inverse" data-bind="click: deactivateVwmChild">{{lang.wfm}}</span>
-                    <span class="min-left-margin link-view-inverse" data-bind="if: $root.isUserInDemoMode">demo cabinet</span>
-                </div>
-                <div class="pull-right">
-                    <button type="button" class="btn btn-xs btn-inverse" data-bind="click: $parent.logOff.bind($parent)">
-                        <i class="glyphicon glyphicon-off"></i>
-                        {{capitalizeFirst lang.logOut}}
-                    </button>
-                </div>
-            </nav>
-            <div class="wfm-content-wrap">
-                <div>
-                    <div data-bind="visible: mdlWorkspace.isTriedToLoadUserProfile">
-                        <div data-bind="ifnot: vwmUserProfile">
-                            <div data-bind="slideVisible: isRegisteredPage">
-                                <!-- register page -->
-                                {{> account-logon }}
-                            </div>
-                            <div data-bind="slideHidden: isRegisteredPage">
-                                <!-- login page -->
-                                {{> account-register }}
-                            </div>
-                        </div>
-                        <div data-bind="with: vwmUserProfile">
-                            <!-- current: vwmUserProfile -->
-                            <div data-bind="ifnot: mdlStage.isLoadedEmployees">{{lang.loading}}</div>
-                            <div data-bind="if: mdlStage.isLoadedEmployees">
-                                <!-- If no selected employee: show list of employees -->
-                                <div data-bind="ifnot: slcVwmChild">
-                                    {{> employee-list }}
-                                </div>
-                                <div data-bind="with: slcVwmChild">
-                                    <!-- current: vwmEmployee-->
-                                    <div data-bind="if: mdlEmployee.canEditAll">
-                                        {{> edit-mode-btn }}
-                                    </div>
-                                    <div>
-                                        <div>
-                                            <div class="clearfix">
-                                                <div class="sidebar-toggle" data-bind="css: $root.sidebarToggleCss">
-                                                    <button type="button" data-bind="click: $root.toggleIsVisibleMenu.bind($root)" title="Hide/show menu">
-                                                        <i class="glyphicon glyphicon-chevron-left" data-bind="visible: $root.isVisibleMenu"></i>
-                                                        <i class="glyphicon glyphicon-chevron-right" data-bind="hidden: $root.isVisibleMenu"></i>
-                                                    </button>
-                                                </div>
-                                                <!-- TODO: fix: slider scroll with page scroll #MH! -->
-                                                <div class="sidebar-wrap" data-bind="css: $root.sidebarWrapCss">
-                                                    <div data-bind="scroller: { }">
-                                                        {{> workspace-menu }}
-                                                    </div>
-                                                </div>
-                                                <div class="workspace-container" data-bind="css: $root.workAreaCss, with: vwmCompany">
-                                                    <!-- current: vwmCompany-->
-                                                    <div data-bind="ifnot: slcVwmChild">
-                                                        <!-- if no selected wegion -->
-                                                        {{> section-panel-standard }}
-                                                        {{> dashboard-arousal }}
-                                                        {{> fmgr-arousal }}
-                                                        {{> fmgr-modal }}
-                                                        <div class="tab-content-pad">
-                                                            {{> company }}
-                                                        </div>
-                                                    </div>
-                                                    <div data-bind="with: slcVwmChild">
-                                                        <!-- current: vwmWegion -->
-                                                        <div data-bind="ifnot: slcVwmChild">
-                                                            {{> section-panel-standard }}
-                                                            {{> dashboard-arousal }}
-                                                            {{> fmgr-arousal }}
-                                                            {{> fmgr-modal }}
-                                                            <div class="tab-content-pad">
-                                                              {{> wegion }}
-                                                            </div>
-                                                        </div>
-                                                        <div data-bind="with: slcVwmChild">
-                                                            <!-- current: vwmWield-->
-                                                            <div data-bind="ifnot: slcVwmChild">
-                                                                {{> section-panel-standard }}
-                                                                {{> dashboard-arousal }}
-                                                                {{> fmgr-arousal }}
-                                                                {{> fmgr-modal }}
-                                                                <div class="tab-content-pad">
-                                                                  {{> wield }}
-                                                                </div>
-                                                            </div>
-                                                            <div data-bind="with: slcVwmChild">
-                                                                <!-- current: vwmWroup -->
-                                                                <div data-bind="ifnot: slcVwmChild">
-                                                                    {{> section-panel-standard }}
-                                                                    {{> dashboard-arousal }}
-                                                                    {{> fmgr-arousal }}
-                                                                    {{> fmgr-modal }}
-                                                                    <div class="tab-content-pad">
-                                                                      {{> wroup }}
-                                                                    </div>
-                                                                </div>
-                                                                <div data-bind="with: slcVwmChild">
-                                                                    <!-- current: vwmWell -->
-                                                                    {{> section-panel-well }}
-                                                                    {{> dashboard-arousal }}
-                                                                    {{> fmgr-arousal }}
-                                                                    {{> fmgr-modal }}
-                                                                    <div class="tab-content-pad">
-                                                                      {{> well }}
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- end: isLoadedAccountInfo -->
-                </div>
-            </div>
-        </div>
-        {{> modal-standard }}
-        {{> modal-panzoom }}
-        {{> modal-wide }}
-        {{> clip-path-perfomance }}
+      <div class="loader-main"></div>
+      <div>
+          <!-- current: vwmWorkspace-->
+          <nav class="wfm-nav clearfix navbar-inverse" data-bind="with: vwmUserProfile">
+              <div class="pull-left">
+                  <span class="link-view-inverse" data-bind="click: deactivateVwmChild">{{lang.wfm}}</span>
+                  <span class="min-left-margin link-view-inverse" data-bind="if: $root.isUserInDemoMode">demo cabinet</span>
+              </div>
+              <div class="pull-right">
+                  <button type="button" class="btn btn-xs btn-inverse" data-bind="click: $parent.logOff.bind($parent)">
+                      <i class="glyphicon glyphicon-off"></i>
+                      {{capitalizeFirst lang.logOut}}
+                  </button>
+              </div>
+          </nav>
+          <div class="wfm-content-wrap">
+              <div>
+                  <div data-bind="visible: mdlWorkspace.isTriedToLoadUserProfile">
+                      <div data-bind="ifnot: vwmUserProfile">
+                          <div data-bind="slideVisible: isRegisteredPage">
+                              <!-- register page -->
+                              {{> account-logon }}
+                          </div>
+                          <div data-bind="slideHidden: isRegisteredPage">
+                              <!-- login page -->
+                              {{> account-register }}
+                          </div>
+                      </div>
+                      <div data-bind="with: vwmUserProfile">
+                          <!-- current: vwmUserProfile -->
+                          <div data-bind="ifnot: mdlStage.isLoadedEmployees">{{lang.loading}}</div>
+                          <div data-bind="if: mdlStage.isLoadedEmployees">
+                              <!-- If no selected employee: show list of employees -->
+                              <div data-bind="ifnot: slcVwmChild">
+                                  {{> employee-list }}
+                              </div>
+                              <div data-bind="with: slcVwmChild">
+                                  <!-- current: vwmEmployee-->
+                                  <div data-bind="if: mdlEmployee.canEditAll">
+                                      {{> edit-mode-btn }}
+                                  </div>
+                                  <div>
+                                      <div>
+                                          <div class="clearfix">
+                                              <div class="sidebar-toggle" data-bind="css: $root.sidebarToggleCss">
+                                                  <button type="button" data-bind="click: $root.toggleIsVisibleMenu.bind($root)" title="Hide/show menu">
+                                                      <i class="glyphicon glyphicon-chevron-left" data-bind="visible: $root.isVisibleMenu"></i>
+                                                      <i class="glyphicon glyphicon-chevron-right" data-bind="hidden: $root.isVisibleMenu"></i>
+                                                  </button>
+                                              </div>
+                                              <!-- TODO: fix: slider scroll with page scroll #MH! -->
+                                              <div class="sidebar-wrap" data-bind="css: $root.sidebarWrapCss">
+                                                  <div data-bind="scroller: { }">
+                                                      {{> workspace-menu }}
+                                                  </div>
+                                              </div>
+                                              <div class="workspace-container" data-bind="css: $root.workAreaCss, with: vwmCompany">
+                                                  <!-- current: vwmCompany-->
+                                                  <div data-bind="ifnot: slcVwmChild">
+                                                      <!-- if no selected wegion -->
+                                                      {{> section-panel-standard }}
+                                                      {{> dashboard-arousal }}
+                                                      {{> fmgr-arousal }}
+                                                      {{> fmgr-modal }}
+                                                      <div class="tab-content-pad">
+                                                          {{> company }}
+                                                      </div>
+                                                  </div>
+                                                  <div data-bind="with: slcVwmChild">
+                                                      <!-- current: vwmWegion -->
+                                                      <div data-bind="ifnot: slcVwmChild">
+                                                          {{> section-panel-standard }}
+                                                          {{> dashboard-arousal }}
+                                                          {{> fmgr-arousal }}
+                                                          {{> fmgr-modal }}
+                                                          <div class="tab-content-pad">
+                                                            {{> wegion }}
+                                                          </div>
+                                                      </div>
+                                                      <div data-bind="with: slcVwmChild">
+                                                          <!-- current: vwmWield-->
+                                                          <div data-bind="ifnot: slcVwmChild">
+                                                              {{> section-panel-standard }}
+                                                              {{> dashboard-arousal }}
+                                                              {{> fmgr-arousal }}
+                                                              {{> fmgr-modal }}
+                                                              <div class="tab-content-pad">
+                                                                {{> wield }}
+                                                              </div>
+                                                          </div>
+                                                          <div data-bind="with: slcVwmChild">
+                                                              <!-- current: vwmWroup -->
+                                                              <div data-bind="ifnot: slcVwmChild">
+                                                                  {{> section-panel-standard }}
+                                                                  {{> dashboard-arousal }}
+                                                                  {{> fmgr-arousal }}
+                                                                  {{> fmgr-modal }}
+                                                                  <div class="tab-content-pad">
+                                                                    {{> wroup }}
+                                                                  </div>
+                                                              </div>
+                                                              <div data-bind="with: slcVwmChild">
+                                                                  <!-- current: vwmWell -->
+                                                                  {{> section-panel-well }}
+                                                                  {{> dashboard-arousal }}
+                                                                  {{> fmgr-arousal }}
+                                                                  {{> fmgr-modal }}
+                                                                  <div class="tab-content-pad">
+                                                                    {{> well }}
+                                                                  </div>
+                                                              </div>
+                                                          </div>
+                                                      </div>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <!-- end: isLoadedAccountInfo -->
+              </div>
+          </div>
+      </div>
+      {{> modal-standard }}
+      {{> modal-panzoom }}
+      {{> modal-wide }}
+      <!-- widget templates: loaded only once on the index page -->
+      {{> widget-default-summary }}
+      {{> widget-wield-map }}
+      {{> widget-well-sketch}}
+      {{> widget-well-history}}
+      {{> widget-well-perfomance}}
+      {{> widget-well-monitoring}}
+      {{> widget-well-map}}
+      <!-- clip path for svg blocks -->
+      {{> clip-path-perfomance }}
     </div>
     <footer class="navbar-fixed-bottom navbar-inverse">
         <div class="footer-logo-wrap">
             <div class="footer-logo"></div>
         </div>
     </footer>
-    {{> widget-default-summary }}
     <!-- Load main script file for page or default (with auth logic only) -->
     {{#if conf.isProd}}
     <script data-main="js/main-bundle-{{package.version}}" src="js/require.js"></script>
