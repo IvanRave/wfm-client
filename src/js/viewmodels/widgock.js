@@ -47,17 +47,133 @@ define(['knockout',
 			});
 
 		/**
+		 * All stage keys
+		 */
+		this.dictOfKeyOfStage = [{
+				optValue : stageCnst.company.id,
+				optText : stageCnst.company.single
+			}, {
+				optValue : stageCnst.wegion.id,
+				optText : stageCnst.wegion.single
+			}, {
+				optValue : stageCnst.wield.id,
+				optText : stageCnst.wield.single
+			}, {
+				optValue : stageCnst.wroup.id,
+				optText : stageCnst.wroup.single
+			}, {
+				optValue : stageCnst.well.id,
+				optText : stageCnst.well.single
+			}
+		];
+
+		/**
+		 * A selected key of stage for a new widget
+     *    By default: current stage key
+		 * @type {string}
+		 */
+		this.slcKeyOfStage = ko.observable(this.mdlWidgock.getWidgout().getParent().stageKey);
+
+		/**
+		 * Section patterns for the selected key of a stage
+		 * @type {Array.<module:models/section-pattern>}
+		 */
+		this.listOfPatternOfSection = ko.computed({
+				read : this.calcListOfPatternOfSection,
+				deferEvaluation : true,
+				owner : this
+			});
+
+		/**
 		 * Selected section pattern for widget (of this stage)
 		 * @type {module:models/section-pattern}
 		 */
-		this.slcStagePatternForWidget = ko.observable();
+		this.slcStagePatternForWidget = ko.observable(null);
 
 		/**
-		 * Id of seclected context of a stage
+		 * Whether user can add a new widget
+		 * @type {boolean}
+		 */
+		this.canAddVwmWidget = ko.computed({
+				read : this.calcCanAddVwmWidget,
+				deferEvaluation : true,
+				owner : this
+			});
+      
+		/**
+		 * A dict of stages
+		 * @type {Array.<Object>}
+		 */
+		this.dictOfStage = ko.computed({
+				read : this.calcDictOfStage,
+				deferEvaluation : true,
+				owner : this
+			});
+
+		/**
+		 * Selected context (a stage)
 		 *    When user add a widget from other stage
 		 * @type {string}
 		 */
-		this.idOfSlcCntxStage = ko.observable('7004');
+		this.slcCntxStage = ko.observable(null);
+	};
+
+	/**
+	 * Calculate a dict of stages
+	 * @returns {Array.<Object>}
+	 */
+	exports.prototype.calcDictOfStage = function () {
+		var tmpKeyOfStage = ko.unwrap(this.slcKeyOfStage);
+		var resultDict = [];
+
+		if (tmpKeyOfStage) {
+			// find stage by key
+			var needArr = this.mdlWidgock.getWidgout().getParent().getListOfStageByKey(tmpKeyOfStage);
+
+			resultDict = needArr.map(function (elem) {
+					return {
+						optValue : elem, // full element
+						optText : ko.unwrap(elem.name) || ko.unwrap(elem.Name)
+					};
+				});
+		}
+
+		return resultDict;
+	};
+
+	/**
+	 * Calc a list of section patterns for selected stage key
+	 * @type {module:models/section-pattern}
+	 */
+	exports.prototype.calcListOfPatternOfSection = function () {
+		var tmpAllPatterns = ko.unwrap(this.mdlWidgock.getWidgout().getParent().getRootMdl().ListOfSectionPatternDto);
+
+		var tmpSlcKeyOfStage = ko.unwrap(this.slcKeyOfStage);
+
+		return tmpAllPatterns.filter(this.isPat.bind(this, tmpSlcKeyOfStage));
+	};
+
+	/**
+	 * Whether the key of pattern equals key of a stage
+	 *    only for widget
+	 * @returns {boolean}
+	 */
+	exports.prototype.isPat = function (tmpKeyOfStage, tmpPattern) {
+		return ((tmpPattern.idOfStage === tmpKeyOfStage) && (tmpPattern.isWidget === true));
+	};
+
+	/**
+	 * Whether the user can add a new widget
+	 * @returns {boolean}
+	 */
+	exports.prototype.calcCanAddVwmWidget = function () {
+		if (ko.unwrap(this.slcStagePatternForWidget)) {
+			if (ko.unwrap(this.slcCntxStage)) {
+				return true;
+			}
+		}
+
+		return false;
 	};
 
 	/**
@@ -66,21 +182,34 @@ define(['knockout',
 	exports.prototype.addVwmWidget = function () {
 		var tmpStagePattern = ko.unwrap(this.slcStagePatternForWidget);
 		if (tmpStagePattern) {
-			var tmpIdOfSlcCntxStage = ko.unwrap(this.idOfSlcCntxStage);
-      
-      // This is a hack for company GUIDs and other stage INTEGERS ids
-      var typeOfCntxStage = tmpStagePattern.id.split('-')[0]; // 'wegion'; //'company';
-      
-      if (typeOfCntxStage !== 'company') {
-        tmpIdOfSlcCntxStage = parseInt(tmpIdOfSlcCntxStage); //6002;
-      }
-      
+			// Clean old value, to possible future adding
+			// Clean only the section selection
+			this.slcStagePatternForWidget(null);
+
+			var tmpSlcCntxStage = ko.unwrap(this.slcCntxStage);
+
+			var tmpIdOfSlcCntxStage = tmpSlcCntxStage.id;
+
 			if (tmpIdOfSlcCntxStage) {
-				this.mdlWidgock.addWidget(ko.unwrap(tmpStagePattern.name), 
-          tmpStagePattern.id,
-          tmpIdOfSlcCntxStage,
+				// This is a hack for company GUIDs and other stage INTEGERS ids
+				var typeOfCntxStage = tmpStagePattern.id.split('-')[0]; // 'wegion'; //'company';
+
+				if (typeOfCntxStage !== 'company') {
+					tmpIdOfSlcCntxStage = parseInt(tmpIdOfSlcCntxStage); //6002;
+				}
+
+				// Name of added widget, like Summary WellName
+				var tmpNameOfFutureWidget = (ko.unwrap(tmpSlcCntxStage.name) || ko.unwrap(tmpSlcCntxStage.Name)) +
+				' ' + ko.unwrap(tmpStagePattern.name);
+
+				this.mdlWidgock.addWidget(tmpNameOfFutureWidget,
+					tmpStagePattern.id,
+					tmpIdOfSlcCntxStage,
 					this.afterAddingVwmWidget.bind(this));
 			}
+
+			// Destroy used objects
+			tmpSlcCntxStage = null;
 		}
 	};
 

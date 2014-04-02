@@ -12,10 +12,10 @@ define(['jquery',
 		'services/wield',
 		'services/wroup',
 		'constants/stage-constants',
-    'helpers/app-helper'],
+		'helpers/app-helper'],
 	function ($, ko, datacontext,
 		fileHelper, StageBase, MapOfWield, mapOfWieldService, SectionOfWield, WellGroup,
-		PropSpec, wieldService, wroupService, stageConstants, appHelper) {
+		PropSpec, wieldService, wroupService, stageCnst, appHelper) {
 	'use strict';
 
 	// 10. WellFieldMaps (convert data objects into array)
@@ -89,7 +89,7 @@ define(['jquery',
 		 * Stage key: equals file name
 		 * @type {string}
 		 */
-		this.stageKey = stageConstants.wield.id;
+		this.stageKey = stageCnst.wield.id;
 
 		// Add identical properties for all stages (well, field, group, regions, company)
 		StageBase.call(this, data);
@@ -142,9 +142,9 @@ define(['jquery',
 		this.listOfSection(importListOfSectionOfWieldDto(data.ListOfSectionOfWieldDto, ths));
 	};
 
-  /** Inherit from a stage base model */
+	/** Inherit from a stage base model */
 	appHelper.inherits(exports, StageBase);
-  
+
 	/** Load all maps for this field */
 	exports.prototype.loadMapsOfWield = function () {
 		if (ko.unwrap(this.isLoadedMapsOfWield)) {
@@ -154,7 +154,7 @@ define(['jquery',
 		mapOfWieldService.get(this.id).done(function (result) {
 			ths.isLoadedMapsOfWield(true);
 			ths.WellFieldMaps(importWellFieldMapsDto(result, ths));
-      console.log('maps are loaded', result, ko.unwrap(ths.WellFieldMaps));
+			console.log('maps are loaded', result, ko.unwrap(ths.WellFieldMaps));
 		});
 	};
 
@@ -213,6 +213,40 @@ define(['jquery',
 		mapOfWieldService.remove(ths.id, itemToDelete.id).done(function () {
 			ths.WellFieldMaps.remove(itemToDelete);
 		});
+	};
+
+	/**
+	 * Find a list of cognate stages
+	 *    1. A list for selection box for new widget (name and id)
+	 *    2. A list to find specific stage by id: findCognateStage
+	 * @returns {Array.<Object>}
+	 */
+	exports.prototype.getListOfStageByKey = function (keyOfStage) {
+		switch (keyOfStage) {
+		case stageCnst.company.id:
+			return [this.getWellRegion().getCompany()];
+		case stageCnst.wegion.id:
+			return [this.getWellRegion()];
+		case stageCnst.wield.id:
+			return [this];
+		case stageCnst.wroup.id:
+			return ko.unwrap(this.wroups);
+		case stageCnst.well.id:
+			return this.calcListOfWell();
+		}
+	};
+
+  /** Calc all wells for this well field */
+	exports.prototype.calcListOfWell = function () {
+		var needArr = [];
+
+		ko.unwrap(this.wroups).forEach(function (wroupItem) {
+			ko.unwrap(wroupItem.wells).forEach(function (wellItem) {
+				needArr.push(wellItem);
+			});
+		});
+
+		return needArr;
 	};
 
 	return exports;

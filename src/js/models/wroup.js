@@ -23,7 +23,7 @@ define(['jquery',
 		StageBase,
 		PropSpec,
 		wroupService,
-		stageConstants,
+		stageCnst,
 		procentBorderService,
 		monitoringRecordService,
     appHelper) {
@@ -105,7 +105,7 @@ define(['jquery',
 		 * Stage key: equals file name
 		 * @type {string}
 		 */
-		this.stageKey = stageConstants.wroup.id;
+		this.stageKey = stageCnst.wroup.id;
 
 		/** Base for all stages */
 		StageBase.call(this, data);
@@ -344,5 +344,26 @@ define(['jquery',
 		});
 	};
 
+  /**
+	 * Find a list of cognate stages
+	 *    1. A list for selection box for new widget (name and id)
+	 *    2. A list to find specific stage by id: findCognateStage
+	 * @returns {Array.<Object>}
+	 */
+	exports.prototype.getListOfStageByKey = function (keyOfStage) {
+		switch (keyOfStage) {
+		case stageCnst.company.id:
+			return [this.getWellField().getWellRegion().getCompany()];
+		case stageCnst.wegion.id:
+			return [this.getWellField().getWellRegion()];
+		case stageCnst.wield.id:
+			return [this.getWellField()];
+		case stageCnst.wroup.id:
+			return [this];
+		case stageCnst.well.id:
+			return ko.unwrap(this.wells);
+		}
+	};
+  
 	return exports;
 });

@@ -50,16 +50,6 @@ define(['knockout',
 				owner : this
 			});
 
-		/**
-		 * List of patterns for widgets
-		 * @type {Array.<module:models/section-pattern>}
-		 */
-		this.stagePatternsForWidget = ko.computed({
-				read : this.calcStagePatternsForWidget,
-				deferEvaluation : true,
-				owner : this
-			});
-
 		/** Widget layouts of this stage */
 		this.widgouts = ko.observableArray([]).trackHasItems();
 
@@ -83,14 +73,6 @@ define(['knockout',
 			});
 
 		return filteredProps[0];
-	};
-
-	/** Get stage patterns, filtered only for widgets */
-	exports.prototype.calcStagePatternsForWidget = function () {
-		var tmpStagePatterns = ko.unwrap(this.stagePatterns);
-		return tmpStagePatterns.filter(function (elem) {
-			return elem.isWidget;
-		});
 	};
 
 	/**
@@ -163,25 +145,23 @@ define(['knockout',
 		// }, this);
 	};
 
-	// typeOfStage, idOfStage
-	exports.prototype.findCognateStage = function () {
-    return this;
-		// throw new Error('Please define this method in sub-classes with params: ' +
-			// typeOfStage + ', ' + idOfStage);
-		// for example - this - wield
-		//switch typeOfStage {
-		//case 'well': this.wroups().wells().find...
-		//case 'wield': thisWield only
-		//case 'company': only parent company
-		//}
-
-		// if this.stageKey = wroup
-		// switch typeOfStage
-		// case 'well': this.wells().find..
-
-		// if this.stageKey = company
-		// switch typeOfStage
-		// case 'wroup':
+	/**
+	 * Get cognate stages by stage key
+	 * @returns {Array.<Object>}
+	 */
+	exports.prototype.getListOfStageByKey = function () {
+		throw new Error('need to ovveride in sub-classes');
+	};
+  
+  /**
+	 * Find a cognate stage
+	 *    When user has id of the stage from widget options
+	 *    he may to get cognate this stage by id and type
+	 */
+	exports.prototype.findCognateStage = function (keyOfStage, idOfStage) {
+		return this.getListOfStageByKey(keyOfStage).filter(function (elem) {
+			return elem.id === idOfStage;
+		})[0];
 	};
 
 	/** Remove a child stage */

@@ -1,10 +1,14 @@
 ﻿/** @module */
-define(['knockout',
+define(['jquery',
+		'knockout',
 		'helpers/app-helper',
+		'helpers/modal-helper',
 		'viewmodels/wegion',
 		'base-viewmodels/stage-base'],
-	function (ko,
+	function ($,
+		ko,
 		appHelper,
+		modalHelper,
 		VwmWegion,
 		VwmStageBase) {
 	'use strict';
@@ -50,6 +54,35 @@ define(['knockout',
 		return tmpListOfMdlWegion.map(function (elem) {
 			return new VwmWegion(elem, this, this.defaultSlcData_);
 		}, this);
+	};
+
+	/**
+	 * Open a window to add well region
+	 */
+	exports.prototype.prePostVwmWegion = function () {
+		var inputName = document.createElement('input');
+		inputName.type = 'text';
+		var jqrInput = $(inputName);
+		jqrInput.prop({
+			'required' : true
+		}).addClass('form-control');
+
+		var innerDiv = document.createElement('div');
+		$(innerDiv).addClass('form-horizontal').append(
+			modalHelper.gnrtDom('Name', inputName));
+
+		modalHelper.openModalWindow('Well region',
+			innerDiv,
+			this.postVwmWegion.bind(this, jqrInput));
+	};
+
+	exports.prototype.postVwmWegion = function (jqrInput) {
+		this.mdlStage.postWegion(jqrInput.val(), this.successPostVwmWegion.bind(this));
+	};
+
+	exports.prototype.successPostVwmWegion = function (dataOfWegion) {
+		this.mdlStage.pushWegion(dataOfWegion);
+		modalHelper.closeModalWindow();
 	};
 
 	return exports;

@@ -47,8 +47,6 @@ define(['jquery',
 	var exports = function (data, company) {
 		data = data || {};
 
-		var ths = this;
-
 		this.getCompany = function () {
 			return company;
 		};
@@ -61,7 +59,7 @@ define(['jquery',
 		// Persisted properties
 		this.id = data.Id;
 		this.companyId = data.CompanyId;
-		this.wields = ko.observableArray();
+		this.wields = ko.observableArray([]);
 		/** Props specifications */
 		this.propSpecList = wegionPropSpecList;
 
@@ -74,89 +72,118 @@ define(['jquery',
 		/** Base for all stages */
 		StageBase.call(this, data);
 
-		/**
-		 * Get well field by id
-		 * @param {number} idOfWield - Well field id
-		 */
-		this.getWieldById = function (idOfWield) {
-			var tmpWields = ko.unwrap(ths.wields);
-			return tmpWields.filter(function (elem) {
-				return elem.id === idOfWield;
-			})[0];
-		};
-
-		/** Save well region */
-		this.save = function () {
-			wegionService.put(ths.id, ths.toDto());
-		};
-
-		/** Post well field */
-		this.postWield = function (tmpName) {
-			wieldService.post({
-				'Name' : tmpName,
-				'Description' : '',
-				'WellRegionId' : ths.id
-			}).done(function (result) {
-				ths.wields.push(new WellField(result, ths));
-			});
-		};
-
-		/// <summary>
-		/// Convert model to plain json object without unnecessary properties. Can be used to send requests (with clean object) to the server
-		/// </summary>
-		/// <remarks>
-		/// http://knockoutjs.com/documentation/json-data.html
-		/// "ko.toJS — this clones your view model’s object graph, substituting for each observable the current value of that observable,
-		/// so you get a plain copy that contains only your data and no Knockout-related artifacts"
-		/// </remarks>
-		this.toDto = function () {
-			var dtoObj = {
-				'Id' : ths.id,
-				'CompanyId' : ths.companyId
-			};
-
-			ths.propSpecList.forEach(function (prop) {
-				dtoObj[prop.serverId] = ko.unwrap(ths[prop.clientId]);
-			});
-
-			return dtoObj;
-		};
-
 		/** load well fields */
-		this.wields(importWieldDtoList(data.WellFieldsDto, ths));
+		this.wields(importWieldDtoList(data.WellFieldsDto, this));
 
 		/** Load sections */
-		this.listOfSection(importListOfSectionOfWegionDto(data.ListOfSectionOfWegionDto, ths));
+		this.listOfSection(importListOfSectionOfWegionDto(data.ListOfSectionOfWegionDto, this));
 	};
 
 	/** Inherit from a stage base model */
 	appHelper.inherits(exports, StageBase);
 
-	/** Remove a child */
-	exports.prototype.removeChild = function (wellFieldForDelete) {
-		var ths = this;
-		wieldService.remove(wellFieldForDelete.id).done(function () {
-			ths.wields.remove(wellFieldForDelete);
-		});
+	/** Remove a child from a server */
+	exports.prototype.removeChild = function (wieldForDelete) {
+		wieldService.remove(wieldForDelete.id).done(this.removeFromListOfWield.bind(this, wieldForDelete));
 	};
-  
-  // exports.prototype.findCognateStage = function(typeOfStage, idOfStage){
-    // switch(typeOfStage){
-      // case stageCnst.company.id: 
-        // var tmpCompany = this.getCompany();
-        // return tmpCompany.id === idOfStage ? tmpCompany : null;
-      // case stageCnst.wegion.id: 
-        // return this.id === idOfStage ? this : null;
-      // case stageCnst.wield.id:
-        // return this.findWieldById(idOfStage);
-    // }
-  // };
 
-  // exports.prototype.findWieldById = function(idOfWield){
-    // return ko.unwrap(this.wields).filter(function(wieldItem){
-      // return wieldItem.id === idOfWield;
-    // })[0];
-  // };
-  
+	/** Remove a child from a list */
+	exports.prototype.removeFromListOfWield = function (wieldForDelete) {
+		this.wields.remove(wieldForDelete);
+	};
+
+	// exports.prototype.findCognateStage = function(typeOfStage, idOfStage){
+
+	// };
+
+	/**
+	 * Convert model to plain json object without unnecessary properties.
+	 *    Can be used to send requests (with clean object) to the server.
+	 *    http://knockoutjs.com/documentation/json-data.html
+	 *    "ko.toJS — this clones your view model’s object graph, substituting for each observable the current value of that observable,
+	 *    so you get a plain copy that contains only your data and no Knockout-related artifacts"
+	 */
+	exports.prototype.toDto = function () {
+		var dtoObj = {
+			'Id' : this.id,
+			'CompanyId' : this.companyId
+		};
+
+		this.propSpecList.forEach(function (prop) {
+			dtoObj[prop.serverId] = ko.unwrap(this[prop.clientId]);
+		}, this);
+
+		return dtoObj;
+	};
+
+	/** Post well field */
+	exports.prototype.postWield = function (tmpName) {
+		wieldService.post({
+			'Name' : tmpName,
+			'Description' : '',
+			'WellRegionId' : this.id
+		}).done(this.pushWield.bind(this));
+	};
+
+	exports.prototype.pushWield = function (wieldData) {
+		this.wields.push(new WellField(wieldData, this));
+	};
+
+	/** Save well region */
+	exports.prototype.save = function () {
+		wegionService.put(this.id, this.toDto());
+	};
+
+	/**
+	 * Find a list of cognate stages
+	 *    1. A list for selection box for new widget (name and id)
+	 *    2. A list to find specific stage by id: findCognateStage
+	 * @returns {Array.<Object>}
+	 */
+	exports.prototype.getListOfStageByKey = function (keyOfStage) {
+		switch (keyOfStage) {
+		case stageCnst.company.id:
+			return [this.getCompany()];
+		case stageCnst.wegion.id:
+			return [this];
+		case stageCnst.wield.id:
+			return ko.unwrap(this.wields);
+		case stageCnst.wroup.id:
+			return this.calcListOfWroup();
+		case stageCnst.well.id:
+			return this.calcListOfWell();
+		}
+	};
+
+	/**
+	 * Calc a list of well groups for this region
+	 */
+	exports.prototype.calcListOfWroup = function () {
+		var needArr = [];
+		ko.unwrap(this.wields).forEach(function (wieldItem) {
+			ko.unwrap(wieldItem.wroups).forEach(function (wroupItem) {
+				needArr.push(wroupItem);
+			});
+		});
+
+		return needArr;
+	};
+
+	/**
+	 * Calc a list of well groups for this region
+	 */
+	exports.prototype.calcListOfWell = function () {
+		var needArr = [];
+		ko.unwrap(this.wields).forEach(function (wieldItem) {
+			ko.unwrap(wieldItem.wroups).forEach(function (wroupItem) {
+				ko.unwrap(wroupItem.wells).forEach(function (wellItem) {
+					needArr.push(wellItem);
+				});
+			});
+		});
+
+		return needArr;
+	};
+
 	return exports;
 });

@@ -39,7 +39,7 @@ define([
 		PropSpec, wellService,
 		IntegrityOfWell, integrityOfWellService,
 		NodalAnalysisOfWell, nodalAnalysisOfWellService,
-		stageConstants, VolumeOfWell,
+		stageCnst, VolumeOfWell,
 		volumeOfWellService, HistoryOfWell,
 		LogOfWell, logOfWellService,
 		fileSpecService, ColumnAttribute, TestScope, testScopeService,
@@ -169,7 +169,7 @@ define([
 		 * Stage key: equals file name
 		 * @type {string}
 		 */
-		this.stageKey = stageConstants.well.id;
+		this.stageKey = stageCnst.well.id;
 
 		/** Add props to constructor */
 		StageBase.call(this, data);
@@ -1022,6 +1022,27 @@ define([
       // var pdfDoc = pdfHelper.createPdf();
       // pdfHelper.savePdf(pdfDoc);
   // };
+
+/**
+	 * Find a list of cognate stages
+	 *    1. A list for selection box for new widget (name and id)
+	 *    2. A list to find specific stage by id: findCognateStage
+	 * @returns {Array.<Object>}
+	 */
+	exports.prototype.getListOfStageByKey = function (keyOfStage) {
+		switch (keyOfStage) {
+		case stageCnst.company.id:
+			return [this.getWellGroup().getWellField().getWellRegion().getCompany()];
+		case stageCnst.wegion.id:
+			return [this.getWellGroup().getWellField().getWellRegion()];
+		case stageCnst.wield.id:
+			return [this.getWellGroup().getWellField()];
+		case stageCnst.wroup.id:
+			return [this.getWellGroup()];
+		case stageCnst.well.id:
+			return [this];
+		}
+	};
   
 	return exports;
 });

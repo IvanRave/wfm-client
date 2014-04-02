@@ -77,16 +77,20 @@
           <div data-bind="if: $root.isEmployeeInEditMode">
             <div class="widget-tile">
               <div class="widget-empty">
-                <div class="text-right">
-                  <!--sectionIdList-->
-                  <!-- current: vwmWidgock -->
-                  <!-- parent: vwmWidgout -->
-                  <!-- parents[1]: vwmStage -->
-                  <select class="input-sm" data-bind="options: $parents[1].mdlStage.stagePatternsForWidget, optionsText: 'name', value: slcStagePatternForWidget, optionsCaption: 'choose widget...'"></select>
-                  <button class="btn btn-default btn-sm" type="button" data-bind="click: addVwmWidget, enable: slcStagePatternForWidget">
-                    {{capitalizeFirst lang.toAdd}}
-                  </button>
-                </div>
+                <!--sectionIdList-->
+                <!-- current: vwmWidgock -->
+                <!-- parent: vwmWidgout -->
+                <!-- parents[1]: vwmStage -->
+                <select class="input-sm" 
+                        data-bind="options: dictOfKeyOfStage, optionsText: 'optText', optionsValue: 'optValue', value: slcKeyOfStage"></select>
+                <select class="input-sm"
+                        data-bind="options: dictOfStage, optionsText: 'optText', optionsValue: 'optValue', value: slcCntxStage"></select>
+                <select class="input-sm" 
+                        data-bind="options: listOfPatternOfSection, optionsText: 'name', value: slcStagePatternForWidget, optionsCaption: 'choose widget...'"></select>
+                <button class="btn btn-default btn-sm" type="button" 
+                        data-bind="click: addVwmWidget, enable: canAddVwmWidget">
+                  <i class="glyphicon glyphicon-plus"></i> {{capitalizeFirst lang.toAdd}}
+                </button>
               </div>
             </div>
           </div>
