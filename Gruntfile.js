@@ -57,7 +57,7 @@ module.exports = function (grunt) {
 		},
 		changelog : {
 			options : {
-				from : 'v0.9.4'
+				from : 'v0.9.5'
 			}
 		},
 		gitlog : {
@@ -251,10 +251,10 @@ module.exports = function (grunt) {
 					mainConfigFile : '<%= trgt %>/js/require-config.js',
 					optimize : 'uglify2',
 					// http://requirejs.org/docs/optimization.html#sourcemaps
-					generateSourceMaps: true,
-					preserveLicenseComments: false,
+					generateSourceMaps : true,
+					preserveLicenseComments : false,
 					////useSourceUrl: true,
-          wrapShim: true,
+					wrapShim : true,
 					//  wrap: true, // wrap in closure
 					// jQuery automatically excluded if it's loaded from CDN
 					include : ['es5-shim', 'es5-sham', 'console-shim', 'jquery',
@@ -291,18 +291,18 @@ module.exports = function (grunt) {
 		validation : {
 			options : {
 				// reset: grunt.option('reset') || false,
-        stoponerror: true,
-        failHard: true,
-        // Ignores these errors
-				relaxerror: ['Bad value X-UA-Compatible for attribute http-equiv on element meta.',
-          'Attribute data-bind not allowed on element g at this point.',
-          'Attribute data-bind not allowed on element svg at this point.',
-          'Attribute data-bind not allowed on element circle at this point.',
-          'Attribute data-bind not allowed on element rect at this point.',
-          'Bad value 100% for attribute colspan on element td: Expected a digit but saw % instead.',
-          'A table row was',
-          'Element img is missing required attribute src.',
-          'An img element must have an alt attribute, except under certain conditions. For details, consult guidance on providing text alternatives for images.'] 
+				stoponerror : true,
+				failHard : true,
+				// Ignores these errors
+				relaxerror : ['Bad value X-UA-Compatible for attribute http-equiv on element meta.',
+					'Attribute data-bind not allowed on element g at this point.',
+					'Attribute data-bind not allowed on element svg at this point.',
+					'Attribute data-bind not allowed on element circle at this point.',
+					'Attribute data-bind not allowed on element rect at this point.',
+					'Bad value 100% for attribute colspan on element td: Expected a digit but saw % instead.',
+					'A table row was',
+					'Element img is missing required attribute src.',
+					'An img element must have an alt attribute, except under certain conditions. For details, consult guidance on providing text alternatives for images.']
 			},
 			files : {
 				src : ['<%= trgt %>/index.html']
@@ -423,10 +423,10 @@ module.exports = function (grunt) {
 
 	// 4. Bundle and minify for production
 	if (isProd) {
-    // validate (only for production - long process)
-    tasks.push('validation');
-    // minify html
-    tasks.push('htmlmin:dist');
+		// validate (only for production - long process)
+		tasks.push('validation');
+		// minify html
+		tasks.push('htmlmin:dist');
 		// Bundle with r.js
 		tasks.push('requirejs:main');
 	}

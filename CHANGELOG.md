@@ -1,3 +1,16 @@
+<a name="0.9.5"></a>
+### 0.9.5 (2014-04-02)
+
+
+#### Features
+
+* **sketch:** join with a volume section ([ceec3b7d](https://github.com/IvanRave/wfm-client/commit/ceec3b7de341815612923905fd25cfc65ec3a20d))
+* **widget:**
+  * three select boxes with adding ([0f213702](https://github.com/IvanRave/wfm-client/commit/0f2137029673eb8bafd0e9f97c8c350ebeef6049))
+  * save id of a context stage ([91c65783](https://github.com/IvanRave/wfm-client/commit/91c657836b9b39636d712323bd18da6ec76479a5))
+* **widgetSystem:** from other stages ([6efe0867](https://github.com/IvanRave/wfm-client/commit/6efe08675831b3d84b02bd5358eb1afbf3631442))
+
+
 <a name="0.9.4"></a>
 ### 0.9.4 (2014-03-21)
 
