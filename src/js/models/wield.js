@@ -112,10 +112,6 @@ define(['jquery',
 		 */
 		this.isLoadedMapsOfWield = ko.observable(false);
 
-		this.loadDashboard = function () {
-			ths.loadMapsOfWield();
-		};
-
 		/** Save non-reference properties, like groups, or region */
 		this.save = function () {
 			wieldService.put(ths.Id, ths.toDto());
@@ -236,7 +232,7 @@ define(['jquery',
 		}
 	};
 
-  /** Calc all wells for this well field */
+	/** Calc all wells for this well field */
 	exports.prototype.calcListOfWell = function () {
 		var needArr = [];
 

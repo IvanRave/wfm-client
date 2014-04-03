@@ -98,7 +98,6 @@ define(['knockout',
 
 	/** Create a history record */
 	exports.prototype.postVwmHistoryOfWell = function () {
-		var ths = this;
 		if (ko.unwrap(this.isEnabledPostHistoryOfWell)) {
 			var wellHistoryNewData = ko.toJS(this.wellHistoryNew);
 
@@ -108,13 +107,20 @@ define(['knockout',
 				}
 
 				this.mdlWell.postHistoryOfWell(wellHistoryNewData.startUnixTime,
-					wellHistoryNewData.endUnixTime, function () {
-					// Set to null for psblty creating new well history
-					ths.wellHistoryNew.startUnixTime(null);
-					ths.wellHistoryNew.endUnixTime(null);
-				});
+					wellHistoryNewData.endUnixTime, this.scsPostHistoryOfWell.bind(this));
 			}
 		}
+	};
+
+	/**
+	 * Success post of history
+	 */
+	exports.prototype.scsPostHistoryOfWell = function (resHistoryRecord) {
+		this.mdlWell.pushHistoryOfWell(resHistoryRecord);
+
+		// Set to null for psblty creating new well history
+		this.wellHistoryNew.startUnixTime(null);
+		this.wellHistoryNew.endUnixTime(null);
 	};
 
 	/**

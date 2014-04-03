@@ -240,13 +240,8 @@ define(['knockout',
 			navigationArr.push('sections');
 			navigationArr.push(vwmSectionItem.mdlSection.sectionPatternId.split('-')[1]);
 		} else if (vwmSectionItem === null) {
-			console.log('unselect section (load dashboard)');
-
 			this.mdlStage.loadWidgouts();
-
-			if (this.mdlStage.loadDashboard) {
-				this.mdlStage.loadDashboard();
-			}
+      // Load widget data - automatically after generating
 		} else {
 			throw new Error('VwmSection can not be undefined (only in init step)');
 		}

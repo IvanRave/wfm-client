@@ -32,7 +32,7 @@ define([
 		'services/monitoring-record'
 	], function ($, ko, datacontext, fileHelper,
 		appHelper,
-    appMoment,
+		appMoment,
 		StageBase,
 		PerfomanceOfWell,
 		SectionOfWell, SketchOfWell,
@@ -124,7 +124,7 @@ define([
 	 * @param {object} data - Well data
 	 * @param {WellGroup} wellGroup - Well group
 	 * @constructor
-   * @augments {module:base-models/stage-base}
+	 * @augments {module:base-models/stage-base}
 	 */
 	var exports = function (data, wellGroup) {
 		data = data || {};
@@ -188,11 +188,6 @@ define([
 
 		/** Sketch of well: by default - empty */
 		this.sketchOfWell = new SketchOfWell(ths);
-
-		/** Save this well main properties */
-		this.save = function () {
-			wellService.put(ths.id, ths.toDto());
-		};
 
 		//{ #region MAP
 
@@ -436,38 +431,6 @@ define([
 		this.historyList = ko.observableArray();
 
 		this.isLoadedHistoryList = ko.observable(false);
-
-		this.loadWellHistoryList = function () {
-			if (ko.unwrap(ths.isLoadedHistoryList)) {
-				return;
-			}
-
-			datacontext.getWellHistoryList({
-				well_id : ths.Id
-			}).done(function (response) {
-				ths.historyList(importWellHistoryDto(response, ths));
-				ths.isLoadedHistoryList(true);
-			});
-		};
-
-		this.postHistoryOfWell = function (tmpStartUnixTime, tmpEndUnixTime, scsCallback) {
-			datacontext.postWellHistory({
-				wellId : ths.id,
-				historyText : '',
-				startUnixTime : tmpStartUnixTime,
-				endUnixTime : tmpEndUnixTime
-			}).done(function (result) {
-				ths.historyList.push(new HistoryOfWell(result, ths));
-				// Clean view values
-				scsCallback();
-			});
-		};
-
-		this.deleteWellHistory = function (itemForDelete) {
-			datacontext.deleteWellHistory(itemForDelete.id).done(function () {
-				ths.historyList.remove(itemForDelete);
-			});
-		};
 
 		//} #endregion HISTORY
 
@@ -808,35 +771,9 @@ define([
 		 * @type {object}
 		 */
 		this.objProcentBorders = ko.computed({
-				read : function () {
-					// List of all params
-					var tmpListOfWfmParamOfWroup = ko.unwrap(ths.getWellGroup().listOfWfmParameterOfWroup);
-
-					// List of existing procent borders
-					var tmpPbs = ko.unwrap(ths.procentBorders);
-
-					// Result object
-					var result = {};
-
-					tmpListOfWfmParamOfWroup.forEach(function (tmpPrm) {
-						var tmpProcentBorder = tmpPbs.filter(function (pbItem) {
-								return pbItem.idOfWfmParameter === tmpPrm.wfmParameterId;
-							})[0];
-
-						if (tmpProcentBorder) {
-							result[tmpPrm.wfmParameterId] = tmpProcentBorder;
-						} else {
-							result[tmpPrm.wfmParameterId] = new ProcentBorder({
-									IdOfWell : ths.id,
-									IdOfWfmParameter : tmpPrm.wfmParameterId
-									// Without procent - null by default
-								}, ths);
-						}
-					});
-
-					return result;
-				},
-				deferEvaluation : true
+				read : this.calcObjProcentBorders,
+				deferEvaluation : true,
+				owner : this
 			});
 
 		/**
@@ -850,12 +787,9 @@ define([
 		 * @type {Array.<models/monitoring-record>}
 		 */
 		this.sortedListOfMonitoringRecord = ko.computed({
-				read : function () {
-					return ko.unwrap(ths.listOfMonitoringRecord).sort(function (l, r) {
-						return ko.unwrap(l.unixTime) > ko.unwrap(r.unixTime) ? 1 : -1;
-					});
-				},
-				deferEvaluation : true
+				read : this.calcSortedListOfMonitoringRecord,
+				deferEvaluation : true,
+				owner : this
 			});
 
 		/**
@@ -864,102 +798,15 @@ define([
 		 */
 		this.isLoadedListOfMonitoringRecord = ko.observable(false);
 
-		/**
-		 * Load the filtered list of monitoring records
-		 */
-		this.loadListOfMonitoringRecord = function (startUnixTime, endUnixTime) {
-
-			// Reload every time: other users can change data in their cabinets
-			ths.isLoadedListOfMonitoringRecord(false);
-			monitoringRecordService.getFilteredData(ths.id, startUnixTime, endUnixTime).done(function (res) {
-				ths.isLoadedListOfMonitoringRecord(true);
-
-				var tmpMntrParams = ko.unwrap(ths.getWellGroup().listOfMonitoredParams);
-
-				ths.importMonitoringRecords(res, tmpMntrParams);
-			});
-		};
-
-		/**
-		 * Import monitoring records
-		 */
-		this.importMonitoringRecords = function (tmpData, tmpMntrParams) {
-			var objArr = tmpData.map(function (tmpItem) {
-					// objProcentBorders to make computed properties:
-					//         difference between the aveDict and the dict with some procent border
-					return new MonitoringRecord(tmpItem, tmpMntrParams, ths.objProcentBorders);
-				});
-
-			ths.listOfMonitoringRecord(objArr);
-			console.log('monitored parameter records: ', ko.unwrap(ths.listOfMonitoringRecord));
-		};
-
-		/**
-		 * Post the monitoring record to the server
-		 * @param {object} tmpDict - Dictionary of parameters (for new records - empty)
-		 */
-		this.postMonitoringRecord = function (tmpUnixTime, tmpMntrParams, tmpDict, scsCallback) {
-			monitoringRecordService.upsert(ths.id, tmpUnixTime, {
-				IdOfWell : ths.id,
-				UnixTime : tmpUnixTime,
-				Dict : tmpDict
-			}).done(function () {
-				// Add to the list: not required - this method used only in a group section,
-				//       where all data will be reload after posting (to get average values)
-				////ths.listOfMonitoringRecord.push(new MonitoringRecord(response, tmpMntrParams, ths.objProcentBorders));
-				if (scsCallback) {
-					scsCallback();
-				}
-			});
-		};
-
-		/**
-		 * Remove all records for this well
-		 */
-		this.removeAllMonitoringRecords = function () {
-			monitoringRecordService.removeAll(ths.id).done(function () {
-				// Clean list
-				ths.listOfMonitoringRecord([]);
-			});
-		};
-
-		/**
-		 * Import server data to procent borders
-		 *    procent borders loaded through the wroup loadProcentBordersForAllWells method
-		 */
-		this.importProcentBorders = function (tmpProcentBorders) {
-			ths.procentBorders(tmpProcentBorders.map(function (pbItem) {
-					return new ProcentBorder(pbItem, ths);
-				}));
-
-			console.log('Well: ' + ths.id + ': ', ko.unwrap(ths.procentBorders));
-		};
-
-		//} #endregion
+		//} #endregion MONITORING
 
 		/** Load well sections */
 		this.listOfSection(importListOfSection(data.ListOfSectionOfWellDto, ths));
-
-		this.toDto = function () {
-			var dtoObj = {
-				'Id' : ths.Id,
-				'WellGroupId' : ths.WellGroupId,
-				'WellType' : ko.unwrap(ths.WellType),
-				'FlowType' : ko.unwrap(ths.FlowType),
-				'Comment' : ko.unwrap(ths.Comment)
-			};
-
-			ths.propSpecList.forEach(function (prop) {
-				dtoObj[prop.serverId] = ko.unwrap(ths[prop.clientId]);
-			});
-
-			return dtoObj;
-		};
 	};
 
-  /** Inherit from a stage base model */
+	/** Inherit from a stage base model */
 	appHelper.inherits(exports, StageBase);
-  
+
 	/**
 	 * Remove (clear) a procent border
 	 */
@@ -973,7 +820,7 @@ define([
 	/** Get well map list from well field maps with need well id */
 	exports.prototype.calcMarkersForWell = function () {
 		var wellFieldMapList = ko.unwrap(this.getWellGroup().getWellField().WellFieldMaps);
-    console.log('calc markers for a well', wellFieldMapList);
+		console.log('calc markers for a well', wellFieldMapList);
 		var wellId = this.id;
 
 		var arrMarkers = [];
@@ -1000,30 +847,218 @@ define([
 				throw new Error('Only one well per each map');
 			}
 		});
-    
+
 		return arrMarkers;
 	};
 
-	/** Load a dashboard */
-	exports.prototype.loadDashboard = function () {
-		this.sketchOfWell.load();
-		// TODO: load data only if there is one or more perfomance widgets (only once) for entire well
-		this.getWellGroup().loadListOfWfmParameterOfWroup();
-		this.perfomanceOfWell.forecastEvolution.getDict();
-		this.perfomanceOfWell.getHstProductionDataSet();
-		this.loadWellHistoryList();
-    this.getWellGroup().getWellField().loadMapsOfWield();
+	// /**
+	// * Create a PDF report
+	// */
+	// exports.prototype.createReport = function(){
+	// var pdfDoc = pdfHelper.createPdf();
+	// pdfHelper.savePdf(pdfDoc);
+	// };
+
+	//{ #region HISTORY-METHODS
+
+	/**
+	 * Load a list with history records
+	 */
+	exports.prototype.loadWellHistoryList = function () {
+		if (ko.unwrap(this.isLoadedHistoryList)) {
+			return;
+		}
+
+		datacontext.getWellHistoryList({
+			well_id : this.id
+		}).done(this.successLoadWellHistoryList.bind(this));
 	};
 
-  // /**
-  // * Create a PDF report
-  // */
-  // exports.prototype.createReport = function(){
-      // var pdfDoc = pdfHelper.createPdf();
-      // pdfHelper.savePdf(pdfDoc);
-  // };
+	/**
+	 * Success callback for loading history records
+	 */
+	exports.prototype.successLoadWellHistoryList = function (data) {
+		this.historyList(importWellHistoryDto(data, this));
+		this.isLoadedHistoryList(true);
+	};
 
-/**
+	/**
+	 * Post a history record to the server
+	 */
+	exports.prototype.postHistoryOfWell = function (tmpStartUnixTime, tmpEndUnixTime, scsCallback) {
+		datacontext.postWellHistory({
+			wellId : this.id,
+			historyText : '',
+			startUnixTime : tmpStartUnixTime,
+			endUnixTime : tmpEndUnixTime
+		}).done(scsCallback);
+	};
+
+	/**
+	 * Push a history record to the main list
+	 * @params {Object} data - Data from the server
+	 */
+	exports.prototype.pushHistoryOfWell = function (data) {
+		this.historyList.push(new HistoryOfWell(data, this));
+	};
+
+	/**
+	 * Remove a history record
+	 */
+	exports.prototype.unlinkHistoryOfWell = function (itemForDelete) {
+		this.historyList.remove(itemForDelete);
+	};
+
+	/**
+	 * Delete a history record from the server
+	 */
+	exports.prototype.deleteWellHistory = function (itemForDelete) {
+		datacontext.deleteWellHistory(itemForDelete.id)
+		.done(this.unlinkHistoryOfWell.bind(this, itemForDelete));
+	};
+
+	//} #endregion HISTORY-METHODS
+
+	//{ #region MONITORING-METHODS
+
+	/**
+	 * Load the filtered list of monitoring records
+	 */
+	exports.prototype.loadListOfMonitoringRecord = function (startUnixTime, endUnixTime) {
+		// Reload every time: other users can change data in their cabinets
+		this.isLoadedListOfMonitoringRecord(false);
+		monitoringRecordService.getFilteredData(this.id, startUnixTime, endUnixTime)
+		.done(this.scsLoadListOfMinitoringRecord.bind(this));
+	};
+
+	/**
+	 * Success loading
+	 */
+	exports.prototype.scsLoadListOfMinitoringRecord = function (res) {
+		this.isLoadedListOfMonitoringRecord(true);
+		this.importMonitoringRecords(res);
+	};
+
+	/**
+	 * Import monitoring records
+	 */
+	exports.prototype.importMonitoringRecords = function (tmpData) {
+		var tmpMntrParams = ko.unwrap(this.getWellGroup().listOfMonitoredParams);
+
+		var objArr = tmpData.map(function (tmpItem) {
+				// objProcentBorders to make computed properties:
+				//         difference between the aveDict and the dict with some procent border
+				return new MonitoringRecord(tmpItem, tmpMntrParams, this.objProcentBorders);
+			}, this);
+
+		this.listOfMonitoringRecord(objArr);
+
+		// Destroy
+		objArr = null;
+	};
+
+	/**
+	 * Post the monitoring record to the server
+	 * @param {object} tmpDict - Dictionary of parameters (for new records - empty)
+	 */
+	exports.prototype.postMonitoringRecord = function (tmpUnixTime, tmpMntrParams, tmpDict, scsCallback) {
+		monitoringRecordService.upsert(this.id, tmpUnixTime, {
+			IdOfWell : this.id,
+			UnixTime : tmpUnixTime,
+			Dict : tmpDict
+		}).done(scsCallback);
+		// function () {
+		// // Add to the list: not required - this method used only in a group section,
+		// //       where all data will be reload after posting (to get average values)
+		// ////ths.listOfMonitoringRecord.push(new MonitoringRecord(response, tmpMntrParams, ths.objProcentBorders));
+		// if (scsCallback) {
+		// scsCallback();
+		// }
+		// });
+	};
+
+	/**
+	 * Calculate procent borders
+	 * @private
+	 */
+	exports.prototype.calcObjProcentBorders = function () {
+		// List of all params
+		var tmpListOfWfmParamOfWroup = ko.unwrap(this.getWellGroup().listOfWfmParameterOfWroup);
+
+		// List of existing procent borders
+		var tmpPbs = ko.unwrap(this.procentBorders);
+
+		// Result object
+		var result = {};
+
+		// Fill result
+		tmpListOfWfmParamOfWroup.forEach(this.fillObjProcentBorder.bind(this, result, tmpPbs));
+
+		// Destroy
+		tmpPbs = null;
+		tmpListOfWfmParamOfWroup = null;
+
+		return result;
+	};
+
+	/**
+	 * Fill the object with percent border's data
+	 *    need to foreach method in calcObjProcentBorders
+	 * @private
+	 */
+	exports.prototype.fillObjProcentBorder = function (result, tmpPbs, tmpPrm) {
+		var tmpProcentBorder = tmpPbs.filter(function (pbItem) {
+				return pbItem.idOfWfmParameter === tmpPrm.wfmParameterId;
+			})[0];
+
+		if (tmpProcentBorder) {
+			result[tmpPrm.wfmParameterId] = tmpProcentBorder;
+		} else {
+			result[tmpPrm.wfmParameterId] = new ProcentBorder({
+					IdOfWell : this.id,
+					IdOfWfmParameter : tmpPrm.wfmParameterId
+					// Without procent - null by default
+				}, this);
+		}
+	};
+
+	/**
+	 * Calc a sorted list
+	 */
+	exports.prototype.calcSortedListOfMonitoringRecord = function () {
+		return ko.unwrap(this.listOfMonitoringRecord).sort(function (l, r) {
+			return ko.unwrap(l.unixTime) > ko.unwrap(r.unixTime) ? 1 : -1;
+		});
+	};
+
+	/**
+	 * Remove all records for this well
+	 */
+	exports.prototype.removeAllMonitoringRecords = function () {
+		monitoringRecordService.removeAll(this.id).done(this.cleanListOfMonitoringRecord.bind(this));
+	};
+
+	/**
+	 * Clean list after deletion
+	 * @private
+	 */
+	exports.prototype.cleanListOfMonitoringRecord = function () {
+		this.listOfMonitoringRecord([]);
+	};
+
+	/**
+	 * Import server data to procent borders
+	 *    procent borders loaded through the wroup loadProcentBordersForAllWells method
+	 */
+	exports.prototype.importProcentBorders = function (tmpProcentBorders) {
+		this.procentBorders(tmpProcentBorders.map(function (pbItem) {
+				return new ProcentBorder(pbItem, this);
+			}, this));
+	};
+
+	//} #endregion MONITORING-METHODS
+
+	/**
 	 * Find a list of cognate stages
 	 *    1. A list for selection box for new widget (name and id)
 	 *    2. A list to find specific stage by id: findCognateStage
@@ -1043,6 +1078,30 @@ define([
 			return [this];
 		}
 	};
-  
+
+	/** Save this well main properties */
+	exports.prototype.save = function () {
+		wellService.put(this.id, this.toDto());
+	};
+
+	/**
+	 * Convert to a plain object
+	 */
+	exports.prototype.toDto = function () {
+		var dtoObj = {
+			'Id' : this.Id,
+			'WellGroupId' : this.WellGroupId,
+			'WellType' : ko.unwrap(this.WellType),
+			'FlowType' : ko.unwrap(this.FlowType),
+			'Comment' : ko.unwrap(this.Comment)
+		};
+
+		this.propSpecList.forEach(function (prop) {
+			dtoObj[prop.serverId] = ko.unwrap(this[prop.clientId]);
+		}, this);
+
+		return dtoObj;
+	};
+
 	return exports;
 });

@@ -423,8 +423,9 @@ module.exports = function (grunt) {
 
 	// 4. Bundle and minify for production
 	if (isProd) {
-		// validate (only for production - long process)
-		tasks.push('validation');
+		// // validate (only for production - long process)
+    // // hand up on slow connections
+		// tasks.push('validation');
 		// minify html
 		tasks.push('htmlmin:dist');
 		// Bundle with r.js

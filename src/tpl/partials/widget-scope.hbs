@@ -70,7 +70,8 @@
                 </div>
               </div>
               <div class="widget-tile-content">
-                <div data-bind="template: { name: mdlWidget.widgetTpl, data: $data, as: 'vwmWidget' }"></div>
+                <!-- current: vwmWidget from foreach -->
+                <div data-bind="template: { name: mdlWidget.widgetTpl, data: $data, as: 'vwmWidget', afterRender: afterRenderWidget.bind($data) }"></div>
               </div>
             </div>
           </div>

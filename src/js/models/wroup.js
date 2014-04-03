@@ -12,7 +12,7 @@ define(['jquery',
 		'constants/stage-constants',
 		'services/procent-border',
 		'services/monitoring-record',
-    'helpers/app-helper'],
+		'helpers/app-helper'],
 	function ($,
 		ko,
 		datacontext,
@@ -26,7 +26,7 @@ define(['jquery',
 		stageCnst,
 		procentBorderService,
 		monitoringRecordService,
-    appHelper) {
+		appHelper) {
 	'use strict';
 
 	// 18. WellGroupWfmParameter
@@ -191,9 +191,9 @@ define(['jquery',
 		this.listOfSection(importListOfSectionOfWroupDto(data.ListOfSectionOfWroupDto, ths));
 	};
 
-  /** Inherit from a stage base model */
+	/** Inherit from a stage base model */
 	appHelper.inherits(exports, StageBase);
-  
+
 	/**
 	 * Load procent borders for all wells
 	 */
@@ -303,16 +303,26 @@ define(['jquery',
 	/**
 	 * Load parameters
 	 */
-	exports.prototype.loadListOfWfmParameterOfWroup = function () {
-		var ths = this;
-		if (ko.unwrap(ths.isLoadedListOfWfmParameterOfWroup)) {
-			return;
+	exports.prototype.loadListOfWfmParameterOfWroup = function (callback) {
+		if (!ko.unwrap(this.isLoadedListOfWfmParameterOfWroup)) {
+			wfmParameterOfWroupService.get(this.id).done(this.scsLoadListOfWfmParameterOfWroup.bind(this, callback));
+		} else {
+			if (appHelper.isFunction(callback)) {
+				callback();
+			}
 		}
+	};
 
-		wfmParameterOfWroupService.get(ths.id).done(function (response) {
-			ths.listOfWfmParameterOfWroup(importWellGroupWfmParameterDtoList(response));
-			ths.isLoadedListOfWfmParameterOfWroup(true);
-		});
+	/**
+	 * Success callback
+	 * @private
+	 */
+	exports.prototype.scsLoadListOfWfmParameterOfWroup = function (callback, response) {
+		this.listOfWfmParameterOfWroup(importWellGroupWfmParameterDtoList(response));
+		this.isLoadedListOfWfmParameterOfWroup(true);
+		if (appHelper.isFunction(callback)) {
+			callback();
+		}
 	};
 
 	/**
@@ -344,7 +354,7 @@ define(['jquery',
 		});
 	};
 
-  /**
+	/**
 	 * Find a list of cognate stages
 	 *    1. A list for selection box for new widget (name and id)
 	 *    2. A list to find specific stage by id: findCognateStage
@@ -364,6 +374,6 @@ define(['jquery',
 			return ko.unwrap(this.wells);
 		}
 	};
-  
+
 	return exports;
 });

@@ -20,9 +20,6 @@ define(['knockout',
 		this.widgetVwmMonitoringOfWell = new VwmMonitoringOfWell(mdlWidget.mdlStageContext,
       mdlWidget.opts.startUnixTime, 
       mdlWidget.opts.endUnixTime);
-    
-    // TODO: #43! Load after initialization -> init graph redrawing
-    mdlWidget.opts.startUnixTime.valueHasMutated();
 	};
 
 	/** Inherit from a widget viewmodel */

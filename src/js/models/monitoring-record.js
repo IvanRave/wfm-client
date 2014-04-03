@@ -1,22 +1,26 @@
 ﻿/** @module */
-define([
-		'jquery',
-		'knockout',
+define(['knockout',
+		'helpers/app-helper',
 		'services/monitoring-record'],
-	function ($, ko, monitoringRecordService) {
+	function (ko, appHelper, monitoringRecordService) {
 	'use strict';
 
 	/**
 	 * Model: a monitoring record (for a well and well field monitoring section)
 	 * @constructor
-	 * @param {object} koObjProcentBorders - to make computed properties:
+   * @param {Object} mtnrParams - Monitored parameters from a well group
+   *        Need to calculate and load monitored params before generate this record
+	 * @param {Object} koObjProcentBorders - to make computed properties:
 	 *        difference between the aveDict and the dict with some procent border
 	 *        red and green values in the table
 	 */
 	var exports = function (data, mntrParams, koObjProcentBorders) {
 		data = data || {};
 
-		var ths = this;
+		/**
+		 * Observable procent's borders
+		 */
+		this.koObjProcentBorders = koObjProcentBorders;
 
 		/**
 		 * Id of parent
@@ -43,38 +47,6 @@ define([
 		this.isSaveProgress = ko.observable(false);
 
 		/**
-		 * Insert or update the record
-		 */
-		this.upsert = function () {
-			// Check dict to numbers
-			// And convert to numbers from string
-
-			var tmpDict = ko.toJS(ths.dict);
-
-			for (var tmpKey in tmpDict) {
-				if (tmpDict.hasOwnProperty(tmpKey)) {
-					if ($.isNumeric(tmpDict[tmpKey])) {
-						tmpDict[tmpKey] = +tmpDict[tmpKey];
-					} else if (!tmpDict[tmpKey]) { // check all exclude zero (zero - is number)
-						tmpDict[tmpKey] = null; // set to null when empty
-					} else {
-						alert('Only numbers for ' + tmpKey + ': ' + tmpDict[tmpKey]);
-						return;
-					}
-				}
-			}
-
-			ths.isSaveProgress(true);
-			monitoringRecordService.upsert(ths.idOfWell, ko.unwrap(ths.unixTime), {
-				IdOfWell : ths.idOfWell,
-				UnixTime : ko.unwrap(ths.unixTime),
-				Dict : tmpDict
-			}).done(function () {
-				ths.isSaveProgress(false);
-			});
-		};
-
-		/**
 		 * A dictionary with values of parameters
 		 * @type {object}
 		 */
@@ -99,71 +71,136 @@ define([
 		 */
 		this.diffClassDict = {};
 
+		/**
+		 * Load all data
+		 */
+		this.loadData(data, mntrParams);
+	};
+
+	/**
+	 * Load all data
+	 */
+	exports.prototype.loadData = function (data, mntrParams) {
 		// May be null if no average data
 		// Convert to empty object, to show null values of this object
-		var aveData = data.AverageDict || {};
-
 		// Fill usual values for parameters
-		mntrParams.forEach(function (elem) {
-			ths.dict[elem.wfmParameterId] = ko.observable(data.Dict[elem.wfmParameterId]);
-			ths.dict[elem.wfmParameterId].subscribe(ths.upsert);
-			// Fill average values for parameters (per last 30 days, exclude today)
-			ths.aveDict[elem.wfmParameterId] = ko.observable(aveData[elem.wfmParameterId]);
+		mntrParams.forEach(this.loadItem.bind(this,
+				(data.Dict || {}),
+				(data.AverageDict || {})));
+	};
 
-			// Fill a dictionary with differences results
-			ths.diffDict[elem.wfmParameterId] = ko.computed({
-					read : function () {
-						var tmpProcentBorder = ko.unwrap(koObjProcentBorders)[elem.wfmParameterId];
-						if (tmpProcentBorder) {
-							var tmpProcentValue = ko.unwrap(tmpProcentBorder.procent);
-							// Number from 0 to 100 (procents)
-							if ($.isNumeric(tmpProcentValue)) {
-								// Convert to number
-								tmpProcentValue = +tmpProcentValue;
-								var tmpUsualVal = ko.unwrap(ths.dict[elem.wfmParameterId]);
-								if ($.isNumeric(tmpUsualVal)) {
-									// Convert to number
-									tmpUsualVal = +tmpUsualVal;
-									var tmpAveVal = ko.unwrap(ths.aveDict[elem.wfmParameterId]);
-									if ($.isNumeric(tmpAveVal)) {
-										// Convert to number
-										tmpAveVal = +tmpAveVal;
-										var absoluteProcent = tmpAveVal * (tmpProcentValue / 100); // result = number
+	/**
+	 * Load each item during the foreach cycle
+	 */
+	exports.prototype.loadItem = function (mainData, aveData, elem) {
+		this.dict[elem.wfmParameterId] = ko.observable(mainData[elem.wfmParameterId]);
+		this.dict[elem.wfmParameterId].subscribe(this.upsertMonitoringRecord, this);
+		// Fill average values for parameters (per last 30 days, exclude today)
+		this.aveDict[elem.wfmParameterId] = ko.observable(aveData[elem.wfmParameterId]);
 
-										console.log('procent for elem ', elem.wfmParameterId, tmpProcentValue, absoluteProcent);
+		// Fill a dictionary with differences results
+		this.diffDict[elem.wfmParameterId] = ko.computed({
+				read : this.genDiffDictItem.bind(this, elem),
+				deferEvaluation : true,
+				owner : this
+			});
 
-										if (tmpUsualVal > (tmpAveVal + absoluteProcent)) {
-											// is out of the top border
-											return true;
-										} else if (tmpUsualVal < (tmpAveVal - absoluteProcent)) {
-											// is out of the bottom border
-											return true;
-										} else {
-											// is in borders (false - no warning)
-											return false;
-										}
-									}
-								}
-							}
+		// Fill classes for differences results
+		this.diffClassDict[elem.wfmParameterId] = ko.computed({
+				read : this.genDiffClassItem.bind(this, elem),
+				deferEvaluation : true,
+				owner : this
+			});
+	};
+
+	/**
+	 * Generate a class for a record
+	 */
+	exports.prototype.genDiffClassItem = function (elem) {
+		var tmpIsDiff = ko.unwrap(this.diffDict[elem.wfmParameterId]);
+		if (tmpIsDiff === true) {
+			return 'danger';
+		}
+		if (tmpIsDiff === false) {
+			return 'success';
+		}
+	};
+
+	/**
+	 * Generate data for a record
+	 */
+	exports.prototype.genDiffDictItem = function (elem) {
+		var tmpProcentBorder = ko.unwrap(this.koObjProcentBorders)[elem.wfmParameterId];
+		if (tmpProcentBorder) {
+			var tmpProcentValue = ko.unwrap(tmpProcentBorder.procent);
+			// Number from 0 to 100 (procents)
+			if (appHelper.isNumeric(tmpProcentValue)) {
+				// Convert to number
+				tmpProcentValue = +tmpProcentValue;
+				var tmpUsualVal = ko.unwrap(this.dict[elem.wfmParameterId]);
+				if (appHelper.isNumeric(tmpUsualVal)) {
+					// Convert to number
+					tmpUsualVal = +tmpUsualVal;
+					var tmpAveVal = ko.unwrap(this.aveDict[elem.wfmParameterId]);
+					if (appHelper.isNumeric(tmpAveVal)) {
+						// Convert to number
+						tmpAveVal = +tmpAveVal;
+						var absoluteProcent = tmpAveVal * (tmpProcentValue / 100); // result = number
+
+						console.log('procent for elem ', elem.wfmParameterId, tmpProcentValue, absoluteProcent);
+
+						if (tmpUsualVal > (tmpAveVal + absoluteProcent)) {
+							// is out of the top border
+							return true;
+						} else if (tmpUsualVal < (tmpAveVal - absoluteProcent)) {
+							// is out of the bottom border
+							return true;
+						} else {
+							// is in borders (false - no warning)
+							return false;
 						}
-					},
-					deferEvaluation : true
-				});
+					}
+				}
+			}
+		}
+	};
 
-			// Fill classes for differences results
-			ths.diffClassDict[elem.wfmParameterId] = ko.computed({
-					read : function () {
-						var tmpIsDiff = ko.unwrap(ths.diffDict[elem.wfmParameterId]);
-						if (tmpIsDiff === true) {
-							return 'danger';
-						}
-						if (tmpIsDiff === false) {
-							return 'success';
-						}
-					},
-					deferEvaluation : true
-				});
-		});
+	/**
+	 * Insert or update the record
+	 */
+	exports.prototype.upsertMonitoringRecord = function () {
+		// Check dict to numbers
+		// And convert to numbers from string
+
+		var tmpDict = ko.toJS(this.dict);
+
+		for (var tmpKey in tmpDict) {
+			if (tmpDict.hasOwnProperty(tmpKey)) {
+				if (appHelper.isNumeric(tmpDict[tmpKey])) {
+					tmpDict[tmpKey] = +tmpDict[tmpKey];
+				} else if (!tmpDict[tmpKey]) { // check all exclude zero (zero - is number)
+					tmpDict[tmpKey] = null; // set to null when empty
+				} else {
+					alert('Only numbers for ' + tmpKey + ': ' + tmpDict[tmpKey]);
+					return;
+				}
+			}
+		}
+
+		this.isSaveProgress(true);
+
+		monitoringRecordService.upsert(this.idOfWell, ko.unwrap(this.unixTime), {
+			IdOfWell : this.idOfWell,
+			UnixTime : ko.unwrap(this.unixTime),
+			Dict : tmpDict
+		}).done(this.scsUpsertMonitoringRecord.bind(this));
+	};
+
+	/**
+	 * Success callback for upserting
+	 */
+	exports.prototype.scsUpsertMonitoringRecord = function () {
+		this.isSaveProgress(false);
 	};
 
 	return exports;

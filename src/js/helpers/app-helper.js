@@ -4,15 +4,15 @@ define(['jquery'], function ($) {
 
 	var exports = {};
 
-  /**
-  * Convert to float
-  * @param (number} value 123.
-  * @param {number} countAfterPeriod .524
-  */
-  exports.toFloatDec = function(value, countAfterPeriod){
-    return parseInt(value * Math.pow(10, countAfterPeriod)) / Math.pow(10, countAfterPeriod);
-  };
-  
+	/**
+	 * Convert to float
+	 * @param (number} value 123.
+	 * @param {number} countAfterPeriod .524
+	 */
+	exports.toFloatDec = function (value, countAfterPeriod) {
+		return parseInt(value * Math.pow(10, countAfterPeriod)) / Math.pow(10, countAfterPeriod);
+	};
+
 	/**
 	 * Whether is value numeric
 	 *    https://api.jquery.com/jQuery.isNumeric/
@@ -21,6 +21,14 @@ define(['jquery'], function ($) {
 	exports.isNumeric = function (value) {
 		// may be additional check
 		return $.isNumeric(value);
+	};
+
+	/**
+	 * Whether the value is function
+	 * @returns {boolean}
+	 */
+	exports.isFunction = function (possibleFunc) {
+		return $.isFunction(possibleFunc);
 	};
 
 	// Hidden Iframe for file loading (to the client comp)

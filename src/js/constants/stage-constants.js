@@ -68,6 +68,7 @@ define([], function () {
 				monitoring : 'well-monitoring',
 				integrity : 'well-integrity',
         log: 'well-log',
+        test: 'well-test',
         nodalAnalysis: 'well-nodalanalysis'
 			}
 		}

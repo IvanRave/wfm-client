@@ -95,6 +95,7 @@ define(['jquery',
 	 * Load the list, using filtered dates (if both exists)
 	 */
 	exports.prototype.loadFilteredListOfMonitoringRecord = function () {
+    console.log('load monitoring');
 		var tmpTime = this.mntrUnixTimeBorder;
 		var startUnixTime = ko.unwrap(tmpTime.start);
 		if (startUnixTime) {

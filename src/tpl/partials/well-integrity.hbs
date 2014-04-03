@@ -32,12 +32,12 @@
           <li>
             <div class="clearfix">
               <div class="pull-left">
-                <span class="pointer link-view" data-bind="click: $parent.selectVwmIntegrity">
+                <span class="pointer link-view" data-bind="click: $parent.selectVwmIntegrity.bind($parent)">
                   <span data-bind="text: mdlIntegrity.name, css: { 'bld': isSlc }"></span>
                 </span>
               </div>
               <div class="pull-right">
-                  <button class="btn btn-default btn-xs" data-bind="click: $parent.removeVwmIntegrity">
+                  <button class="btn btn-default btn-xs" data-bind="click: $parent.removeVwmIntegrity.bind($parent)">
                     <i class="glyphicon glyphicon-remove"></i>
                   </button>
               </div>

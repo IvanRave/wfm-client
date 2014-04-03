@@ -80,7 +80,7 @@ define([
 
 		// Has sections and widgets
 		VwmStageBase.call(this, defaultSlcData.wellSectionId, parentVwmWroup.unqOfSlcVwmChild, null);
-    
+
 		//mdlSketchOfWell, koWellUnzOfSlcVwmSectionFmg, koSlcVwmSectionFmg,  fmgrLink
 		this.vwmSketchOfWell = new VwmSketchOfWell(this.mdlStage.sketchOfWell, this.unzOfSlcVwmSectionFmg, this.slcVwmSectionFmg, this.fmgrModal);
 
@@ -121,7 +121,7 @@ define([
 		 * @type {module:viewmodels/history-of-well}
 		 */
 		this.vwmScopeOfHistoryOfWell = new VwmScopeOfHistoryOfWell(this,
-        this.mdlStage,
+				this.mdlStage,
 				ko.observable(null),
 				ko.observable(null),
 				ko.observable(null),
@@ -131,8 +131,8 @@ define([
 
 		//{ #region LOG
 
-    var ths = this;
-    
+		var ths = this;
+
 		/**
 		 * List of viewmodels of log of well
 		 * @type {Array.<module:viewmodels/log-of-well>}
@@ -251,12 +251,9 @@ define([
 		 * List of viewmodels
 		 */
 		this.listOfVwmIntegrity = ko.computed({
-				read : function () {
-					return ko.unwrap(ths.mdlStage.listOfIntegrity).map(function (elem) {
-						return new VwmIntegrity(elem, ths.vidOfSlcVwmIntegrity);
-					});
-				},
-				deferEvaluation : true
+				read : this.buildListOfVwmIntegrity,
+				deferEvaluation : true,
+				owner : this
 			});
 
 		/**
@@ -268,40 +265,10 @@ define([
 		 * Selected viewmodel
 		 */
 		this.slcVwmIntegrity = ko.computed({
-				read : function () {
-					var tmpVid = ko.unwrap(ths.vidOfSlcVwmIntegrity);
-					var tmpList = ko.unwrap(ths.listOfVwmIntegrity);
-					if (tmpVid) {
-						return tmpList.filter(function (elem) {
-							return elem.vid === tmpVid;
-						})[0];
-					} else {
-						// Get first element by default
-						var tmpElem = tmpList[0];
-						if (tmpElem) {
-							ths.vidOfSlcVwmIntegrity(tmpElem.vid);
-							return tmpElem;
-						}
-					}
-				},
-				deferEvaluation : true
+				read : this.calcSlcVwmIntegrity,
+				deferEvaluation : true,
+				owner : this
 			});
-
-		/**
-		 * Select view model
-		 */
-		this.selectVwmIntegrity = function (vwmToSelect) {
-			ths.vidOfSlcVwmIntegrity(vwmToSelect.vid);
-		};
-
-		/**
-		 * Remove viewmodel and model
-		 */
-		this.removeVwmIntegrity = function (vwmToRemove) {
-			if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(vwmToRemove.mdlIntegrity.name) + '"?')) {
-				ths.mdlStage.removeIntegrity(vwmToRemove.mdlIntegrity);
-			}
-		};
 
 		//} #endregion INTEGRITY
 
@@ -326,7 +293,7 @@ define([
 					});
 				},
 				deferEvaluation : true,
-        owner: this
+				owner : this
 			});
 
 		/**
@@ -397,55 +364,55 @@ define([
 			});
 
 		//} #endregion MAP
-    
-    //{ #region SWITCHER overwriting to remove hard-code strings and ko() props in html
-    console.log('history pattern', stageCnst.well.ptrn.history);
-    this.isSlcPtrnWellHistory = ko.computed({
-      read: this.calcIsSlcPtrn.bind(this, stageCnst.well.ptrn.history),
-      deferEvaluation: true,
-      owner: this
-    });
-    
-    this.isSlcPtrnWellIntegrity = ko.computed({
-      read: this.calcIsSlcPtrn.bind(this, stageCnst.well.ptrn.integrity),
-      deferEvaluation: true,
-      owner: this
-    });
-    
-    this.isSlcPtrnWellLog = ko.computed({
-      read: this.calcIsSlcPtrn.bind(this, stageCnst.well.ptrn.log),
-      deferEvaluation: true,
-      owner: this
-    });
-    
-    this.isSlcPtrnWellNodalAnalysis = ko.computed({
-      read: this.calcIsSlcPtrn.bind(this, stageCnst.well.ptrn.nodalAnalysis),
-      deferEvaluation: true,
-      owner: this
-    });
-    
-    this.isSlcPtrnWellPerfomance = ko.computed({
-      read: this.calcIsSlcPtrn.bind(this, stageCnst.well.ptrn.perfomance),
-      deferEvaluation: true,
-      owner: this
-    });
-    
-    this.isSlcPtrnWellMap = ko.computed({
-      read: this.calcIsSlcPtrn.bind(this, stageCnst.well.ptrn.map),
-      deferEvaluation: true,
-      owner: this
-    });
-    
-    //{ #endregion SWITCHER
+
+		//{ #region SWITCHER overwriting to remove hard-code strings and ko() props in html
+		console.log('history pattern', stageCnst.well.ptrn.history);
+		this.isSlcPtrnWellHistory = ko.computed({
+				read : this.calcIsSlcPtrn.bind(this, stageCnst.well.ptrn.history),
+				deferEvaluation : true,
+				owner : this
+			});
+
+		this.isSlcPtrnWellIntegrity = ko.computed({
+				read : this.calcIsSlcPtrn.bind(this, stageCnst.well.ptrn.integrity),
+				deferEvaluation : true,
+				owner : this
+			});
+
+		this.isSlcPtrnWellLog = ko.computed({
+				read : this.calcIsSlcPtrn.bind(this, stageCnst.well.ptrn.log),
+				deferEvaluation : true,
+				owner : this
+			});
+
+		this.isSlcPtrnWellNodalAnalysis = ko.computed({
+				read : this.calcIsSlcPtrn.bind(this, stageCnst.well.ptrn.nodalAnalysis),
+				deferEvaluation : true,
+				owner : this
+			});
+
+		this.isSlcPtrnWellPerfomance = ko.computed({
+				read : this.calcIsSlcPtrn.bind(this, stageCnst.well.ptrn.perfomance),
+				deferEvaluation : true,
+				owner : this
+			});
+
+		this.isSlcPtrnWellMap = ko.computed({
+				read : this.calcIsSlcPtrn.bind(this, stageCnst.well.ptrn.map),
+				deferEvaluation : true,
+				owner : this
+			});
+
+		//{ #endregion SWITCHER
 	};
 
 	/** Inherit from a stage base viewmodel */
 	appHelper.inherits(exports, VwmStageBase);
 
-  exports.prototype.calcIsSlcPtrn = function(ptrnStr){
-    return ko.unwrap(this.patternOfSlcVwmSectionWrk) === ptrnStr;
-  };
-  
+	exports.prototype.calcIsSlcPtrn = function (ptrnStr) {
+		return ko.unwrap(this.patternOfSlcVwmSectionWrk) === ptrnStr;
+	};
+
 	/** Calculate a selected marker, using id of map */
 	exports.prototype.calcSlcVwmMapMarker = function () {
 		var tmpIdOfMap = ko.unwrap(this.idOfMapOfSlcVwmMapMarker);
@@ -486,15 +453,15 @@ define([
 	exports.prototype.loadSectionContent = function (idOfSectionPattern) {
 		switch (idOfSectionPattern) {
 			// Dashboard: from undefined to null
-		case 'well-history': {
+		case stageCnst.well.ptrn.history: {
 				this.mdlStage.loadWellHistoryList();
 				break;
 			}
-		case 'well-sketch': {
+		case stageCnst.well.ptrn.sketch: {
 				this.mdlStage.sketchOfWell.load();
 				break;
 			}
-		case 'well-volume': {
+		case stageCnst.well.ptrn.volume: {
 				this.mdlStage.loadVolumes();
 				break;
 			}
@@ -504,24 +471,24 @@ define([
 				this.mdlStage.perfomanceOfWell.getHstProductionDataSet();
 				break;
 			}
-		case 'well-nodalanalysis': {
+		case stageCnst.well.ptrn.nodalAnalysis: {
 				this.mdlStage.loadListOfNodalAnalysis();
 				break;
 			}
-		case 'well-integrity': {
+		case stageCnst.well.ptrn.integrity: {
 				this.mdlStage.loadListOfIntegrity();
 				break;
 			}
-		case 'well-log': {
+		case stageCnst.well.ptrn.log: {
 				this.mdlStage.loadLogsOfWell();
 				break;
 			}
-		case 'well-test': {
+		case stageCnst.well.ptrn.test: {
 				this.mdlStage.loadListOfTestScope();
 				this.mdlStage.getWellGroup().loadListOfWfmParameterOfWroup();
 				break;
 			}
-		case 'well-monitoring': {
+		case stageCnst.well.ptrn.monitoring: {
 				this.mdlStage.getWellGroup().loadListOfWfmParameterOfWroup();
 
 				// Load procent borders for all wells
@@ -535,7 +502,7 @@ define([
 
 				break;
 			}
-		case 'well-map': {
+		case stageCnst.well.ptrn.map: {
 				// find wellfield_id
 				var wellFieldItem = this.mdlStage.getWellGroup().getWellField();
 
@@ -938,6 +905,61 @@ define([
 	};
 
 	//} #endregion VOLUME-METHODS
+
+	//{ #region INTEGRITY-METHODS
+
+	/**
+	 * Build a list with integrities' viewmodels
+	 */
+	exports.prototype.buildListOfVwmIntegrity = function () {
+		return ko.unwrap(this.mdlStage.listOfIntegrity).map(this.createVwmIntegrity, this);
+	};
+
+	/**
+	 * Create a viewmodel of an integrity
+	 * @private
+	 */
+	exports.prototype.createVwmIntegrity = function (data) {
+		return new VwmIntegrity(data, this.vidOfSlcVwmIntegrity);
+	};
+
+	/**
+	 * Select view model
+	 */
+	exports.prototype.selectVwmIntegrity = function (vwmToSelect) {
+		this.vidOfSlcVwmIntegrity(vwmToSelect.vid);
+	};
+
+	/**
+	 * Calculate selected viewodel of integrity
+	 */
+	exports.prototype.calcSlcVwmIntegrity = function () {
+		var tmpVid = ko.unwrap(this.vidOfSlcVwmIntegrity);
+		var tmpList = ko.unwrap(this.listOfVwmIntegrity);
+		if (tmpVid) {
+			return tmpList.filter(function (elem) {
+				return elem.vid === tmpVid;
+			})[0];
+		} else {
+			// Get first element by default
+			var tmpElem = tmpList[0];
+			if (tmpElem) {
+				this.vidOfSlcVwmIntegrity(tmpElem.vid);
+				return tmpElem;
+			}
+		}
+	};
+
+	/**
+	 * Remove viewmodel and model
+	 */
+	exports.prototype.removeVwmIntegrity = function (vwmToRemove) {
+		if (confirm('{{capitalizeFirst lang.confirmToDelete}} "' + ko.unwrap(vwmToRemove.mdlIntegrity.name) + '"?')) {
+			this.mdlStage.removeIntegrity(vwmToRemove.mdlIntegrity);
+		}
+	};
+
+	//} #endregion INTEGRITY-METHODS
 
 	return exports;
 });
