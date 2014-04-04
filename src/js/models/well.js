@@ -85,13 +85,6 @@ define([
 		});
 	}
 
-	/** Test scope */
-	function importTestScopeDtoList(data, wellItem) {
-		return data.map(function (item) {
-			return new TestScope(item, wellItem);
-		});
-	}
-
 	/** Import all sections of well */
 	function importListOfSection(data, wellItem) {
 		return data.map(function (item) {
@@ -217,34 +210,14 @@ define([
 
 		this.listOfTestScope = ko.observableArray();
 
-		this.loadListOfTestScope = function () {
-			testScopeService.get(ths.id).done(function (response) {
-				ths.listOfTestScope(importTestScopeDtoList(response, ths));
-			});
-		};
-
 		/**
 		 * Last approved test scope for potential section in well group
 		 * @type {module:models/test-scope}
 		 */
 		this.lastApprovedTestScope = ko.computed({
-				read : function () {
-					var tmpApprovedList = ko.unwrap(ths.listOfTestScope).filter(function (elem) {
-							return ko.unwrap(elem.isApproved) === true;
-						});
-
-					var lastTestScope = tmpApprovedList[0];
-
-					// Find last (by time) test scope
-					tmpApprovedList.forEach(function (elem) {
-						if (ko.unwrap(elem.startUnixTime) > ko.unwrap(lastTestScope.startUnixTime)) {
-							lastTestScope = elem;
-						}
-					});
-
-					return lastTestScope;
-				},
-				deferEvaluation : true
+				read : this.calcLastApprovedTestScope,
+				deferEvaluation : true,
+				owner : this
 			});
 
 		/** Unix time data for creating new test scope */
@@ -254,47 +227,15 @@ define([
 			minute : ko.observable(0)
 		};
 
+		/**
+		 * Whether the user can add a new test scope
+		 * @type {boolean}
+		 */
 		this.isEnabledPostTestScope = ko.computed({
-				read : function () {
-					if (ko.unwrap(ths.testScopeNewStartUnixTime.unixDate)) {
-						if (ko.unwrap(ths.testScopeNewStartUnixTime.hour) >= 0) {
-							if (ko.unwrap(ths.testScopeNewStartUnixTime.minute) >= 0) {
-								return true;
-							}
-						}
-					}
-
-					return false;
-				},
-				deferEvaluation : true
+				read : this.calcIsEnabledPostTestScope,
+				deferEvaluation : true,
+				owner : this
 			});
-
-		/** Post test scope to server */
-		this.postTestScope = function () {
-			if (ths.isEnabledPostTestScope) {
-				// Date in UTC second
-				var unixTime = ko.unwrap(ths.testScopeNewStartUnixTime.unixDate);
-
-				// Remove UTC offset
-				// in seconds
-				unixTime += new Date(unixTime * 1000).getTimezoneOffset() * 60;
-
-				// Add hours
-				unixTime += ko.unwrap(ths.testScopeNewStartUnixTime.hour) * 3600;
-				// Add minutes
-				unixTime += ko.unwrap(ths.testScopeNewStartUnixTime.minute) * 60;
-
-				testScopeService.post({
-					WellId : ths.id,
-					StartUnixTime : unixTime,
-					IsApproved : null,
-					ConductedBy : '',
-					CertifiedBy : ''
-				}).done(function (response) {
-					ths.listOfTestScope.unshift(new TestScope(response, ths));
-				});
-			}
-		};
 
 		//} #endregion TEST
 
@@ -1057,6 +998,126 @@ define([
 	};
 
 	//} #endregion MONITORING-METHODS
+
+	//{ #region TEST-METHODS
+
+	/**
+	 * Load a list of test scopes
+	 */
+	exports.prototype.loadListOfTestScope = function () {
+		testScopeService.get(this.id).done(this.importListOfTestScope.bind(this));
+	};
+
+	/**
+	 * Fill a list
+	 * @private
+	 */
+	exports.prototype.importListOfTestScope = function (data) {
+		data = data || [];
+		this.listOfTestScope(data.map(this.createTestScope, this));
+	};
+
+	/**
+	 * Create an object
+	 * @private
+	 */
+	exports.prototype.createTestScope = function (itemData) {
+		return new TestScope(itemData, this);
+	};
+
+	/**
+	 * Calculate the last approved test scope
+	 * @returns {module:models/test-scope}
+	 */
+	exports.prototype.calcLastApprovedTestScope = function () {
+		var tmpApprovedList = ko.unwrap(this.listOfTestScope).filter(function (elem) {
+				return ko.unwrap(elem.isApproved) === true;
+			});
+
+		var lastTestScope = tmpApprovedList[0];
+
+		// Find last (by time) test scope
+		tmpApprovedList.forEach(function (elem) {
+			if (ko.unwrap(elem.startUnixTime) > ko.unwrap(lastTestScope.startUnixTime)) {
+				lastTestScope = elem;
+			}
+		});
+
+		// Destroy
+		tmpApprovedList = null;
+
+		return lastTestScope;
+	};
+
+	/**
+	 * Whether the user can add a new test scope
+	 * @returns {boolean}
+	 */
+	exports.prototype.calcIsEnabledPostTestScope = function () {
+		if (ko.unwrap(this.testScopeNewStartUnixTime.unixDate)) {
+			if (ko.unwrap(this.testScopeNewStartUnixTime.hour) >= 0) {
+				if (ko.unwrap(this.testScopeNewStartUnixTime.minute) >= 0) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	};
+
+	/**
+	 * Set a default time for the new test scope template
+	 */
+	exports.prototype.setDefaultTimeForTestScopeNew = function () {
+		this.testScopeNewStartUnixTime.unixDate(null);
+		this.testScopeNewStartUnixTime.hour(0);
+		this.testScopeNewStartUnixTime.minute(0);
+	};
+
+	/** Post a test scope to the server */
+	exports.prototype.postTestScope = function () {
+		if (!this.isEnabledPostTestScope) {
+			return;
+		}
+
+		// Date in UTC second
+		var unixTime = ko.unwrap(this.testScopeNewStartUnixTime.unixDate);
+
+		// Remove UTC offset
+		// in seconds
+		unixTime += new Date(unixTime * 1000).getTimezoneOffset() * 60;
+
+		// Add hours
+		unixTime += ko.unwrap(this.testScopeNewStartUnixTime.hour) * 3600;
+
+		// Add minutes
+		unixTime += ko.unwrap(this.testScopeNewStartUnixTime.minute) * 60;
+
+		testScopeService.post({
+			WellId : this.id,
+			StartUnixTime : unixTime,
+			IsApproved : null,
+			ConductedBy : '',
+			CertifiedBy : ''
+		}).done(this.scsPostTestScope.bind(this));
+	};
+
+	/**
+	 * A success callback for posting the test scope
+	 */
+	exports.prototype.scsPostTestScope = function (data) {
+		this.setDefaultTimeForTestScopeNew();
+		this.unshiftTestScope(data);
+	};
+
+	/**
+	 * Add to the begin of the list
+	 */
+	exports.prototype.unshiftTestScope = function (data) {
+		this.listOfTestScope.unshift(new TestScope(data, this));
+	};
+
+	//} #endregion TEST-METHODS
 
 	/**
 	 * Find a list of cognate stages

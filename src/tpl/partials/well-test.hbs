@@ -115,6 +115,7 @@
               <!-- /ko -->
             </tr>
             <!-- /ko -->
+            <!-- ko if: $root.isEmployeeInEditMode -->
             <tr>
               <td colspan="4">
                 <button type="button" class="btn btn-xs btn-default" data-bind="click: vwmTestScope.mdlTestScope.addTestData">
@@ -122,6 +123,7 @@
                 </button>
               </td>
             </tr>
+            <!-- /ko -->
           </tbody>
           <tfoot>
             <tr>
