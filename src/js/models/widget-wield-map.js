@@ -18,26 +18,35 @@ define(['knockout',
 		var tmpOpts = JSON.parse(data.Opts);
 
 		/**
-		 * Model id of selected map viewmodel
+		 * Widget options
+		 * @enum {Object.<string, Object>}
 		 */
-		this.opts.idOfSlcMapOfWield = ko.observable(tmpOpts['idOfSlcMapOfWield']);
-
-		/** Whether the name of a map is visible */
-		this.opts.isVisName = ko.observable(tmpOpts['isVisName']);
-
-		/** Whether map is visible */
-		this.opts.isVisImg = ko.observable(tmpOpts['isVisImg']);
-
-    /**
-    * A transform attribute
-    *    two parameters in one observable object, to don't repeat redrawing, 
-    *    when both params are updated
-    * @type {Object}
-    */
-		this.opts.transform = ko.observable({
+		this.opts = {
+			/**
+			 * Model id of selected map viewmodel
+			 */
+			idOfSlcMapOfWield : ko.observable(tmpOpts['idOfSlcMapOfWield']),
+			/**
+			 * Whether the name of a map is visible
+			 * @type {boolean}
+			 */
+			isVisName : ko.observable(tmpOpts['isVisName']),
+			/**
+			 * Whether the map is visible
+			 * @type {boolean}
+			 */
+			isVisImg : ko.observable(tmpOpts['isVisImg']),
+			/**
+			 * A transform attribute
+			 *    two parameters in one observable object, to don't repeat redrawing,
+			 *    when both params are updated
+			 * @type {Object}
+			 */
+			transform : ko.observable({
 				scale : tmpOpts.transform ? (tmpOpts.transform.scale || 1) : 1,
 				translate : tmpOpts.transform ? (tmpOpts.transform.translate || [0, 0]) : [0, 0]
-			});
+			})
+		};
 
 		/**
 		 * Dictionary for select box (value, text) with maps
@@ -54,19 +63,19 @@ define(['knockout',
 
 	/** Convert to plain JSON to send to the server as widget settings */
 	exports.prototype.toPlainOpts = function () {
-    return ko.toJSON(this.opts);
+		return ko.toJSON(this.opts);
 	};
-  
-  /**
+
+	/**
 	 * Get a dictionary for a select box (select map)
 	 */
 	exports.prototype.getDictOfMap = function () {
-    // getWidgock().getWidgout().getParent()
-    console.log('mdl stage context from dict of map', this.mdlStageContext);
-    var allMaps = ko.unwrap(this.mdlStageContext.WellFieldMaps);
+		// getWidgock().getWidgout().getParent()
+		console.log('mdl stage context from dict of map', this.mdlStageContext);
+		var allMaps = ko.unwrap(this.mdlStageContext.WellFieldMaps);
 		return allMaps.map(function (elem) {
 			return {
-        optValue : ko.unwrap(elem.id),
+				optValue : ko.unwrap(elem.id),
 				optText : ko.unwrap(elem.name)
 			};
 		});

@@ -15,6 +15,12 @@
           </span>
           <span data-bind="ifnot: $root.isEmployeeInEditMode">
             <span data-bind="text: mdlWidgout.name"></span>
+            <button class="btn btn-link" data-bind="click: generateReport">
+              <i class="glyphicon glyphicon-book"></i> Generate a report
+            </button>
+            <span data-bind="visible: isReportInProgress">
+              <span class="loader-line-small></span>
+            </span>
           </span>
         </span>
       </div>

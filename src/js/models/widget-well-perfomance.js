@@ -15,20 +15,50 @@ define(['knockout',
 	var exports = function (data, widgockItem) {
 		Widget.call(this, data, widgockItem);
 
-    /**
+		/**
 		 * Options for widget, like {isVisName: true, ...}
-     *    data.Opts cannot be null or undefined
-     *    it is a temporary string for a quick access to set observable parameters
+		 *    data.Opts cannot be null or undefined
+		 *    it is a temporary string for a quick access to set observable parameters
 		 * @type {Object}
 		 */
 		var tmpOpts = JSON.parse(data.Opts);
-    
-		this.opts.startYear = ko.observable(tmpOpts['startYear']);
-		this.opts.endYear = ko.observable(tmpOpts['endYear']);
-		this.opts.startMonth = ko.observable(tmpOpts['startMonth']);
-		this.opts.endMonth = ko.observable(tmpOpts['endMonth']);
-		this.opts.selectedAttrGroupId = ko.observable(tmpOpts['selectedAttrGroupId']);
-		this.opts.isVisibleForecastData = ko.observable(tmpOpts['isVisibleForecastData']);
+
+		/**
+		 * Widget options
+		 * @enum {Object.<string, Object>}
+		 */
+		this.opts = {
+			/**
+			 * Filter: start year
+			 * @type {number}
+			 */
+			startYear : ko.observable(tmpOpts['startYear']),
+			/**
+			 * Filter: end year
+			 * @type {number}
+			 */
+			endYear : ko.observable(tmpOpts['endYear']),
+      /**
+			 * Filter: start month
+			 * @type {number}
+			 */
+			startMonth : ko.observable(tmpOpts['startMonth']),
+      /**
+			 * Filter: end month
+			 * @type {number}
+			 */
+			endMonth : ko.observable(tmpOpts['endMonth']),
+      /**
+			 * Filter: selected squad of params
+			 * @type {string}
+			 */
+			selectedAttrGroupId : ko.observable(tmpOpts['selectedAttrGroupId']),
+      /**
+			 * Whether the forecast is visible
+			 * @type {boolean}
+			 */
+			isVisibleForecastData : ko.observable(tmpOpts['isVisibleForecastData'])
+		};
 	};
 
 	/** Inherit from a widget model */
@@ -36,7 +66,7 @@ define(['knockout',
 
 	/** Convert to string */
 	exports.prototype.toPlainOpts = function () {
-    return ko.toJSON(this.opts);
+		return ko.toJSON(this.opts);
 	};
 
 	return exports;

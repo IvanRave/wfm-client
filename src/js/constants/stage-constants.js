@@ -5,6 +5,7 @@ define([], function () {
 	/**
 	 * Enum for stages
 	 *    id == key to use without strings, only by keys, like: stageConstants[stageKey]
+   *    Please use this class in wfm-node and wfm-client
 	 * @readonly
 	 * @enum {Object.<string, string>}
 	 */

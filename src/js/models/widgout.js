@@ -1,5 +1,11 @@
 ﻿/** @module */
-define(['knockout', 'models/widgock', 'services/widgout'], function (ko, Widgock, widgoutService) {
+define(['knockout',
+		'models/widgock',
+		'services/widgout',
+    'services/report'], function (ko,
+		Widgock,
+		widgoutService,
+    reportService) {
 	'use strict';
 
 	/** Import widget block list to layout */
@@ -16,10 +22,10 @@ define(['knockout', 'models/widgock', 'services/widgout'], function (ko, Widgock
 	var exports = function (data, parent) {
 		data = data || {};
 
-    /**
-    * Getter for a parent stage (well, group, field... )
-    * @returns {module:base-models/stage-base}
-    */
+		/**
+		 * Getter for a parent stage (well, group, field... )
+		 * @returns {module:base-models/stage-base}
+		 */
 		this.getParent = function () {
 			return parent;
 		};
@@ -30,33 +36,37 @@ define(['knockout', 'models/widgock', 'services/widgout'], function (ko, Widgock
 		 */
 		this.id = data.Id;
 
-    /**
-    * A name of the layout
-    * @type {string}
-    */
+		/**
+		 * A name of the layout
+		 * @type {string}
+		 */
 		this.name = ko.observable(data.Name);
 
-    // Save, when a name is changed */
+		// Save, when a name is changed */
 		this.name.subscribe(this.save);
 
-		/** 
-    * Well widget block list 
-    * @type {Array.<module:models/widgock>}
-    */
+		/**
+		 * Well widget block list
+		 * @type {Array.<module:models/widgock>}
+		 */
 		this.widgocks = ko.observableArray(importWidgocks(data.WidgockDtoList, this));
 	};
 
 	/** Save a layout */
 	exports.prototype.save = function () {
-		var ths = this;
 		// Get well id as parent
-		var tmpStageId = ths.getParent().Id || ths.getParent().id;
+		var tmpStageId = this.getParent().Id || this.getParent().id;
 
-		widgoutService.put(ths.getParent().stageKey, tmpStageId, ths.id, {
-			id : ths.id,
-			name : ko.unwrap(ths.name)
+		widgoutService.put(this.getParent().stageKey, tmpStageId, this.id, {
+			id : this.id,
+			name : ko.unwrap(this.name)
 		});
 	};
+
+	/** Post a request */
+	exports.prototype.postReport = function (scsCallback) {
+    reportService.post(this.id).done(scsCallback);
+  };
 
 	return exports;
 });

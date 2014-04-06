@@ -14,7 +14,7 @@ define(['knockout',
 	 */
 	var exports = function (data, widgockItem) {
 		Widget.call(this, data, widgockItem);
-    
+
 		/**
 		 * Options for widget, like {isVisName: true, ...}
 		 *    data.Opts cannot be null or undefined
@@ -25,6 +25,12 @@ define(['knockout',
 
 		/** All summary properties for current stage */
 		var propSpecList = this.mdlStageContext.propSpecList;
+
+		/**
+		 * Widget options: 'IsVis' + stage property
+		 * @enum {Object.<string, Object>}
+		 */
+		this.opts = {};
 
 		/**
 		 * Fill properties

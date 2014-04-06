@@ -42,11 +42,6 @@ define(['knockout',
 		this.mdlStageContext = this.getWidgock().getWidgout().getParent().findCognateStage(typeOfCntxStage, this.idOfCntxStage);
 
 		/**
-		 * Widget options: filled in widget subclasses
-		 */
-		this.opts = {};
-
-		/**
 		 * Widget template name: for summary - default summary section
 		 * @type {string}
 		 */

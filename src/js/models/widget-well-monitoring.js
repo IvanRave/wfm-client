@@ -16,9 +16,23 @@ define(['knockout',
 		Widget.call(this, data, widgockItem);
 
 		var tmpOpts = JSON.parse(data.Opts);
-		// todo: #23! Load after initialization -> init graph redrawing
-		this.opts.startUnixTime = ko.observable(tmpOpts['startUnixTime']);
-		this.opts.endUnixTime = ko.observable(tmpOpts['endUnixTime']);
+
+		/**
+		 * Widget options
+		 * @enum {Object.<string, Object>}
+		 */
+		this.opts = {
+			/**
+			 * Start monitoring
+			 * @type {number}
+			 */
+			startUnixTime : ko.observable(tmpOpts['startUnixTime']),
+			/**
+			 * End monitoring
+			 * @type {number}
+			 */
+			endUnixTime : ko.observable(tmpOpts['endUnixTime'])
+		};
 	};
 
 	/** Inherit from a widget model */

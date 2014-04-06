@@ -54,7 +54,7 @@ define(['jquery',
 
 		/**
 		 * A list of job types of this company
-		 * @type {module: models/job-type}
+		 * @type {module:models/job-type}
 		 */
 		this.listOfJobTypeOfCompany = ko.computed({
 				read : this.calcListOfJobTypeOfCompany,

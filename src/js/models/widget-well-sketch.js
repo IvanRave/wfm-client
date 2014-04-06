@@ -17,8 +17,22 @@ define(['knockout',
 
 		var tmpOpts = JSON.parse(data.Opts);
 
-		this.opts.isVisImg = ko.observable(tmpOpts['isVisImg']);
-		this.opts.isVisDescription = ko.observable(tmpOpts['isVisDescription']);
+		/**
+		 * Widget options
+		 * @enum {Object.<string, Object>}
+		 */
+		this.opts = {
+			/**
+			 * Whether the skech image is visible
+			 * @type {boolean}
+			 */
+			isVisImg : ko.observable(tmpOpts['isVisImg']),
+			/**
+			 * Whether the description is visible
+			 * @type {boolean}
+			 */
+			isVisDescription : ko.observable(tmpOpts['isVisDescription'])
+		};
 	};
 
 	/** Inherit from a widget model */
