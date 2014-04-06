@@ -9,6 +9,7 @@ module.exports = function (grunt) {
 
 	// API url (prod and dev)
 	var requrl = isProd ? '//wfm-client.azurewebsites.net' : 'http://localhost:17171';
+	var wfmNodeUrl = isProd ? '//wfm-node.azurewebsites.net' : 'http://localhost:3000';
 
 	// Target - destination folder plus config, for example:
 	// dev (development)
@@ -199,6 +200,7 @@ module.exports = function (grunt) {
 					// if empty - the same domain (simple requests)
 					// Example {{requrl}}/api/values
 					requrl : requrl,
+					wfmNodeUrl : wfmNodeUrl,
 					isProd : isProd
 					// isIpad: isIpad,
 					// isMetro: isMetro
@@ -424,7 +426,7 @@ module.exports = function (grunt) {
 	// 4. Bundle and minify for production
 	if (isProd) {
 		// // validate (only for production - long process)
-    // // hand up on slow connections
+		// // hand up on slow connections
 		// tasks.push('validation');
 		// minify html
 		tasks.push('htmlmin:dist');
