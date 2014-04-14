@@ -110,15 +110,25 @@ module.exports = function (grunt) {
 						flatten : true,
 						cwd : '<%= bowerFolder %>/',
 						dest : '<%= trgt %>/js/',
-						src : ['jquery/jquery.js', 'moment/moment.js',
-							'requirejs/require.js', 'knockout/knockout.js',
+						src : ['moment/moment.js', 'requirejs/require.js', 'knockout/knockout.js',
 							'console-shim/console-shim.js', 'es5-shim/es5-shim.js', 'es5-shim/es5-sham.js',
 							'pickadate/lib/picker.js', 'pickadate/lib/picker.date.js', 'pickadate/lib/picker.time.js',
 							'jQuery-slimScroll/jquery.slimscroll.js', 'blueimp-file-upload/js/vendor/jquery.ui.widget.js',
 							'blueimp-file-upload/js/jquery.fileupload.js', 'blueimp-file-upload/js/jquery.iframe-transport.js',
 							'blueimp-canvas-to-blob/js/canvas-to-blob.js',
 							'blueimp-load-image/js/load-image.js', 'blueimp-load-image/js/load-image-*.js',
-							'd3/d3.js', 'jquery.panzoom/dist/jquery.panzoom.js', 'jcrop/js/jquery.Jcrop.js']
+							'd3/d3.min.js', 'jquery.panzoom/dist/jquery.panzoom.js', 'jcrop/js/jquery.Jcrop.js']
+					}
+				]
+			},
+			bower_jquery : {
+				files : [{
+						expand : true,
+						dot : true,
+						flatten : true,
+						cwd : '<%= bowerFolder %>/jquery/',
+						dest : '<%= trgt %>/js/',
+						src : ['jquery.min.js', 'jquery.min.map', 'jquery.js']
 					}
 				]
 			},
@@ -236,11 +246,10 @@ module.exports = function (grunt) {
 			options : {
 				sourcemap : true,
 				style : 'compressed'
-				////require: 'sass-css-importer' // Doesn't work
 			},
 			main : {
 				files : {
-					'<%= trgt %>/css/main.min.css' : '<%= trgt %>/css/main.scss'
+					'<%= trgt %>/css/main-bundle-<%= pkg.version %>.css' : '<%= trgt %>/css/main.scss'
 				}
 			}
 		},
@@ -259,7 +268,8 @@ module.exports = function (grunt) {
 					wrapShim : true,
 					//  wrap: true, // wrap in closure
 					// jQuery automatically excluded if it's loaded from CDN
-					include : ['es5-shim', 'es5-sham', 'console-shim', 'jquery',
+					exclude : ['jquery', 'd3'],
+					include : ['es5-shim', 'es5-sham', 'console-shim',
 						'bootstrap/transition', 'bootstrap/modal', 'bootstrap/dropdown',
 						'jquery.panzoom',
 						'bindings/all-bindings', 'bindings/svg-bindings',
@@ -308,6 +318,16 @@ module.exports = function (grunt) {
 			},
 			files : {
 				src : ['<%= trgt %>/index.html']
+			}
+		},
+		uglify : {
+			dist : {
+				options : {
+					sourceMap : true
+				},
+				files : {
+					'dst/js/require.min.js' : ['dst/js/require.js']
+				}
 			}
 		},
 		htmlmin : { // Task
@@ -413,6 +433,7 @@ module.exports = function (grunt) {
 		// 3. Copy plain and assembled files
 		'copy:main', // Copy main files
 		'copy:bower_js', // Copy unchanged files from bower folder: jquery, momentjs...
+		'copy:bower_jquery', // Jquery loaded separately, maybe loaded from CDN
 		'copy:bower_css_sass', // Copy css files as scss partials (to import to main.scss file)
 		'copy:bower_fonts',
 		'copy:bower_img',
@@ -428,6 +449,7 @@ module.exports = function (grunt) {
 		// // validate (only for production - long process)
 		// // hand up on slow connections
 		// tasks.push('validation');
+		tasks.push('uglify:dist');
 		// minify html
 		tasks.push('htmlmin:dist');
 		// Bundle with r.js
@@ -477,4 +499,5 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-sass');
 	grunt.loadNpmTasks('grunt-git-log');
 	grunt.loadNpmTasks('grunt-ftp-deploy');
+	grunt.loadNpmTasks('grunt-contrib-uglify');
 };

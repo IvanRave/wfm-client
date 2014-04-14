@@ -1,7 +1,10 @@
 ﻿define([], function () {
 	requirejs.config({
 		//baseUrl: '.',
+		waitSeconds : 0, // turn off -> by default = 7
 		paths : {
+			'jquery' : 'jquery.min',
+			'd3' : 'd3.min'
 			// // 'bootstrap-modal': 'bootstrap/modal',
 			// // 'bootstrap-dropdown': 'bootstrap/dropdown',
 			// // 'bootstrap-transition': 'bootstrap/transition'

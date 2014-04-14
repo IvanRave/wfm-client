@@ -6,7 +6,7 @@
     <title>{{lang.wfm}}</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="css/main.min.css" rel="stylesheet" />
+    <link href="css/main-bundle-{{package.version}}.css" rel="stylesheet" />
 </head>
 <body>
     <!--[if lt IE 10]><p class="chromeframe">You are using an <strong>outdated</strong> browser. Please upgrade your browser.</p><![endif]-->
@@ -158,7 +158,7 @@
     </footer>
     <!-- Load main script file for page or default (with auth logic only) -->
     {{#if conf.isProd}}
-    <script data-main="js/main-bundle-{{package.version}}" src="js/require.js"></script>
+    <script data-main="js/main-bundle-{{package.version}}" src="js/require.min.js"></script>
     {{else}}
     <script data-main="js/main" src="js/require.js"></script>
     {{/if}}
