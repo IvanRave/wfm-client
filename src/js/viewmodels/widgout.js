@@ -1,8 +1,10 @@
 ﻿/** @module */
 define(['knockout',
-		'viewmodels/widgock'],
+		'viewmodels/widgock',
+		'helpers/lang-helper'],
 	function (ko,
-		VwmWidgock) {
+		VwmWidgock,
+		langHelper) {
 
 	'use strict';
 
@@ -62,7 +64,8 @@ define(['knockout',
 
 		// Send a request to the wfm-node to create a report
 		this.isReportInProgress(true);
-		this.mdlWidgout.postReport(this.scsGenerateReport.bind(this));
+		this.mdlWidgout.postReport(this.scsGenerateReport.bind(this),
+			this.errGenerateReport.bind(this));
 	};
 
 	/**
@@ -71,6 +74,19 @@ define(['knockout',
 	exports.prototype.scsGenerateReport = function () {
 		// Stop a loading
 		this.isReportInProgress(false);
+	};
+
+	/**
+	 * Callback for error
+	 */
+	exports.prototype.errGenerateReport = function (jqXhr) {
+		this.isReportInProgress(false);
+		console.log(jqXhr);
+		if (jqXhr.status === 422) {
+			var resJson = jqXhr.responseJSON;
+			var tmpProcessError = (langHelper.translate(resJson.errId) || resJson.errId);
+			alert(tmpProcessError);
+		}
 	};
 
 	return exports;

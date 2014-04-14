@@ -1164,5 +1164,13 @@ define([
 		return dtoObj;
 	};
 
+	/**
+	 * Get guid of a parent company
+	 * @returns {string}
+	 */
+	exports.prototype.getIdOfCompany = function () {
+		return this.getWellGroup().getWellField().getWellRegion().getCompany().id;
+	};
+
 	return exports;
 });

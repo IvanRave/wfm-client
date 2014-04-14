@@ -1,4 +1,8 @@
-/** @module */
+/**
+* @module
+* @todo #32! When the user selects only one filtered time picker, 
+*            need to show the graph with one limit
+*/
 define(['jquery',
 		'knockout',
 		'viewmodels/svg-graph',

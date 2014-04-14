@@ -152,8 +152,8 @@ define(['knockout',
 	exports.prototype.getListOfStageByKey = function () {
 		throw new Error('need to ovveride in sub-classes');
 	};
-  
-  /**
+
+	/**
 	 * Find a cognate stage
 	 *    When user has id of the stage from widget options
 	 *    he may to get cognate this stage by id and type
@@ -166,6 +166,14 @@ define(['knockout',
 
 	/** Remove a child stage */
 	exports.prototype.removeChild = function () {
+		throw new Error('Need to override in a subclass');
+	};
+
+	/**
+	 * Get guid of a parent company
+	 * @returns {string}
+	 */
+	exports.prototype.getIdOfCompany = function () {
 		throw new Error('Need to override in a subclass');
 	};
 

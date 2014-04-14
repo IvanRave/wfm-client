@@ -288,5 +288,13 @@ define(['jquery',
 			}));
 	};
 
+	/**
+	 * Get guid of this company
+	 * @returns {string}
+	 */
+	exports.prototype.getIdOfCompany = function () {
+		return this.id;
+	};
+
 	return exports;
 });

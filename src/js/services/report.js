@@ -10,10 +10,11 @@ define(['helpers/ajax-request'], function (ajaxRequest) {
 	 * A report service static methods
 	 */
 	var exports = {
-		post : function (idOfWidgout) {
+		post : function (idOfWidgout, nameOfReport) {
 			return ajaxRequest('POST', reportUrl(), {
-				'idOfWidgout' : idOfWidgout
-				// .. name, desc, other data
+				idOfWidgout : idOfWidgout,
+				nameOfReport : nameOfReport
+				// desc, other data
 			});
 		}
 	};

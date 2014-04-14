@@ -2,10 +2,10 @@
 define(['knockout',
 		'models/widgock',
 		'services/widgout',
-    'services/report'], function (ko,
+		'services/report'], function (ko,
 		Widgock,
 		widgoutService,
-    reportService) {
+		reportService) {
 	'use strict';
 
 	/** Import widget block list to layout */
@@ -64,9 +64,9 @@ define(['knockout',
 	};
 
 	/** Post a request */
-	exports.prototype.postReport = function (scsCallback) {
-    reportService.post(this.id).done(scsCallback);
-  };
+	exports.prototype.postReport = function (scsCallback, errCallback) {
+		reportService.post(this.id, 'Demo report').done(scsCallback).fail(errCallback);
+	};
 
 	return exports;
 });

@@ -375,5 +375,13 @@ define(['jquery',
 		}
 	};
 
+	/**
+	 * Get guid of a parent company
+	 * @returns {string}
+	 */
+	exports.prototype.getIdOfCompany = function () {
+		return this.getWellField().getWellRegion().getCompany().id;
+	};
+
 	return exports;
 });
