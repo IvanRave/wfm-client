@@ -74,8 +74,8 @@ define(['knockout',
 				owner : this
 			});
 
-    //{ #region HACK-VIEW-PROPS
-    
+		//{ #region HACK-VIEW-PROPS
+
 		/**
 		 * A hack property, needed for the section-panel-well partial
 		 *    to show a perfomance menu with groups (a select input)
@@ -97,8 +97,8 @@ define(['knockout',
 		 */
 		this.isSectionPatternIdIsWellVolume = this.sectionPatternId === stageCnst.well.ptrn.volume;
 
-    //} #endregion HACK-VIEW-PROPS
-    
+		//} #endregion HACK-VIEW-PROPS
+
 		/**
 		 * Whether section is visible as view: calculated using section checkbox and pattern checkbox
 		 * @type {boolean}
@@ -113,13 +113,13 @@ define(['knockout',
 		 * List of file specifications
 		 * @type {Array.<module:models/file-spec>}
 		 */
-		this.listOfFileSpec = ko.observableArray();
+		this.listOfFileSpec = ko.observableArray([]);
 
 		/**
 		 * A list of uploading files
 		 * @type {Array.<module:models/pre-file>}
 		 */
-		this.listOfPreFile = ko.observableArray();
+		this.listOfPreFile = ko.observableArray([]);
 
 		/**
 		 * Sorted and filtered list of files: ready to view
@@ -271,13 +271,11 @@ define(['knockout',
 	/** Load list of file spec from the server */
 	exports.prototype.loadListOfFileSpec = function () {
 		console.log('load list of file specs');
-		var ths = this;
-		// Do not load if loaded already
-		if (ko.unwrap(ths.isLoadedListOfFileSpec)) {
-			// Unselect all files in this section
-			var tmpListOfFileSpec = ko.unwrap(ths.listOfFileSpec);
 
-			tmpListOfFileSpec.forEach(function (elem) {
+		// Do not load if loaded already
+		if (ko.unwrap(this.isLoadedListOfFileSpec)) {
+			// Unselect all files in this section
+			ko.unwrap(this.listOfFileSpec).forEach(function (elem) {
 				elem.isSelected(false);
 			});
 
@@ -285,15 +283,17 @@ define(['knockout',
 		}
 
 		// Loaded files are unselected by default
-		fileSpecService.get(ths.stageKey, this.id).done(function (r) {
-			// Import data to objects
-			ths.listOfFileSpec(importFileSpecs(r));
-			// Set flag (do not load again)
-			ths.isLoadedListOfFileSpec(true);
-		});
+		fileSpecService.get(this.stageKey, this.id).done(this.scsLoadListOfFileSpec.bind(this));
 	};
 
-	/** Build a list for a view */
+	exports.prototype.scsLoadListOfFileSpec = function (r) {
+		// Import data to objects
+		this.listOfFileSpec(importFileSpecs(r));
+		// Set flag (do not load again)
+		this.isLoadedListOfFileSpec(true);
+	};
+
+	/** Sorted list, for a view */
 	exports.prototype.buildReadyListOfFileSpec = function () {
 		var tmpList = ko.unwrap(this.listOfFileSpec);
 		return tmpList.sort(function (a, b) {

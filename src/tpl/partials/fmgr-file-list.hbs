@@ -22,11 +22,14 @@
       </div>
     </div>
     <div class="col-sm-6 text-right">
-      <div data-bind="if: $root.isEmployeeInEditMode">
+      <div>
         <span data-bind="with: oneVisibleSlcVwmFileSpec">
           <button class="btn btn-inverse btn-sm" data-bind="click: download">
             <i class="glyphicon glyphicon-download-alt"></i>
           </button>
+        </span>
+        <!-- ko if: $root.isEmployeeInEditMode -->
+        <span data-bind="with: oneVisibleSlcVwmFileSpec">
           <button class="btn btn-inverse btn-sm" data-bind="click: $parent.editVwmFileSpec.bind($parent)">
             <i class="glyphicon glyphicon-edit"></i>
           </button>
@@ -43,6 +46,7 @@
             <input data-bind="filoader: getSectionFiloader()" type="file" multiple />
           </span>
         </span>
+        <!-- /ko -->
       </div>
     </div>
     <div class="col-sm-4">

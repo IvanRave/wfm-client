@@ -15,12 +15,19 @@
           </span>
           <span data-bind="ifnot: $root.isEmployeeInEditMode">
             <span data-bind="text: mdlWidgout.name"></span>
-            <button class="btn btn-link" data-bind="click: generateReport">
-              <i class="glyphicon glyphicon-book"></i> Generate a report
+          </span>
+          <button class="btn btn-sm btn-default" data-bind="click: preGenerateReport">
+            <i class="glyphicon glyphicon-book"></i> Generate a report
+          </button>
+          <span data-bind="with: reportFileSpec">
+            <button class="btn btn-sm btn-default" data-bind="click: $parent.downloadWithClean.bind($parent)">
+              <!-- <span data-bind="text: namePlusExtension"></span> -->
+              <i class="glyphicon glyphicon-download-alt"></i> Download
             </button>
-            <span data-bind="visible: isReportInProgress">
-              <span class="loader-line-small></span>
-            </span>
+            <small>(saved in a Report folder)</small>
+          </span>
+          <span data-bind="visible: isReportInProgress">
+            <span class="loader-line-small"></span>
           </span>
         </span>
       </div>

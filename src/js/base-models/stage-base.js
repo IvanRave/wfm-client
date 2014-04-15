@@ -64,6 +64,16 @@ define(['knockout',
 
 		/** Selected possible widget layout for adding to widget layout list */
 		this.slcWidgoutTemplate = ko.observable();
+
+		/**
+		 * A report section for this stage
+		 * @type {module:models/section-of-stage}
+		 */
+		this.reportSection = ko.computed({
+				read : this.calcReportSection,
+				owner : this,
+				deferEvaluation : true
+			});
 	};
 
 	/** Get a need property from array */
@@ -175,6 +185,16 @@ define(['knockout',
 	 */
 	exports.prototype.getIdOfCompany = function () {
 		throw new Error('Need to override in a subclass');
+	};
+
+	/**
+	 * Calc a report section
+	 * @returns {module:models/section-of-stage}
+	 */
+	exports.prototype.calcReportSection = function () {
+		return ko.unwrap(this.listOfSection).filter(function (elem) {
+			return (elem.sectionPatternId === (this.stageKey + '-report'));
+		}, this)[0];
 	};
 
 	return exports;

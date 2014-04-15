@@ -1,10 +1,7 @@
 ﻿/**
-* @module
-*/
-define(['knockout',
-		'helpers/app-helper'],
-	function (ko,
-		appHelper) {
+ * @module
+ */
+define(['knockout'], function (ko) {
 	'use strict';
 
 	/**
@@ -39,13 +36,13 @@ define(['knockout',
 		 * @type {boolean}
 		 */
 		this.isEditView = ko.observable(false);
-    
-    /**
-    * Whether the input has a focus
-    * @todo #34! doesn't work for file spec records
-    * @type {boolean}
-    */
-    this.hasInputFocus = ko.observable(false);
+
+		/**
+		 * Whether the input has a focus
+		 * @todo #34! doesn't work for file spec records
+		 * @type {boolean}
+		 */
+		this.hasInputFocus = ko.observable(false);
 	};
 
 	/**
@@ -65,7 +62,7 @@ define(['knockout',
 
 	/** Download file */
 	exports.prototype.download = function () {
-		appHelper.downloadURL(this.mdlFileSpec.fileUrl);
+		this.mdlFileSpec.download();
 	};
 
 	return exports;

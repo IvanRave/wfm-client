@@ -4,9 +4,11 @@
  *       update knockout to 3.1 firstly with a new method
  */
 define(['knockout',
-		'moment'],
+		'moment',
+    'helpers/app-helper'],
 	function (ko,
-		appMoment) {
+		appMoment,
+    appHelper) {
 	'use strict';
 
 	/**
@@ -121,6 +123,11 @@ define(['knockout',
       ImgWidth: ko.unwrap(this.imgWidth),
       ImgHeight: ko.unwrap(this.imgHeight)
 		};
+	};
+  
+  /** Download file */
+	exports.prototype.download = function () {
+		appHelper.downloadURL(this.fileUrl);
 	};
 
 	return exports;

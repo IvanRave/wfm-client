@@ -64,8 +64,8 @@ define(['knockout',
 	};
 
 	/** Post a request */
-	exports.prototype.postReport = function (scsCallback, errCallback) {
-		reportService.post(this.id, 'Demo report').done(scsCallback).fail(errCallback);
+	exports.prototype.postReport = function (nameOfReport, scsCallback, errCallback) {
+		reportService.post(this.id, nameOfReport).done(scsCallback).fail(errCallback);
 	};
 
 	return exports;
