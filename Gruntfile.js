@@ -58,7 +58,7 @@ module.exports = function (grunt) {
 		},
 		changelog : {
 			options : {
-				from : 'v0.9.5'
+				from : 'v0.9.6'
 			}
 		},
 		gitlog : {

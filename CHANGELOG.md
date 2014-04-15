@@ -1,3 +1,20 @@
+<a name="0.9.6"></a>
+### 0.9.6 (2014-04-15)
+
+
+#### Bug Fixes
+
+* **report:** add methods for report generation ([6d14651c](https://github.com/IvanRave/wfm-client/commit/6d14651c818e3c7939bf6e4bc8485ad3d12eb4c7))
+* **widget:** load widget data during rendering ([8783f7f2](https://github.com/IvanRave/wfm-client/commit/8783f7f278f91ba4bcfefb940eaeff1dae2b062d))
+
+
+#### Features
+
+* **report:**
+  * add logic for generating ([b3cecc98](https://github.com/IvanRave/wfm-client/commit/b3cecc98228a11d02ff624b1082e1bdacd52f66a))
+  * add a service ([08a4b848](https://github.com/IvanRave/wfm-client/commit/08a4b848ad1a66603ffd458a21c3820044be7462))
+
+
 <a name="0.9.5"></a>
 ### 0.9.5 (2014-04-02)
 
