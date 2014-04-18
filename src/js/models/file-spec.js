@@ -5,10 +5,10 @@
  */
 define(['knockout',
 		'moment',
-    'helpers/app-helper'],
+		'helpers/file-helper'],
 	function (ko,
 		appMoment,
-    appHelper) {
+		fileHelper) {
 	'use strict';
 
 	/**
@@ -120,14 +120,14 @@ define(['knockout',
 			Extension : ko.unwrap(this.extension),
 			CreatedUnixTime : ko.unwrap(this.createdUnixTime),
 			Length : ko.unwrap(this.length),
-      ImgWidth: ko.unwrap(this.imgWidth),
-      ImgHeight: ko.unwrap(this.imgHeight)
+			ImgWidth : ko.unwrap(this.imgWidth),
+			ImgHeight : ko.unwrap(this.imgHeight)
 		};
 	};
-  
-  /** Download file */
+
+	/** Download file */
 	exports.prototype.download = function () {
-		appHelper.downloadURL(this.fileUrl);
+		fileHelper.downloadURL(this.fileUrl);
 	};
 
 	return exports;

@@ -1,5 +1,6 @@
 ﻿/**
  * @module
+ * @todo #42! Allow only jpg and png as a logo
  */
 define(['jquery',
 		'knockout',

@@ -1,8 +1,13 @@
 ﻿/** @module */
-define(['jquery'], function ($) {
+define([], function () {
 	'use strict';
 
 	var exports = {};
+
+	exports.toInt = function (val) {
+		// May be some additional checking
+		return parseInt(val);
+	};
 
 	/**
 	 * Convert to float
@@ -10,7 +15,7 @@ define(['jquery'], function ($) {
 	 * @param {number} countAfterPeriod .524
 	 */
 	exports.toFloatDec = function (value, countAfterPeriod) {
-		return parseInt(value * Math.pow(10, countAfterPeriod)) / Math.pow(10, countAfterPeriod);
+		return exports.toInt(value * Math.pow(10, countAfterPeriod)) / Math.pow(10, countAfterPeriod);
 	};
 
 	/**
@@ -18,9 +23,14 @@ define(['jquery'], function ($) {
 	 *    https://api.jquery.com/jQuery.isNumeric/
 	 * @returns {boolean}
 	 */
-	exports.isNumeric = function (value) {
-		// may be additional check
-		return $.isNumeric(value);
+	exports.isNumeric = function (obj) {
+		// From jquery
+		// // May be additional check
+		// parseFloat NaNs numeric-cast false positives (null|true|false|"")
+		// ...but misinterprets leading-number strings, particularly hex literals ("0x...")
+		// subtraction forces infinities to NaN
+		return obj - parseFloat(obj) >= 0;
+		// return $.isNumeric(value);
 	};
 
 	/**
@@ -28,37 +38,9 @@ define(['jquery'], function ($) {
 	 * @returns {boolean}
 	 */
 	exports.isFunction = function (possibleFunc) {
-		return $.isFunction(possibleFunc);
-	};
-
-	// Hidden Iframe for file loading (to the client comp)
-	exports.downloadURL = function (url) {
-		var hiddenIFrameID = 'hiddenDownloader';
-		var iframe = document.getElementById(hiddenIFrameID);
-		if (iframe === null) {
-			iframe = document.createElement('iframe');
-			iframe.id = hiddenIFrameID;
-			iframe.style.display = 'none';
-			document.body.appendChild(iframe);
-		}
-
-		iframe.src = url;
-	};
-
-	exports.endsWith = function (str, suffix) {
-		return str.indexOf(suffix, str.length - suffix.length) !== -1;
-	};
-
-	exports.startsWith = function (str, suffix) {
-		return str.indexOf(suffix) === 0;
-	};
-
-	exports.trimLeft = function (str) {
-		return str.replace(/^\s+/, '');
-	};
-
-	exports.trimRight = function (str) {
-		return str.replace(/\s+$/, '');
+		// http://stackoverflow.com/questions/5999998/how-can-i-check-if-a-javascript-variable-is-function-type
+		return (typeof(possibleFunc) === 'function');
+		//return $.isFunction(possibleFunc);
 	};
 
 	// result example: 12,32 43,12 43,54
@@ -78,7 +60,7 @@ define(['jquery'], function ($) {
 		// result = ["12.3,324", "1234,53.45"]
 
 		function getNumberArray(stringArr) {
-			return $.map(stringArr, function (elemValue) {
+			return stringArr.map(function (elemValue) {
 				return +elemValue;
 			});
 		}
@@ -123,10 +105,6 @@ define(['jquery'], function ($) {
 		return tempArr;
 	};
 
-	exports.capitalizeFirst = function (str) {
-		return str.charAt(0).toUpperCase() + str.slice(1);
-	};
-
 	/**
 	 * Get element from list by property value: element with property [propName] equals [propValue]
 	 */
@@ -134,24 +112,14 @@ define(['jquery'], function ($) {
 		var needElemValue = null;
 
 		if (propName) {
-			$.each(elemList, function (elemIndex, elemValue) {
+			elemList.forEach(function (elemValue) {
 				if (elemValue[propName] === propValue) {
-					// Find elem
 					needElemValue = elemValue;
-					// Exit from this cycle
-					return false;
 				}
-
-				// Continue this cycle
-				return true;
 			});
 		}
 
 		return needElemValue;
-	};
-
-	exports.isGuidValid = function (guidValue) {
-		return (/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/).test(guidValue);
 	};
 
 	/**

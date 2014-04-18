@@ -1,5 +1,7 @@
 ﻿/** @module */
-define(['helpers/app-helper', 'constants/stage-constants'], function (appHelper, stageConstants) {
+define(['helpers/string-helper',
+		'constants/stage-constants'], function (stringHelper,
+		stageConstants) {
 	'use strict';
 
 	var historyHelper = {
@@ -158,7 +160,7 @@ define(['helpers/app-helper', 'constants/stage-constants'], function (appHelper,
 				if (paramType) {
 					switch (paramType) {
 					case 'guid':
-						isTypeSuccess = appHelper.isGuidValid(currentUrlArr[elemIndex]);
+						isTypeSuccess = stringHelper.isGuidValid(currentUrlArr[elemIndex]);
 						break;
 					case 'int':
 						isTypeSuccess = currentUrlArr[elemIndex] % 1 === 0;

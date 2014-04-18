@@ -340,18 +340,19 @@ define(['jquery',
 	 * Add selected param to the server with default color and order number
 	 * @param {string} tmpWfmParamId - Id of a parameter, like well-map
 	 */
-	exports.prototype.postWfmParameterOfWroup = function (tmpWfmParamId) {
-		var ths = this;
-
-		wfmParameterOfWroupService.post(ths.id, {
-			Color : '',
+	exports.prototype.postWfmParameterOfWroup = function (tmpWfmParamId, tmpColor, tmpUom) {
+		wfmParameterOfWroupService.post(this.id, {
+			Color : tmpColor,
 			SerialNumber : 1,
-			WellGroupId : ths.id,
+			WellGroupId : this.id,
 			WfmParameterId : tmpWfmParamId,
-			IsMonitored : false
-		}).done(function (response) {
-			ths.listOfWfmParameterOfWroup.push(new WellGroupWfmParameter(response, ths));
-		});
+			IsMonitored : false,
+      Uom: tmpUom
+		}).done(this.pushWfmParameterOfWroup.bind(this));
+	};
+
+	exports.prototype.pushWfmParameterOfWroup = function (data) {
+		this.listOfWfmParameterOfWroup.push(new WellGroupWfmParameter(data, this));
 	};
 
 	/**

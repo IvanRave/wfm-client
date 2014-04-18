@@ -1,5 +1,7 @@
 ﻿/** @module */
-define(['knockout'], function (ko) {
+define(['knockout',
+		'helpers/uom-helper'], function (ko,
+		uomHelper) {
 	'use strict';
 
 	var uomCoefDict = {
@@ -27,50 +29,6 @@ define(['knockout'], function (ko) {
 		}
 	};
 
-	function getUomCoefFromDict(needUom, needCoefDict) {
-		var result;
-		for (var coefGroup in needCoefDict) {
-			if (needCoefDict.hasOwnProperty(coefGroup)) {
-				for (var coefItem in needCoefDict[coefGroup]) {
-					if (needCoefDict[coefGroup].hasOwnProperty(coefItem)) {
-						if (needUom === coefItem) {
-							result = needCoefDict[coefGroup][coefItem];
-						}
-					}
-				}
-			}
-		}
-
-		return result;
-	}
-
-	// [['bbl'],['d']] -> bbl/d
-	// [['kg','m'], ['s']] -> kg*m/s
-	function convertMatrixToStr(uomMatrix) {
-		// [['kg','m'], ['s']] -> ['kg*m','s']
-		var groupArr = [];
-		for (var i = 0; i < uomMatrix.length; i += 1) {
-			groupArr.push(uomMatrix[i].join('*'));
-		}
-
-		// ['kg*m','s'] -> kg*m/s
-		return groupArr.join('/');
-	}
-
-	// bbl/d -> [['bbl'],['d']]
-	// kg*m/s -> [['kg','m'], ['s']]
-	function convertStrToMatrix(uomStr) {
-		// divide by numerator and denominator
-		var tmpList = uomStr.split('/');
-
-		var readyMatrix = [];
-		for (var i = 0; i < tmpList.length; i += 1) {
-			readyMatrix.push(tmpList[i].split('*'));
-		}
-
-		return readyMatrix;
-	}
-
 	/**
 	 * Parameter, like OilRate, WaterRate etc.
 	 * @constructor
@@ -78,8 +36,6 @@ define(['knockout'], function (ko) {
 	 */
 	var exports = function (data) {
 		data = data || {};
-
-		var self = this;
 
 		/**
 		 * Parameter id (OilRate, WaterRate, etc.)
@@ -105,13 +61,12 @@ define(['knockout'], function (ko) {
 		// For Newton: [[kg,m],[s,s]]
 		// For Speed: [[m],[s,s]]
 		// For Gas: [[f, f, f]] or [[scf]] - standard cubic feet
-		this.sourceUomMatrix = convertStrToMatrix(data.Uom);
+		this.sourceUomMatrix = uomHelper.convertStrToMatrix(data.Uom);
 
 		this.uomMatrix = ko.computed({
-				read : function () {
-					return convertStrToMatrix(ko.unwrap(self.uom));
-				},
-				deferEvaluation : true
+				read : this.calcUomMatrix,
+				deferEvaluation : true,
+				owner : this
 			});
 
 		/**
@@ -140,76 +95,96 @@ define(['knockout'], function (ko) {
 		 */
 		this.wfmParamSquadId = ko.observable(data.WfmParamSquadId);
 
-		// List of possible units of measurements (for choosed uom)
-		this.getPossibleUomListForSelectedUom = function (selectedUom) {
-			// choose group for need unit of measurement
-			var needGroup;
-			for (var uomCoefGroup in uomCoefDict) {
-				if (uomCoefDict.hasOwnProperty(uomCoefGroup)) {
-					for (var uomCoefItem in uomCoefDict[uomCoefGroup]) {
-						if (uomCoefDict[uomCoefGroup].hasOwnProperty(uomCoefItem)) {
-							if (uomCoefItem === selectedUom) {
-								needGroup = uomCoefDict[uomCoefGroup];
-							}
-						}
-					}
-				}
-			}
-
-			var resultList = [];
-			// convert group to array (exclude need uom)
-			if (needGroup) {
-				for (var uomCoefMain in needGroup) {
-					if (needGroup.hasOwnProperty(uomCoefMain)) {
-						if (uomCoefMain !== selectedUom) {
-							resultList.push(uomCoefMain);
-						}
-					}
-				}
-			}
-
-			return resultList;
-		};
-
-		this.changeSelectedUom = function (selectedUom, selectedUomSquadPosition, selectedUomPosition) {
-			////var prevSelectedUom = self.uomMatrix()[selectedUomSquadPosition][selectedUomPosition];
-			var uomMatrixNew = self.uomMatrix().slice();
-			uomMatrixNew[selectedUomSquadPosition][selectedUomPosition] = selectedUom;
-			self.uom(convertMatrixToStr(uomMatrixNew));
-		};
-
 		// If user wants to remember coef state than use cookies and change after initialization
 		this.uomCoef = ko.computed({
-				read : function () {
-					var coef = 1;
-
-					var currentUomMatrix = self.uomMatrix();
-					for (var i = 0; i < self.sourceUomMatrix.length; i += 1) {
-						for (var j = 0; j < self.sourceUomMatrix[i].length; j += 1) {
-							var curItem = currentUomMatrix[i][j];
-							var srcItem = self.sourceUomMatrix[i][j];
-
-							if (curItem !== srcItem) {
-								// get coef (only for changed values)
-								if (i === 0) {
-									// If numerator (first value in array)
-									coef *= getUomCoefFromDict(srcItem, uomCoefDict) / getUomCoefFromDict(curItem, uomCoefDict);
-								} else if (i === 1) {
-									// If denominator (second value in array)
-									coef /= getUomCoefFromDict(srcItem, uomCoefDict) / getUomCoefFromDict(curItem, uomCoefDict);
-								}
-							}
-						}
-					}
-
-					return coef;
-				},
-				deferEvaluation : true
+				read : this.calcUomCoef.bind(this),
+				deferEvaluation : true,
+				owner : this
 			});
 
 		this.toPlainJson = function () {
 			return ko.toJS(this);
 		};
+	};
+
+	/**
+	 * Calculate a coef for an unit
+	 * @private
+	 */
+	exports.prototype.calcUomCoef = function () {
+		var coef = 1;
+
+		var currentUomMatrix = ko.unwrap(this.uomMatrix);
+		for (var i = 0; i < this.sourceUomMatrix.length; i += 1) {
+			for (var j = 0; j < this.sourceUomMatrix[i].length; j += 1) {
+				var curItem = currentUomMatrix[i][j];
+				var srcItem = this.sourceUomMatrix[i][j];
+
+				if (curItem !== srcItem) {
+					// get coef (only for changed values)
+					if (i === 0) {
+						// If numerator (first value in array)
+						coef *= uomHelper.getUomCoefFromDict(srcItem, uomCoefDict) / uomHelper.getUomCoefFromDict(curItem, uomCoefDict);
+					} else if (i === 1) {
+						// If denominator (second value in array)
+						coef /= uomHelper.getUomCoefFromDict(srcItem, uomCoefDict) / uomHelper.getUomCoefFromDict(curItem, uomCoefDict);
+					}
+				}
+			}
+		}
+
+		return coef;
+	};
+
+	/**
+	 * Select box for changing unit
+	 */
+	exports.prototype.changeSelectedUom = function (selectedUom, selectedUomSquadPosition, selectedUomPosition) {
+		////var prevSelectedUom = self.uomMatrix()[selectedUomSquadPosition][selectedUomPosition];
+		var uomMatrixNew = ko.unwrap(this.uomMatrix).slice();
+		uomMatrixNew[selectedUomSquadPosition][selectedUomPosition] = selectedUom;
+		this.uom(uomHelper.convertMatrixToStr(uomMatrixNew));
+	};
+
+	/**
+	 *  List of possible units of measurements (for choosed uom)
+	 */
+	exports.prototype.getPossibleUomListForSelectedUom = function (selectedUom) {
+		// choose group for need unit of measurement
+		var needGroup;
+		for (var uomCoefGroup in uomCoefDict) {
+			if (uomCoefDict.hasOwnProperty(uomCoefGroup)) {
+				for (var uomCoefItem in uomCoefDict[uomCoefGroup]) {
+					if (uomCoefDict[uomCoefGroup].hasOwnProperty(uomCoefItem)) {
+						if (uomCoefItem === selectedUom) {
+							needGroup = uomCoefDict[uomCoefGroup];
+						}
+					}
+				}
+			}
+		}
+
+		var resultList = [];
+		// convert group to array (exclude need uom)
+		if (needGroup) {
+			for (var uomCoefMain in needGroup) {
+				if (needGroup.hasOwnProperty(uomCoefMain)) {
+					if (uomCoefMain !== selectedUom) {
+						resultList.push(uomCoefMain);
+					}
+				}
+			}
+		}
+
+		return resultList;
+	};
+
+	/**
+	 * Calc a matrix for an unit
+	 * @private
+	 */
+	exports.prototype.calcUomMatrix = function () {
+		return uomHelper.convertStrToMatrix(ko.unwrap(this.uom));
 	};
 
 	return exports;

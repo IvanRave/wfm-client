@@ -38,7 +38,7 @@ define([
 
 		// Has sections and widgets
 		VwmStageBase.call(this, defaultSlcData.wroupSectionId, parentVwmWield.unqOfSlcVwmChild, defaultSlcData.wellId);
-    
+
 		/**
 		 * List of viewmodels of wfm parameters of well group
 		 * @type {Array.<module:viewmodels/wfm-parameter-of-wroup>}
@@ -52,8 +52,10 @@ define([
 				deferEvaluation : true
 			});
 
-		// WFM parameter which user select from unselected wfm parameter list (from root)
-		this.selectedWfmParameterId = ko.observable();
+		/**
+		 * WFM parameter which user select from unselected wfm parameter list (from root)
+		 */
+		this.slcWfmParameter = ko.observable();
 
 		// wfm parameter from main source which is not in this group
 		this.unselectedWfmParameterList = ko.computed({
@@ -76,16 +78,6 @@ define([
 				},
 				deferEvaluation : true
 			});
-
-		/**
-		 * Add selected parameter to the main list
-		 */
-		this.addWellGroupWfmParameter = function () {
-			var tmpWfmParamId = ko.unwrap(ths.selectedWfmParameterId);
-			if (tmpWfmParamId) {
-				ths.mdlStage.postWfmParameterOfWroup(tmpWfmParamId);
-			}
-		};
 
 		//{ #region MONITORING
 
@@ -291,6 +283,19 @@ define([
 		return ko.unwrap(this.mdlStage.wells).map(function (elem) {
 			return new VwmWell(elem, this, this.defaultSlcData);
 		}, this);
+	};
+
+	/**
+	 * Add selected parameter to the main list
+	 */
+	exports.prototype.addWellGroupWfmParameter = function () {
+		var tmpWfmParam = ko.unwrap(this.slcWfmParameter);
+    
+		if (tmpWfmParam) {
+			this.mdlStage.postWfmParameterOfWroup(tmpWfmParam.id,
+				ko.unwrap(tmpWfmParam.defaultColor),
+				ko.unwrap(tmpWfmParam.uom));
+		}
 	};
 
 	return exports;

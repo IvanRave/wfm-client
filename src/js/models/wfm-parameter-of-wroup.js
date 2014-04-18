@@ -16,8 +16,6 @@ define(['knockout',
 	var exports = function (data, wellGroupItem) {
 		data = data || {};
 
-		var ths = this;
-
 		/**
 		 * Get well group (parent)
 		 * @returns {module:models/wroup} Well group (parent)
@@ -51,6 +49,13 @@ define(['knockout',
 		this.color = ko.observable(data.Color);
 
 		/**
+		 * Unit of measure
+		 *    overrided a wfm-parameter property
+		 * @type {string}
+		 */
+		this.uom = ko.observable(data.Uom);
+
+		/**
 		 * Whether this parameter is monitored (well or platform monitoring)
 		 * @type {boolean}
 		 */
@@ -68,41 +73,35 @@ define(['knockout',
 		 */
 		this.wfmParameter = ko.observable();
 
-    if (!data.WfmParameterDto) {
-      console.log('TODO: remove');
-    }
-    
+		if (!data.WfmParameterDto) {
+			console.log('TODO: remove');
+		}
+
 		// When create temp parameter for POST request - this data is not exists
 		if (data.WfmParameterDto) {
+      console.log('try to find a parameter from loaded parameters');
 			this.wfmParameter(new WfmParameter(data.WfmParameterDto));
-
-			// If no color then use default color from wfm parameter
-			if (!ko.unwrap(this.color)) {
-				this.color(ko.unwrap(ko.unwrap(ths.wfmParameter).defaultColor));
-			}
 		}
-    
-    /**
-		 * Save the wfm parameter
-		 */
-		this.save = function () {
-			wfmParameterOfWroupService.put(ths.wellGroupId, ths.wfmParameterId, {
-				WellGroupId : ths.wellGroupId,
-				WfmParameterId : ths.wfmParameterId,
-				IsMonitored : ko.unwrap(ths.isMonitored),
-				Color : ko.unwrap(ths.color),
-				SerialNumber : ko.unwrap(ths.serialNumber)
-			});
-		};
 
-    // Subscribe events (only after function and props initialization)
-    
-		this.isMonitored.subscribe(ths.save);
-    this.color.subscribe(ths.save);
+		// Subscribe events (only after function and props initialization)
 
-		this.toPlainJson = function () {
-			return ko.toJS(ths);
-		};
+		this.isMonitored.subscribe(this.save, this);
+		this.color.subscribe(this.save, this);
+    this.uom.subscribe(this.save, this);
+	};
+
+	/**
+	 * Save the wfm parameter
+	 */
+	exports.prototype.save = function () {
+		wfmParameterOfWroupService.put(this.wellGroupId, this.wfmParameterId, {
+			WellGroupId : this.wellGroupId,
+			WfmParameterId : this.wfmParameterId,
+			IsMonitored : ko.unwrap(this.isMonitored),
+			Color : ko.unwrap(this.color),
+			SerialNumber : ko.unwrap(this.serialNumber),
+			Uom : ko.unwrap(this.uom)
+		});
 	};
 
 	return exports;

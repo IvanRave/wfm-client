@@ -1,4 +1,7 @@
-﻿/** @module */
+﻿/**
+ * @module
+ * @todo #22! fix a changing a name of a layout
+ */
 define(['knockout',
 		'models/widgock',
 		'services/widgout',

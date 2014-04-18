@@ -1,18 +1,18 @@
 /**
-* @module
-* @todo #32! When the user selects only one filtered time picker, 
-*            need to show the graph with one limit
-*/
-define(['jquery',
-		'knockout',
+ * @module
+ * @todo #32! When the user selects only one filtered time picker,
+ *            need to show the graph with one limit
+ */
+define(['knockout',
 		'viewmodels/svg-graph',
 		'd3',
-		'viewmodels/wfm-parameter-of-wroup'],
-	function ($,
-		ko,
+		'viewmodels/wfm-parameter-of-wroup',
+		'helpers/monitoring-helper'],
+	function (ko,
 		SvgGraph,
 		d3,
-		VwmWfmParameterOfWroup) {
+		VwmWfmParameterOfWroup,
+		mntrHelper) {
 	'use strict';
 
 	/**
@@ -57,7 +57,7 @@ define(['jquery',
 		 * @type {Array}
 		 */
 		this.valueBorderArr = ko.computed({
-				read : this.getValueBorderArr,
+				read : mntrHelper.getValueBorderArr.bind(null, this.mdlWell.listOfMonitoringRecord),
 				deferEvaluation : true,
 				owner : this
 			});
@@ -99,7 +99,7 @@ define(['jquery',
 	 * Load the list, using filtered dates (if both exists)
 	 */
 	exports.prototype.loadFilteredListOfMonitoringRecord = function () {
-    console.log('load monitoring');
+		console.log('load monitoring');
 		var tmpTime = this.mntrUnixTimeBorder;
 		var startUnixTime = ko.unwrap(tmpTime.start);
 		if (startUnixTime) {
@@ -116,38 +116,6 @@ define(['jquery',
 	 */
 	exports.prototype.getTimeBorderArr = function () {
 		return [ko.unwrap(this.mntrUnixTimeBorder.start), ko.unwrap(this.mntrUnixTimeBorder.end)];
-	};
-
-	/**
-	 * Get a value border array
-	 * @returns {Array} - [min, max] values
-	 */
-	exports.prototype.getValueBorderArr = function () {
-		var minVal = null,
-		maxVal = null;
-
-		var tmpRecords = ko.unwrap(this.mdlWell.listOfMonitoringRecord);
-
-		tmpRecords.forEach(function (tmpRecord) {
-			var tmpDict = tmpRecord.dict;
-			for (var paramKey in tmpDict) {
-				if (tmpDict.hasOwnProperty(paramKey)) {
-					var paramVal = ko.unwrap(tmpDict[paramKey]);
-					if ($.isNumeric(paramVal)) {
-						// Set min and max values if they are null
-						if (minVal === null && maxVal === null) {
-							minVal = maxVal = paramVal;
-						} else {
-							minVal = Math.min(minVal, paramVal);
-							maxVal = Math.max(maxVal, paramVal);
-						}
-					}
-				}
-			}
-		});
-
-		// Elements of this array can be null
-		return [minVal, maxVal];
 	};
 
 	/**
@@ -174,52 +142,25 @@ define(['jquery',
 	 * Get the array of svg paths
 	 */
 	exports.prototype.getPathsArr = function () {
-		var resultArr = [];
-
 		// Redraw data after changing a graph zoom
 		var tmpZoomTransform = ko.unwrap(this.mntrGraph.zoomTransform);
 
 		// Without zoom initization - do not redraw
 		if (tmpZoomTransform) {
-
 			var listOfVwmParam = ko.unwrap(this.listOfMonitoredVwmParams);
 
 			var tmpXScale = ko.unwrap(this.mntrGraph.scaleX),
 			tmpYScale = ko.unwrap(this.mntrGraph.scaleY);
 
 			if (tmpXScale && tmpYScale) {
-
 				// Monitoring records for all dates
 				var tmpRecords = ko.unwrap(this.mdlWell.sortedListOfMonitoringRecord);
 
-				listOfVwmParam.forEach(function (vwmParamItem) {
-					// parameter id, like CSG, WaterRate ...
-					var tmpIdOfParameter = vwmParamItem.mdlWfmParameterOfWroup.wfmParameterId;
-
-					/**
-					 * Create line with d3 lib
-					 *    https://github.com/mbostock/d3/wiki/SVG-Shapes#wiki-line
-					 */
-					var generateLinePath = d3.svg.line()
-						.interpolate('monotone') // monotone or linear
-						.x(function (d) {
-							return tmpXScale(new Date(ko.unwrap(d.unixTime) * 1000));
-						})
-						.y(function (d) {
-							return tmpYScale(
-								$.isNumeric(ko.unwrap(d.dict[tmpIdOfParameter])) ? (ko.unwrap(d.dict[tmpIdOfParameter]) * ko.unwrap(ko.unwrap(vwmParamItem.mdlWfmParameterOfWroup.wfmParameter).uomCoef)) : null);
-						});
-
-					resultArr.push({
-						prmPath : generateLinePath(tmpRecords),
-						prmStroke : ko.unwrap(vwmParamItem.mdlWfmParameterOfWroup.color),
-						prmVisible : ko.unwrap(vwmParamItem.isVisible)
-					});
-				});
+				return listOfVwmParam.map(mntrHelper.genFromParam.bind(null, tmpRecords, tmpXScale, tmpYScale));
 			}
 		}
 
-		return resultArr;
+		return [];
 	};
 
 	return exports;
