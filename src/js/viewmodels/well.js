@@ -543,11 +543,16 @@ define([
 		var secondsInDay = 24 * 60 * 60;
 		var startUnixTime = curUnixTime - secondsInDay * 35; // minus 50 days
 
-		var tmpMntrParams = ko.unwrap(this.getParentVwm().mdlStage.listOfMonitoredParams);
-		var ths = this;
+		var tmpParentVwm = this.getParentVwm();
+
+		var tmpMntrParams = ko.unwrap(tmpParentVwm.mdlStage.listOfMonitoredParams);
+
 		for (var unt = startUnixTime; unt <= curUnixTime; unt += secondsInDay) {
 			// Last function for current time: reload table to get average values for the created record
-			ths.mdlStage.postMonitoringRecord(unt, tmpMntrParams, generateDict(tmpMntrParams), unt === curUnixTime ? ths.getParentVwm().reloadMonitoringRecords : null);
+			this.mdlStage.postMonitoringRecord(unt,
+				tmpMntrParams,
+				generateDict(tmpMntrParams),
+				(unt === curUnixTime) ? tmpParentVwm.reloadMonitoringRecords.bind(tmpParentVwm) : null);
 		}
 	};
 
@@ -555,15 +560,17 @@ define([
 	 * Create a monitoring record for selected time in well group
 	 */
 	exports.prototype.createMonitoringRecord = function () {
+		var tmpParentVwm = this.getParentVwm();
+
 		// Time, selected in the well group of this well
-		var currentUnixTimeInWroup = ko.unwrap(this.getParentVwm().monitoringUnixTime);
+		var currentUnixTimeInWroup = ko.unwrap(tmpParentVwm.monitoringUnixTime);
 		if (currentUnixTimeInWroup) {
 
-			var tmpMntrParams = ko.unwrap(this.getParentVwm().mdlStage.listOfMonitoredParams);
+			var tmpMntrParams = ko.unwrap(tmpParentVwm.mdlStage.listOfMonitoredParams);
 
 			// Create record with empty dictionary
 			// Last parameter - function to reload table (to get average params for the new record)
-			this.mdlStage.postMonitoringRecord(currentUnixTimeInWroup, tmpMntrParams, {}, this.getParentVwm().reloadMonitoringRecords);
+			this.mdlStage.postMonitoringRecord(currentUnixTimeInWroup, tmpMntrParams, {}, tmpParentVwm.reloadMonitoringRecords.bind(tmpParentVwm));
 		}
 	};
 

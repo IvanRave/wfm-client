@@ -43,7 +43,7 @@
           <tr>
             <td class="text-center">
               <div>
-                <button class="btn btn-xs btn-link" type="button" data-bind="click: $parent.goToMonitoringOfWell">
+                <button class="btn btn-xs btn-link" type="button" data-bind="click: $parent.goToMonitoringOfWell.bind($parent)">
                   <span class="bld" data-bind="text: vwmWell.mdlStage.Name"></span>  
                 </button>
               </div>

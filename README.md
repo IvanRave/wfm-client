@@ -318,3 +318,7 @@ After all commits:
 ### Distributive (gh-pages branch)
 * Create distributive: ```grunt --prod```
 * Push to gh-pages branch: ```grunt gh-pages```
+
+## Tasks
+* feat(dashboard): #43! a dashboard graph with active and non-active wells
+* style(graphs): #43! add points with info to graphs (show by hover action)

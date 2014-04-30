@@ -64,8 +64,8 @@ module.exports = function (grunt) {
 		gitlog : {
 			options : {
 				dest : 'doc/month.log',
-				afterDate : new Date(2014, 2, 1),
-				beforeDate : new Date(2014, 3, 2)
+				afterDate : new Date(2014, 3, 1),
+				beforeDate : new Date(2014, 4, 1)
 			}
 		},
 		jshint : {

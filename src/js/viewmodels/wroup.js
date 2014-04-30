@@ -18,14 +18,20 @@ define([
 
 	'use strict';
 
+	// Private static methods
+
+	var calcListOfMonitoredVwmParams = function (koList) {
+		return ko.unwrap(koList).filter(function (elem) {
+			return ko.unwrap(elem.mdlWfmParameterOfWroup.isMonitored);
+		});
+	};
+
 	/**
 	 * Well group view model
 	 * @constructor
 	 * @augments {module:base-viewmodels/stage-base}
 	 */
 	var exports = function (mdlWroup, parentVwmWield, defaultSlcData) {
-		var ths = this;
-
 		this.mdlStage = mdlWroup;
 
 		this.getParentVwm = function () {
@@ -44,12 +50,9 @@ define([
 		 * @type {Array.<module:viewmodels/wfm-parameter-of-wroup>}
 		 */
 		this.listOfVwmWfmParameterOfWroup = ko.computed({
-				read : function () {
-					return ko.unwrap(mdlWroup.listOfWfmParameterOfWroup).map(function (elem) {
-						return new VwmWfmParameterOfWroup(elem);
-					});
-				},
-				deferEvaluation : true
+				read : this.calcListOfVwmWfmParameterOfWroup,
+				deferEvaluation : true,
+				owner : this
 			});
 
 		/**
@@ -59,24 +62,9 @@ define([
 
 		// wfm parameter from main source which is not in this group
 		this.unselectedWfmParameterList = ko.computed({
-				read : function () {
-					// two dimensioanl array
-					var tmpList = ko.unwrap(ths.mdlStage.getRootMdl().wfmParameterList);
-					return $.grep(tmpList, function (prmElem) {
-						var isParamExist = false;
-						$.each(ko.unwrap(ths.mdlStage.listOfWfmParameterOfWroup), function (wlgIndex, wlgElem) {
-							if (wlgElem.wfmParameterId === prmElem.id) {
-								isParamExist = true;
-								// break from arr
-								return false;
-							}
-						});
-
-						// return params which are not selected in this well group
-						return !isParamExist;
-					});
-				},
-				deferEvaluation : true
+				read : this.calcUnselectedWfmParameterList,
+				deferEvaluation : true,
+				owner : this
 			});
 
 		//{ #region MONITORING
@@ -86,14 +74,9 @@ define([
 		 * @type {Array.<module:viewmodels/wfm-parameter-of-wroup>}
 		 */
 		this.listOfMonitoredVwmParams = ko.computed({
-				read : function () {
-					var tmpList = ko.unwrap(ths.listOfVwmWfmParameterOfWroup);
-
-					return tmpList.filter(function (elem) {
-						return ko.unwrap(elem.mdlWfmParameterOfWroup.isMonitored);
-					});
-				},
-				deferEvaluation : true
+				read : calcListOfMonitoredVwmParams.bind(null, this.listOfVwmWfmParameterOfWroup),
+				deferEvaluation : true,
+				owner : true
 			}).trackHasItems();
 
 		/**
@@ -102,33 +85,6 @@ define([
 		 * @type {string}
 		 */
 		this.monitoringUnixTime = ko.observable();
-
-		/**
-		 * Open well and select monitoring section
-		 */
-		this.goToMonitoringOfWell = function (tmpVwmWell) {
-			// Select monitoring section
-			tmpVwmWell.unzOfSlcVwmSectionWrk('well-monitoring');
-			// Load content (this event is triggered when an user click to the section)
-			tmpVwmWell.loadSectionContent('well-monitoring');
-
-			// Activate well view
-			ths.activateVwmChild(tmpVwmWell);
-		};
-
-		/**
-		 * Open this wroup and select monitoring section
-		 */
-		this.goToMonitoringOfWroup = function () {
-			// Select monitoring section
-			ths.unzOfSlcVwmSectionWrk('wroup-monitoring');
-
-			// Load content (this event is triggered when an user click to the section)
-			ths.loadSectionContent('wroup-monitoring');
-
-			// Activate this wroup
-			parentVwmWield.activateVwmChild(ths);
-		};
 
 		/**
 		 * Whether a current view (table) show montly procents
@@ -151,31 +107,14 @@ define([
 		};
 
 		/**
-		 * Get monitoring records
-		 *    after changing unix time
-		 *    or count of wfm properties
-		 *    or by generating new records from well
-		 */
-		this.reloadMonitoringRecords = function () {
-			var tmpUnixTime = ko.unwrap(ths.monitoringUnixTime);
-			if (tmpUnixTime) {
-				var tmpListOfParams = ko.unwrap(ths.mdlStage.listOfMonitoredParams);
-
-				if (tmpListOfParams.length > 0) {
-					ths.mdlStage.loadListOfScopeOfMonitoring(tmpUnixTime, tmpListOfParams);
-				}
-			}
-		};
-
-		/**
 		 * Load monitoring data when the user select some date
 		 */
-		this.monitoringUnixTime.subscribe(ths.reloadMonitoringRecords);
+		this.monitoringUnixTime.subscribe(this.reloadMonitoringRecords, this);
 
 		/**
 		 * Reload monitoring records when the user change monitoring parameters
 		 */
-		this.listOfMonitoredVwmParams.subscribe(ths.reloadMonitoringRecords);
+		this.listOfMonitoredVwmParams.subscribe(this.reloadMonitoringRecords, this);
 
 		//} #endregion MONITORING
 	};
@@ -290,11 +229,93 @@ define([
 	 */
 	exports.prototype.addWellGroupWfmParameter = function () {
 		var tmpWfmParam = ko.unwrap(this.slcWfmParameter);
-    
+
 		if (tmpWfmParam) {
 			this.mdlStage.postWfmParameterOfWroup(tmpWfmParam.id,
 				ko.unwrap(tmpWfmParam.defaultColor),
 				ko.unwrap(tmpWfmParam.uom));
+		}
+	};
+
+	/**
+	 * Calc a group parameters
+	 * @private
+	 */
+	exports.prototype.calcListOfVwmWfmParameterOfWroup = function () {
+		return ko.unwrap(this.mdlStage.listOfWfmParameterOfWroup).map(function (elem) {
+			return new VwmWfmParameterOfWroup(elem);
+		});
+	};
+
+	/**
+	 * Func for upper filtering
+	 * @private
+	 */
+	var calcUnselectedItem = function (listOfParams, prmElem) {
+		var isParamExist = false;
+		listOfParams.forEach(function (wlgElem) {
+			if (wlgElem.wfmParameterId === prmElem.id) {
+				isParamExist = true;
+				// break from arr
+				//return false;
+			}
+		});
+
+		// return params which are not selected in this well group
+		return !isParamExist;
+	};
+
+	/**
+	 * Calc unchoosed parameters
+	 * @private
+	 */
+	exports.prototype.calcUnselectedWfmParameterList = function () {
+		// two dimensioanl array
+		return ko.unwrap(this.mdlStage.getRootMdl().wfmParameterList)
+		.filter(calcUnselectedItem.bind(null, ko.unwrap(this.mdlStage.listOfWfmParameterOfWroup)));
+	};
+
+	/**
+	 * Open well and select monitoring section
+	 */
+	exports.prototype.goToMonitoringOfWell = function (tmpVwmWell) {
+		// Select monitoring section
+		tmpVwmWell.unzOfSlcVwmSectionWrk('well-monitoring');
+		// Load content (this event is triggered when an user click to the section)
+		tmpVwmWell.loadSectionContent('well-monitoring');
+
+		// Activate well view
+		this.activateVwmChild(tmpVwmWell);
+	};
+
+	/**
+	 * Open this wroup and select monitoring section
+	 */
+	exports.prototype.goToMonitoringOfWroup = function () {
+		// Select monitoring section
+		this.unzOfSlcVwmSectionWrk('wroup-monitoring');
+
+		// Load content (this event is triggered when an user click to the section)
+		this.loadSectionContent('wroup-monitoring');
+
+		// Activate this wroup
+		this.getParentVwm().activateVwmChild(this);
+	};
+
+	/**
+	 * Get monitoring records
+	 *    after changing unix time
+	 *    or count of wfm properties
+	 *    or by generating new records from well
+	 */
+	exports.prototype.reloadMonitoringRecords = function () {
+		var tmpUnixTime = ko.unwrap(this.monitoringUnixTime);
+		if (tmpUnixTime) {
+			var tmpListOfParams = ko.unwrap(this.mdlStage.listOfMonitoredParams);
+
+			if (tmpListOfParams.length > 0) {
+				this.mdlStage.loadListOfScopeOfMonitoring(tmpUnixTime, tmpListOfParams);
+			}
 		}
 	};
 
