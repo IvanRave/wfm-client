@@ -23,6 +23,8 @@ mobile application created from WFM client using Phonegap
 * __WFM API__ http://wfm-client.azurewebsites.net/api/
 methods to manage WFM data. Methods are secured and required authorization. 
 After getting auth token (after registration ang authentication) you can make requests to API
+* __WFM Rerport__ https://wfm-report.herokuapp.com
+Generate a report for WFM clients
 
 ### WFM data storage
 * Authentication data: relational database to store user profiles
@@ -124,6 +126,9 @@ No quickview (no download), because only one modal window can be runned.
 * Integrity
 * Nodal analysis
 * Report
+
+### Report structure
+![ReportStructure] (https://drive.google.com/uc?export=view&id=0B9c2LY35SH-ccHJFemJOU1lfU2c "Report structure")
 
 ### Widget hierarchy
 #### Simple scheme
