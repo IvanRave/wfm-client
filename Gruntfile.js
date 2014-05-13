@@ -1,3 +1,7 @@
+/**
+ * Grunt file
+ * @todo #51! remove grunt-bower-task
+ */
 module.exports = function (grunt) {
 	'use strict';
 
@@ -10,7 +14,7 @@ module.exports = function (grunt) {
 	// API url (prod and dev)
 	var requrl = isProd ? '//wfm-client.azurewebsites.net' : 'http://localhost:17171';
 	var wfmNodeUrl = isProd ? '//wfm-report.herokuapp.com' : 'http://localhost:3000';
-  ////wfm-node.azurewebsites.net
+	////wfm-node.azurewebsites.net
 
 	// Target - destination folder plus config, for example:
 	// dev (development)
