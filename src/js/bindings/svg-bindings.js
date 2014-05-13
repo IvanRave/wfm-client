@@ -24,6 +24,16 @@ define(['jquery',
 		}
 	};
 
+	function graphPathsItem(pathsWrap, prmItem) {
+		pathsWrap.append('path')
+		.attr('class', 'svg-graph-path')
+		.attr('stroke', prmItem.prmStroke)
+		.attr('d', prmItem.prmPath)
+		.attr('visible', prmItem.prmVisible)
+		// The attribute 'visible' doesn't work always (with monitoring curves)
+		.style('visibility', prmItem.prmVisible ? 'visible' : 'hidden');
+	}
+
 	/**
 	 * Update paths for perfomance graph
 	 */
@@ -43,15 +53,7 @@ define(['jquery',
 			pathsWrap.text('');
 
 			// Add new paths
-			prmArr.forEach(function (prmItem) {
-				pathsWrap.append('path')
-				.attr('class', 'svg-graph-path')
-				.attr('stroke', prmItem.prmStroke)
-				.attr('d', prmItem.prmPath)
-				.attr('visible', prmItem.prmVisible)
-				// The attribute 'visible' doesn't work always (with monitoring curves)
-				.style('visibility', prmItem.prmVisible ? 'visible' : 'hidden');
-			});
+			prmArr.forEach(graphPathsItem.bind(null, pathsWrap));
 		}
 	};
 
@@ -168,23 +170,23 @@ define(['jquery',
 		}
 	};
 
+	function updateWidth(accessor, element) {
+		accessor.koSvgWidth($(element).parent().width());
+	}
+
 	/** svg (like perfomance graph or field map) */
 	ko.bindingHandlers.svgResponsive = {
 		init : function (element, valueAccessor) {
 			var accessor = valueAccessor();
 
-			function updateWidth() {
-				accessor.koSvgWidth($(element).parent().width());
-			}
-
 			// When change window size - update svg size
-			$(window).resize(updateWidth);
+			$(window).resize(updateWidth.bind(null, accessor, element));
 
 			// When toggle left menu - update svg size
-			accessor.tmpIsVisibleMenu.subscribe(updateWidth);
+			accessor.tmpIsVisibleMenu.subscribe(updateWidth.bind(null, accessor, element));
 
 			// Update initial
-			updateWidth();
+			updateWidth(accessor, element);
 			// svg viewbox size need to init before creating of this element
 		}
 	};

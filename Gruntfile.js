@@ -1,6 +1,5 @@
 /**
  * Grunt file
- * @todo #51! remove grunt-bower-task
  */
 module.exports = function (grunt) {
 	'use strict';
@@ -104,7 +103,7 @@ module.exports = function (grunt) {
 						cwd : '<%= src %>/',
 						dest : '<%= trgt %>/',
 						// Copy all files besides templates and scripts (which assembled separately)
-						src : ['**/*', '!tpl/**/*', '!js/**/*']
+						src : ['**/*', '!tpl/**/*', '!js/**/*', '!cjs/**/*']
 					}
 				]
 			},
@@ -196,12 +195,18 @@ module.exports = function (grunt) {
 		},
 		jsdoc : {
 			main : {
-				src : ['src/js/**/*.js'],
+				src : ['src/cjs/**/*.js'],
 				options : {
 					destination : 'doc'
 				}
 			}
 		},
+		// exec : {
+		// cjs : {
+		// cmd : 'node_modules\\.bin\\r.js.cmd -convert src\\cjs dev\\js',
+		// stdout : false
+		// }
+		// },
 		assemble : {
 			options : {
 				engine : 'handlebars',
@@ -241,6 +246,22 @@ module.exports = function (grunt) {
 				files : [{
 						expand : true,
 						cwd : '<%= src %>/js/',
+						src : ['**/*.js'],
+						dest : '<%= trgt %>/js/'
+					}
+				]
+			},
+			cjs : {
+				options : {
+					ext : '.js',
+					// Create requirejs modules from commonjs
+					postprocess : function (src) {
+						return 'define(function (require, exports, module) {\n' + src + '\n});';
+					}
+				},
+				files : [{
+						expand : true,
+						cwd : '<%= src %>/cjs/',
 						src : ['**/*.js'],
 						dest : '<%= trgt %>/js/'
 					}
@@ -390,13 +411,13 @@ module.exports = function (grunt) {
 					cwd : '<%= src %>/',
 					spawn : false
 				},
-				files : ['**/*', '!tpl/**/*', '!js/**/*'],
+				files : ['**/*', '!tpl/**/*', '!js/**/*', '!cjs/**/*'],
 				tasks : ['copy:main']
 			},
 			// Update all template pages when change template data
 			assemble_data : {
 				files : ['<%= src %>/tpl/data/syst.json', '<%= bowerFolder %>/wfm-dict/lang/en/lang.json', 'package.json'],
-				tasks : ['assemble:html', 'assemble:js']
+				tasks : ['assemble:html', 'assemble:js', 'assemble:cjs']
 			},
 			assemble_html : {
 				files : ['<%= src %>/tpl/**/*.hbs'],
@@ -408,6 +429,13 @@ module.exports = function (grunt) {
 				},
 				files : ['<%= src %>/js/**/*.js'],
 				tasks : ['assemble:js']
+			},
+			assemble_cjs : {
+				options : {
+					spawn : false
+				},
+				files : ['<%= src %>/cjs/**/*.js'],
+				tasks : ['assemble:cjs']
 			},
 			sass_main : {
 				options : {
@@ -446,6 +474,7 @@ module.exports = function (grunt) {
 		'copy:bower_bootstrap_sass', // Copy bowe scss partials to main.css file may be import these partials
 		'sass:main', // Make main sass file from copied file
 		'assemble:js', // After copy all files to destination - replace all {{value}} - rewrite the same files
+		'assemble:cjs', // Copy with assembling and transformation from commonjs module to requirejs modules
 		'assemble:html' // Copy other files: Assemble and copy templates files
 	];
 
@@ -481,6 +510,8 @@ module.exports = function (grunt) {
 			changeFileSrc(['copy', 'main', 'files'], filepath);
 		} else if (targetEvent === 'assemble_js') {
 			changeFileSrc(['assemble', 'js', 'files'], filepath);
+		} else if (targetEvent === 'assemble_cjs') {
+			changeFileSrc(['assemble', 'cjs', 'files'], filepath);
 		} else if (targetEvent === 'jshint_app') {
 			changeFileSrc(['jshint', 'app', 'files'], filepath);
 		}
@@ -505,4 +536,5 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-git-log');
 	grunt.loadNpmTasks('grunt-ftp-deploy');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
+	//grunt.loadNpmTasks('grunt-exec');
 };
