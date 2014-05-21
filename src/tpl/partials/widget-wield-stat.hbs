@@ -1,0 +1,15 @@
+﻿<script type="text/html" id="widget-tpl-wield-stat">
+  <!-- current: vwmWidget -->
+  <div data-bind="if: isVisSettingPanel">
+    <div class="widget-setting-panel" data-bind="with: mdlWidget">
+      <label>
+        <input type="checkbox" data-bind="checked: opts.isVisWellActivity" /> {{capitalizeFirst lang.isVisWellActivity}}
+      </label>
+    </div>
+  </div>
+  <div class="widget-content">
+    <div data-bind="if: mdlWidget.opts.isVisWellActivity">
+      <span>Pie chart: active/non-active wells
+    </div>
+  </div>
+</script>

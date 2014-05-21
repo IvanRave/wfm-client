@@ -42,7 +42,8 @@ exports = {
 		plural : 'well-fields',
 		ptrn : {
 			summary : 'wield-summary',
-			map : 'wield-map'
+			map : 'wield-map',
+			stat : 'wield-stat'
 		}
 	},
 	/** Well group (platform) */

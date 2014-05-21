@@ -130,7 +130,7 @@ module.exports = function (grunt) {
 						expand : true,
 						dot : true,
 						flatten : true,
-						cwd : '<%= bowerFolder %>/jquery/',
+						cwd : '<%= bowerFolder %>/jquery/dist/',
 						dest : '<%= trgt %>/js/',
 						src : ['jquery.min.js', 'jquery.min.map', 'jquery.js']
 					}

@@ -8,7 +8,8 @@ define(['knockout',
 		'models/widget-well-monitoring',
 		'models/widget-well-perfomance',
 		'models/widget-well-sketch',
-		'models/widget-wield-map'],
+		'models/widget-wield-map',
+		'models/widget-wield-stat'],
 	function (ko,
 		stageCnst,
 		widgetService,
@@ -18,7 +19,8 @@ define(['knockout',
 		MdlWidgetWellMonitoring,
 		MdlWidgetWellPerfomance,
 		MdlWidgetWellSketch,
-		MdlWidgetWieldMap) {
+		MdlWidgetWieldMap,
+		MdlWidgetWieldStat) {
 	'use strict';
 
 	/**
@@ -101,10 +103,10 @@ define(['knockout',
 	};
 
 	/** Create a widget */
-	exports.prototype.addWidget = function (tmpWidgetName, 
-    tmpIdOfSectionPattern, 
-    tmpIdOfCntxStage,
-    scsCallback) {
+	exports.prototype.addWidget = function (tmpWidgetName,
+		tmpIdOfSectionPattern,
+		tmpIdOfCntxStage,
+		scsCallback) {
 		var tmpWidgetList = ko.unwrap(this.widgetList);
 
 		// Get order number of last widget
@@ -116,15 +118,15 @@ define(['knockout',
 			lastOrderNumber = 0;
 		}
 
-    var tmpParentStage = this.getWidgout().getParent();
-    
+		var tmpParentStage = this.getWidgout().getParent();
+
 		widgetService.post(tmpParentStage.stageKey, this.id, {
 			Name : tmpWidgetName,
 			IdOfSectionPattern : tmpIdOfSectionPattern,
 			OrderNumber : lastOrderNumber + 1,
 			Opts : '{}',
 			WidgockId : this.id,
-      IdOfCntxStage: tmpIdOfCntxStage
+			IdOfCntxStage : tmpIdOfCntxStage
 		}).done(scsCallback);
 	};
 
@@ -153,6 +155,8 @@ define(['knockout',
 			return new MdlWidgetWellSketch(widgetData, widgockItem);
 		case stageCnst.wield.ptrn.map:
 			return new MdlWidgetWieldMap(widgetData, widgockItem);
+		case stageCnst.wield.ptrn.stat:
+			return new MdlWidgetWieldStat(widgetData, widgockItem);
 		}
 	};
 

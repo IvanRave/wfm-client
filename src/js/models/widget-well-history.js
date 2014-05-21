@@ -1,4 +1,9 @@
-﻿/** @module */
+﻿/** 
+* @module 
+* @todo #32! Sort by date, even one of date is pointed
+*       from StartDate
+*       till EndDate
+*/
 define(['knockout',
 		'helpers/app-helper',
 		'base-models/widget-base'],

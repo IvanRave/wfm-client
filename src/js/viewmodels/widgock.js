@@ -7,7 +7,8 @@ define(['knockout',
 		'viewmodels/widget-well-sketch',
 		'viewmodels/widget-well-history',
 		'viewmodels/widget-wield-map',
-		'viewmodels/widget-well-map'],
+		'viewmodels/widget-well-map',
+		'viewmodels/widget-wield-stat'],
 	function (ko,
 		stageCnst,
 		VwmWidgetDefaultSummary,
@@ -16,7 +17,8 @@ define(['knockout',
 		VwmWidgetWellSketch,
 		VwmWidgetWellHistory,
 		VwmWidgetWieldMap,
-		VwmWidgetWellMap) {
+		VwmWidgetWellMap,
+		VwmWidgetWieldStat) {
 	'use strict';
 
 	/**
@@ -69,7 +71,7 @@ define(['knockout',
 
 		/**
 		 * A selected key of stage for a new widget
-     *    By default: current stage key
+		 *    By default: current stage key
 		 * @type {string}
 		 */
 		this.slcKeyOfStage = ko.observable(this.mdlWidgock.getWidgout().getParent().stageKey);
@@ -99,7 +101,7 @@ define(['knockout',
 				deferEvaluation : true,
 				owner : this
 			});
-      
+
 		/**
 		 * A dict of stages
 		 * @type {Array.<Object>}
@@ -270,6 +272,8 @@ define(['knockout',
 			return new VwmWidgetWellHistory(mdlWidget, tmpParentVwmStage);
 		case stageCnst.wield.ptrn.map:
 			return new VwmWidgetWieldMap(mdlWidget, tmpParentVwmStage);
+    case stageCnst.wield.ptrn.stat:
+			return new VwmWidgetWieldStat(mdlWidget, tmpParentVwmStage);
 		case stageCnst.well.ptrn.map:
 			return new VwmWidgetWellMap(mdlWidget, tmpParentVwmStage);
 		case stageCnst.well.ptrn.sketch:
