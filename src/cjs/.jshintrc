@@ -10,8 +10,8 @@
 	"unused" : true,
 	"boss" : true,
 	"eqnull" : true,
-	"node" : false,
+	"node" : true,
 	"browser" : true,
 	"devel" : true,
-	"predef" : ["define", "requirejs", "require"]
+	"predef" : ["requirejs"]
 }

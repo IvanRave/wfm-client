@@ -10,6 +10,18 @@
 //-- Redefine bootstrap properties (with !default)
 $icon-font-path: "../fonts/";
 
+$gray-darker:            #222;
+$gray-dark:              #333;
+$gray:                   #555;
+$gray-light:             #999;
+$gray-lighter:           #eee;
+
+$brand-primary:         #79a0c1;
+$brand-success:         #5cb85c;
+$brand-info:            #5bc0de;
+$brand-warning:         #f0ad4e;
+$brand-danger:          #d9534f;
+
 //-- Import section
 
 //== Bootstrap
@@ -83,6 +95,7 @@ $input-width-md: 48px;
 //-- A footer and a section panel
 $footer-height: 50px;
 
+$pie-font-size: 0.7em;
 
 //-- Main css
 
@@ -1063,4 +1076,18 @@ ul.wfm-light-list {
   padding-top:180px;
   font-size: 1.4em;
   @include gradient-line(#efefef, #fefefe);
+}
+
+.pie-text {
+  font-size: $pie-font-size;
+}
+
+.pie-legend {
+  text-align: center;
+}
+
+.pie-legend__dash {
+  width: 20px;
+  height: 10px;
+  display: inline-block
 }

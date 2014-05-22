@@ -1,6 +1,5 @@
 ﻿/** @module */
-define(['jquery',
-		'knockout',
+define(['knockout',
 		'services/datacontext',
 		'helpers/file-helper',
 		'base-models/stage-base',
@@ -13,7 +12,7 @@ define(['jquery',
 		'services/wroup',
 		'constants/stage-constants',
 		'helpers/app-helper'],
-	function ($, ko, datacontext,
+	function (ko, datacontext,
 		fileHelper, StageBase, MapOfWield, mapOfWieldService, SectionOfWield, WellGroup,
 		PropSpec, wieldService, wroupService, stageCnst, appHelper) {
 	'use strict';
@@ -132,10 +131,10 @@ define(['jquery',
 		};
 
 		/** Load groups */
-		this.wroups(importWroupDtoList(data.WellGroupsDto, ths));
+		this.wroups(importWroupDtoList(data.WellGroupsDto, this));
 
 		/** Load sections */
-		this.listOfSection(importListOfSectionOfWieldDto(data.ListOfSectionOfWieldDto, ths));
+		this.listOfSection(importListOfSectionOfWieldDto(data.ListOfSectionOfWieldDto, this));
 	};
 
 	/** Inherit from a stage base model */
@@ -245,13 +244,13 @@ define(['jquery',
 		return needArr;
 	};
 
-  /**
+	/**
 	 * Get guid of a parent company
 	 * @returns {string}
 	 */
 	exports.prototype.getIdOfCompany = function () {
 		return this.getWellRegion().getCompany().id;
 	};
-  
+
 	return exports;
 });

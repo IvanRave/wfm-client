@@ -62,7 +62,7 @@ module.exports = function (grunt) {
 		},
 		changelog : {
 			options : {
-				from : 'v0.9.6'
+				from : 'v0.9.7'
 			}
 		},
 		gitlog : {
@@ -78,6 +78,18 @@ module.exports = function (grunt) {
 					jshintrc : '.jshintrc'
 				},
 				src : 'Gruntfile.js'
+			},
+			cjs : {
+				options : {
+					jshintrc : '<%= src %>/cjs/.jshintrc'
+				},
+				files : [{
+						expand : true,
+						dot : true,
+						cwd : '<%= src %>/cjs/',
+						src : ['**/*.js']
+					}
+				]
 			},
 			app : {
 				options : {
@@ -406,6 +418,13 @@ module.exports = function (grunt) {
 				files : ['<%= src %>/js/**/*.js'],
 				tasks : ['jshint:app']
 			},
+      jshint_cjs : {
+				options : {
+					spawn : false
+				},
+				files : ['<%= src %>/cjs/**/*.js'],
+				tasks : ['jshint:cjs']
+			},
 			copy_main : {
 				options : {
 					cwd : '<%= src %>/',
@@ -459,6 +478,7 @@ module.exports = function (grunt) {
 		// 1. Check and test
 		'jshint:gruntfile',
 		'jshint:app',
+    'jshint:cjs',
 
 		// 2. Clean
 		'clean:main',
@@ -514,6 +534,8 @@ module.exports = function (grunt) {
 			changeFileSrc(['assemble', 'cjs', 'files'], filepath);
 		} else if (targetEvent === 'jshint_app') {
 			changeFileSrc(['jshint', 'app', 'files'], filepath);
+		} else if (targetEvent === 'jshint_cjs') {
+			changeFileSrc(['jshint', 'cjs', 'files'], filepath);
 		}
 		////grunt.log.writeln(targetEvent + ': ' + filepath + ' has ' + action);
 	});

@@ -9,7 +9,14 @@
   </div>
   <div class="widget-content">
     <div data-bind="if: mdlWidget.opts.isVisWellActivity">
-      <span>Pie chart: active/non-active wells
+      <div data-bind="svgPie: { pieData: mdlWidget.wellActivityData}">
+      </div>
+      <div class="pie-legend">
+        <div data-bind="foreach: mdlWidget.wellActivityData">
+          <div class="pie-legend__dash" data-bind="style: { background : color }"></div>
+          <span data-bind="text: name"></span>
+        </div>
+      </div>
     </div>
   </div>
 </script>
