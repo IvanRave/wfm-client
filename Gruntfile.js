@@ -177,7 +177,7 @@ module.exports = function (grunt) {
 					'<%= trgt %>/css/pickadate/_default-date.scss' : '<%= bowerFolder %>/pickadate/lib/themes/default.date.css',
 					'<%= trgt %>/css/pickadate/_default-time.scss' : '<%= bowerFolder %>/pickadate/lib/themes/default.time.css',
 					'<%= trgt %>/css/fileupload/_fileupload.scss' : '<%= bowerFolder %>/blueimp-file-upload/css/jquery.fileupload.css',
-					'<%= trgt %>/css/_wfm-icons.scss' : '<%= bowerFolder %>/wfm-fonts/dst/css/_wfm-icons.scss',
+					'<%= trgt %>/css/wfm/_wfm-icons.scss' : '<%= bowerFolder %>/wfm-fonts/dst/css/_wfm-icons.scss',
 					'<%= trgt %>/css/jcrop/_jcrop.scss' : '<%= bowerFolder %>/jcrop/css/jquery.Jcrop.css',
 					// Copy as usual image in the css root for jcrop stylesheet
 					'<%= trgt %>/css/Jcrop.gif' : '<%= bowerFolder %>/jcrop/css/Jcrop.gif'
@@ -460,7 +460,7 @@ module.exports = function (grunt) {
 				options : {
 					spawn : false
 				},
-				files : ['<%= src %>/css/main.scss'],
+				files : ['<%= src %>/css/**/*.scss'],
 				tasks : ['sass:main']
 			}
 
