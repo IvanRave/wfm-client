@@ -1,0 +1,95 @@
+/* Base styles for site */
+
+html, body {
+    height: 100%;
+    /* The html and body elements cannot have any padding or margin. */
+}
+
+.full-min-height {
+    min-height: 100% !important;
+}
+
+.full-height {
+    height: 100% !important;
+}
+
+/*frequent margins for blocks*/
+.min-top-margin {
+    margin-top: 8px;
+}
+
+.min-left-margin {
+    margin-left: 8px;
+}
+
+.min-right-margin {
+    margin-right: 8px;
+}
+
+.min-bottom-margin {
+    margin-bottom: 8px;
+}
+
+.min-margin {
+    margin: 8px;
+}
+
+.input-narrow {
+    padding: 2px;
+    font-size: 0.8em;
+}
+
+.elem-shadow {
+    -moz-box-shadow: 1px 1px 2px 2px #ccc;
+    -webkit-box-shadow: 1px 1px 2px 2px #ccc;
+    box-shadow: 1px 1px 2px 2px #ccc;
+}
+
+.pre-wrap-text {
+    white-space: pre-wrap;
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.input-width-xs {
+    width: $input-width-xs;
+}
+
+.input-width-sm {
+    width: $input-width-sm;
+}
+
+.input-width-md {
+    width: $input-width-md;
+}
+
+.link-view {
+    border-bottom: 1px dashed $link-color;
+    color: $link-color;
+    cursor: pointer;
+}
+
+    .link-view:hover {
+        border-bottom: 1px dashed $link-hover-color;
+        color: $link-hover-color;
+    }
+    
+.link-view-inverse {
+    color: $navbar-inverse-link-color;
+    cursor: pointer;
+}
+
+    .link-view-inverse:hover {
+        color: $navbar-inverse-link-hover-color;
+    }
+    
+.link-icon {
+    cursor: pointer;
+    color: $link-color;
+}
+
+    .link-icon:hover {
+        color: $link-hover-color;
+    }

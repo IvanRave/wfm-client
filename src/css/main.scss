@@ -7,20 +7,7 @@
 
 //-- SASS: $ gem install sass --pre
 
-//-- Redefine bootstrap properties (with !default)
-$icon-font-path: "../fonts/";
-
-$gray-darker:            #222;
-$gray-dark:              #333;
-$gray:                   #555;
-$gray-light:             #999;
-$gray-lighter:           #eee;
-
-$brand-primary:         #79a0c1;
-$brand-success:         #5cb85c;
-$brand-info:            #5bc0de;
-$brand-warning:         #f0ad4e;
-$brand-danger:          #d9534f;
+@import "wfm/variables";
 
 //-- Import section
 
@@ -39,112 +26,52 @@ $brand-danger:          #d9534f;
 @import "jcrop/jcrop";
 
 //== WFM icons, created from fonts
-@import "wfm-icons";
-
-//-- Z-index WFM list
-
-$zindex-loader-main: 9999;          // Loader for main ajax requests
-                                    // 1040: bootstrap modal window
-$zindex-sidebar-toggle: 1031;       // Button to show/hide sidebar
-$zindex-section-panel: 1031;        // Panel with sections (icons and titles)
-$zindex-top-tab-panel: 1031;        // Panel with file manager and dashboard buttons
-$zindex-fixed-panel: 1030;          // Top and bottom fixed panel, fixed wfm-nav menu
-                                    // 99: workspace sidebar trailer
-$zindex-sidebar-wrap-visible: 98;   // Sidebar with scroll (z-index for scroll - 99)
-$zindex-log-las-text-creator: 15;   // Log element to create text (over text block)
-$zindex-log-las-text: 11;           // Log text block (over base)
-$zindex-log-las-draw: 3;            // Log draw canvas (over base)
-$zindex-log-las-base: 2;            // Log base canvas
-$zindex-log-las-img: 1;             // Log image (under base)
-$zindex-log-las-wrap: 1;            // Log wrap (contain upper blocks)
-
-
-//-- Other properties
-
-@mixin gradient-line($first, $second) {
-  background: $second;
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$first', endColorstr='$second');
-  background: -webkit-gradient(linear, left top, left bottom, from($first), to($second));
-  background: -moz-linear-gradient(top,  $first,  $second);
-}
-
-$wfm-nav-height: 32px;
-
-//-- Loader's pathes
-$loader-circle-medium-path: '../img/loader-circle-medium.gif';
-$loader-line-small-path: '../img/loader-line-small.gif';
-$loader-line-medium-path: '../img/loader-line-medium.gif';
-
-//-- Loader sizes
-$loader-circle-medium-width: 32px;
-$loader-circle-medium-height: 32px;
-$loader-circle-medium-margin-left: -($loader-circle-medium-width / 2);
-$loader-circle-medium-margin-top: -($loader-circle-medium-width / 2);
-
-$loader-line-small-width: 16px;
-$loader-line-small-height: 11px;
-
-$loader-line-medium-width: 126px;
-$loader-line-medium-height: 22px;
-
-//-- Input widths
-$input-width-xs: 16px;
-$input-width-sm: 32px;
-$input-width-md: 48px;
-
-//-- A footer and a section panel
-$footer-height: 50px;
-
-$pie-font-size: 0.7em;
-
-//-- Main css
-
-html, body {
-    height: 100%;
-    /* The html and body elements cannot have any padding or margin. */
-}
+@import "wfm/wfm-icons";
+@import "wfm/site-base";
+@import "wfm/loader";
+@import "wfm/modal";
+@import "wfm/wfm-list";
+@import "wfm/section-panel";
+@import "wfm/slider";
+@import "wfm/well-log";
 
 .wfm-nav {
-    position: fixed;
-    right: 0;
-    left: 0;
-    padding: 0 10px;
-    z-index: $zindex-fixed-panel;
-    min-height: $wfm-nav-height;
-    height: $wfm-nav-height;
+  position: fixed;
+  right: 0;
+  left: 0;
+  padding: 0 10px;
+  z-index: $zindex-fixed-panel;
+  min-height: $wfm-nav-height;
+  height: $wfm-nav-height;
+  @include gradient-line(#222, #444);
 }
 
-    .wfm-nav div {
-        padding: 6px;
-    }
-
-        .wfm-nav div a {
-            text-decoration: none;
-            color: #ccc;
-            padding: 6px;
-        }
+  .wfm-nav__block {
+    padding: 6px;
+  }
 
 /* Set the fixed height of the footer here */
-footer {
-    height: $footer-height;
-    padding: 0;
-    z-index: $zindex-fixed-panel;
+.wfm-footer {
+  height: $footer-height;
+  padding: 0;
+  z-index: $zindex-fixed-panel;
+  @include gradient-line($gray-four, $gray-darker);
 }
 
-    footer .footer-logo-wrap {
-        padding: 12px;
-        padding-left: 22px;
+  .wfm-footer__logo-wrap {
+      padding: 12px;
+      padding-left: 22px;
+  }
+
+    .wfm-footer__logo {
+        background: url(../img/logo-footer.png) no-repeat;
+        height: 24px;
+        width: 100px;
     }
 
-        footer .footer-logo-wrap .footer-logo {
-            background: url(../img/logo-footer.png) no-repeat;
-            height: 24px;
-            width: 100px;
-        }
-
 .company-logo {
-    box-shadow: 0 0 8px #ccc;
-    width: 100px;
+    box-shadow: 0 0 8px $gray-lighter;
+    width: $company-logo-width;
 }
 
 @media (max-width: 992px) {
@@ -176,221 +103,6 @@ footer {
             text-decoration: none;
             background-color: #eeeeee;
         }
-
-
-.wfm-list ul {
-    /*padding-top: 4px;*/
-    /*padding-left:8px;*/
-}
-
-    .wfm-list ul > li {
-        padding-top: 4px;
-    }
-
-        .wfm-list ul > li > div > i {
-            color: #ccc;
-            padding: 4px;
-            cursor: pointer;
-            background-color: #333;
-            float: left;
-        }
-
-            .wfm-list ul > li > div > i:hover {
-                color: #fff;
-            }
-
-        .wfm-list ul > li .wfm-menu-item {
-            padding: 4px;
-            display: block;
-            cursor: pointer;
-            background-color: #444;
-            color: #fcfcfc;
-            margin-left: 22px;
-            white-space: nowrap;
-        }
-
-            .wfm-list ul > li .wfm-menu-item:hover {
-                background-color: #888;
-                color: #fcfcfc;
-                text-decoration: none;
-            }
-
-        .wfm-list ul > li .wfm-menu-header {
-            margin-left: 2px !important;
-        }
-
-        .wfm-list ul > li .wfm-slc-menu-item {
-            background-color: #777;
-            color: #fff;
-            font-weight: bold;
-        }
-
-        .wfm-list ul > li a {
-            padding: 4px;
-            display: block;
-            cursor: pointer;
-            background-color: #444;
-            color: #fcfcfc;
-            margin-left: 22px;
-            white-space: nowrap;
-        }
-
-            .wfm-list ul > li a:hover {
-                background-color: #888;
-                color: #fcfcfc;
-                text-decoration: none;
-            }
-
-.wfm-list button {
-    margin-left: 22px;
-    color: #ccc;
-    background-color: #444;
-    border-color: #555;
-    border-radius: 0;
-}
-
-    .wfm-list button:hover {
-        color: #eee;
-        background-color: #555;
-        border-color: #777;
-    }
-
-.wfm-list .wfm-child {
-    padding-left: 16px;
-}
-
-/*.wfm-list > li > div > a {
-    display: block;
-    padding: 4px 8px 4px 0;
-    text-decoration: none;
-    white-space: nowrap;
-    color: #ccc;
-}
-
-    .wfm-list > li > div > a:hover {
-        text-decoration: none;
-        background: #000;
-    }*/
-
-.loader-main {
-    width: $loader-circle-medium-width;
-    height: $loader-circle-medium-height;
-    top: 50%;
-    left: 50%;
-    background: url($loader-circle-medium-path) no-repeat center;
-    margin-left: $loader-circle-medium-margin-left;
-    margin-top: $loader-circle-medium-margin-top;
-    z-index: $zindex-loader-main;
-    overflow: auto;
-    display: none;
-    position: fixed;
-}
-
-.loader-line-small {
-    display: inline-block;
-    width: $loader-line-small-width;
-    height: $loader-line-small-height;
-    background: url($loader-line-small-path) no-repeat center;
-}
-
-.loader-line-medium {
-    display: inline-block;
-    width: $loader-line-medium-width;
-    height: $loader-line-medium-height;
-    background: url($loader-line-medium-path) no-repeat center;
-}
-
-input.input-width-xs {
-    width: $input-width-xs;
-}
-
-input.input-width-sm {
-    width: $input-width-sm;
-}
-
-input.input-width-md {
-    width: $input-width-md;
-}
-
-.validation-summary-errors {
-    color: #e80c4d;
-}
-
-.pointer {
-    cursor: pointer;
-}
-
-.link-view {
-    border-bottom: 1px dashed #1F98C7;
-    color: #1F98C7;
-    cursor: pointer;
-}
-
-    .link-view:hover {
-        border-bottom: 1px dashed #78C1DD;
-        color: #78C1DD;
-    }
-
-.link-view-inverse {
-    color: #efefef;
-    cursor: pointer;
-}
-
-    .link-view-inverse:hover {
-        color: #fff;
-    }
-
-.link-icon {
-    cursor: pointer;
-    color: #1F98C7;
-}
-
-    .link-icon:hover {
-        color: #78C1DD;
-    }
-
-.width-rate {
-    width: 20%;
-}
-
-    .width-rate .btn-group {
-        width: 100%;
-    }
-
-    .width-rate button:first-child {
-        width: 84%;
-    }
-
-.width-rate-first {
-    width: 20%;
-}
-
-.table-rate-wrap {
-    height: 380px;
-    overflow: auto;
-    overflow-x: hidden;
-    border: 2px solid #dddddd;
-}
-
-.table-rate {
-    width: 100%;
-    table-layout: fixed;
-}
-
-    .table-rate td {
-        padding: 2px 1px;
-        text-align: center;
-        border-top: 1px solid #dddddd;
-    }
-
-        .table-rate td.td-first {
-            padding-left: 8px;
-            text-align: left;
-        }
-
-    .table-rate .forecast-row {
-        background-color: yellow;
-    }
 
 .table-fragment {
     width: 100%;
@@ -438,100 +150,13 @@ input.input-width-md {
         color: #fff;
     }
 
-.modal-wide {
-    width: 98% !important;
-    /*height: 95% !important;*/
-    /*padding: 0 !important;*/
-    margin: auto;
-}
-
-    .modal-wide .modal-content {
-        /*height: 100% !important;*/
-        border-radius: 0 !important;
-    }
-
-.modal-fullscreen {
-    width: 99% !important;
-    height: 99% !important;
-    padding: 0 !important;
-    margin: auto !important;
-}
-
-.full-min-height {
-    min-height: 100% !important;
-}
-
-.full-height {
-    height: 100% !important;
-}
-
-/*.modal-fullscreen .modal-content .modal-body {
-            height: 100% !important;
-        }*/
-
-/*.wfm-mgr-file-list {
-    height: 100%;
-    padding-bottom: 100px;
-}
-
-    .wfm-mgr-file-list .inner-list {
-        height: 100%;
-        overflow: auto;
-    }*/
-
 .workspace-container {
     padding-left: 21px;
 }
 
 .sidebar-wrap {
-    background-color: #333;
+  background-color: $gray-dark;  
 }
-
-/* Block for well, field, group, region tab links to sections */
-.wfm-section-panel {
-    background-color: #222;
-}
-
-/* Block with icon and caption in a footer panel*/
-.wfm-section-item {
-    border-radius: 0;
-    padding: 4px 0 0 0;
-    margin: 0;
-    color: #a1a1a1;
-    width: 70px;
-    height: $footer-height;
-    text-align: center;
-    cursor: pointer;
-    position: relative;
-}
-
-/** A modificator for active blocks */
-.wfm-section-item_state_active {
-    background-color: #000;
-    color: #c0c0c0;
-}
-
-  .wfm-section-item:focus {
-      background-color: #000;
-      color: #c0c0c0;
-  }
-
-  .wfm-section-item:hover {
-      background-color: #111;
-      color: #c8c8c8;
-  }
-
-  .wfm-section-item__caret {
-      position: absolute;
-      bottom: 4px;
-      right: 4px;
-      border-top-color: #ccc;
-      border-bottom-color: #ccc;
-  }
-      
-  .wfm-section-item__caption {
-    font-size: 70%;
-  }
 
 .sidebar-toggle {
     width: 20px;
@@ -540,7 +165,7 @@ input.input-width-md {
 }
 
     .sidebar-toggle button {
-        background-color: #333;
+        background-color: $gray-dark;
         padding: 0;
         color: #efefef;
         border: 0;
@@ -633,27 +258,6 @@ input.input-width-md {
     padding: 8px 15px 0 0;
 }
 
-/*frequent margins for blocks*/
-.min-top-margin {
-    margin-top: 8px;
-}
-
-.min-left-margin {
-    margin-left: 8px;
-}
-
-.min-right-margin {
-    margin-right: 8px;
-}
-
-.min-bottom-margin {
-    margin-bottom: 8px;
-}
-
-.min-margin {
-    margin: 8px;
-}
-
 .btn-tile {
     border: 0;
     border-radius: 0;
@@ -685,34 +289,6 @@ input.input-width-md {
         background-color: #444;
     }
 
-/*calculator page*/
-.slider-wrap {
-    padding-top: 7px;
-}
-
-    .slider-wrap .slider {
-        width: 500px;
-    }
-
-    .slider-wrap .slider-count {
-        margin-left: 16px;
-        font-weight: bold;
-        width: 60px;
-    }
-
-    .slider-wrap .slider-price {
-        margin-left: 16px;
-        font-weight: bold;
-    }
-
-.slider-total {
-    width: 500px;
-    text-align: center;
-    font-weight: bold;
-    border: 1px solid #ccc;
-    padding: 7px;
-}
-
 .axis {
 }
 
@@ -740,11 +316,6 @@ input.input-width-md {
     vector-effect: non-scaling-stroke;
 }
 
-.input-narrow {
-    padding: 2px;
-    font-size: 0.8em;
-}
-
 .evo-scope-wrap {
     padding: 6px;
 }
@@ -753,16 +324,6 @@ input.input-width-md {
         border: 2px outset #eee;
         padding: 6px;
     }
-
-.elem-shadow {
-    -moz-box-shadow: 1px 1px 2px 2px #ccc;
-    -webkit-box-shadow: 1px 1px 2px 2px #ccc;
-    box-shadow: 1px 1px 2px 2px #ccc;
-}
-
-.pre-wrap-text {
-    white-space: pre-wrap;
-}
 
 .widget-tile {
     margin-bottom: 8px;
@@ -872,14 +433,6 @@ input.input-width-md {
         fill: #bbb;
     }
 
-
-.btn-modal-close {
-    font-size: 1.1em;
-    position: absolute;
-    top: 4px;
-    right: 4px;
-}
-
 .panzoom-controls {
     position: absolute;
     font-size: 1.5em;
@@ -914,67 +467,6 @@ ul.wfm-light-list {
     ul.wfm-light-list > li {
         padding: 4px 0 4px 0;
     }
-
-.log-las-wrap {
-    position: relative;
-    z-index: $zindex-log-las-wrap;
-}
-
-.log-las-base {
-    position: absolute;
-    top: 0;
-    left: 0;
-    border: 2px dashed #ccc;
-    z-index: $zindex-log-las-base;
-}
-
-.log-las-img-wrap {
-    height: 480px;
-    width: 650px;
-    overflow: auto;
-    overflow-x: hidden;
-}
-
-    .log-las-img-wrap.log-las-img {
-        z-index: $zindex-log-las-img;
-        width: 624px;
-        border: 2px solid #ccc;
-    }
-
-.log-las-draw {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: $zindex-log-las-draw;
-    border: 2px dashed #aaa;
-    display: none;
-}
-
-.log-las-text {
-    background-color: #fff;
-    opacity: 0.5;
-    filter: alpha(opacity = 50);
-    width: 624px;
-    height: 480px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: $zindex-log-las-text;
-    border: 2px dashed #aaa;
-    display: none;
-}
-
-.log-las-text-creator {
-    position: absolute;
-    white-space: nowrap;
-    font-size: 12px;
-    font-family: 'sans-serif';
-    z-index: $zindex-log-las-text-creator;
-}
-
-.log-las-podl {
-    color: #888;
-}
 
 .wield-map-svg {
     font: 20px sans-serif;
