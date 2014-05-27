@@ -173,12 +173,12 @@ module.exports = function (grunt) {
 			// Ready css files to import to main sass
 			bower_css_sass : {
 				files : {
-					'<%= trgt %>/css/pickadate/_default.scss' : '<%= bowerFolder %>/pickadate/lib/themes/default.css',
-					'<%= trgt %>/css/pickadate/_default-date.scss' : '<%= bowerFolder %>/pickadate/lib/themes/default.date.css',
-					'<%= trgt %>/css/pickadate/_default-time.scss' : '<%= bowerFolder %>/pickadate/lib/themes/default.time.css',
-					'<%= trgt %>/css/fileupload/_fileupload.scss' : '<%= bowerFolder %>/blueimp-file-upload/css/jquery.fileupload.css',
-					'<%= trgt %>/css/wfm/_wfm-icons.scss' : '<%= bowerFolder %>/wfm-fonts/dst/css/_wfm-icons.scss',
-					'<%= trgt %>/css/jcrop/_jcrop.scss' : '<%= bowerFolder %>/jcrop/css/jquery.Jcrop.css',
+					'<%= trgt %>/scss/pickadate/_default.scss' : '<%= bowerFolder %>/pickadate/lib/themes/default.css',
+					'<%= trgt %>/scss/pickadate/_default-date.scss' : '<%= bowerFolder %>/pickadate/lib/themes/default.date.css',
+					'<%= trgt %>/scss/pickadate/_default-time.scss' : '<%= bowerFolder %>/pickadate/lib/themes/default.time.css',
+					'<%= trgt %>/scss/fileupload/_fileupload.scss' : '<%= bowerFolder %>/blueimp-file-upload/css/jquery.fileupload.css',
+					'<%= trgt %>/scss/wfm/_wfm-icons.scss' : '<%= bowerFolder %>/wfm-fonts/dst/css/_wfm-icons.scss',
+					'<%= trgt %>/scss/jcrop/_jcrop.scss' : '<%= bowerFolder %>/jcrop/css/jquery.Jcrop.css',
 					// Copy as usual image in the css root for jcrop stylesheet
 					'<%= trgt %>/css/Jcrop.gif' : '<%= bowerFolder %>/jcrop/css/Jcrop.gif'
 				}
@@ -189,7 +189,7 @@ module.exports = function (grunt) {
 						flatten : true,
 						cwd : '<%= bowerFolder %>/bootstrap-sass/vendor/assets/stylesheets/bootstrap/',
 						src : ['*.scss'], // Redefined variables in project main scss file
-						dest : '<%= trgt %>/css/bootstrap/'
+						dest : '<%= trgt %>/scss/bootstrap/'
 					}
 				]
 			},
@@ -280,17 +280,33 @@ module.exports = function (grunt) {
 				]
 			}
 		},
-		sass : {
-			options : {
-				sourcemap : true,
-				style : 'compressed'
-			},
+		compass : {
 			main : {
-				files : {
-					'<%= trgt %>/css/main-bundle-<%= pkg.version %>.css' : '<%= trgt %>/css/main.scss'
+				options : {
+					//appDir: '<%= trgt %>',
+					outputStyle : 'compressed',
+					sassDir : '<%= trgt %>/scss',
+					cssDir : '<%= trgt %>/css',
+					specify : '<%= trgt %>/scss/main.scss',
+					relativeAssets : true,
+					cacheDir : '.sass-cache'
+          //debugInfo: true
+					//raw: 'sass_options = {:sourcemap => true}'
+					//sourcemap : true
 				}
 			}
 		},
+		// sass : {
+		// options : {
+		// sourcemap : true,
+		// style : 'compressed'
+		// },
+		// main : {
+		// files : {
+		// '<%= trgt %>/css/main-bundle-<%= pkg.version %>.css' : '<%= trgt %>/scss/main.scss'
+		// }
+		// }
+		// },
 		requirejs : {
 			main : {
 				options : {
@@ -418,7 +434,7 @@ module.exports = function (grunt) {
 				files : ['<%= src %>/js/**/*.js'],
 				tasks : ['jshint:app']
 			},
-      jshint_cjs : {
+			jshint_cjs : {
 				options : {
 					spawn : false
 				},
@@ -456,12 +472,13 @@ module.exports = function (grunt) {
 				files : ['<%= src %>/cjs/**/*.js'],
 				tasks : ['assemble:cjs']
 			},
-			sass_main : {
+			compass_main : {
 				options : {
 					spawn : false
 				},
-				files : ['<%= src %>/css/**/*.scss'],
-				tasks : ['sass:main']
+        // Changed file will be copied to target dir, and then compassing
+				files : ['<%= src %>/scss/**/*.scss'],
+				tasks : ['compass:main']
 			}
 
 			// livereload server: http://127.0.0.1:35729/livereload.js
@@ -478,7 +495,7 @@ module.exports = function (grunt) {
 		// 1. Check and test
 		'jshint:gruntfile',
 		'jshint:app',
-    'jshint:cjs',
+		'jshint:cjs',
 
 		// 2. Clean
 		'clean:main',
@@ -492,7 +509,7 @@ module.exports = function (grunt) {
 		'copy:bower_img',
 		'copy:bower_bootstrap_js', // Copy unchanged files from bootstrap-sass
 		'copy:bower_bootstrap_sass', // Copy bowe scss partials to main.css file may be import these partials
-		'sass:main', // Make main sass file from copied file
+		'compass:main', // Make main sass file from copied file
 		'assemble:js', // After copy all files to destination - replace all {{value}} - rewrite the same files
 		'assemble:cjs', // Copy with assembling and transformation from commonjs module to requirejs modules
 		'assemble:html' // Copy other files: Assemble and copy templates files
@@ -554,9 +571,10 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-gh-pages');
 	grunt.loadNpmTasks('grunt-jsdoc');
 	grunt.loadNpmTasks('grunt-notify');
-	grunt.loadNpmTasks('grunt-contrib-sass');
 	grunt.loadNpmTasks('grunt-git-log');
 	grunt.loadNpmTasks('grunt-ftp-deploy');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
+	grunt.loadNpmTasks('grunt-contrib-compass');
+  //grunt.loadNpmTasks('grunt-contrib-sass');
 	//grunt.loadNpmTasks('grunt-exec');
 };

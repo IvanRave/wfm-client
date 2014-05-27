@@ -7,6 +7,10 @@
 
 //-- SASS: $ gem install sass --pre
 
+@import "compass/css3/filter";
+
+@import "compass/css3/opacity";
+
 @import "wfm/variables";
 
 //-- Import section
@@ -56,6 +60,7 @@
   padding: 0;
   z-index: $zindex-fixed-panel;
   @include gradient-line($gray-four, $gray-darker);
+  /*border-color: #090909;*/
 }
 
   .wfm-footer__logo-wrap {
