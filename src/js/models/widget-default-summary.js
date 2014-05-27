@@ -23,7 +23,13 @@ define(['knockout',
 		 */
 		this.tmpOpts = JSON.parse(data.Opts);
 
-		/** All summary properties for current stage */
+		/**
+		 * All summary properties for current stage
+		 * @todo #24! Possible error:
+		 *       Cannot read property 'propSpecList' of undefined
+     *       Error occurs, during loading application, 
+     *       if user click to the dashboard before loading is finished
+		 */
 		var propSpecList = this.mdlStageContext.propSpecList;
 
 		/**

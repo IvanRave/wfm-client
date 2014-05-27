@@ -197,15 +197,15 @@ ko.bindingHandlers.svgPie = {
 
 		var tmpDiv = document.createElement('div');
 
-		// TODO: #33! Calc width, height by element
 		svgPieHelper.drawPie(tmpDiv, pieData);
 
 		element.appendChild(tmpDiv);
 
 		var resultWidth = $(tmpDiv).width();
 
-		console.log('resultSvg', resultWidth);
+		//console.log('resultSvg', resultWidth);
     
+    // Resize like width
     $(tmpDiv).height(resultWidth);
 	}
 };
