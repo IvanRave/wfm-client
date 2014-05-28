@@ -287,10 +287,11 @@ module.exports = function (grunt) {
 					outputStyle : 'compressed',
 					sassDir : '<%= trgt %>/scss',
 					cssDir : '<%= trgt %>/css',
-					specify : '<%= trgt %>/scss/main.scss',
+					specify : ['<%= trgt %>/scss/main-light.scss',
+						'<%= trgt %>/scss/main-dark.scss'],
 					relativeAssets : true,
 					cacheDir : '.sass-cache'
-          //debugInfo: true
+					//debugInfo: true
 					//raw: 'sass_options = {:sourcemap => true}'
 					//sourcemap : true
 				}
@@ -476,7 +477,7 @@ module.exports = function (grunt) {
 				options : {
 					spawn : false
 				},
-        // Changed file will be copied to target dir, and then compassing
+				// Changed file will be copied to target dir, and then compassing
 				files : ['<%= src %>/scss/**/*.scss'],
 				tasks : ['compass:main']
 			}
@@ -504,7 +505,7 @@ module.exports = function (grunt) {
 		'copy:main', // Copy main files
 		'copy:bower_js', // Copy unchanged files from bower folder: jquery, momentjs...
 		'copy:bower_jquery', // Jquery loaded separately, maybe loaded from CDN
-		'copy:bower_css_sass', // Copy css files as scss partials (to import to main.scss file)
+		'copy:bower_css_sass', // Copy css files as scss partials (to import to main-style.scss file)
 		'copy:bower_fonts',
 		'copy:bower_img',
 		'copy:bower_bootstrap_js', // Copy unchanged files from bootstrap-sass
@@ -575,6 +576,6 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-ftp-deploy');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-compass');
-  //grunt.loadNpmTasks('grunt-contrib-sass');
+	//grunt.loadNpmTasks('grunt-contrib-sass');
 	//grunt.loadNpmTasks('grunt-exec');
 };

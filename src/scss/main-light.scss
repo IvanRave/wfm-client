@@ -1,0 +1,45 @@
+﻿// TODO: style: design examples #LH!
+//       http://petrohelp.com/
+//       http://www.windowsazure.com/en-us/
+//       http://www.iwell.info/
+//       http://wrapbootstrap.com/preview/WB00U99JJ
+//       http://bootswatch.com/
+
+@import "compass/css3/filter";
+@import "compass/css3/text-shadow";
+@import "compass/css3/box-shadow";
+@import "compass/css3/opacity";
+
+//-- Import section
+
+//== Import before bootstrap to redefine variables
+@import "wfm/variables";
+@import "wfm/variables-light";
+
+//== Bootstrap
+@import "bootstrap/bootstrap";
+
+//== File upload
+@import "fileupload/fileupload";
+
+//== Pickadate
+@import "pickadate/default";
+@import "pickadate/default-date";
+@import "pickadate/default-time";
+
+//== JCrop without image
+@import "jcrop/jcrop";
+
+//== WFM icons, created from fonts
+@import "wfm/wfm-icons";
+
+//== WFM other
+@import "wfm/site-base";
+@import "wfm/widget-tile";
+@import "wfm/loader";
+@import "wfm/modal";
+@import "wfm/wfm-list";
+@import "wfm/section-panel";
+@import "wfm/slider";
+@import "wfm/well-log";
+@import "wfm/well-test";

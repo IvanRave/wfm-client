@@ -2,13 +2,17 @@
 define(['knockout',
 		'helpers/history-helper',
 		'helpers/lang-helper',
+		'helpers/cookie-helper',
 		'constants/demo-auth-constants',
-		'viewmodels/user-profile'],
+		'viewmodels/user-profile',
+		'constants/global-css-constants'],
 	function (ko,
 		historyHelper,
 		langHelper,
+		cookieHelper,
 		demoAuthConstants,
-		VwmUserProfile) {
+		VwmUserProfile,
+		globalCssCnst) {
 	'use strict';
 
 	/**
@@ -24,6 +28,31 @@ define(['knockout',
 		 * @type {boolean}
 		 */
 		this.isVisibleMenu = ko.observable(true);
+
+		/**
+		 * List of global csses
+		 *    from constants
+		 * @type {Array.<Object>}
+		 */
+		this.listOfGlobalCss = globalCssCnst;
+
+		/**
+		 * Current global css
+		 * @type {string}
+		 */
+		this.curGlobalCss = ko.observable(null);
+
+		this.curGlobalCss.subscribe(this.changeGlobalCss, this);
+
+		// /**
+		// * Global css for the site
+		// * @type {string}
+		// */
+		// this.wfmGlobalCss = ko.computed({
+		// read : this.calcWfmGlobalCss,
+		// deferEvaluation : true,
+		// owner : this
+		// });
 
 		this.sidebarWrapCss = ko.computed({
 				read : this.calcSidebarWrapCss,
@@ -269,13 +298,13 @@ define(['knockout',
 		}
 	};
 
-  /** Demo logon */
+	/** Demo logon */
 	exports.prototype.demoLogOn = function () {
 		this.mdlWorkspace.sendLogOn(demoAuthConstants,
-      this.handleLogOnSuccess.bind(this),
+			this.handleLogOnSuccess.bind(this),
 			this.handleLogOnError.bind(this));
 	};
-  
+
 	exports.prototype.realLogOn = function () {
 		this.errToRealLogOn('');
 		// get obj from fields check obj
@@ -286,7 +315,7 @@ define(['knockout',
 	};
 
 	exports.prototype.handleLogOnSuccess = function (userProfileData) {
-    this.mdlWorkspace.setUserProfile(userProfileData);
+		this.mdlWorkspace.setUserProfile(userProfileData);
 		// Clear added object: if user logoff then need empty fields to logon again (for different user)
 		this.objToRealLogOn.email('');
 		this.objToRealLogOn.password('');
@@ -298,6 +327,21 @@ define(['knockout',
 		if (jqXhr.status === 422) {
 			this.errToRealLogOn(langHelper.translate(jqXhr.responseJSON.errId) || '{{lang.unknownError}}');
 		}
+	};
+
+	/**
+	 * Change href of the link in the head of the site
+	 *    change cookie
+	 */
+	exports.prototype.changeGlobalCss = function (choosedCss) {
+		if (!choosedCss) {
+			return;
+		}
+
+		var styleLinkElem = document.getElementById('wfm-style-link');
+		styleLinkElem.href = choosedCss.path + '?{{package.version}}';
+
+		cookieHelper.createCookie('{{ syst.wfmStyleLinkCookie }}', choosedCss.path, 30);
 	};
 
 	return exports;

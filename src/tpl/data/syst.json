@@ -6,5 +6,6 @@
   "registerConfirmationUrl": "/account/register/confirmation",
   "companyListUrl": "/companies",
   "tplUrl": "/tpl",
-  "tplExt": ".html"
+  "tplExt": ".html",
+  "wfmStyleLinkCookie": "wfmstylelink"
 }

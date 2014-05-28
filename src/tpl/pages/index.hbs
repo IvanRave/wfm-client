@@ -6,7 +6,7 @@
     <title>{{lang.wfm}}</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="css/main.css?{{package.version}}" rel="stylesheet" />
+    {{> style-link-generator }}
 </head>
 <body>
     <!--[if lt IE 10]><p class="chromeframe">You are using an <strong>outdated</strong> browser. Please upgrade your browser.</p><![endif]-->
@@ -14,16 +14,21 @@
       <div class="loader-main"></div>
       <div>
           <!-- current: vwmWorkspace-->
-          <nav class="wfm-nav clearfix navbar-inverse" data-bind="with: vwmUserProfile">
-            <div class="pull-left wfm-nav__block">
-              <span class="link-view-inverse" data-bind="click: deactivateVwmChild">{{lang.wfm}}</span>
-              <span class="min-left-margin link-view-inverse" data-bind="if: $root.isUserInDemoMode">demo cabinet</span>
+          <nav class="wfm-nav clearfix navbar-inverse">
+            <div data-bind="ifnot: vwmUserProfile">
+              {{> style-link-selector }}
             </div>
-            <div class="pull-right wfm-nav__block">
-              <button type="button" class="btn btn-xs btn-inverse" data-bind="click: $parent.logOff.bind($parent)">
-                <i class="glyphicon glyphicon-off"></i>
-                {{capitalizeFirst lang.logOut}}
-              </button>
+            <div data-bind="with: vwmUserProfile">
+              <div class="pull-left wfm-nav__block">
+                <span class="link-view-inverse" data-bind="click: deactivateVwmChild">{{lang.wfm}}</span>
+                <span class="min-left-margin link-view-inverse" data-bind="if: $root.isUserInDemoMode">demo cabinet</span>
+              </div>
+              <div class="pull-right wfm-nav__block">
+                <button type="button" class="btn btn-xs btn-inverse" data-bind="click: $parent.logOff.bind($parent)">
+                  <i class="glyphicon glyphicon-off"></i>
+                  {{capitalizeFirst lang.logOut}}
+                </button>
+              </div>
             </div>
           </nav>
           <div class="wfm-content-wrap">

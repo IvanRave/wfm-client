@@ -24,7 +24,7 @@
     <!-- current: vwmWegion-->
     <li>
       <div class="clearfix">
-        <i class="glyphicon" data-bind="css: menuItemCss, click: toggleItem"></i>
+        <i class="glyphicon wfm-toggle-item" data-bind="css: menuItemCss, click: toggleItem"></i>
         <div class="wfm-menu-item" data-bind="click: $parent.activateVwmChild.bind($parent), css: { 'wfm-slc-menu-item': isActiveVwmStage }">
           <div class="pull-right">
             <small>
@@ -41,7 +41,7 @@
         <!-- current: vwmWield -->
         <li>
           <div class="clearfix">
-            <i class="glyphicon" data-bind="css: menuItemCss, click: toggleItem"></i>
+            <i class="glyphicon wfm-toggle-item" data-bind="css: menuItemCss, click: toggleItem"></i>
             <div class="wfm-menu-item" data-bind="click: $parent.activateVwmChild.bind($parent), css: { 'wfm-slc-menu-item': isActiveVwmStage }">
               <div class="pull-right">
                 <small>
@@ -58,7 +58,7 @@
             <!-- current: vwmWroup -->
             <li>
               <div class="clearfix">
-                <i class="glyphicon" data-bind="css: menuItemCss, click: toggleItem"></i>
+                <i class="glyphicon wfm-toggle-item" data-bind="css: menuItemCss, click: toggleItem"></i>
                 <div class="wfm-menu-item" data-bind="click: $parent.activateVwmChild.bind($parent), css: { 'wfm-slc-menu-item': isActiveVwmStage }">
                   <div class="pull-right">
                     <small>
@@ -89,26 +89,25 @@
                 </li>
                 <!-- /ko -->
                 <li data-bind="if: $root.isEmployeeInEditMode">
-                  <button class="btn btn-xs" data-bind="click: postVwmWell" type="button">Add well</button>
+                  <button class="btn btn-xs wfm-menu-button" data-bind="click: postVwmWell" type="button">Add well</button>
                 </li>
               </ul>
             </li>
             <!-- /ko -->
             <li data-bind="if: $root.isEmployeeInEditMode">
-              <button class="btn btn-xs" data-bind="click: addVwmWroup" type="button">Add group</button>
+              <button class="btn btn-xs wfm-menu-button" data-bind="click: addVwmWroup" type="button">Add group</button>
             </li>
           </ul>
         </li>
         <!-- /ko -->
         <li data-bind="if: $root.isEmployeeInEditMode">
-          <button class="btn btn-xs" data-bind="click: addVwmWield" type="button">Add field</button>
+          <button class="btn btn-xs wfm-menu-button" data-bind="click: addVwmWield" type="button">Add field</button>
         </li>
       </ul>
     </li>
     <!-- /ko -->
     <li data-bind="if: $root.isEmployeeInEditMode">
-      <button class="btn btn-xs" type="button" 
-              data-bind="click: prePostVwmWegion">
+      <button class="btn btn-xs wfm-menu-button" type="button" data-bind="click: prePostVwmWegion">
         Add region
       </button>
     </li>

@@ -1,0 +1,31 @@
+/* Widget tiles */
+
+.widget-tile {
+    margin-bottom: 8px;
+    border: 2px solid $widget-tile-header-bg;
+    @include single-box-shadow(darken($widget-tile-header-bg, 10%), 3px, 4px, 5px, 0, false);
+}
+
+    .widget-tile .widget-tile-header {
+        padding: 4px;
+        background-color: $widget-tile-header-bg;
+        cursor: move;
+    }
+
+    .widget-tile .widget-tile-content {
+        border-top: 0;
+    }
+
+        .widget-tile .widget-tile-content .widget-setting-panel {
+            padding: 4px;
+            border-bottom: 1px dashed #ccc;
+        }
+
+        .widget-tile .widget-tile-content .widget-content {
+            padding: 4px;
+        }
+
+    .widget-tile .widget-empty {
+        padding: 4px;
+        text-align: left;
+    }

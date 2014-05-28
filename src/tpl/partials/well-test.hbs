@@ -16,7 +16,7 @@
         <input class="input-sm" type="number" min="0" max="59" data-bind="value: minute" placeholder="{{lang.minutes}}" />
       </div>
       <!-- /ko -->
-      <div class="pull-left">
+      <div class="pull-left min-left-margin">
         <button type="button" class="btn btn-default btn-sm" data-bind="enable: isEnabledPostTestScope, click: postTestScope">
           <i class="glyphicon glyphicon-plus"></i> {{capitalizeFirst lang.toCreateTest}}
         </button>
@@ -25,7 +25,7 @@
   </div>
   <div data-bind="foreach: { data: handledListOfVwmTestScope, as: 'vwmTestScope' }">
     <div>
-      <div class="min-top-margin" style="background-color: #f5f5f5">
+      <div class="min-top-margin">
         <div class="test-header clearfix" data-bind="css: { 'test-approved': mdlTestScope.isApproved, 'test-declined': mdlTestScope.isApproved() === false }">
           <div class="pull-left">
             <button class="btn btn-inverse btn-xs" data-bind="click: toggleIsDetailed">
