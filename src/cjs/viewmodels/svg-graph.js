@@ -109,7 +109,8 @@ exports.prototype.getAxisY = function () {
 			return d3.svg.axis()
 			.scale(tmpYScale)
 			.orient('left')
-			.tickSize(-this.vboxSize.width);
+			.tickSize(-this.vboxSize.width)
+      .tickFormat(d3.format('.3s')); // like 1.34k or 34.1M
 		}
 	}
 };
