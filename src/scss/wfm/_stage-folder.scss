@@ -1,0 +1,32 @@
+/* File manager folders */
+
+.stage-folder {
+  width: 78px;
+  position: relative;
+  padding: 8px 2px 0;
+  @include gradient-line($stage-folder-start-bg, $stage-folder-stop-bg);
+  border: 1px solid $stage-folder-border-color;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+.stage-folder:hover {
+  @include gradient-line($stage-folder-start-bg-hover, $stage-folder-stop-bg-hover);
+}
+
+.stage-folder__wfm-icon {
+  font-size: 2em;
+}
+
+.stage-folder__folder-icon {
+  font-size: 0.8em;
+  position: absolute;
+  top: 2px;
+  right: 6px;
+}
+
+.stage-folder__name {
+  font-size: 0.8em;
+  white-space: nowrap;
+}

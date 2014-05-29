@@ -13,10 +13,10 @@ exports.drawPie = function (parentElem, data) {
 	height = 120;
 	var radius = Math.min(width, height) / 2;
 
-  var colors = data.map(function(item){
-    return item.color;
-  });
-  
+	var colors = data.map(function (item) {
+			return item.color;
+		});
+
 	var color = d3.scale.ordinal()
 		.range(colors);
 
@@ -37,8 +37,6 @@ exports.drawPie = function (parentElem, data) {
 		.append("g")
 		.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
-    
-    
 	data.forEach(function (d) {
 		d.val = +d.val;
 	});

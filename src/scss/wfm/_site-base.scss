@@ -6,13 +6,13 @@ html, body {
 }
 
 select {
-  background-color: $select-bg;
-  color: $select-color;
+  background-color: $input-bg;
+  color: $input-color;
 }
 
 input {
-  background-color: $select-bg;
-  color: $select-color;
+  background-color: $input-bg;
+  color: $input-color;
 }
 
 table {
@@ -53,8 +53,15 @@ table {
     font-size: 0.8em;
 }
 
+/* Redefine bootstrap alerts: small padding */
+.alert {
+    padding: 8px !important;
+    margin-bottom: 8px !important;
+}
+
 .elem-shadow {
-  @include box-shadow(1px, 1px, 2px, 2px, #ccc);
+  /*@include box-shadow(1px, 1px, 2px, 2px, #ccc);*/
+  @include single-box-shadow(#ccc, 1px, 1px, 2px, 2px, false);
 }
 
 .pre-wrap-text {
@@ -121,6 +128,20 @@ table {
         background-color: lighter($btn-inverse-bg, 5%);
         color: #ddd;
     }
+
+.break-word {
+    -ms-word-wrap: break-word;
+    word-wrap: break-word;
+}
+    
+.stencil-img {
+  height: 400px;
+  border: 2px outset $stencil-img-start-bg;
+  text-align: center;
+  padding-top:180px;
+  font-size: 1.4em;
+  @include gradient-line($stencil-img-start-bg, $stencil-img-stop-bg);
+}
     
 /* .btn {
   @include text-shadow(rgba($btn-default-color, 0.2) 1px 1px 0, rgba($btn-default-color, 0.2) 2px 2px 0, rgba($btn-default-color, 0.2) 3px 3px 0);
@@ -163,7 +184,7 @@ table {
     }
 
 .company-logo {
-    box-shadow: 0 0 8px $gray-lighter;
+    @include single-box-shadow(#777, 0, 0, 8px, 0, false);
     width: $company-logo-width;
 }
 
@@ -281,33 +302,6 @@ table {
     padding: 8px 15px 0 0;
 }
 
-.axis {
-}
-
-    .axis text {
-        font-size: 1.4em;
-        font-family: 'Bookman Old Style', serif;
-    }
-
-    .axis line {
-        fill: none;
-        stroke: #ccc;
-        stroke-width: 1px;
-    }
-
-    .axis path {
-        fill: none;
-        stroke: #888;
-        stroke-width: 1px;
-    }
-
-.svg-graph-path {
-    fill: none;
-    stroke-width: 1.5px;
-    // During scaling - doesn't change stroke width
-    vector-effect: non-scaling-stroke;
-}
-
 .evo-scope-wrap {
     padding: 6px;
 }
@@ -367,32 +361,6 @@ table {
 	}
 }
 
-.graph-zoom-rect {
-    fill: none;
-    pointer-events: all;
-    cursor: move;
-}
-
-.svg-zoom-controls {
-    stroke: #bbb;
-    cursor: pointer;
-    stroke-width: 1px;
-}
-
-    .svg-zoom-controls circle {
-        fill: none;
-        pointer-events: all;
-    }
-
-        .svg-zoom-controls circle:hover {
-            stroke: #000;
-            stroke-width: 2px;
-        }
-
-    .svg-zoom-controls path {
-        fill: #bbb;
-    }
-
 .panzoom-controls {
     position: absolute;
     font-size: 1.5em;
@@ -413,11 +381,6 @@ table {
     top: 130px;
 }
 
-.break-word {
-    -ms-word-wrap: break-word;
-    word-wrap: break-word;
-}
-
 /* Standard wfm list for any items: light */
 ul.wfm-light-list {
     padding-left: 0;
@@ -428,108 +391,11 @@ ul.wfm-light-list {
         padding: 4px 0 4px 0;
     }
 
-.wield-map-svg {
-    font: 20px sans-serif;
-    shape-rendering: crispEdges;
+.pie-wrap {
+  @include filter(drop-shadow(5px 5px 5px #333));
+  /* @include filter(drop-shadow(5px 5px 5px #333) opacity(0.4)); */
 }
-
-    .wield-map-svg__back-rect {
-        fill: #efefef;
-    }
-
-/* Redefine bootstrap alerts: small padding */
-.alert {
-    padding: 8px !important;
-    margin-bottom: 8px !important;
-}
-
-.graph-wrap{
-  @include gradient-line(#efefef, #fefefe);
-}
-
-  .well-marker_pre-created {
-    fill: green;
-    stroke: #ccc;
-  }
-
-  .well-marker_drilled {
-    fill: #000;
-    stroke: #777;
-  }
   
-  .well-marker_non-drilled {
-    fill: #999;
-    stroke: #555;
-  }
-  
-  .well-marker_selected {
-    fill: #f00;
-    stroke: #000;
-  }
-  
-.stage-folder {
-  width: 78px;
-  position: relative;
-  padding: 8px 2px 0;
-  @include gradient-line(#eee, #ccc);
-  border: 1px solid #aaa;
-  text-align: center;
-  cursor: pointer;
-  border-radius: 3px;
-}
-
-.stage-folder:hover {
-  @include gradient-line(#ddd, #bbb);
-}
-
-.stage-folder__wfm-icon {
-  font-size: 2em;
-}
-
-.stage-folder__folder-icon {
-  font-size: 0.8em;
-  position: absolute;
-  top: 2px;
-  right: 6px;
-}
-
-.stage-folder__name {
-  font-size: 0.8em;
-  white-space: nowrap;
-}
-
-/* A header of a list of file */
-.lf-header {
-  padding-bottom: 4px;
-}
-
-.lf-header-column {
-  padding: 4px 4px 6px 12px;
-  border: 1px solid #cecece;
-  background-color: #efefef;
-  position: relative;
-}
-
-.lf-header-column__select-all {
-  margin: 0 0 0 0 !important;
-  position: absolute;
-  top: 8px;
-  left: 14px;
-}
-
-.lf-header-column__name-header {
-  margin-left: 26px;
-}
-
-.stencil-img {
-  height: 400px;
-  border: 2px outset #ccc;
-  text-align: center;
-  padding-top:180px;
-  font-size: 1.4em;
-  @include gradient-line(#efefef, #fefefe);
-}
-
 .pie-text {
   font-size: $pie-font-size;
 }

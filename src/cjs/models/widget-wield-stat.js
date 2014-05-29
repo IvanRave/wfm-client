@@ -74,7 +74,7 @@ exports.prototype.calcWellActivityData = function () {
 			lbl : nonActiveCount || '',
 			val : nonActiveCount,
 			name : 'Non-active wells',
-			color : '#999' // $gray-light:             #999;
+			color : '#999'
 		}
 	];
 };

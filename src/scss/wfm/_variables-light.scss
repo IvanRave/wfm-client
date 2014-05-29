@@ -2,23 +2,61 @@
 
 // Bootstrap
 $body-bg:                   #fefefe;
-$text-color:                $gray-dark;
+$text-color:                #333;
 $dropdown-bg:               #fefefe;
-$well-bg:                   $gray-lighter;
+$dropdown-link-hover-bg:    darken($dropdown-bg, 10%);
+$well-bg:                   #eee;
 $input-bg:                  #fefefe;
+$input-color:               $text-color;
+$input-border:              darken($input-bg, 15%);
 $modal-content-bg:          #fefefe;
-$modal-backdrop-bg:         $gray-light;
+$modal-backdrop-bg:         #999;
+$list-group-bg:             #fefefe;
+$list-group-border:         #ddd;
+$list-group-hover-bg:       #f5f5f5;
 
 // WFM
-$wfm-footer-color-start:    $gray-four;
-$wfm-footer-color-stop:     $gray-darker;
-$select-bg:                 #fefefe;
-$select-color:              $gray-darker;
-$wfm-nav-color-start:       $gray;
-$wfm-nav-color-stop:        $gray-darker;
-$sidebar-wrap-bg:           $gray;
+$wfm-footer-color-start:    #333;
+$wfm-footer-color-stop:     #111;
+$wfm-nav-color-start:       #111;
+$wfm-nav-color-stop:        #333;
+$sidebar-wrap-bg:           #222;
+
 $btn-inverse-bg:            #333;
 $btn-inverse-color:         #eee;
 $btn-inverse-border-color:  #777;
 
-$widget-tile-header-bg:     $gray-lighter;
+$widget-tile-header-bg:     #eee;
+
+$brand-default:             #eee;
+
+$btn-default-color:         #444;
+$btn-default-bg:            $brand-default;
+$btn-default-border:        darken($btn-default-bg, 10%);
+
+/* stage-folder.scss */
+$stage-folder-start-bg:           #eee;
+$stage-folder-stop-bg:            #ccc;
+$stage-folder-start-bg-hover:     lighten($stage-folder-start-bg, 10%);
+$stage-folder-stop-bg-hover:      lighten($stage-folder-stop-bg, 10%);
+$stage-folder-border-color:       #aaa;
+
+/* file-list.scss */
+$lf-header-bg:                    #efefef;
+$lf-header-border-color:          darken($lf-header-bg, 20%);
+
+/* stencil image */
+$stencil-img-start-bg:            #efefef;
+$stencil-img-stop-bg:             #fefefe;
+
+/* svg-graph.scss */
+$graph-wrap-start-bg:             #efefef;
+$graph-wrap-stop-bg:              #fefefe;
+$graph-axis-line-stoke:           #ccc;
+$graph-axis-path-stroke:          #888;
+$graph-axis-text-fill:            $text-color;
+$graph-axis-text-fsz:             1.4em;
+
+/* wield-map */
+$svg-map-bg:                      $body-bg;
+$svg-map-border:                  darken($svg-map-bg, 10%);

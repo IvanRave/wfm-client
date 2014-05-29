@@ -13,7 +13,7 @@
     .sidebar-toggle button {
         background-color: $sidebar-wrap-bg;
         padding: 0;
-        color: $gray-light;
+        color: #999;
         border: 0;
         font-size: 0.8em;
         width: 20px;
@@ -22,7 +22,7 @@
     }
 
         .sidebar-toggle button:hover {
-            color: $gray-lighter;
+            color: #eee;
         }
 
 .wfm-list ul {

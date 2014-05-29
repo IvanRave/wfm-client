@@ -9,7 +9,7 @@
   </div>
   <div class="widget-content">
     <div data-bind="if: mdlWidget.opts.isVisWellActivity">
-      <div data-bind="svgPie: { pieData: mdlWidget.wellActivityData}">
+      <div class="pie-wrap" data-bind="svgPie: { pieData: mdlWidget.wellActivityData}">
       </div>
       <div class="pie-legend">
         <div data-bind="foreach: mdlWidget.wellActivityData">

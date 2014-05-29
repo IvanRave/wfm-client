@@ -1,8 +1,7 @@
 /* Block for well, field, group, region tab links to sections */
 
 .wfm-section-panel {
-    /*background-color: $gray-darker;*/
-    @include gradient-line($gray-four, $gray-darker);
+  @include gradient-line($wfm-footer-color-start, $wfm-footer-color-stop);
 }
 
 /* Block with icon and caption in a footer panel*/
@@ -20,17 +19,17 @@
 
 /** A modificator for active blocks */
 .wfm-section-item_state_active {
-    background-color: $gray-darker;
+    background-color: #222;
     color: $wfm-section-item-color;
 }
 
   .wfm-section-item:focus {
-      background-color: $gray-darker;
+      background-color: #222;
       color: $wfm-section-item-color;
   }
 
   .wfm-section-item:hover {
-      background-color: $gray-darker;
+      background-color: #222;
       color: $wfm-section-item-color;
   }
 
@@ -38,8 +37,8 @@
       position: absolute;
       bottom: 4px;
       right: 4px;
-      border-top-color: $gray-lighter;
-      border-bottom-color: $gray-lighter;
+      border-top-color: #eee;
+      border-bottom-color: #eee;
   }
       
   .wfm-section-item__caption {

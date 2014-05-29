@@ -3,23 +3,11 @@
 //-- Redefine bootstrap properties (with !default)
 $icon-font-path: "../fonts/";
 
-$gray-darker:            #222;
-$gray-dark:              #333;
-$gray-four:              #444;
-$gray:                   #555;
-$gray-light:             #999;
-$gray-lighter:           #eee;
-
 $brand-primary:         #79a0c1;
 $brand-success:         #5cb85c;
 $brand-info:            #5bc0de;
 $brand-warning:         #f0ad4e;
 $brand-danger:          #d9534f;
-$brand-default:         #ededed;
-
-$btn-default-color:     #444;
-$btn-default-bg:        $brand-default;
-$btn-default-border:    darken($btn-default-bg, 10%);
 
 // WFM props
 
@@ -53,6 +41,7 @@ $wfm-nav-height: 32px;
 
 //-- Loader's pathes
 $loader-circle-medium-path: '../img/loader-circle-medium.gif';
+$loader-circle-large-path: '../img/loader-circle-large.gif';
 $loader-line-small-path: '../img/loader-line-small.gif';
 $loader-line-medium-path: '../img/loader-line-medium.gif';
 
@@ -61,6 +50,11 @@ $loader-circle-medium-width: 32px;
 $loader-circle-medium-height: 32px;
 $loader-circle-medium-margin-left: -($loader-circle-medium-width / 2);
 $loader-circle-medium-margin-top: -($loader-circle-medium-width / 2);
+
+$loader-circle-large-width: 100px;
+$loader-circle-large-height: 100px;
+$loader-circle-large-margin-left: -($loader-circle-large-width / 2);
+$loader-circle-large-margin-top: -($loader-circle-large-width / 2);
 
 $loader-line-small-width: 16px;
 $loader-line-small-height: 11px;

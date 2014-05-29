@@ -4,7 +4,9 @@
     <div class="col-md-8">
         <div data-bind="with: slcVwmMapMarker">
           <div data-bind="with: getVwmMapOfWield()">
-            {{> oil-map }}
+            <div class="oil-map-wrap">
+              {{> oil-map }}
+            </div>
           </div>
         </div>
     </div>

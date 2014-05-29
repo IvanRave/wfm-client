@@ -16,7 +16,7 @@
           <span data-bind="ifnot: $root.isEmployeeInEditMode">
             <span data-bind="text: mdlWidgout.name"></span>
           </span>
-          <button class="btn btn-sm btn-default" data-bind="click: preGenerateReport">
+          <button class="btn btn-link" data-bind="click: preGenerateReport">
             <i class="glyphicon glyphicon-book"></i> Generate a report
           </button>
           <span data-bind="with: reportFileSpec">
@@ -62,13 +62,13 @@
                 </div>
                 <div class="pull-right" data-bind="if: $root.isEmployeeInEditMode">
                   <div data-bind="ifnot: isVisSettingPanel">
-                    <button class="btn btn-xs" type="button" 
+                    <button class="btn btn-xs btn-default" type="button" 
                             data-bind="click: showVisSettingPanel">
                       <i class="glyphicon glyphicon-cog" 
                          title="{{capitalizeFirst lang.settings}}"></i>
                     </button>
                     <!-- parent: vwmWidgock -->
-                    <button class="btn btn-xs" type="button" 
+                    <button class="btn btn-xs btn-default" type="button" 
                             data-bind="click: $parent.removeVwmWidget.bind($parent)">
                       <i class="glyphicon glyphicon-remove" 
                          title="{{capitalizeFirst lang.toDelete}}"></i>

@@ -1,24 +1,62 @@
 // WFM variables for dark template
 
 // Bootstrap
-$body-bg:                   $gray-dark;
-$text-color:                $gray-lighter;
-$dropdown-bg:               $gray-lighter;
-$well-bg:                   $gray;
-$input-bg:                  $gray-lighter;
-$modal-content-bg:          $gray;
-$modal-backdrop-bg:         $gray-light;
+$body-bg:                   #444;
+$text-color:                #eee;
+$dropdown-bg:               #ddd;
+$dropdown-link-hover-bg:    darken($dropdown-bg, 10%);
+$well-bg:                   #555;
+$input-bg:                  #555;
+$input-color:               $text-color;
+$input-border:              lighten($input-bg, 15%);
+$modal-content-bg:          #555;
+$modal-backdrop-bg:         #999;
+$list-group-bg:             #444;
+$list-group-border:         #555;
+$list-group-hover-bg:       #434343;
 
 // WFM
-$wfm-footer-color-start:    $gray-four;
-$wfm-footer-color-stop:     $gray-darker;
-$select-bg:                 $gray-lighter;
-$select-color:              #000;
-$wfm-nav-color-start:       $gray;
-$wfm-nav-color-stop:        $gray-darker;
-$sidebar-wrap-bg:           $gray-darker;
+$wfm-footer-color-start:    #333;
+$wfm-footer-color-stop:     #111;
+$wfm-nav-color-start:       #111;
+$wfm-nav-color-stop:        #333;
+$sidebar-wrap-bg:           #222;
+
 $btn-inverse-bg:            #333;
 $btn-inverse-color:         #eee;
 $btn-inverse-border-color:  #777;
 
-$widget-tile-header-bg:     $gray;
+$widget-tile-header-bg:     #323232;
+
+$brand-default:                   #222;
+
+$btn-default-color:               $text-color;
+$btn-default-bg:                  $brand-default;
+$btn-default-border:              darken($btn-default-bg, 15%);
+
+/* stage-folder.scss */
+$stage-folder-start-bg:           #101010;
+$stage-folder-stop-bg:            #323232;
+$stage-folder-start-bg-hover:     lighten($stage-folder-start-bg, 10%);
+$stage-folder-stop-bg-hover:      lighten($stage-folder-stop-bg, 10%);
+$stage-folder-border-color:       #121212;
+
+/* file-list.scss */
+$lf-header-bg:                    #222;
+$lf-header-border-color:          lighten($lf-header-bg, 20%);
+
+/* stencil image */
+$stencil-img-start-bg:            #555;
+$stencil-img-stop-bg:             #444;
+
+/* svg-graph.scss */
+$graph-wrap-start-bg:             #555;
+$graph-wrap-stop-bg:              #111;
+$graph-axis-line-stoke:           #777;
+$graph-axis-path-stroke:          #888;
+$graph-axis-text-fill:            $text-color;
+$graph-axis-text-fsz:             1.4em;
+
+/* wield-map */
+$svg-map-bg:                      $body-bg;
+$svg-map-border:                  darken($svg-map-bg, 10%);

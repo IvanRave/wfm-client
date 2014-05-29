@@ -1,0 +1,36 @@
+/* a well field map and markers */
+
+.oil-map-wrap {
+  border: 1px solid $svg-map-border;
+  @include single-box-shadow($svg-map-border, 1px, 1px, 2px, 2px, false);
+  background-color: $svg-map-bg;
+}
+
+  .oil-map-svg {
+      font: 20px sans-serif;
+      shape-rendering: crispEdges;
+  }
+
+  .oil-map-svg__back-rect {
+      fill: $svg-map-bg;
+  }
+
+  .well-marker_pre-created {
+    fill: green;
+    stroke: #ccc;
+  }
+
+  .well-marker_drilled {
+    fill: #000;
+    stroke: #777;
+  }
+  
+  .well-marker_non-drilled {
+    fill: #999;
+    stroke: #555;
+  }
+  
+  .well-marker_selected {
+    fill: #f00;
+    stroke: #000;
+  }

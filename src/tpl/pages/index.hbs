@@ -11,7 +11,6 @@
 <body>
     <!--[if lt IE 10]><p class="chromeframe">You are using an <strong>outdated</strong> browser. Please upgrade your browser.</p><![endif]-->
     <div class="hide" id="workspace-project">
-      <div class="loader-main"></div>
       <div>
           <!-- current: vwmWorkspace-->
           <nav class="wfm-nav clearfix navbar-inverse">
@@ -21,7 +20,7 @@
             <div data-bind="with: vwmUserProfile">
               <div class="pull-left wfm-nav__block">
                 <span class="link-view-inverse" data-bind="click: deactivateVwmChild">{{lang.wfm}}</span>
-                <span class="min-left-margin link-view-inverse" data-bind="if: $root.isUserInDemoMode">demo cabinet</span>
+                <!-- <span class="min-left-margin link-view-inverse" data-bind="if: $root.isUserInDemoMode">demo cabinet</span> -->
               </div>
               <div class="pull-right wfm-nav__block">
                 <button type="button" class="btn btn-xs btn-inverse" data-bind="click: $parent.logOff.bind($parent)">
@@ -162,6 +161,25 @@
         <div class="wfm-footer__logo"></div>
       </div>
     </footer>
+    <!-- <div id="loader-main" class="loader-circle-large"></div> -->
+    <div id="loader-main">
+      <div class="f_circleG" id="frotateG_01">
+      </div>
+      <div class="f_circleG" id="frotateG_02">
+      </div>
+      <div class="f_circleG" id="frotateG_03">
+      </div>
+      <div class="f_circleG" id="frotateG_04">
+      </div>
+      <div class="f_circleG" id="frotateG_05">
+      </div>
+      <div class="f_circleG" id="frotateG_06">
+      </div>
+      <div class="f_circleG" id="frotateG_07">
+      </div>
+      <div class="f_circleG" id="frotateG_08">
+      </div>
+    </div>
     <!-- Load main script file for page or default (with auth logic only) -->
     {{#if conf.isProd}}
     <script data-main="js/main-bundle-{{package.version}}" src="js/require.min.js"></script>
