@@ -1,6 +1,5 @@
 ﻿/**
  * @module
- * @todo #22! fix a changing a name of a layout
  */
 define(['knockout',
 		'models/widgock',
@@ -46,7 +45,7 @@ define(['knockout',
 		this.name = ko.observable(data.Name);
 
 		// Save, when a name is changed */
-		this.name.subscribe(this.save);
+		this.name.subscribe(this.saveWidgout, this);
 
 		/**
 		 * Well widget block list
@@ -56,7 +55,7 @@ define(['knockout',
 	};
 
 	/** Save a layout */
-	exports.prototype.save = function () {
+	exports.prototype.saveWidgout = function () {
 		// Get well id as parent
 		var tmpStageId = this.getParent().Id || this.getParent().id;
 
