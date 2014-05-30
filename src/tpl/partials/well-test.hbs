@@ -41,7 +41,7 @@
             <div data-bind="if: mdlTestScope.isApproved() !== null">
               <div class="min-right-margin">
                 <span data-bind="if: $root.isEmployeeInEditMode">
-                  <button class="btn btn-xs btn-inverse" type="button" data-bind="click: mdlTestScope.setStatusToNull">
+                  <button class="btn btn-xs btn-inverse" type="button" data-bind="click: mdlTestScope.setStatusToNull.bind(mdlTestScope)">
                     Clear status
                   </button>
                 </span>
@@ -54,8 +54,8 @@
             <div data-bind="if: $root.isEmployeeInEditMode">
               <div data-bind="if: mdlTestScope.isApproved() === null">
                 <div class="btn-group">
-                  <button type="button" class="btn btn-xs btn-success" data-bind="click: mdlTestScope.setStatusToApproved">{{capitalizeFirst lang.approve}}</button>
-                  <button type="button" class="btn btn-xs btn-danger" data-bind="click: mdlTestScope.setStatusToDeclined">{{capitalizeFirst lang.decline}}</button>
+                  <button type="button" class="btn btn-xs btn-success" data-bind="click: mdlTestScope.setStatusToApproved.bind(mdlTestScope)">{{capitalizeFirst lang.approve}}</button>
+                  <button type="button" class="btn btn-xs btn-danger" data-bind="click: mdlTestScope.setStatusToDeclined.bind(mdlTestScope)">{{capitalizeFirst lang.decline}}</button>
                 </div>
               </div>
             </div>
@@ -110,7 +110,10 @@
                   <button type="button" class="btn btn-default btn-xs" data-bind="click: saveTestData, slideVisible: isEdit() === true">{{capitalizeFirst lang.toSave}}</button>
                   <button type="button" class="btn btn-default btn-xs" data-bind="click: cancelEditTestData, slideVisible: isEdit() === true">{{capitalizeFirst lang.toCancel}}</button>
                   <!-- parent: vwmTestScope -->
-                  <button type="button" class="btn btn-default btn-xs" data-bind="click: vwmTestScope.mdlTestScope.deleteTestData, slideVisible: $index() === ($parent.mdlTestScope.testDataList().length - 1)">{{capitalizeFirst lang.toDelete}}</button>
+                  <button type="button" class="btn btn-default btn-xs" 
+                    data-bind="click: vwmTestScope.mdlTestScope.deleteTestData.bind(vwmTestScope.mdlTestScope), slideVisible: $index() === ($parent.mdlTestScope.testDataList().length - 1)">
+                      {{capitalizeFirst lang.toDelete}}
+                  </button>
               </td>
               <!-- /ko -->
             </tr>
@@ -118,7 +121,7 @@
             <!-- ko if: $root.isEmployeeInEditMode -->
             <tr>
               <td colspan="4">
-                <button type="button" class="btn btn-xs btn-default" data-bind="click: vwmTestScope.mdlTestScope.addTestData">
+                <button type="button" class="btn btn-xs btn-default" data-bind="click: vwmTestScope.mdlTestScope.addTestData.bind(vwmTestScope.mdlTestScope)">
                   {{capitalizeFirst lang.toAddHour}}
                 </button>
               </td>

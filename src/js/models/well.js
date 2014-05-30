@@ -294,7 +294,7 @@ define([
 		////            // ColumnAttributes (convert data objects into array)
 		////            var columnAttributes = importColumnAttributes(res);
 
-		////            // TODO: Style decor for attribute selection
+		////            // Style decor for attribute selection
 		////            var selectDepth = document.createElement('select');
 		////            $(selectDepth).addClass('pd-parameter');
 
