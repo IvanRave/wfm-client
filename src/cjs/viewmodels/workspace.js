@@ -1,11 +1,85 @@
 ﻿/** @module viewmodels/workspace */
 'use strict';
 
+var $ = require('jquery');
 var ko = require('knockout');
 var historyHelper = require('helpers/history-helper');
 var cookieHelper = require('helpers/cookie-helper');
 var VwmUserProfile = require('viewmodels/user-profile');
 var globalCssCnst = require('constants/global-css-constants');
+
+// http://stackoverflow.com/questions/8648892/convert-url-parameters-to-a-javascript-object
+function calcObjFromUrl(search) {
+	return search ? JSON.parse('{"' + search.replace(/&/g, '","').replace(/=/g, '":"') + '"}',
+		function (key, value) {
+		return key === "" ? value : decodeURIComponent(value);
+	}) : {};
+}
+
+function handleAuthResult(nextFunc, authResult) {
+	var resultObj = calcObjFromUrl(authResult);
+	console.log(resultObj);
+	// Send a code to the api (change to sid)
+
+	var options = {
+		cache : false,
+		type : 'POST',
+		// need for CORS requests without preflight request
+		contentType : 'application/x-www-form-urlencoded; charset=UTF-8',
+		data : 'code=' + resultObj.code,
+		xhrFields : {
+			// For CORS request to send cookies
+			withCredentials : true
+		}
+	};
+
+	$.ajax('http://localhost:3000/api/session-manager', options).done(function (rr) {
+		console.log('response from wfm-node', rr);
+    nextFunc();
+	}).fail(function (errr) {
+		console.log('error from wfm-node', errr);
+		//if (jqXhr.status === 422) {
+		//  err = langHelper.translate(jqXhr.responseJSON.errId) || '{{lang.unknownError}}');
+		//}
+	});
+}
+
+function openNewWindow(next) {
+	var redirectUri = 'http://127.0.0.1:12345/handle-auth-code.html';
+
+	var authWindow;
+
+	var authInterval = setInterval(function () {
+			var authLocation = authWindow.location;
+
+			var authLocationHref;
+			// Uncaught SecurityError: Blocked a frame with origin "http://127.0.0.1:12345" from accessing
+			// a frame with origin "http://localhost:1337". Protocols, domains, and ports must match.
+			try {
+				authLocationHref = authLocation.href;
+			} catch (errSecurity) {}
+
+			console.log(authLocationHref);
+
+			if (authLocationHref) {
+				var hrefParts = authLocationHref.split('?');
+				if (hrefParts[0] === redirectUri) {
+					// Get code or error
+					var authResponse = hrefParts[1];
+
+					clearInterval(authInterval);
+					// Close popup
+					authWindow.close();
+
+					next(authResponse);
+				}
+			}
+
+		}, 1000);
+
+	authWindow = window.open('http://localhost:1337/dialog/authorize?response_type=code&client_id=abc123&redirect_uri=' + redirectUri, '_blank',
+			'location=yes,height=570,width=520,scrollbars=yes,status=yes');
+}
 
 /**
  * A workspace view model: a root for knockout
@@ -106,6 +180,19 @@ exports = function (mdlWorkspace) {
 
 	////    ths.userProfile.loadUserProfile();
 	////};
+};
+
+exports.prototype.openAuth = function () {
+	console.log('open auth');
+  var ths = this;
+	openNewWindow(handleAuthResult.bind(null, function () {
+			ths.mdlWorkspace.setUserProfile({
+        Id: null,
+        // TODO^ #33! get email from the server
+        Email: 'todo@change.email',
+        Roles: null
+      });
+		}));
 };
 
 /** Build a viewmodel for user profile */

@@ -27,9 +27,10 @@ define(['knockout',
 
 		/**
 		 * File url: generating on the server
+		 *    without right part, like /api/sections/some-file-id
 		 * @type {string}
 		 */
-		this.fileUrl = data.FileUrl;
+		this.fileUrl = '{{conf.requrl}}' + data.FileUrl;
 
 		/**
 		 * File name (255)
