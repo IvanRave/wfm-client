@@ -60,7 +60,8 @@
                   <span data-bind="if: $root.isEmployeeInEditMode">
                     <span data-bind="with: vwmWell">
                       <button class="btn btn-sm btn-default" data-bind="click: createMonitoringRecord">Create record</button>
-                      <span data-bind="if: $root.isUserInDemoMode">
+                      <!-- TODO: #42! show this button only for demo cabinet -->
+                      <span>
                         <button class="btn btn-sm btn-default" data-bind="click: createDemoMonitoringRecords">Generate records for last month</button>
                       </span>
                     </span>

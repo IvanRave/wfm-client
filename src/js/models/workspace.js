@@ -1,4 +1,8 @@
-﻿/** @module */
+﻿/** @module
+ * todo: #22! handle to remove
+ *       this.setUserProfile
+ *       this.cleanUserProfile
+ */
 define([
 		'knockout',
 		'helpers/app-helper',
@@ -8,7 +12,6 @@ define([
 		'models/wfm-param-squad',
 		'services/wfm-param-squad',
 		'services/auth',
-		'services/register',
 		'helpers/knockout-lazy'],
 	function (ko,
 		appHelper,
@@ -17,8 +20,7 @@ define([
 		sectionPatternService,
 		WfmParamSquad,
 		wfmParamSquadService,
-		userProfileService,
-		registerService) {
+		userProfileService) {
 	'use strict';
 
 	/**
@@ -27,18 +29,18 @@ define([
 	 */
 	var exports = function () {
 		/**
-    * Param squads
-    */
+		 * Param squads
+		 */
 		this.wfmParamSquadList = ko.lazyObservableArray(this.loadParamSquadList, this);
 
 		/**
-    * A list of section patterns: lazy loading by first request
-    */
+		 * A list of section patterns: lazy loading by first request
+		 */
 		this.ListOfSectionPatternDto = ko.lazyObservableArray(this.loadListOfSectionPattern, this);
 
-		/** 
-    * All parameters from all groups as one dimensional array
-    */
+		/**
+		 * All parameters from all groups as one dimensional array
+		 */
 		this.wfmParameterList = ko.computed({
 				read : this.calcWfmParameterList,
 				deferEvaluation : true,
@@ -59,10 +61,6 @@ define([
 		this.isTriedToLoadUserProfile = ko.observable(false);
 	};
 
-	exports.prototype.sendLogOn = function (logOnData, scsCallback, errCallback) {
-		userProfileService.accountLogon(logOnData).done(scsCallback).fail(errCallback);
-	};
-
 	exports.prototype.setUserProfile = function (r) {
 		this.userProfile(new UserProfile(r, this));
 	};
@@ -70,19 +68,6 @@ define([
 	exports.prototype.cleanUserProfile = function () {
 		this.userProfile(null);
 		// automatically cleaned all child companies, wegions etc.
-	};
-
-	/** Log out from app: clean objects, set isLogged to false */
-	exports.prototype.logOff = function () {
-		userProfileService.accountLogoff().done(this.cleanUserProfile.bind(this));
-	};
-
-	exports.prototype.sendRegister = function (objToRegister, scsCallback, errCallback) {
-		registerService.accountRegister(objToRegister).done(scsCallback).fail(errCallback);
-	};
-
-	exports.prototype.sendConfirmRegistration = function (objToConfirmRegistration, scsCallback, errCallback) {
-		registerService.accountRegisterConfirmation(objToConfirmRegistration).done(scsCallback).fail(errCallback);
 	};
 
 	/**

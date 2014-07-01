@@ -35,6 +35,9 @@
           console.log('response from wfm-node', rr);
         }).fail(function(errr){
           console.log('error from wfm-node', errr);
+          //if (jqXhr.status === 422) {
+          //  err = langHelper.translate(jqXhr.responseJSON.errId) || '{{lang.unknownError}}');
+          //}
         });
       }
       
@@ -107,10 +110,10 @@
             <div data-bind="with: vwmUserProfile">
               <div class="pull-left wfm-nav__block">
                 <span class="link-view-inverse" data-bind="click: deactivateVwmChild">{{lang.wfm}}</span>
-                <!-- <span class="min-left-margin link-view-inverse" data-bind="if: $root.isUserInDemoMode">demo cabinet</span> -->
               </div>
               <div class="pull-right wfm-nav__block">
-                <button type="button" class="btn btn-xs btn-inverse" data-bind="click: $parent.logOff.bind($parent)">
+                <!-- TODO: #22! add logic for logoff -->
+                <button type="button" class="btn btn-xs btn-inverse" data-bind="">
                   <i class="glyphicon glyphicon-off"></i>
                   {{capitalizeFirst lang.logOut}}
                 </button>
@@ -120,17 +123,9 @@
           <div class="wfm-content-wrap">
               <div>
                   <div data-bind="visible: mdlWorkspace.isTriedToLoadUserProfile">
-                      <!--<a href="#" onclick="openNewWindow(handleAuthResult)">Open auth</a>
-                      <a href="#" onclick="sendSomeReq()">Send some req</a>-->
                       <div data-bind="ifnot: vwmUserProfile">
-                          <div data-bind="slideVisible: isRegisteredPage">
-                              <!-- register page -->
-                              {{> account-logon }}
-                          </div>
-                          <div data-bind="slideHidden: isRegisteredPage">
-                              <!-- login page -->
-                              {{> account-register }}
-                          </div>
+                        <a href="#" onclick="openNewWindow(handleAuthResult)">Open auth</a>
+                        <a href="#" onclick="sendSomeReq()">Send some req</a>                          
                       </div>
                       <div data-bind="with: vwmUserProfile">
                           <!-- current: vwmUserProfile -->

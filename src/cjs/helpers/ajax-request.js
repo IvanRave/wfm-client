@@ -74,11 +74,11 @@ exports = function (type, url, data) {
 		}
 	};
 
-	// For CORS JSON request generate OPTION request
-	// Default content-type = url-encoded string
-	options.contentType = 'application/json; charset=utf-8';
-
 	if (data) {
+		// For CORS JSON request generate OPTION request
+		// Default content-type = url-encoded string
+		options.contentType = 'application/json; charset=utf-8';
+
 		// all knockout models need contain toPlainJson function,
 		// which converts knockout object to plain object (observables to plain objects etc.)
 		if ($.isFunction(data.toPlainJson)) {
@@ -110,10 +110,10 @@ exports = function (type, url, data) {
 		////ko.toJSON(data)
 	}
 
-  // Generate time marker
-  var marker = new Date().getTime();
+	// Generate time marker
+	var marker = new Date().getTime();
 	loaderHelper.toggleLoadingState(true, marker);
-  
+
 	return $.ajax(url, options)
 	.fail(cbkFail)
 	.always(cbkAlways.bind(null, marker));
