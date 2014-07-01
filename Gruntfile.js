@@ -11,7 +11,7 @@ module.exports = function (grunt) {
 	lang = grunt.option('lang') || 'en';
 
 	// API url (prod and dev)
-	var requrl = isProd ? '//wfm-client.azurewebsites.net' : 'http://localhost:17171';
+	var requrl = isProd ? '//wfm-client.azurewebsites.net' : 'http://localhost:3000';
 	var wfmNodeUrl = isProd ? '//wfm-report.herokuapp.com' : 'http://localhost:3000';
 	////wfm-node.azurewebsites.net
 
@@ -68,8 +68,8 @@ module.exports = function (grunt) {
 		gitlog : {
 			options : {
 				dest : 'doc/month.log',
-				afterDate : new Date(2014, 3, 1),
-				beforeDate : new Date(2014, 4, 1)
+				afterDate : new Date(2014, 4, 1),
+				beforeDate : new Date(2014, 5, 1)
 			}
 		},
 		jshint : {

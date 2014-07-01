@@ -17,7 +17,6 @@ var testDataService = require('services/test-data');
  * @constructor
  */
 exports = function (data, testScopeItem) {
-	var self = this;
 	data = data || {};
 
 	this.getTestScope = function () {
@@ -32,30 +31,48 @@ exports = function (data, testScopeItem) {
 
 	this.isEdit = ko.observable(false);
 
-	var cancelData;
-	this.editTestData = function () {
-		cancelData = {
-			comment : self.comment(),
-			dict : $.extend({}, self.dict)
-		};
+	/**
+	 * Data for cancelling saving
+	 */
+	this.cancelData = null;
+};
 
-		self.isEdit(true);
+/**
+ * Go to edit mode
+ */
+exports.prototype.editTestData = function () {
+	this.cancelData = {
+		comment : ko.unwrap(this.comment),
+		dict : $.extend({}, this.dict)
 	};
 
-	this.saveTestData = function () {
-		testDataService.put(self.testScopeId, self.hourNumber, ko.toJS(self)).done(function (response) {
-			self.getTestScope().testDataListUpdateDate(new Date());
-			self.comment(response.Comment);
-			self.dict = response.Dict;
-			self.isEdit(false);
-		});
-	};
+	this.isEdit(true);
+};
 
-	this.cancelEditTestData = function () {
-		self.comment(cancelData.comment);
-		self.dict = $.extend({}, cancelData.dict);
-		self.isEdit(false);
-	};
+/**
+ * Cancel edit mode
+ */
+exports.prototype.cancelEditTestData = function () {
+	this.comment(this.cancelData.comment);
+	this.dict = $.extend({}, this.cancelData.dict);
+	this.isEdit(false);
+};
+
+/**
+ * Handle saving
+ * @private
+ */
+exports.prototype.cbkSaveTestData = function (response) {
+	this.getTestScope().testDataListUpdateDate(new Date());
+	this.comment(response.Comment);
+	this.dict = response.Dict;
+	this.isEdit(false);
+};
+
+/** Save a test record */
+exports.prototype.saveTestData = function () {
+	testDataService.put(this.testScopeId, this.hourNumber, ko.toJS(this))
+	.done(this.cbkSaveTestData.bind(this));
 };
 
 module.exports = exports;

@@ -89,7 +89,7 @@
               <!-- ko foreach: $parents[1].mdlStage.getWellGroup().listOfWfmParameterOfWroup -->
               <td>
                 <div data-bind="if: testData.isEdit() === true">
-                  <input class="input-sm" style="width: 50px" data-bind="value: testData.dict[$data.wfmParameterId]" />
+                  <input class="input-sm test-record-input" data-bind="value: testData.dict[$data.wfmParameterId]" />
                 </div>
                 <div data-bind="if: testData.isEdit() === false">
                   <span data-bind="text: testData.dict[$data.wfmParameterId]"></span>

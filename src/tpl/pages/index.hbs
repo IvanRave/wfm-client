@@ -7,6 +7,93 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {{> style-link-generator }}
+    <script>
+      // http://stackoverflow.com/questions/8648892/convert-url-parameters-to-a-javascript-object
+      function calcObjFromUrl(search){
+        return search ? JSON.parse('{"' + search.replace(/&/g, '","').replace(/=/g,'":"') + '"}',
+          function(key, value) { return key===""?value:decodeURIComponent(value) }) : {};
+      }
+      
+      function handleAuthResult(authResult){
+        var resultObj = calcObjFromUrl(authResult);
+        console.log(resultObj);
+        // Send a code to the api (change to sid)
+        
+        var options = {
+          cache : false,
+          type : 'POST',
+          // need for CORS requests without preflight request
+          contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+          data: 'code=' + resultObj.code,
+         	xhrFields : {
+            // For CORS request to send cookies
+            withCredentials : true
+          }
+        };
+        
+        $.ajax('http://localhost:3000/api/session-manager', options).done(function(rr){
+          console.log('response from wfm-node', rr);
+        }).fail(function(errr){
+          console.log('error from wfm-node', errr);
+        });
+      }
+      
+      function sendSomeReq(){
+        var options = {
+          cache : false,
+          type : 'GET',
+          // need for CORS requests without preflight request
+         	xhrFields : {
+            // For CORS request to send cookies
+            withCredentials : true
+          }
+        };
+      
+        $.ajax('http://localhost:3000/api/company?id=429296ec-b457-4c15-afd8-6465bd69c430', options).done(function(rr){
+          console.log('some response from wfm-node', rr);
+        }).fail(function(errr){
+          console.log('some error from wfm-node', errr);
+        });
+      }
+    
+      function openNewWindow(next) {
+        var redirectUri = 'http://127.0.0.1:12345/handle-auth-code.html';
+      
+        var authWindow;
+      
+        var authInterval = setInterval(function(){
+          var authLocation = authWindow.location;
+          
+          var authLocationHref;
+          // Uncaught SecurityError: Blocked a frame with origin "http://127.0.0.1:12345" from accessing 
+          // a frame with origin "http://localhost:1337". Protocols, domains, and ports must match.
+          try {
+            authLocationHref = authLocation.href;
+          }
+          catch (errSecurity) {}
+          
+          console.log(authLocationHref);
+          
+          if (authLocationHref){
+            var hrefParts = authLocationHref.split('?');
+            if (hrefParts[0] === redirectUri){
+              // Get code or error
+              var authResponse = hrefParts[1];
+
+              clearInterval(authInterval);
+              // Close popup
+              authWindow.close();
+              
+              next(authResponse);
+            }
+          }
+          
+        }, 1000);
+      
+        authWindow = window.open('http://localhost:1337/dialog/authorize?response_type=code&client_id=abc123&redirect_uri=' + redirectUri, '_blank',
+        'location=yes,height=570,width=520,scrollbars=yes,status=yes');
+      }
+    </script>
 </head>
 <body>
     <!--[if lt IE 10]><p class="chromeframe">You are using an <strong>outdated</strong> browser. Please upgrade your browser.</p><![endif]-->
@@ -33,6 +120,8 @@
           <div class="wfm-content-wrap">
               <div>
                   <div data-bind="visible: mdlWorkspace.isTriedToLoadUserProfile">
+                      <!--<a href="#" onclick="openNewWindow(handleAuthResult)">Open auth</a>
+                      <a href="#" onclick="sendSomeReq()">Send some req</a>-->
                       <div data-bind="ifnot: vwmUserProfile">
                           <div data-bind="slideVisible: isRegisteredPage">
                               <!-- register page -->

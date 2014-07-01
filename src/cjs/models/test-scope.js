@@ -1,7 +1,6 @@
 ﻿/** @module models/test-scope */
 'use strict';
 
-var $ = require('jquery');
 var ko = require('knockout');
 var appMoment = require('moment');
 var TestData = require('models/test-data');
@@ -19,8 +18,6 @@ function importTestDataDtoList(data, testScopeItem) {
  * @constructor
  */
 exports = function (data, wellItem) {
-	var ths = this;
-
 	data = data || {};
 
 	this.getWell = function () {
@@ -36,10 +33,9 @@ exports = function (data, wellItem) {
 	this.certifiedBy = ko.observable(data.CertifiedBy);
 
 	this.startUnixTimeDateView = ko.computed({
-			read : function () {
-				return appMoment(ko.unwrap(ths.startUnixTime) * 1000).format('YYYY-MM-DD HH:mm');
-			},
-			deferEvaluation : true
+			read : this.calcStartUnixTimeDateView,
+			deferEvaluation : true,
+			owner : this
 		});
 
 	this.testDataList = ko.observableArray();
@@ -55,7 +51,7 @@ exports = function (data, wellItem) {
 		});
 
 	// fill test data list
-	this.testDataList(importTestDataDtoList(data.TestDataDtoList, ths));
+	this.testDataList(importTestDataDtoList(data.TestDataDtoList, this));
 };
 
 /*
@@ -132,35 +128,50 @@ exports.prototype.setStatusToNull = function () {
 	this.saveTestScope();
 };
 
+var calcEachTestData = function (tempArr, paramValue, testDataValue) {
+	if (typeof testDataValue.dict[paramValue.wfmParameterId] !== "undefined" && testDataValue.dict[paramValue.wfmParameterId] !== null) {
+		tempArr.push(parseFloat((testDataValue.dict[paramValue.wfmParameterId])));
+	}
+};
+
+/**
+ * Calc each total
+ * @private
+ */
+exports.prototype.calcEachTotal = function (result, paramValue) {
+	var tempArr = [];
+	ko.unwrap(this.testDataList).forEach(calcEachTestData.bind(null, tempArr, paramValue));
+
+	if (tempArr.length > 0) {
+		var sum = tempArr.reduce(function (a, b) {
+				return a + b;
+			});
+		result[paramValue.wfmParameterId] = parseFloat(sum / tempArr.length).toFixed(2);
+		if (ko.unwrap(paramValue.wfmParameter().isCumulative) === true) {
+			result[paramValue.wfmParameterId] *= 24;
+		}
+	}
+};
+
 /** Calculate total row */
 exports.prototype.calcTestDataTotal = function () {
 	var result = {};
 	if (ko.unwrap(this.testDataList).length > 0) {
 		// check for release computed value
 		if (ko.unwrap(this.testDataListUpdateDate)) {
-			var ths = this;
-			$.each(ko.unwrap(ths.getWell().getWellGroup().listOfWfmParameterOfWroup), function (paramIndex, paramValue) {
-				var tempArr = [];
-				$.each(ths.testDataList(), function (testDataIndex, testDataValue) {
-					if (typeof testDataValue.dict[paramValue.wfmParameterId] !== "undefined" && testDataValue.dict[paramValue.wfmParameterId] !== null) {
-						tempArr.push(parseFloat((testDataValue.dict[paramValue.wfmParameterId])));
-					}
-				});
-
-				if (tempArr.length > 0) {
-					var sum = tempArr.reduce(function (a, b) {
-							return a + b;
-						});
-					result[paramValue.wfmParameterId] = parseFloat(sum / tempArr.length).toFixed(2);
-					if (ko.unwrap(paramValue.wfmParameter().isCumulative) === true) {
-						result[paramValue.wfmParameterId] *= 24;
-					}
-				}
-			});
+			ko.unwrap(this.getWell().getWellGroup().listOfWfmParameterOfWroup)
+			.forEach(this.calcEachTotal.bind(this, result));
 		}
 	}
 
 	return result;
+};
+
+/**
+ * Calc date view
+ */
+exports.prototype.calcStartUnixTimeDateView = function () {
+	return appMoment(ko.unwrap(this.startUnixTime) * 1000).format('YYYY-MM-DD HH:mm');
 };
 
 module.exports = exports;
