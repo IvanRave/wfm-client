@@ -58,7 +58,9 @@ var cbkAuthInterval = function (redirectUri, authScope, next) {
 
 	if (authLocationHref) {
 		var hrefParts = authLocationHref.split('?');
-		if (hrefParts[0] === redirectUri) {
+    
+    // if https://some.ru -> //some.ru
+		if (hrefParts[0].indexOf(redirectUri) >= 0) {
 			// Get code or error
 			var authResponse = hrefParts[1];
 

@@ -338,7 +338,6 @@ module.exports = function (grunt) {
 						'services/auth',
 						'services/company-user',
 						'services/datacontext',
-						'services/register',
 						'services/section-pattern',
 						'services/widgout',
 						// Viewmodels
