@@ -17,13 +17,12 @@
             <div data-bind="ifnot: vwmUserProfile">
               {{> style-link-selector }}
             </div>
-            <div data-bind="with: vwmUserProfile">
-              <div class="pull-left wfm-nav__block">
+            <div>
+              <div class="pull-left wfm-nav__block" data-bind="with: vwmUserProfile">
                 <span class="link-view-inverse" data-bind="click: deactivateVwmChild">{{lang.wfm}}</span>
               </div>
-              <div class="pull-right wfm-nav__block">
-                <!-- TODO: #22! add logic for logoff -->
-                <button type="button" class="btn btn-xs btn-inverse" data-bind="">
+              <div class="pull-right wfm-nav__block" data-bind="if: vwmUserProfile">
+                <button type="button" class="btn btn-xs btn-inverse" data-bind="click: accountLogOff">
                   <i class="glyphicon glyphicon-off"></i>
                   {{capitalizeFirst lang.logOut}}
                 </button>
@@ -33,9 +32,42 @@
           <div class="wfm-content-wrap">
               <div>
                   <div data-bind="visible: mdlWorkspace.isTriedToLoadUserProfile">
-                      <div class="text-center min-top-margin" data-bind="ifnot: vwmUserProfile">
-                        <!-- TODO: #22! Place a button -->
-                        <button class="btn btn-default" data-bind="click: openAuth">Open auth</button>
+                      <div class="min-top-margin" data-bind="ifnot: vwmUserProfile">
+                        <div class="clearfix">
+                          <div class="col-sm-4"></div>
+                          <div class="col-sm-4">
+                            <h3 class="text-center">Well file manager</h3>
+                            <!-- TODO: #22! Place a button -->
+                            <div class="text-center">
+                              <button class="btn btn-default" data-bind="click: openAuth, disable: isLoginInProgress">
+                                <span data-bind="hidden: isLoginInProgress">Login using PetrohelpAuth</span>
+                                <span data-bind="visible: isLoginInProgress">Login...</span>
+                              </button>
+                            </div>
+                            <div class="text-center">
+                              <small>secured authentication / register free / demo login</small>
+                            </div>
+                            <div class="min-top-margin">
+                              <p class="text-center">
+                                Petrohelp’s Well File Manager is specialized software used to manage well data, 
+                                production data, maps and to calculate many parameters.
+                              </p>
+                              <ul class="list-unstyled min-left-margin">
+                                <li>✓ Management of Drilling data and history of the well, including deviation survey and completion details.</li>
+                                <li>✓ Maps with well location, distance between wells and area calculations.</li>
+                                <li>✓ Management of Production data from the field. This can simply be loaded to the data base and visualized using a graph wherever you are.</li>
+                                <li>✓ Artificial lift method and gas lift calculations.</li> 
+                                <li>✓ Decline analysis.</li>
+                                <li>✓ PVT data review.</li>
+                                <li>✓ Nodal Analysis and Reservoir performance review.</li>
+                                <li>✓ and more...</li>
+                              </ul>
+                              <p class="text-center">
+                                Keep all the information for your asset always updated and organized as well as accessible worldwide thanks to WFM.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                       <div data-bind="with: vwmUserProfile">
                           <!-- current: vwmUserProfile -->

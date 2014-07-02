@@ -33,9 +33,9 @@ function handleAuthResult(nextFunc, authResult) {
 		}
 	};
 
-	$.ajax('http://localhost:3000/api/session-manager', options).done(function (rr) {
+	$.ajax('{{conf.requrl}}' + '/api/session-manager', options).done(function (rr) {
 		console.log('response from wfm-node', rr);
-    nextFunc();
+		nextFunc();
 	}).fail(function (errr) {
 		console.log('error from wfm-node', errr);
 		//if (jqXhr.status === 422) {
@@ -44,42 +44,48 @@ function handleAuthResult(nextFunc, authResult) {
 	});
 }
 
-function openNewWindow(next) {
-	var redirectUri = 'http://127.0.0.1:12345/handle-auth-code.html';
+var cbkAuthInterval = function (redirectUri, authScope, next) {
+	var authLocation = authScope.authWindow.location;
 
-	var authWindow;
+	var authLocationHref;
+	// Uncaught SecurityError: Blocked a frame with origin "http://127.0.0.1:12345" from accessing
+	// a frame with origin "http://localhost:1337". Protocols, domains, and ports must match.
+	try {
+		authLocationHref = authLocation.href;
+	} catch (errSecurity) {}
 
-	var authInterval = setInterval(function () {
-			var authLocation = authWindow.location;
+	console.log(authLocationHref);
 
-			var authLocationHref;
-			// Uncaught SecurityError: Blocked a frame with origin "http://127.0.0.1:12345" from accessing
-			// a frame with origin "http://localhost:1337". Protocols, domains, and ports must match.
-			try {
-				authLocationHref = authLocation.href;
-			} catch (errSecurity) {}
+	if (authLocationHref) {
+		var hrefParts = authLocationHref.split('?');
+		if (hrefParts[0] === redirectUri) {
+			// Get code or error
+			var authResponse = hrefParts[1];
 
-			console.log(authLocationHref);
+			clearInterval(authScope.authInterval);
+			// Close popup
+			authScope.authWindow.close();
 
-			if (authLocationHref) {
-				var hrefParts = authLocationHref.split('?');
-				if (hrefParts[0] === redirectUri) {
-					// Get code or error
-					var authResponse = hrefParts[1];
+			next(authResponse);
+		}
+	}
 
-					clearInterval(authInterval);
-					// Close popup
-					authWindow.close();
+};
 
-					next(authResponse);
-				}
-			}
+var openAuthWindow = function (next) {
+	var redirectUri = '{{conf.appUrl}}' + '/handle-auth-code.html';
 
-		}, 1000);
+	// Object to catch changes in bind method
+	var authScope = {
+		authWindow : null,
+		authInterval : null
+	};
 
-	authWindow = window.open('http://localhost:1337/dialog/authorize?response_type=code&client_id=abc123&redirect_uri=' + redirectUri, '_blank',
+	authScope.authInterval = setInterval(cbkAuthInterval.bind(null, redirectUri, authScope, next), 1000);
+
+	authScope.authWindow = window.open('{{conf.authUrl}}' + '/dialog/authorize?response_type=code&client_id=abc123&redirect_uri=' + redirectUri, '_blank',
 			'location=yes,height=570,width=520,scrollbars=yes,status=yes');
-}
+};
 
 /**
  * A workspace view model: a root for knockout
@@ -164,7 +170,17 @@ exports = function (mdlWorkspace) {
 			owner : this
 		});
 
-	/** After initialization: try to load user */
+	/**
+	 * Changes when you click to Login button
+	 *    Back to false, when login proccess is ended
+	 * @type {Boolean}
+	 */
+	this.isLoginInProgress = ko.observable(false);
+
+	/**
+	 * After initialization: try to load user
+	 * @todo #43! try to move to init commands, instead this model
+	 */
 	this.mdlWorkspace.tryToLoadUserProfile();
 
 	/** Back, forward, re   fresh browser navigation */
@@ -183,16 +199,25 @@ exports = function (mdlWorkspace) {
 };
 
 exports.prototype.openAuth = function () {
-	console.log('open auth');
-  var ths = this;
-	openNewWindow(handleAuthResult.bind(null, function () {
+	var ths = this;
+	this.isLoginInProgress(true);
+	openAuthWindow(handleAuthResult.bind(null, function () {
 			ths.mdlWorkspace.setUserProfile({
-        Id: null,
-        // TODO^ #33! get email from the server
-        Email: 'todo@change.email',
-        Roles: null
-      });
+				Id : null,
+				// TODO^ #33! get email from the server
+				Email : 'todo@change.email',
+				Roles : null
+			});
+			ths.isLoginInProgress(false);
 		}));
+};
+
+/**
+ * End the session
+ *    Logoff only from current cabinet (now, logic may changed)
+ */
+exports.prototype.accountLogOff = function () {
+	this.mdlWorkspace.accountLogOff();
 };
 
 /** Build a viewmodel for user profile */

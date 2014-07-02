@@ -1,11 +1,11 @@
 ﻿/** @module */
 define(['knockout',
 		'viewmodels/employee',
-    'helpers/app-helper',
+		'helpers/app-helper',
 		'base-viewmodels/stage-base'],
 	function (ko,
 		VwmEmployee,
-    appHelper,
+		appHelper,
 		VwmStageBase) {
 	'use strict';
 
@@ -45,9 +45,9 @@ define(['knockout',
 		 * @type {string}
 		 */
 		this.unq = this.mdlStage.id;
-      
+
 		// 1. null - No default data to selection  (only one per website)
-    // 2. If no other userprofiles then this upro is selected always
+		// 2. If no other userprofiles then this upro is selected always
 		VwmStageBase.call(this, null, ko.observable(this.unq), this.defaultSlcData_.companyId);
 
 		// Other stagebase view
@@ -58,9 +58,9 @@ define(['knockout',
 		this.mdlStage.loadEmployees();
 	};
 
-  /** Inherit from a stage base viewmodel */
+	/** Inherit from a stage base viewmodel */
 	appHelper.inherits(exports, VwmStageBase);
-  
+
 	/** Build a list of children */
 	exports.prototype.buildListOfVwmChild = function () {
 		var listOfMdlEmployee = ko.unwrap(this.mdlStage.employees);

@@ -1,9 +1,13 @@
 ﻿/** @module */
-define(['jquery', 'helpers/ajax-request'], function ($, ajaxRequest) {
+define(['helpers/ajax-request'], function (ajaxRequest) {
 	'use strict';
 	
 	function accountInfoUrl() {
 		return '{{conf.requrl}}/api/account/info';
+	}
+  
+  function accountLogOffUrl() {
+		return '{{conf.requrl}}/api/account/logoff';
 	}
 
 	/** Auth service */
@@ -13,6 +17,11 @@ define(['jquery', 'helpers/ajax-request'], function ($, ajaxRequest) {
 	exports.getUserProfile = function () {
 		return ajaxRequest('GET', accountInfoUrl());
 	};
+  
+  /** End the session */
+  exports.accountLogOff = function() {
+    return ajaxRequest('GET', accountLogOffUrl());
+  };
 
 	return exports;
 });

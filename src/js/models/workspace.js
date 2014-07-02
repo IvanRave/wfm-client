@@ -85,6 +85,16 @@ define([
 	};
 
 	/**
+	 * End the session
+	 *    Logoff only from current cabinet (now, logic may changed)
+	 */
+	exports.prototype.accountLogOff = function () {
+    // sync methods, no time to wait response
+		userProfileService.accountLogOff();
+    this.cleanUserProfile();
+	};
+
+	/**
 	 * Calculate parameters from squads
 	 * @private
 	 * @returns {module:models/wfm-parameter}

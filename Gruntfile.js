@@ -11,8 +11,12 @@ module.exports = function (grunt) {
 	lang = grunt.option('lang') || 'en';
 
 	// API url (prod and dev)
-	var requrl = isProd ? '//wfm-client.azurewebsites.net' : 'http://localhost:3000';
-	var wfmNodeUrl = isProd ? '//wfm-report.herokuapp.com' : 'http://localhost:3000';
+	var requrl = isProd ? '//wfm-report.herokuapp.com' : 'http://localhost:3000';
+	var appUrl = isProd ? '//wfm-client.azurewebsites.net' : 'http://127.0.0.1:12345';
+  // Auth provider url: for openning popup window to auth
+	var authUrl = isProd ? '//petrohelp-auth.herokuapp.com' : 'http://localhost:1337';
+
+	// 'http://localhost:3000/api/session-manager'
 	////wfm-node.azurewebsites.net
 
 	// Target - destination folder plus config, for example:
@@ -232,7 +236,8 @@ module.exports = function (grunt) {
 					// if empty - the same domain (simple requests)
 					// Example {{requrl}}/api/values
 					requrl : requrl,
-					wfmNodeUrl : wfmNodeUrl,
+					appUrl : appUrl,
+          authUrl: authUrl, 
 					isProd : isProd
 					// isIpad: isIpad,
 					// isMetro: isMetro

@@ -3,7 +3,7 @@ define(['helpers/ajax-request'], function (ajaxRequest) {
 	'use strict';
 
 	var reportUrl = function () {
-		return '{{conf.wfmNodeUrl}}/api/report';
+		return '{{conf.requrl}}/api/report';
 	};
 
 	/**
