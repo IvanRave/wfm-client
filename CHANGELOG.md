@@ -1,3 +1,23 @@
+<a name="0.9.8"></a>
+### 0.9.8 (2014-07-03)
+
+
+#### Bug Fixes
+
+* **app:**
+  * post and put requests ([dd1fc6e0](https://github.com/IvanRave/wfm-client/commit/dd1fc6e0e3054327f2ea08d675c97bf4d6cacf77))
+  * remove previous auth logic ([7530c44b](https://github.com/IvanRave/wfm-client/commit/7530c44b16237a5548b70bd9e3c28a3685d1ac55))
+* **js:** url equals ([639f037c](https://github.com/IvanRave/wfm-client/commit/639f037c304e5cc25109ea16aa47de9818fa7dd4))
+* **widget:** change name of layout ([a0a36f92](https://github.com/IvanRave/wfm-client/commit/a0a36f92acdc938ea324830e0a2f0f7bddae8b25))
+
+
+#### Features
+
+* **ajax:** delay and queue for a loader ([e1b9a622](https://github.com/IvanRave/wfm-client/commit/e1b9a6227583339f57af244682cc3f8c4f0efcae))
+* **app:** separate main style ([4ceb0736](https://github.com/IvanRave/wfm-client/commit/4ceb07369efa05baf12d2fb99ae3655d2c1ca79b))
+* **svgGraph:** show Y axis in short format ([7759a47c](https://github.com/IvanRave/wfm-client/commit/7759a47c21f6a74de92a7fe3ec6baca7a82c42c4))
+
+
 <a name="0.9.6"></a>
 ### 0.9.6 (2014-04-15)
 
