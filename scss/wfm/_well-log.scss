@@ -1,0 +1,62 @@
+/* well-log */
+
+.log-las-wrap {
+    position: relative;
+    z-index: $zindex-log-las-wrap;
+}
+
+.log-las-base {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border: 2px dashed #ccc;
+    z-index: $zindex-log-las-base;
+}
+
+.log-las-img-wrap {
+    height: 480px;
+    width: 650px;
+    overflow: auto;
+    overflow-x: hidden;
+}
+
+    .log-las-img-wrap.log-las-img {
+        z-index: $zindex-log-las-img;
+        width: 624px;
+        border: 2px solid #ccc;
+    }
+
+.log-las-draw {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: $zindex-log-las-draw;
+    border: 2px dashed #aaa;
+    display: none;
+}
+
+.log-las-text {
+    background-color: #fff;
+    opacity: 0.5;
+    filter: alpha(opacity = 50);
+    width: 624px;
+    height: 480px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: $zindex-log-las-text;
+    border: 2px dashed #aaa;
+    display: none;
+}
+
+.log-las-text-creator {
+    position: absolute;
+    white-space: nowrap;
+    font-size: 12px;
+    font-family: 'sans-serif';
+    z-index: $zindex-log-las-text-creator;
+}
+
+.log-las-podl {
+    color: #888;
+}

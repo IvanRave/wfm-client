@@ -1,4 +1,5 @@
-define(['jquery', 'jquery.bootstrap'], function ($) {
+/** @module */
+define(['jquery', 'bootstrap/modal'], function ($) {
     'use strict';
 
     var bootstrapModal = {};
@@ -40,21 +41,19 @@ define(['jquery', 'jquery.bootstrap'], function ($) {
         $('#modal-wide-block').modal('hide');
     };
 
-    bootstrapModal.openModalWideWindow = function (bodyDom, submitFunction) {
+    bootstrapModal.openModalWideWindow = function (bodyDom, submitFunction, tmpTitle) {
         var $modalWideBlock = $('#modal-wide-block');
         $modalWideBlock.find('.modal-body').html(bodyDom);
-        $modalWideBlock.find('.modal-ok').off("click").on("click", function () {
+        $modalWideBlock.find('.modal-ok').off('click').on('click', function () {
             submitFunction();
             return false;
         });
+        
+        $modalWideBlock.find('.modal-title').html(tmpTitle);
 
-        $modalWideBlock.find('.modal-close').off("click").on("click", bootstrapModal.closeModalWideWindow);
+        $modalWideBlock.find('.modal-close').off('click').on('click', bootstrapModal.closeModalWideWindow);
 
         $modalWideBlock.modal('show');
-    };
-
-    bootstrapModal.closeModalFileManager = function () {
-        $('#modal-file-manager').modal('hide');
     };
 
     bootstrapModal.openModalPanzoomWindow = function (imgSrc) {

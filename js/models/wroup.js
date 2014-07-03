@@ -1,354 +1,388 @@
 /** @module */
 define(['jquery',
-    'knockout',
-    'services/datacontext',
-    'helpers/modal-helper',
-    'models/well',
-    'models/wfm-parameter-of-wroup'], function ($, ko, datacontext, bootstrapModal, Well, WellGroupWfmParameter) {
-        'use strict';
+		'knockout',
+		'services/datacontext',
+		'models/well',
+		'models/wfm-parameter-of-wroup',
+		'services/wfm-parameter-of-wroup',
+		'models/section-of-stage',
+		'base-models/stage-base',
+		'models/prop-spec',
+		'services/wroup',
+		'constants/stage-constants',
+		'services/procent-border',
+		'services/monitoring-record',
+		'helpers/app-helper'],
+	function ($,
+		ko,
+		datacontext,
+		Well,
+		WellGroupWfmParameter,
+		wfmParameterOfWroupService,
+		SectionOfWroup,
+		StageBase,
+		PropSpec,
+		wroupService,
+		stageCnst,
+		procentBorderService,
+		monitoringRecordService,
+		appHelper) {
+	'use strict';
 
-        // 18. WellGroupWfmParameter
-        function importWellGroupWfmParameterDtoList(data, wellGroupItem) { return $.map(data || [], function (item) { return new WellGroupWfmParameter(item, wellGroupItem); }); }
+	// 18. WellGroupWfmParameter
+	function importWellGroupWfmParameterDtoList(data, wellGroupItem) {
+		return (data || []).map(function (item) {
+			return new WellGroupWfmParameter(item, wellGroupItem);
+		});
+	}
 
-        // 4. Wells (convert data objects into array)
-        function importWellsDto(data, parent) { return $.map(data || [], function (item) { return new Well(item, parent); }); }
+	// 4. Wells (convert data objects into array)
+	function importWells(data, parent) {
+		return data.map(function (item) {
+			return new Well(item, parent);
+		});
+	}
 
-        /**
-        * Well group
-        * @constructor
-        * @param {object} data - Group data
-        * @param {module:models/wield} wellField - Well field (parent)
-        */
-        var exports = function (data, wellField) {
-            data = data || {};
+	/** Import sections */
+	function importListOfSectionOfWroupDto(data, parent) {
+		return data.map(function (item) {
+			return new SectionOfWroup(item, parent);
+		});
+	}
 
-            /** Alternative of this context: for closures etc. */
-            var self = this;
+	/** Main properties for groups */
+	var wroupPropSpecList = [
+		new PropSpec('Name', 'Name', 'Group name', 'SingleLine', {
+			maxLength : 255
+		}),
+		new PropSpec('Description', 'Description', 'Description', 'MultiLine', {})
+	];
 
-            /**
-            * Get well field (parent)
-            * @returns {module:models/wield}
-            */
-            this.getWellField = function () {
-                return wellField;
-            };
+	/**
+	 * Well group
+	 * @constructor
+	 * @param {object} data - Group data
+	 * @param {module:models/wield} wellField - Well field (parent)
+	 */
+	var exports = function (data, wellField) {
+		data = data || {};
 
-            /**
-            * Group id
-            * @type {number}
-            */
-            this.Id = data.Id;
+		/** Alternative of this context: for closures etc. */
+		var ths = this;
 
-            /**
-            * Group name
-            * @type {string}
-            */
-            this.Name = ko.observable(data.Name);
+		/**
+		 * Get well field (parent)
+		 * @returns {module:models/wield}
+		 */
+		this.getWellField = function () {
+			return wellField;
+		};
 
-            /**
-            * Field (parent) id
-            * @type {number}
-            */
-            this.WellFieldId = data.WellFieldId;
+		/** Get root view model */
+		this.getRootMdl = function () {
+			return this.getWellField().getRootMdl();
+		};
 
-            /**
-            * List of well for this group
-            * @type {Array.<module:models/well>}
-            */
-            this.Wells = ko.observableArray();
+		/**
+		 * Group id
+		 * @type {number}
+		 */
+		this.Id = data.Id;
 
-            /**
-            * Selected well
-            * @type {module:models/well}
-            */
-            this.selectedWell = ko.observable();
+		/** Alternatie for caps Id */
+		this.id = data.Id;
 
-            /**
-            * Select well (child)
-            * @param {module:models/well} wellToSelect - Well to select
-            */
-            this.selectWell = function (wellToSelect) {
-                ////window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
-                ////    region: self.getWellGroup().getWellField().getWellRegion().Id,
-                ////    field: self.getWellGroup().getWellField().Id,
-                ////    group: self.getWellGroup().Id,
-                ////    well: self.Id
-                ////});
+		/**
+		 * Field (parent) id
+		 * @type {number}
+		 */
+		this.WellFieldId = data.WellFieldId;
 
-                // By default - no template - show widget page
-                // Previous - by default - summary self.sectionList[0].id;
-                var previousSelectedSection;
+		/** Property specifications */
+		this.propSpecList = wroupPropSpecList;
 
-                var prevSlcWellRegion = ko.unwrap(self.getWellField().getWellRegion().getCompany().selectedWegion);
+		/**
+		 * Stage key: equals file name
+		 * @type {string}
+		 */
+		this.stageKey = stageCnst.wroup.id;
 
-                // get previous selected section (if exists)
-                if (prevSlcWellRegion) {
-                    var prevSlcWellField = ko.unwrap(prevSlcWellRegion.selectedWield);
-                    if (prevSlcWellField) {
-                        var prevSlcWellGroup = ko.unwrap(prevSlcWellField.selectedWroup);
-                        if (prevSlcWellGroup) {
-                            // previous selected well
-                            var prevSlcWell = ko.unwrap(prevSlcWellGroup.selectedWell);
-                            if (prevSlcWell) {
-                                previousSelectedSection = ko.unwrap(prevSlcWell.selectedSection);
+		/** Base for all stages */
+		StageBase.call(this, data);
 
-                                // If selected perfomance section
-                                var tmpSelectedAttrGroupId = ko.unwrap(prevSlcWell.mainPerfomanceView.selectedAttrGroupId);
-                                if (tmpSelectedAttrGroupId) {
-                                    wellToSelect.mainPerfomanceView.selectedAttrGroupId(tmpSelectedAttrGroupId);
-                                }
-                            }
-                        }
-                    }
-                }
+		/**
+		 * List of well for this group
+		 * @type {Array.<module:models/well>}
+		 */
+		this.wells = ko.observableArray();
 
-                // set new selected data (plus region in the end)
-                var slcWellGroup = self;
-                var slcWellField = self.getWellField();
-                var slcWellRegion = slcWellField.getWellRegion();
-                var slcCompany = slcWellRegion.getCompany();
+		/**
+		 * List of wfm parameters for this group
+		 * @type {Array.<module:models/wfm-parameter-of-wroup>}
+		 */
+		this.listOfWfmParameterOfWroup = ko.observableArray();
 
-                // 1. Section
-                if (previousSelectedSection) {
-                    wellToSelect.selectSectionByPatternId(previousSelectedSection.SectionPatternId);
-                }
-                else {
-                    wellToSelect.unselectSection();
-                }
+		/**
+		 * Whether parameters are loaded
+		 * @type {boolean}
+		 */
+		this.isLoadedListOfWfmParameterOfWroup = ko.observable(false);
 
-                // 2. Well
-                // set selected items in DESC order (can be redraw each time if ASC order)
-                // set selected well
-                slcWellGroup.selectedWell(wellToSelect);
+		/**
+		 * Sum of totals of test scopes
+		 *    for wroup potential
+		 */
+		this.totalTestScopeOfWells = ko.computed({
+				read : function () {
+					var result = {};
+					var tmpActiveWells = ko.unwrap(ths.wells).filter(function (elem) {
+							return ko.unwrap(elem['IsActive']) === true;
+						});
 
-                // 3. Group: set selected well group
-                slcWellField.selectedWroup(slcWellGroup);
+					var tmpWroupParams = ko.unwrap(ths.listOfWfmParameterOfWroup);
 
-                // 4: Field: set selected well field
-                slcWellRegion.selectedWield(slcWellField);
+					tmpActiveWells.forEach(function (tmpWell) {
+						var tmpLastApprovedTestScope = ko.unwrap(tmpWell.lastApprovedTestScope);
+						if (tmpLastApprovedTestScope) {
+							var tmpTestDataTotal = ko.unwrap(tmpLastApprovedTestScope.testDataTotal);
+							tmpWroupParams.forEach(function (tmpParam) {
+								if (!result[tmpParam.wfmParameterId]) {
+									result[tmpParam.wfmParameterId] = 0;
+								}
 
-                // 5. Region
-                slcCompany.selectedWegion(slcWellRegion);
-            };
+								result[tmpParam.wfmParameterId] +=  + (tmpTestDataTotal[tmpParam.wfmParameterId] || 0);
+							});
+						}
+					});
 
-            /**
-            * List of wfm parameters for this group
-            * @type {Array.<module:models/wfm-parameter-of-wroup>}
-            */
-            this.wellGroupWfmParameterList = ko.observableArray();
+					return result;
+				},
+				deferEvaluation : true
+			});
 
-            /**
-            * Whether parameters are loaded
-            * @type {boolean}
-            */
-            this.isLoadWellGroupWfmParameterList = ko.observable(false);
+		//{ #region MONITORING
 
-            self.getWellGroupWfmParameterList = function () {
-                if (ko.unwrap(self.isLoadWellGroupWfmParameterList) === false) {
-                    datacontext.getWellGroupWfmParameterList({ wellgroup_id: self.Id }).done(function (response) {
-                        self.wellGroupWfmParameterList(importWellGroupWfmParameterDtoList(response));
-                        self.isLoadWellGroupWfmParameterList(true);
-                    });
-                }
-            };
+		/**
+		 * List of monitored params
+		 * @type {Array.<module:models/wfm-parameter-of-well-group>}
+		 */
+		this.listOfMonitoredParams = ko.computed({
+				read : function () {
+					var tmpList = ko.unwrap(ths.listOfWfmParameterOfWroup);
+					return tmpList.filter(function (elem) {
+						return ko.unwrap(elem.isMonitored);
+					});
+				},
+				deferEvaluation : true
+			});
 
-            var appViewModel = self.getWellField().getWellRegion().getParentViewModel();
+		/**
+		 * Whether procent borders are loaded
+		 * @type {boolean}
+		 */
+		this.isLoadedProcentBordersForAllWells = ko.observable(false);
 
-            // wfm parameter from main source which is not in this group
-            self.unselectedWfmParameterList = ko.computed({
-                read: function () {
-                    // two arrays
-                    return $.grep(ko.unwrap(appViewModel.wfmParameterList), function (prmElem) {
-                        var isParamExist = false;
-                        $.each(ko.unwrap(self.wellGroupWfmParameterList), function (wlgIndex, wlgElem) {
-                            if (wlgElem.wfmParameterId === prmElem.id) {
-                                isParamExist = true;
-                                // break from arr
-                                return false;
-                            }
-                        });
+		//} #endregion MONITORING
 
-                        // return params which are not selected in this well group
-                        return !isParamExist;
-                    });
-                },
-                deferEvaluation: true
-            });
+		/** Load wells */
+		this.wells(importWells(data.WellsDto, ths));
 
-            // WFM parameter which user select from unselected wfm parameter list (from root)
-            self.selectedWfmParameterId = ko.observable();
+		/** Load sections */
+		this.listOfSection(importListOfSectionOfWroupDto(data.ListOfSectionOfWroupDto, ths));
+	};
 
-            self.addWellGroupWfmParameter = function () {
-                var tmpWfmParamId = ko.unwrap(self.selectedWfmParameterId);
-                if (tmpWfmParamId) {
-                    datacontext.postWellGroupWfmParameter({
-                        Color: '',
-                        SerialNumber: 1,
-                        WellGroupId: self.Id,
-                        WfmParameterId: tmpWfmParamId
-                    }).done(function (response) {
-                        self.wellGroupWfmParameterList.push(new WellGroupWfmParameter(response, self));
-                    });
-                }
-            };
+	/** Inherit from a stage base model */
+	appHelper.inherits(exports, StageBase);
 
-            ////self.addWellGroupWfmParameter = function () {
-            ////    var inputId = document.createElement("input");
-            ////    inputId.type = "text";
-            ////    $(inputId).prop({ pattern: "[a-zA-Z]+", title: "Only letters: a-z(A-Z)", required: true });
+	/**
+	 * Load procent borders for all wells
+	 */
+	exports.prototype.loadProcentBordersForAllWells = function () {
+		var ths = this;
+		if (ko.unwrap(ths.isLoadedProcentBordersForAllWells)) {
+			return;
+		}
 
-            ////    var inputName = document.createElement("input");
-            ////    inputName.type = "text";
-            ////    $(inputName).prop({ required: true });
+		procentBorderService.getForAllWells(ths.id).done(function (tmpScope) {
+			ths.isLoadedProcentBordersForAllWells(true);
+			console.log(tmpScope);
+			var tmpWells = ko.unwrap(ths.wells);
 
-            ////    var inputIsCumulative = document.createElement("input");
-            ////    inputIsCumulative.type = "checkbox";
+			// Import data to each well
+			tmpWells.forEach(function (tmpWell) {
+				// Get array of procent borders for need well
+				var tmpProcentBordersForWell = tmpScope.filter(function (scopeItem) {
+						return scopeItem.IdOfWell === tmpWell.id;
+					})[0].ArrayOfProcentBorder;
 
-            ////    var innerDiv = document.createElement("div");
-            ////    $(innerDiv).addClass("form-horizontal").append(
-            ////        bootstrapModal.gnrtDom("Parameter id", inputId),
-            ////        bootstrapModal.gnrtDom("Name", inputName),
-            ////        bootstrapModal.gnrtDom("Is cumulative", inputIsCumulative)
-            ////    );
+				tmpWell.importProcentBorders(tmpProcentBordersForWell);
+			});
+		});
+	};
 
-            ////    function submitFunction() {
-            ////        // request to create new wfmParameter
-            ////        var wfmParameterNew = datacontext.createWfmParameter({
-            ////            Id: $(inputId).val(),
-            ////            Name: $(inputName).val(),
-            ////            Uom: "",
-            ////            DefaultColor: "",
-            ////            IsCumulative: $(inputIsCumulative).prop("checked"),
-            ////            IsSystem: false
-            ////        });
+	/**
+	 * Convert to DTO
+	 */
+	exports.prototype.toDto = function () {
+		var ths = this;
 
-            ////        datacontext.postParameter(wfmParameterNew).done(function (wfmParameterResponse) {
-            ////            var createdWfmParameter = datacontext.createWfmParameter(wfmParameterResponse);
+		var dtoObj = {
+			'Id' : ths.Id,
+			'WellFieldId' : ths.WellFieldId
+		};
 
-            ////            // request to create wellGroupWfmParameter 
-            ////            var wellGroupWfmParameterNew = datacontext.createWellGroupWfmParameter({
-            ////                Color: "",
-            ////                SerialNumber: 1,
-            ////                WellGroupId: self.Id,
-            ////                WfmParameterId: $(inputId).val()
-            ////            });
+		ths.propSpecList.forEach(function (prop) {
+			dtoObj[prop.serverId] = ko.unwrap(ths[prop.clientId]);
+		});
 
-            ////            datacontext.postWellGroupWfmParameter(wellGroupWfmParameterNew).done(function (response) {
-            ////                var createdWellGroupWfmParameter = datacontext.createWellGroupWfmParameter(response);
-            ////                createdWellGroupWfmParameter.wfmParameter = createdWfmParameter;
-            ////                self.wellGroupWfmParameterList.push(createdWellGroupWfmParameter);
-            ////            });
-            ////            // or error - id is denied
-            ////            // if one company get for itself purposes all ids, then will be errors frequently
-            ////        });
+		return dtoObj;
+	};
 
-            ////        bootstrapModal.closeModalWindow();
-            ////    }
+	/**
+	 * Load data for all wells and for need date
+	 * @param {number} tmpUnixTime - Need date
+	 * @param {object} tmpMntrParams - Monitored parameters
+	 */
+	exports.prototype.loadListOfScopeOfMonitoring = function (tmpUnixTime, tmpMntrParams) {
+		var ths = this;
+		// TODO: if there are data for this date - no need to load #LH!
+		monitoringRecordService.getListOfScope(ths.id, tmpUnixTime).done(function (tmpListOfScope) {
+			var tmpWells = ko.unwrap(ths.wells);
 
-            ////    bootstrapModal.openModalWindow("Add parameter", innerDiv, submitFunction);
-            ////};
+			// Import data to each well
+			tmpWells.forEach(function (tmpWell) {
+				// Get array of data for need well
+				var needScope = tmpListOfScope.filter(function (scopeItem) {
+						return scopeItem.IdOfWell === tmpWell.id;
+					})[0];
 
-            self.addWell = function () {
-                var inputName = document.createElement('input');
-                inputName.type = 'text';
-                $(inputName).prop({ 'required': true }).addClass('form-control');
+				if (needScope) {
+					// Import data to the well
+					tmpWell.importMonitoringRecords(needScope.ListOfMonitoringRecord, tmpMntrParams);
+				}
+			});
+		});
+	};
 
-                var innerDiv = document.createElement('div');
-                $(innerDiv).addClass('form-horizontal').append(
-                    bootstrapModal.gnrtDom('Name', inputName)
-                );
+	/**
+	 * Save this well group
+	 */
+	exports.prototype.save = function () {
+		wroupService.put(this.id, this.toDto());
+	};
 
-                function submitFunction() {
-                    datacontext.postWell({
-                        Name: $(inputName).val(),
-                        WellGroupId: self.Id
-                    }).done(function (result) {
-                        self.Wells.push(new Well(result, self));
-                    });
+	/**
+	 * Remove a child well
+	 * @param {module:models/well} wellToRemove - Well to remove
+	 */
+	exports.prototype.removeChild = function (wellToRemove) {
+		var ths = this;
 
-                    bootstrapModal.closeModalWindow();
-                }
+		datacontext.deleteWell(wellToRemove).done(function () {
+			ths.wells.remove(wellToRemove);
+		});
+	};
 
-                bootstrapModal.openModalWindow('Well', innerDiv, submitFunction);
-            };
+	/**
+	 * Create a new well
+	 * @param {string} tmpName - Well name
+	 */
+	exports.prototype.postWell = function (tmpName, scsCallback) {
+		var ths = this;
+		datacontext.postWell({
+			Name : tmpName,
+			Description : '',
+			WellGroupId : ths.id,
+			IsActive : true
+		}).done(function (result) {
+			ths.wells.push(new Well(result, ths));
+			scsCallback();
+		});
+	};
 
-            self.deleteWell = function (wellForDelete) {
-                if (confirm('Are you sure you want to delete "' + ko.unwrap(wellForDelete.Name) + '"?')) {
-                    datacontext.deleteWell(wellForDelete).done(function () {
-                        self.Wells.remove(wellForDelete);
-                        // Select this wroup
-                        self.getWellField().selectWroup(self);
-                    });
-                }
-            };
+	/**
+	 * Load parameters
+	 */
+	exports.prototype.loadListOfWfmParameterOfWroup = function (callback) {
+		if (!ko.unwrap(this.isLoadedListOfWfmParameterOfWroup)) {
+			wfmParameterOfWroupService.get(this.id).done(this.scsLoadListOfWfmParameterOfWroup.bind(this, callback));
+		} else {
+			if (appHelper.isFunction(callback)) {
+				callback();
+			}
+		}
+	};
 
-            self.editWellGroup = function () {
-                var inputName = document.createElement('input');
-                inputName.type = 'text';
-                $(inputName).val(self.Name()).prop({ 'required': true }).addClass('form-control');
+	/**
+	 * Success callback
+	 * @private
+	 */
+	exports.prototype.scsLoadListOfWfmParameterOfWroup = function (callback, response) {
+		this.listOfWfmParameterOfWroup(importWellGroupWfmParameterDtoList(response));
+		this.isLoadedListOfWfmParameterOfWroup(true);
+		if (appHelper.isFunction(callback)) {
+			callback();
+		}
+	};
 
-                var innerDiv = document.createElement('div');
-                $(innerDiv).addClass('form-horizontal').append(
-                    bootstrapModal.gnrtDom('Name', inputName)
-                );
+	/**
+	 * Remove param from a well group
+	 * @param {module:models/wfm-parameter-of-wroup} - Model of the parameter to remove
+	 */
+	exports.prototype.removeWfmParameterOfWroup = function (mdlToRemove) {
+		var ths = this;
+		wfmParameterOfWroupService.remove(mdlToRemove.wellGroupId, mdlToRemove.wfmParameterId).done(function () {
+			ths.listOfWfmParameterOfWroup.remove(mdlToRemove);
+		});
+	};
 
-                function submitFunction() {
-                    self.Name($(inputName).val());
-                    datacontext.saveChangedWellGroup(self).done(function (result) { self.Name(result.Name); });
-                    bootstrapModal.closeModalWindow();
-                }
+	/**
+	 * Add selected param to the server with default color and order number
+	 * @param {string} tmpWfmParamId - Id of a parameter, like well-map
+	 */
+	exports.prototype.postWfmParameterOfWroup = function (tmpWfmParamId, tmpColor, tmpUom) {
+		wfmParameterOfWroupService.post(this.id, {
+			Color : tmpColor,
+			SerialNumber : 1,
+			WellGroupId : this.id,
+			WfmParameterId : tmpWfmParamId,
+			IsMonitored : false,
+      Uom: tmpUom
+		}).done(this.pushWfmParameterOfWroup.bind(this));
+	};
 
-                bootstrapModal.openModalWindow("Well group", innerDiv, submitFunction);
-            };
+	exports.prototype.pushWfmParameterOfWroup = function (data) {
+		this.listOfWfmParameterOfWroup.push(new WellGroupWfmParameter(data, this));
+	};
 
-            self.isOpenItem = ko.observable(false);
+	/**
+	 * Find a list of cognate stages
+	 *    1. A list for selection box for new widget (name and id)
+	 *    2. A list to find specific stage by id: findCognateStage
+	 * @returns {Array.<Object>}
+	 */
+	exports.prototype.getListOfStageByKey = function (keyOfStage) {
+		switch (keyOfStage) {
+		case stageCnst.company.id:
+			return [this.getWellField().getWellRegion().getCompany()];
+		case stageCnst.wegion.id:
+			return [this.getWellField().getWellRegion()];
+		case stageCnst.wield.id:
+			return [this.getWellField()];
+		case stageCnst.wroup.id:
+			return [this];
+		case stageCnst.well.id:
+			return ko.unwrap(this.wells);
+		}
+	};
 
-            self.toggleItem = function () {
-                self.isOpenItem(!self.isOpenItem());
-            };
+	/**
+	 * Get guid of a parent company
+	 * @returns {string}
+	 */
+	exports.prototype.getIdOfCompany = function () {
+		return this.getWellField().getWellRegion().getCompany().id;
+	};
 
-            /** Whether item and parent are selected */
-            self.isSelectedItem = ko.computed({
-                read: function () {
-                    var tmpField = self.getWellField();
-                    if (ko.unwrap(tmpField.isSelectedItem)) {
-                        if (self === ko.unwrap(tmpField.selectedWroup)) {
-                            return true;
-                        }
-                    }
-                },
-                deferEvaluation: true
-            });
-
-            /** Is item selected and showed on the page */
-            self.isShowedItem = ko.computed({
-                read: function () {
-                    if (ko.unwrap(self.isSelectedItem)) {
-                        if (!ko.unwrap(self.selectedWell)) {
-                            return true;
-                        }
-                    }
-                },
-                deferEvaluation: true
-            });
-
-            self.toPlainJson = function () {
-                ////var copy = ko.toJS(self);
-                var tmpPropList = ['Id', 'Name', 'WellFieldId'];
-                var objReady = {};
-                $.each(tmpPropList, function (propIndex, propValue) {
-                    // null can be sended to ovveride current value to null
-                    if (typeof ko.unwrap(self[propValue]) !== 'undefined') {
-                        objReady[propValue] = ko.unwrap(self[propValue]);
-                    }
-                });
-
-                return objReady;
-            };
-
-            // load wells
-            self.Wells(importWellsDto(data.WellsDto, self));
-        };
-
-        return exports;
-    });
+	return exports;
+});

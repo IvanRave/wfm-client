@@ -1,7 +1,13 @@
-define(['jquery', 'knockout', 'services/datacontext'], function ($, ko, datacontext) {
+/** @module */
+define(['jquery', 'knockout'], function ($, ko) {
     'use strict';
 
-    function ColumnAttribute(data) {
+    /**
+    * Model: column attribute
+    * @constructor
+    * @param {object} data - Attribute data
+    */
+    var exports = function (data) {
         var self = this;
         data = data || {};
 
@@ -10,7 +16,20 @@ define(['jquery', 'knockout', 'services/datacontext'], function ($, ko, datacont
         self.Format = ko.observable(data.Format);
 
         self.numeratorList = data.NumeratorList;
+        
+        /*
+        * Copy of num list
+        * @todo: fix remove links from perfomace-of-well and delete #MM!
+        */
+        self.NumeratorList = data.NumeratorList;
+        
         self.denominatorList = data.DenominatorList;
+        
+        /*
+        * Copy of denom list
+        * @todo: fix remove links from perfomace-of-well and delete #MM!
+        */
+        self.DenominatorList = data.DenominatorList;
         // properties
         self.Title = data.Title || '';
 
@@ -48,9 +67,7 @@ define(['jquery', 'knockout', 'services/datacontext'], function ($, ko, datacont
         self.toPlainJson = function () {
             return ko.toJS(self);
         };
-    }
-
-    datacontext.createColumnAttribute = function (data) {
-        return new ColumnAttribute(data);
     };
+
+    return exports;
 });

@@ -1,79 +1,108 @@
 /** @module */
-define(['knockout', 'services/datacontext', 'models/wfm-parameter'], function (ko, datacontext, WfmParameter) {
-    'use strict';
+define(['knockout',
+		'models/wfm-parameter',
+		'services/wfm-parameter-of-wroup'],
+	function (ko,
+		WfmParameter,
+		wfmParameterOfWroupService) {
+	'use strict';
 
-    /** 
-    * Parameter (union) for test or perfomance data. Every well group has own array of wfm parameters. 
-    * @constructor
-    * @param {object} data - Parameter data
-    * @param {module:models/wroup} wellGroupItem - Well group (parent of parameter)
-    */
-    var exports = function (data, wellGroupItem) {
-        data = data || {};
+	/**
+	 * Parameter (union) for test or perfomance data. Every well group has own array of wfm parameters.
+	 * @constructor
+	 * @param {object} data - Parameter data
+	 * @param {module:models/wroup} wellGroupItem - Well group (parent of parameter)
+	 */
+	var exports = function (data, wellGroupItem) {
+		data = data || {};
 
-        /**
-        * Get well group (parent)
-        * @returns {module:models/wroup} Well group (parent)
-        */
-        this.getWellGroup = function () {
-            return wellGroupItem;
-        };
+		/**
+		 * Get well group (parent)
+		 * @returns {module:models/wroup} Well group (parent)
+		 */
+		this.getWellGroup = function () {
+			return wellGroupItem;
+		};
 
-        /**
-        * Well group (parent) id
-        * @type {number}
-        */
-        this.wellGroupId = data.WellGroupId;
+		/**
+		 * Well group (parent) id
+		 * @type {number}
+		 */
+		this.wellGroupId = data.WellGroupId;
 
-        /**
-        * Wfm parameter id
-        */
-        this.wfmParameterId = data.WfmParameterId;
+		/**
+		 * Wfm parameter id
+		 * @type {string}
+		 */
+		this.wfmParameterId = data.WfmParameterId;
 
-        /**
-        * Serial number (order number)
-        * @type {number}
-        */
-        this.serialNumber = ko.observable(data.SerialNumber);
+		/**
+		 * Serial number (order number)
+		 * @type {number}
+		 */
+		this.serialNumber = ko.observable(data.SerialNumber);
 
-        /**
-        * Parameter color, specified for this well group. Ovveride default color of parameter.
-        * @type {string}
-        */
-        this.color = ko.observable(data.Color);
+		/**
+		 * Parameter color, specified for this well group. Ovveride default color of parameter.
+		 * @type {string}
+		 */
+		this.color = ko.observable(data.Color);
 
-        /**
-        * Whether parameter is visible on test or perfomance page
-        * @type {boolean}
-        */
-        this.isVisible = ko.observable(true);
+		/**
+		 * Unit of measure
+		 *    overrided a wfm-parameter property
+		 * @type {string}
+		 */
+		this.uom = ko.observable(data.Uom);
 
-        /**
-        * Whether parameter can be calculated from other parameters
-        * @type {boolean}
-        */
-        this.isCalc = ko.observable(false);
+		/**
+		 * Whether this parameter is monitored (well or platform monitoring)
+		 * @type {boolean}
+		 */
+		this.isMonitored = ko.observable(data.IsMonitored);
 
-        /**
-        * Wfm parameter (global parameter definition - not only for this group)
-        * @type {module:models/wfm-parameter}
-        */
-        this.wfmParameter = ko.observable();
+		/**
+		 * Whether parameter can be calculated from other parameters
+		 * @type {boolean}
+		 */
+		this.isCalc = ko.observable(false);
 
-        var self = this;
+		/**
+		 * Wfm parameter (global parameter definition - not only for this group)
+		 * @type {module:models/wfm-parameter}
+		 */
+		this.wfmParameter = ko.observable();
 
-        self.toPlainJson = function () { return ko.toJS(self); };
+		if (!data.WfmParameterDto) {
+			console.log('TODO: remove');
+		}
 
-        // When create temp parameter for POST request - this data is not exists
-        if (data.WfmParameterDto) {
-            self.wfmParameter(new WfmParameter(data.WfmParameterDto));
+		// When create temp parameter for POST request - this data is not exists
+		if (data.WfmParameterDto) {
+      console.log('try to find a parameter from loaded parameters');
+			this.wfmParameter(new WfmParameter(data.WfmParameterDto));
+		}
 
-            // If no color then use default color from wfm parameter
-            if (!self.color()) {
-                self.color(self.wfmParameter().defaultColor());
-            }
-        }
-    };
+		// Subscribe events (only after function and props initialization)
 
-    return exports;
+		this.isMonitored.subscribe(this.save, this);
+		this.color.subscribe(this.save, this);
+    this.uom.subscribe(this.save, this);
+	};
+
+	/**
+	 * Save the wfm parameter
+	 */
+	exports.prototype.save = function () {
+		wfmParameterOfWroupService.put(this.wellGroupId, this.wfmParameterId, {
+			WellGroupId : this.wellGroupId,
+			WfmParameterId : this.wfmParameterId,
+			IsMonitored : ko.unwrap(this.isMonitored),
+			Color : ko.unwrap(this.color),
+			SerialNumber : ko.unwrap(this.serialNumber),
+			Uom : ko.unwrap(this.uom)
+		});
+	};
+
+	return exports;
 });

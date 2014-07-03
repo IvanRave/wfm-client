@@ -1,27 +1,35 @@
-define(['jquery', 'knockout', 'services/datacontext'], function ($, ko, datacontext) {
-    'use strict';
+/** @module */
+define(['knockout', 'models/wfm-parameter'], function (ko, WfmParameter) {
+	'use strict';
 
-    function WfmParamSquad(data) {
-        var self = this;
-        data = data || {};
+	function importWfmParameterDtoList(data) {
+		return (data || []).map(function (item) {
+			return new WfmParameter(item);
+		});
+	}
 
-        self.id = data.Id;
+	/**
+	 * Wfm param squad
+	 * @constructor
+	 */
+	var exports = function (data) {
+		
+		data = data || {};
 
-        self.wfmParameterList = ko.observableArray();
+		this.id = data.Id;
 
-        self.toPlainJson = function () { return ko.toJS(this); };
+		this.wfmParameterList = ko.observableArray();
 
-        // Set list of well file manager parameters to group (if exists)
-        // Get requests for squads can be inclusive and non-inclusive: if inclusive then this list exists
-        if (data.WfmParameterDtoList) {
-            require(['models/wfm-parameter'], function (WfmParameter) {
-                function importWfmParameterDtoList(data) { return $.map(data || [], function (item) { return new WfmParameter(item); }); }
-                self.wfmParameterList(importWfmParameterDtoList(data.WfmParameterDtoList));
-            });
-        }
-    }
+		this.toPlainJson = function () {
+			return ko.toJS(this);
+		};
 
-    datacontext.createWfmParamSquad = function (data) {
-        return new WfmParamSquad(data);
-    };
+		// Set list of well file manager parameters to group (if exists)
+		// Get requests for squads can be inclusive and non-inclusive: if inclusive then this list exists
+		if (data.WfmParameterDtoList) {
+			this.wfmParameterList(importWfmParameterDtoList(data.WfmParameterDtoList));
+		}
+	};
+
+	return exports;
 });

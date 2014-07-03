@@ -1,49 +1,56 @@
-/** 
- * @return {!Object} Scope of methods to help working with files.
-*/
-define(['jquery', 'jquery.fileupload'], function ($) {
-    'use strict';
+/**
+ * @module
+ * @returns {!Object} Scope of methods to help working with files.
+ */
+define(['jquery', 'jquery.fileupload'], function () {
+	'use strict';
 
-    return {
-        initFileUpload: function (inputName, url, supportedTypes, callbackFunction) {
-            $(inputName).fileupload({
-                url: url,
-                xhrFields: {
-                    // For CORS request to send cookies
-                    withCredentials: true
-                },
-                add: function (e, data) {
-                    if (data.files[0].size > 10485760) {
-                        alert('Max size of file: 10MB (' + data.files[0].name + ')');
-                        return;
-                    }
+	var exports = {};
 
-                    if (supportedTypes.length > 0 && supportedTypes[0] !== '*') {
-                        if ($.inArray(data.files[0].type, supportedTypes) === -1) {
-                            alert('File type is not supported. Supported types: ' + supportedTypes.join(', ') + '. [' + data.files[0].name + ']');
-                            return;
-                        }
-                    }
+	exports.initRegExpFileUpload = function (jqrElem, url, addCallback) {
+		jqrElem.fileupload({
+			url : url,
+			autoUpload : false,
+			dataType : 'json',
+			xhrFields : {
+				// For CORS request to send cookies
+				withCredentials : true
+			},
+			add : function (e, data) {
+				addCallback(data);
+			}
+		});
 
-                    data.submit()
-                    .success(callbackFunction)
-                    .error(function (jqXHR, textStatus, errorThrown) {
-                        alert(textStatus + ': ' + jqXHR.responseText + ' (' + errorThrown + ')');
-                    });
-                    ////.complete(function (result, textStatus, jqXHR) { alert('complete'); });
-                    ////
-                }
-            });
+		// Use 'add' property instead,
+		// this binding is uploaded file even if returns false
+		// .bind('fileuploadadd', function (e, data) {
+		// addCallback(data);
+		// });
 
-            // Enable iframe cross-domain access via redirect option:
-            ////$('#'+inputName).fileupload(
-            ////    'option',
-            ////    'redirect',
-            ////    window.location.href.replace(
-            ////        /\/[^\/]*$/,
-            ////        '/cors/result.html?%s'
-            ////    )
-            ////);
-        }
-    };
+		// Enable iframe cross-domain access via redirect option:
+		////$('#'+inputName).fileupload(
+		////    'option',
+		////    'redirect',
+		////    window.location.href.replace(
+		////        /\/[^\/]*$/,
+		////        '/cors/result.html?%s'
+		////    )
+		////);
+	};
+
+	// Hidden Iframe for file loading (to the client comp)
+	exports.downloadURL = function (url) {
+		var hiddenIFrameID = 'hiddenDownloader';
+		var iframe = document.getElementById(hiddenIFrameID);
+		if (iframe === null) {
+			iframe = document.createElement('iframe');
+			iframe.id = hiddenIFrameID;
+			iframe.style.display = 'none';
+			document.body.appendChild(iframe);
+		}
+
+		iframe.src = url;
+	};
+
+	return exports;
 });

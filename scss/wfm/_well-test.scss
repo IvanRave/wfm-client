@@ -1,0 +1,28 @@
+/* Well test */
+
+.test-header {
+    padding: 4px;
+    background-color: #777;
+}
+    .test-approved {
+        background-color: $brand-success;
+    }
+
+    .test-declined {
+        background-color: $brand-danger;
+    }
+    
+    .test-header .test-header-prop {
+        padding-top: 2px;
+        color: #fff;
+    }
+    
+    .test-header .test-status {
+        padding-top: 2px;
+        color: #fff;
+    }
+    
+.test-record-input {
+  width: 50px;
+  padding: 5px 3px;
+}

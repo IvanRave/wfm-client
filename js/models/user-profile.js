@@ -1,221 +1,177 @@
 /** @module */
-define(['jquery', 'knockout', 'models/employee', 'services/datacontext', 'helpers/history-helper', 'services/auth'], function ($, ko, Employee, appDatacontext, historyHelper) {
-    'use strict';
+define(['knockout',
+		'models/employee',
+		'helpers/lang-helper',
+		'services/company-user',
+		'services/company',
+		'helpers/history-helper',
+		'constants/stage-constants',
+		'models/prop-spec',
+		'base-models/stage-base',
+		'helpers/app-helper'],
+	function (ko,
+		Employee,
+		langHelper,
+		companyUserService,
+		companyService,
+		historyHelper,
+		stageConstants,
+		PropSpec,
+		StageBase,
+		appHelper) {
+	'use strict';
 
-    /** Import employees for this user */
-    function importEmployees(data, vm) {
-        return $.map(data, function (item) {
-            return new Employee(item, vm);
-        });
-    }
+	/** Import employees for this user */
+	function importEmployees(data, userProfileItem) {
+		return data.map(function (item) {
+			return new Employee(item, userProfileItem);
+		});
+	}
 
-    /**
-    * User profile (can be as a guest - without logon)
-    * @constructor
-    */
-    var exports = function (vm) {
-        /** Alternative for this */
-        var ths = this;
+	/** Main properties for company: headers can be translated here if needed */
+	var userProfilePropSpecList = [
+		/**
+		 * User email (name)
+		 * @type {string}
+		 */
+		new PropSpec('email', 'Email', 'Email', 'SingleLine', {
+			maxLength : 320
+		})
+	];
 
-        /**
-        * User email (name)
-        * @type {string}
-        */
-        this.email = ko.observable();
+	/**
+	 * User profile
+	 * @constructor
+	 * @augments {module:base-models/stage-base}
+	 * @param {object} data - User profile data
+	 */
+	var exports = function (data, rootMdl) {
+		data = data || {};
 
-        /**
-        * User pwd: need for logon or register or change password features
-        * @type {string}
-        */
-        this.pwd = ko.observable();
+		/** Alternative for this */
+		var ths = this;
 
-        /**
-        * Whether browser is remember this user
-        * @type {boolean}
-        */
-        this.rememberMe = ko.observable(false);
+		/**
+		 * Stage key: user profile
+		 * @type {string}
+		 */
+		this.stageKey = stageConstants.upro.id;
 
-        /**
-        * Whether user is logged. If not - guest.
-        * @type {boolean}
-        */
-        this.isLogged = ko.observable(false);
+		this.getRootMdl = function () {
+			return rootMdl;
+		};
 
-        /**
-        * Whether user is registered: define page: logon or register
-        * @type {boolean}
-        */
-        this.isRegistered = ko.observable(true);
+		/** Main observable properties of user profile */
+		this.propSpecList = userProfilePropSpecList;
 
-        /** Toggle registered state: login or registered page */
-        this.toggleIsRegistered = function () {
-            ths.isRegistered(!ko.unwrap(ths.isRegistered));
-        };
+		/** User profile id (guid) */
+		this.id = data.Id;
 
-        /** Demo logon */
-        this.demoLogon = function () {
-            var demoEmail = 'wfm@example.com',
-                demoPwd = '123321';
+		/** Base for all stages: no server data in user profile */
+		StageBase.call(ths, data);
 
-            appDatacontext.accountLogon({}, {
-                'email': demoEmail,
-                'password': demoPwd
-            }).done(function () {
-                ths.email(demoEmail);
-                ths.isLogged(true);
-                ths.loadEmployees();
-            });
-        };
+		/**
+		 * User can be in many companies with access level for each company
+		 * @type {Array.<module:models/employee>}
+		 */
+		this.employees = ko.observableArray();
 
-        this.realLogOnError = ko.observable();
+		/**
+		 * Whether employees are loaded
+		 * @type {boolean}
+		 */
+		this.isLoadedEmployees = ko.observable(false);
 
-        /** Logon with user data */
-        this.realLogOn = function () {
-            ths.realLogOnError('');
-            var tmpEmail = ko.unwrap(ths.email),
-                tmpPwd = ko.unwrap(ths.pwd),
-                tmpRememberMe = ko.unwrap(ths.rememberMe);
+		/**
+		 * Name of a new company: user can create only one company with manager access level
+		 * @type {string}
+		 */
+		this.nameOfCreatedCompany = ko.observable('');
 
-            appDatacontext.accountLogon({}, {
-                'email': tmpEmail,
-                'password': tmpPwd,
-                'rememberMe': tmpRememberMe
-            }).done(function () {
-                ths.isLogged(true);
-                ths.loadEmployees();
-            }).fail(function (jqXHR) {
-                if (jqXHR.status === 422) {
-                    var resJson = jqXHR.responseJSON;
-                    var tmpProcessError = '*';
-                    require(['helpers/lang-helper'], function (langHelper) {
-                        tmpProcessError += (langHelper.translate(resJson.errId) || 'unknown error');
-                        ths.realLogOnError(tmpProcessError);
-                    });
-                }
-            });
-        };
+		/** Add new employee with company */
+		this.postEmployee = function () {
+			// Post employee company
+			var tmpNameOfCreatedCompany = ko.unwrap(ths.nameOfCreatedCompany);
+			if (tmpNameOfCreatedCompany) {
+				companyService.post({
+					'Name' : tmpNameOfCreatedCompany,
+					'Description' : ''
+				}).done(function () {
+					// Reload all companies:
+					// by default - only one company (created company) for manage
+					// and other - for view and/or edit
+					ths.isLoadedEmployees(false);
+					ths.loadEmployees();
+				});
+			}
+		};
 
-        /** Log out from app: clean objects, set isLogged to false */
-        this.logOff = function () {
-            appDatacontext.accountLogoff().done(function () {
-                ths.isLogged(false);
-            });
-        };
+		/**
+		 * Whether user is owner already: block link "register company"
+		 * @type {boolean}
+		 */
+		ths.isOwnerAlready = ko.computed({
+				read : function () {
+					var result = false;
 
-        /**
-        * Whether info for user profile is loaded
-        * @type {boolean}
-        */
-        this.isLoadedAccountInfo = ko.observable(false);
+					var tmpEmployees = ko.unwrap(ths.employees);
 
-        /**
-        * Get account info: Email, Roles, IsLogged
-        * @param {object} [initialData] - WFM default values from url, like companyId, wellId etc.
-        */
-        this.loadAccountInfo = function (initialData) {
-            initialData = initialData || {};
+					tmpEmployees.forEach(function (arrElem) {
+						if (ko.unwrap(arrElem.canManageAll)) {
+							result = true;
+						}
+					});
 
-            ths.isLoadedAccountInfo(false);
-            ths.isLogged(false);
-            appDatacontext.getAccountInfo().done(function (r) {
-                ths.email(r.Email);
-                ths.isLogged(true);
-                ths.loadEmployees(initialData);
-            }).always(function () {
-                ths.isLoadedAccountInfo(true);
-            });
-        };
+					return result;
+				},
+				deferEvaluation : true
+			});
+	};
 
-        /**
-        * User can be in many companies with access level for each company
-        * @type {Array.<module:models/employee>}
-        */
-        this.employees = ko.observableArray();
+	/** Inherit from a stage base model */
+	appHelper.inherits(exports, StageBase);
 
-        /**
-        * Current selected employee
-        * @type {module:models/employee}
-        */
-        this.selectedEmployee = ko.observable();
+	/**
+	 * Load employee list for this user
+	 */
+	exports.prototype.loadEmployees = function () {
+		if (ko.unwrap(this.isLoadedEmployees)) {
+			return;
+		}
 
-        /**
-        * Select employee
-        * @param {module:models/employee} employeeToSelect - Employee to select
-        * @param {object} [initialData] - Initial data
-        */
-        this.selectEmployee = function (employeeToSelect, initialData) {
-            initialData = initialData || {};
+		var ths = this;
+		companyUserService.getCompanyUserList().done(function (response) {
 
-            // Unselect child
-            employeeToSelect.company.selectedWegion(null);
+			////// Set hash, add to history
+			////historyHelper.pushState('/companies');
 
-            // Select self
-            ths.selectedEmployee(employeeToSelect);
+			ths.employees(importEmployees(response, ths));
+			ths.isLoadedEmployees(true);
 
-            // Select parents (no need)
+			////if (tmpInitialUrlData.companyId) {
+			////    emplArray.forEach(function (arrElem) {
+			////        if (arrElem.companyId === tmpInitialUrlData.companyId) {
+			////            // Select employee = select company
+			////            ths.selectEmployee(arrElem);
+			////            // Clean from initial url data to don't select again
+			////            delete tmpInitialUrlData.companyId;
+			////            rootMdl.initialUrlData(tmpInitialUrlData);
+			////        }
+			////    });
+			////}
+		});
+	};
 
-            // Load all regions for company of selected employee
-            ko.unwrap(ths.selectedEmployee).company.loadWegions(initialData);
+	/** Remove company with employee */
+	exports.prototype.removeChild = function (companyToRemove) {
+		var ths = this;
+		var tmpCompanyId = ko.unwrap(companyToRemove.id);
+		companyService.remove(tmpCompanyId).done(function () {
+			// Reload all employees
+			ths.isLoadedEmployees(false);
+			ths.loadEmployees();
+		});
+	};
 
-            if (!initialData.isHistory) {
-                historyHelper.pushState('/companies/' + employeeToSelect.companyId);
-            }
-        };
-
-        /**
-        * Whether employees are loaded 
-        * @type {boolean}
-        */
-        this.isLoadedEmployees = ko.observable(false);
-
-        /**
-        * Load employee list for this user
-        * @param {string} [initialData] - Default values to select, like company id, well id etc.
-        */
-        this.loadEmployees = function (initialData) {
-            initialData = initialData || {};
-
-            ths.isLoadedEmployees(false);
-            ths.selectedEmployee(null);
-            appDatacontext.getCompanyUserList().done(function (response) {
-                if (!initialData.isHistory) {
-                    historyHelper.pushState('/companies');
-                }
-                var emplArray = importEmployees(response, vm);
-                ths.employees(emplArray);
-                ths.isLoadedEmployees(true);
-
-                if (initialData.companyId) {
-                    emplArray.forEach(function (arrElem) {
-                        if (arrElem.companyId === initialData.companyId) {
-                            ths.selectEmployee(arrElem, initialData);
-                        }
-                    });
-                }
-            });
-        };
-
-        /**
-        * Whether user is owner already: block link "register company"
-        * @type {boolean}
-        */
-        ths.isOwnerAlready = ko.computed({
-            read: function () {
-                var result = false;
-
-                var tmpEmployees = ko.unwrap(ths.employees);
-
-                tmpEmployees.forEach(function (arrElem) {
-                    if (ko.unwrap(arrElem.canManageAll)) {
-                        result = true;
-                    }
-                });
-
-                return result;
-            },
-            deferEvaluation: true
-        });
-    };
-
-    return exports;
+	return exports;
 });

@@ -1,42 +1,39 @@
-define(['knockout', 'services/datacontext'], function (ko, datacontext) {
+/** @module */
+define(['models/file-spec'], function (FileSpec) {
     'use strict';
 
-    function WfmImage(data) {
-        var self = this;
+    /**
+    * WFM image: cropped image
+    * @constructor
+    */
+    var exports = function (data) {
         data = data || {};
 
-        self.Id = data.Id;
-        self.Name = data.Name;
-        self.X1 = data.X1;
-        self.Y1 = data.Y1;
-        self.X2 = data.X2;
-        self.Y2 = data.Y2;
-        self.CropXUnits = data.CropXUnits;
-        self.CropYUnits = data.CropYUnits;
+        ////var ths = this;
 
-        self.dataUrl = data.DataUrl;
+        /** Id of image */
+        this.id = data.Id;
 
-        self.ImgUrl = ko.computed(function () {
-            // GetCropImage(int well_id, string purpose, string status, string file_name, string crop)
-            var nameArray = self.Name.split('/');
-            var urlQueryParams = {
-                well_id: nameArray[0],
-                purpose: nameArray[1],
-                status: nameArray[2],
-                file_name: nameArray[3],
-                crop: '(' + [self.X1, self.Y1, self.X2, self.Y2].join(',') + ')'
-            };
+        this.idOfFileSpec = data.IdOfFileSpec;
 
-            return datacontext.getWellFileUrl(urlQueryParams);
-            // divide name by slash
-            // add coords
-            // take wellfileurl with urlqueryparams
-        });
+        this.fileSpec = new FileSpec(data.FileSpecDto);
 
-        self.toPlainJson = function () { return ko.toJS(self); };
-    }
+        //// Name of image: previous url
+        ////this.Name = data.Name;
 
-    datacontext.createWfmImage = function (item) {
-        return new WfmImage(item);
+        this.x1 = data.X1;
+        this.y1 = data.Y1;
+        this.x2 = data.X2;
+        this.y2 = data.Y2;
+        this.cropXUnits = data.CropXUnits;
+        this.cropYUnits = data.CropYUnits;
+
+        /**
+        * Cropped image url: creaded from file url and all coords
+        * @type {string}
+        */
+        this.croppedImageUrl = data.CroppedImageUrl;
     };
+
+    return exports;
 });

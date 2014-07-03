@@ -1,0 +1,50 @@
+/* Loader */
+
+// .loader-main {
+  
+// }
+
+.loader-circle-medium {
+    width: $loader-circle-medium-width;
+    height: $loader-circle-medium-height;
+    // @include opacity(0.8);
+    top: 50%;
+    left: 50%;
+    background: url($loader-circle-medium-path) no-repeat center;
+    margin-left: $loader-circle-medium-margin-left;
+    margin-top: $loader-circle-medium-margin-top;
+    z-index: $zindex-loader-main;
+    overflow: auto;
+    display: inline-block;
+    display: none;
+    position: fixed;
+}
+
+.loader-circle-large {
+    width: $loader-circle-large-width;
+    height: $loader-circle-large-height;
+    top: 50%;
+    left: 50%;
+    background: url($loader-circle-large-path) no-repeat center;
+    margin-left: $loader-circle-large-margin-left;
+    margin-top: $loader-circle-large-margin-top;
+    z-index: $zindex-loader-main;
+    overflow: auto;
+    display: inline-block;
+    display: none;
+    position: fixed;
+}
+
+.loader-line-small {
+    display: inline-block;
+    width: $loader-line-small-width;
+    height: $loader-line-small-height;
+    background: url($loader-line-small-path) no-repeat center;
+}
+
+.loader-line-medium {
+    display: inline-block;
+    width: $loader-line-medium-width;
+    height: $loader-line-medium-height;
+    background: url($loader-line-medium-path) no-repeat center;
+}

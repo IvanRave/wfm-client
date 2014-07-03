@@ -1,0 +1,31 @@
+/* Modal window elements */
+
+.modal-wide {
+    width: 98% !important;
+    /*height: 95% !important;*/
+    /*padding: 0 !important;*/
+    margin: auto;
+}
+
+    .modal-wide .modal-content {
+        /*height: 100% !important;*/
+        border-radius: 0 !important;
+    }
+
+.modal-fullscreen {
+    width: 99% !important;
+    height: 99% !important;
+    padding: 0 !important;
+    margin: auto !important;
+}
+
+/*.modal-fullscreen .modal-content .modal-body {
+            height: 100% !important;
+        }*/
+    
+.btn-modal-close {
+    font-size: 1.1em;
+    position: absolute;
+    top: 4px;
+    right: 4px;
+}

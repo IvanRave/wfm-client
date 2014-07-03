@@ -7,11 +7,16 @@ define(['knockout','models/company'], function (ko, Company) {
     * @constructor
     * @param {object} data - Employee data
     */
-    var exports = function (data, vm) {
+    var exports = function (data, mdlUserProfile) {
         data = data || {};
 
         /** Alternative of this */
         var ths = this;
+
+        /** Get root */
+        this.getRootMdl = function () {
+            return mdlUserProfile.getRootMdl();
+        };
 
         /**
         * Company guid
@@ -23,7 +28,7 @@ define(['knockout','models/company'], function (ko, Company) {
         * Company
         * @type {module:models/company}
         */
-        this.company = new Company(data.CompanyDto, vm);
+        this.company = new Company(data.CompanyDto, ths);
 
         /**
         * User guid
@@ -54,19 +59,6 @@ define(['knockout','models/company'], function (ko, Company) {
         * @type {boolean}
         */
         this.canManageAll = (this.accessLevel & 1) === 1;
-
-        /**
-        * Whether edit mode is turn on
-        * @type {boolean}
-        */
-        this.isEditMode = ko.observable(false);
-
-        /** Toggle edit mode: only if user can edit all */
-        this.toggleEditMode = function () {
-            if (ths.canEditAll) {
-                ths.isEditMode(!ko.unwrap(ths.isEditMode));
-            }
-        };
     };
 
     return exports;

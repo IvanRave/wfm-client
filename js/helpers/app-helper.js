@@ -1,127 +1,167 @@
-define(['jquery'], function ($) {
-    'use strict';
+define(function (require, exports, module) {
+/** @module helpers/app-helper */
+'use strict';
 
-    var appHelper = {};
+/**
+ * Convert to int
+ */
+exports.toInt = function (val) {
+	// May be some additional checking
+	return parseInt(val);
+};
 
-    // Hidden Iframe for file loading (to the client comp)
-    appHelper.downloadURL = function (url) {
-        var hiddenIFrameID = 'hiddenDownloader',
-            iframe = document.getElementById(hiddenIFrameID);
-        if (iframe === null) {
-            iframe = document.createElement('iframe');
-            iframe.id = hiddenIFrameID;
-            iframe.style.display = 'none';
-            document.body.appendChild(iframe);
-        }
+/**
+ * Convert to float
+ * @param (number} value 123.
+ * @param {number} countAfterPeriod .524
+ */
+exports.toFloatDec = function (value, countAfterPeriod) {
+	return exports.toInt(value * Math.pow(10, countAfterPeriod)) / Math.pow(10, countAfterPeriod);
+};
 
-        iframe.src = url;
-    };
+/**
+ * Whether is value numeric
+ *    https://api.jquery.com/jQuery.isNumeric/
+ * @returns {boolean}
+ */
+exports.isNumeric = function (obj) {
+	// From jquery
+	// // May be additional check
+	// parseFloat NaNs numeric-cast false positives (null|true|false|"")
+	// ...but misinterprets leading-number strings, particularly hex literals ("0x...")
+	// subtraction forces infinities to NaN
+	return obj - parseFloat(obj) >= 0;
+	// return $.isNumeric(value);
+};
 
-    appHelper.endsWith = function (str, suffix) {
-        return str.indexOf(suffix, str.length - suffix.length) !== -1;
-    };
+/**
+ * Whether the value is function
+ * @returns {boolean}
+ */
+exports.isFunction = function (possibleFunc) {
+	// http://stackoverflow.com/questions/5999998/how-can-i-check-if-a-javascript-variable-is-function-type
+	return (typeof(possibleFunc) === 'function');
+	//return $.isFunction(possibleFunc);
+};
 
-    appHelper.startsWith = function (str, suffix) {
-        return str.indexOf(suffix) === 0;
-    };
+// result example: 12,32 43,12 43,54
+exports.twoDimArrayToString = function (twoDimArray) {
+	for (var i = 0, iMax = twoDimArray.length; i < iMax; i += 1) {
+		if (twoDimArray[i]instanceof Array) {
+			twoDimArray[i] = twoDimArray[i].join(',');
+		}
+	}
 
-    appHelper.trimLeft = function (str) {
-        return str.replace(/^\s+/, '');
-    };
+	return twoDimArray.join(' ');
+};
 
-    appHelper.trimRight = function (str) {
-        return str.replace(/\s+$/, '');
-    };
+// result example [[12,32] [42,12] [43,54]]
+exports.stringToTwoDimArray = function (stringArray) {
+	var oneDimArray = stringArray.split(' ');
+	// result = ["12.3,324", "1234,53.45"]
 
-    // result example: 12,32 43,12 43,54
-    appHelper.twoDimArrayToString = function (twoDimArray) {
-        for (var i = 0, iMax = twoDimArray.length; i < iMax; i += 1) {
-            if (twoDimArray[i] instanceof Array) {
-                twoDimArray[i] = twoDimArray[i].join(',');
-            }
-        }
+	function getNumberArray(stringArr) {
+		return stringArr.map(function (elemValue) {
+			return +elemValue;
+		});
+	}
 
-        return twoDimArray.join(' ');
-    };
+	var twoDimArray = [];
+	for (var i = 0, iLimit = oneDimArray.length; i < iLimit; i += 1) {
+		// Split result = ["1234", "234.3"]
+		twoDimArray.push(getNumberArray(oneDimArray[i].split(',')));
+	}
 
-    // result example [[12,32] [42,12] [43,54]]
-    appHelper.stringToTwoDimArray = function (stringArray) {
-        var oneDimArray = stringArray.split(' ');
-        // result = ["12.3,324", "1234,53.45"]
+	return twoDimArray;
+};
 
-        function getNumberArray(stringArr) {
-            return $.map(stringArr, function (elemValue) {
-                return +elemValue;
-            });
-        }
+// Get area in square units
+exports.getArea = function (arr) {
+	var arrLength = arr.length;
+	if (arrLength < 3) {
+		return 0;
+	}
+	// set overlast element
+	arr.push([arr[0][0], arr[0][1]]);
 
-        var twoDimArray = [];
-        for (var i = 0, iLimit = oneDimArray.length; i < iLimit; i += 1) {
-            // Split result = ["1234", "234.3"]
-            twoDimArray.push(getNumberArray(oneDimArray[i].split(',')));
-        }
+	var area = 0;
+	for (var i = 0; i < arrLength; i += 1) {
+		area = area + (arr[i][0] * arr[i + 1][1] - arr[i][1] * arr[i + 1][0]);
+	}
 
-        return twoDimArray;
-    };
+	return Math.abs(area / 2);
+};
 
-    // Get area in square units
-    appHelper.getArea = function (arr) {
-        var arrLength = arr.length;
-        if (arrLength < 3) {
-            return 0;
-        }
-        // set overlast element
-        arr.push([arr[0][0], arr[0][1]]);
+/**
+ * Get list of years
+ * @returns {Array}
+ */
+exports.getYearList = function (startYear, endYear) {
+	var tempArr = [];
 
-        var area = 0;
-        for (var i = 0; i < arrLength; i += 1) {
-            area = area + (arr[i][0] * arr[i + 1][1] - arr[i][1] * arr[i + 1][0]);
-        }
+	for (var i = startYear; i <= endYear; i += 1) {
+		tempArr.unshift(i);
+	}
 
-        return Math.abs(area / 2);
-    };
+	return tempArr;
+};
 
-    appHelper.getYearList = function (startYear, endYear) {
-        var tempArr = [],
-            i = startYear;
+/**
+ * Get element from list by property value: element with property [propName] equals [propValue]
+ */
+exports.getElementByPropertyValue = function (elemList, propName, propValue) {
+	var needElemValue = null;
 
-        for (i; i <= endYear; i += 1) {
-            tempArr.unshift(i);
-        }
+	if (propName) {
+		elemList.forEach(function (elemValue) {
+			if (elemValue[propName] === propValue) {
+				needElemValue = elemValue;
+			}
+		});
+	}
 
-        return tempArr;
-    };
+	return needElemValue;
+};
 
-    appHelper.capitalizeFirst = function (str) {
-        return str.charAt(0).toUpperCase() + str.slice(1);
-    };
+/**
+ * Inherit the prototype methods from one constructor into another.
+ * @example
+ * Usage:
+ * <pre>
+ * function ParentClass(a, b) { }
+ * ParentClass.prototype.foo = function(a) { }
+ *
+ * function ChildClass(a, b, c) {
+ *   goog.base(this, a, b);
+ * }
+ * goog.inherits(ChildClass, ParentClass);
+ *
+ * var child = new ChildClass('a', 'b', 'see');
+ * child.foo(); // This works.
+ * </pre>
+ *
+ * In addition, a superclass' implementation of a method can be invoked as
+ * follows:
+ *
+ * <pre>
+ * ChildClass.prototype.foo = function(a) {
+ *   ChildClass.superClass_.foo.call(this, a);
+ *   // Other code here.
+ * };
+ * </pre>
+ *
+ * @param {Function} childCtor Child class.
+ * @param {Function} parentCtor Parent class.
+ */
+exports.inherits = function (childCtor, parentCtor) {
+	function TempCtor() {}
+	TempCtor.prototype = parentCtor.prototype;
+	childCtor.superClass_ = parentCtor.prototype;
+	childCtor.prototype = new TempCtor();
+	/** @override */
+	childCtor.prototype.constructor = childCtor;
+};
 
-    /// <summary>
-    /// Get element from list by property value: element with property [propName] equals [propValue]
-    /// </summary>
-    appHelper.getElementByPropertyValue = function (elemList, propName, propValue) {
-        var needElemValue = null;
+module.exports = exports;
 
-        if (propName) {
-            $.each(elemList, function (elemIndex, elemValue) {
-                if (elemValue[propName] === propValue) {
-                    // Find elem
-                    needElemValue = elemValue;
-                    // Exit from this cycle
-                    return false;
-                }
-
-                // Continue this cycle
-                return true;
-            });
-        }
-
-        return needElemValue;
-    };
-
-    appHelper.isGuidValid = function (guidValue) {
-        return (/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/).test(guidValue);
-    };
-
-    return appHelper;
 });

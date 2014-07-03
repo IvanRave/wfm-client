@@ -1,202 +1,301 @@
-/** @module */
-define(['jquery', 'knockout', 'models/wegion', 'models/job-type', 'services/datacontext',
-    'helpers/modal-helper', 'helpers/history-helper',
-    'helpers/knockout-lazy'], function ($, ko, Wegion, JobType, appDatacontext, modalHelper, historyHelper) {
-        'use strict';
+/**
+ * @module
+ * @todo #42! Allow only jpg and png as a logo
+ */
+define(['jquery',
+		'knockout',
+		'models/wegion',
+		'models/job-type',
+		'services/datacontext',
+		'helpers/modal-helper',
+		'helpers/history-helper',
+		'base-models/stage-base',
+		'models/section-of-stage',
+		'models/prop-spec',
+		'services/company',
+		'models/file-spec',
+		'services/wegion',
+		'constants/stage-constants',
+		'helpers/app-helper',
+		'helpers/knockout-lazy'],
+	function ($,
+		ko,
+		Wegion,
+		JobType,
+		appDatacontext,
+		modalHelper,
+		historyHelper,
+		StageBase,
+		SectionOfCompany,
+		PropSpec,
+		companyService,
+		FileSpec,
+		wegionService,
+		stageCnst,
+		appHelper) {
+	'use strict';
 
-        /** Import well regions for company */
-        function importWegions(data, companyParent) {
-            return $.map(data, function (item) { return new Wegion(item, companyParent); });
-        }
+	/** Import well regions for company */
+	function importWegions(data, companyParent) {
+		return (data || []).map(function (item) {
+			return new Wegion(item, companyParent);
+		});
+	}
 
-        /** Import job types for this company (joined with global types) */
-        function importJobTypeList(data) {
-            return $.map(data || [], function (item) { return new JobType(item); });
-        }
+	/** Import company sections */
+	function importListOfSectionOfCompanyDto(data, parent) {
+		return (data || []).map(function (item) {
+			return new SectionOfCompany(item, parent, item.CompanyId);
+		});
+		// item.CompanyId === parent.id
+	}
 
-        /**
-        * Company model
-        * @constructor
-        * @param {object} data - Company data
-        */
-        var exports = function (data, rootViewModel) {
-            data = data || {};
+	/** Main properties for company: headers can be translated here if needed */
+	var companyPropSpecList = [
+		new PropSpec('name', 'Name', 'Company name', 'SingleLine', {
+			maxLength : 255
+		}),
+		new PropSpec('description', 'Description', 'Company description', 'MultiLine', {}),
+		new PropSpec('fileSpecOfLogo', 'FileSpecOfLogo', 'Company logo', 'FileLine', {
+			width : 100,
+			// Client id of property of nested id of file spec
+			nestedClientId : 'idOfFileSpecOfLogo'
+		}),
+		new PropSpec('idOfFileSpecOfLogo', 'IdOfFileSpecOfLogo', '', '', {})
+	];
 
-            var ths = this;
+	/**
+	 * Company model
+	 * @constructor
+	 * @param {object} data - Company data
+	 */
+	var exports = function (data, mdlEmployee) {
+		data = data || {};
 
-            this.getRootViewModel = function () {
-                return rootViewModel;
-            };
+		this.getRootMdl = function () {
+			return mdlEmployee.getRootMdl();
+		};
 
-            /**
-            * Company guid
-            * @type {string}
-            */
-            this.id = data.Id;
+		/**
+		 * Company guid
+		 * @type {string}
+		 */
+		this.id = data.Id;
 
-            /**
-            * Company name
-            * @type {string}
-            */
-            this.name = ko.observable(data.Name);
+		/** Props specifications */
+		this.propSpecList = companyPropSpecList;
 
-            /**
-            * Company description
-            * @type {string}
-            */
-            this.description = ko.observable(data.Description);
+		/**
+		 * Stage key: equals file name
+		 * @type {string}
+		 */
+		this.stageKey = stageCnst.company.id;
 
-            /**
-            * Logo url
-            * @type {string}
-            */
-            this.logoUrl = ko.observable(data.LogoUrl || 'img/question.jpg');
+		/** Base for all stages */
+		StageBase.call(this, data);
 
-            /**
-            * List of well regions
-            * @type {module:models/wegion}
-            */
-            this.wegions = ko.observableArray();
+		/**
+		 * List of well regions
+		 * @type {module:models/wegion}
+		 */
+		this.wegions = ko.observableArray();
 
-            /**
-            * Whether well regions are loaded
-            * @type {boolean}
-            */
-            this.isLoadedWegions = ko.observable(false);
+		/**
+		 * Whether well regions are loaded
+		 * @type {boolean}
+		 */
+		this.isLoadedWegions = ko.observable(false);
 
-            this.jobTypeList = ko.lazyObservableArray(function () {
-                appDatacontext.getJobTypeList(ths.id).done(function (r) {
-                    ths.jobTypeList(importJobTypeList(r));
-                });
-            }, this);
+		this.jobTypeList = ko.lazyObservableArray(this.loadJobTypeList, this);
 
-            /** Modal window for adding job type */
-            this.goToPostingJobType = function () {
-                var jobTypeNewName = window.prompt('Add job type to list');
-                if (jobTypeNewName) {
-                    appDatacontext.postCompanyJobType(ths.id, {
-                        name: jobTypeNewName,
-                        description: '',
-                        companyId: ths.id
-                    }).done(function (jobTypeCreated) {
-                        ths.jobTypeList.push(new JobType(jobTypeCreated));
-                    });
-                }
-            };
+		/** Load sections */
+		this.listOfSection(importListOfSectionOfCompanyDto(data.ListOfSectionOfCompanyDto, this));
 
-            /**
-            * Selected region
-            * @type {module:models/wegion}
-            */
-            this.selectedWegion = ko.observable();
+		/** Load inner object after initialization: only one time per user profile selection */
+		this.loadWegions();
+	};
 
-            /**
-            * Select well region
-            * @param {module:models/wegion} wegionToSelect - Well region to select
-            * @param {object} [initialData] - Initial data
-            */
-            this.selectWegion = function (wegionToSelect, initialData) {
-                initialData = initialData || {};
+	/** Inherit from a stage base model */
+	appHelper.inherits(exports, StageBase);
 
-                wegionToSelect.isOpenItem(true);
+	/** Convert to data transfer object to sent to the server*/
+	exports.prototype.toDto = function () {
+		var dtoObj = {
+			Id : this.id
+		};
 
-                // Unselect child
-                wegionToSelect.selectedWield(null);
+		this.propSpecList.forEach(function (prop) {
+			dtoObj[prop.serverId] = ko.unwrap(this[prop.clientId]);
+		}, this);
 
-                // Select self
-                ths.selectedWegion(wegionToSelect);
+		return dtoObj;
+	};
 
-                // Select parents (not need)
+	/** Add a job type */
+	exports.prototype.postJobType = function (tmpName) {
+		appDatacontext.postCompanyJobType(this.id, {
+			name : tmpName,
+			description : '',
+			companyId : this.id
+		}).done(this.pushJobType.bind(this));
+	};
 
-                if (!initialData.isHistory) {
-                    historyHelper.pushState('/companies/' + ths.id + '/well-regions/' + wegionToSelect.Id);
-                }
+	exports.prototype.pushJobType = function (dataOfJobType) {
+		this.jobTypeList.push(new JobType(dataOfJobType));
+	};
 
-                ////if (initialData.wieldId) {
-                ////    wegionToSelect.selectWieldById(initialData.wieldId);
-                ////}
-            };
+	/**
+	 * Load wegions of this company
+	 */
+	exports.prototype.loadWegions = function () {
+		if (!ko.unwrap(this.isLoadedWegions)) {
+			wegionService.getInclusive(this.id).done(this.successLoadWegions.bind(this));
+		}
+	};
 
-            /**
-            * Select region by id: wrap for select wegion function
-            * @param {number} wegionId - Id of well region
-            * @param {object} initialData - Initial data
-            */
-            this.selectWegionById = function (wegionId, initialData) {
-                if ($.isNumeric(wegionId)) {
-                    var tmpWegions = ko.unwrap(ths.wegions);
+	exports.prototype.successLoadWegions = function (dataOfWegions) {
+		this.wegions(importWegions(dataOfWegions, this));
+		this.isLoadedWegions(true);
+	};
 
-                    tmpWegions.forEach(function (tmpWegion) {
-                        if (tmpWegion.Id === wegionId) {
-                            ths.selectWegion(tmpWegion, initialData);
-                        }
-                    });
-                }
-            };
+	/** Delete well region */
+	exports.prototype.removeChild = function (wellRegionForDelete) {
+		var ths = this;
+		wegionService.remove(wellRegionForDelete.id).done(function () {
+			ths.wegions.remove(wellRegionForDelete);
+		});
+	};
 
-            /** Delete well region */
-            this.deleteWegion = function (wellRegionForDelete) {
-                if (confirm('Are you sure you want to delete "' + ko.unwrap(wellRegionForDelete.Name) + '"?')) {
-                    appDatacontext.deleteWellRegion(wellRegionForDelete).done(function () {
-                        ths.wegions.remove(wellRegionForDelete);
+	/**
+	 * Find a list of cognate stages
+	 *    1. A list for selection box for new widget (name and id)
+	 *    2. A list to find specific stage by id: findCognateStage
+	 * @returns {Array.<Object>}
+	 */
+	exports.prototype.getListOfStageByKey = function (keyOfStage) {
+		switch (keyOfStage) {
+		case stageCnst.company.id:
+			return [this];
+		case stageCnst.wegion.id:
+			return ko.unwrap(this.wegions);
+		case stageCnst.wield.id:
+			return this.calcListOfWield();
+		case stageCnst.wroup.id:
+			return this.calcListOfWroup();
+		case stageCnst.well.id:
+			return this.calcListOfWell();
+		}
+	};
 
-                        ths.selectedWegion(null);
+	/** Find all well fields */
+	exports.prototype.calcListOfWield = function () {
+		var needArr = [];
 
-                        ////window.location.hash = window.location.hash.split('?')[0];
-                    });
-                }
-            };
+		ko.unwrap(this.wegions).forEach(function (wegionItem) {
+			ko.unwrap(wegionItem.wields).forEach(function (wieldItem) {
+				needArr.push(wieldItem);
+			});
+		});
 
-            /** Create and post new well region */
-            this.postWegion = function () {
-                var inputName = document.createElement('input');
-                inputName.type = 'text';
-                $(inputName).prop({ 'required': true }).addClass('form-control');
+		return needArr;
+	};
 
-                var innerDiv = document.createElement('div');
-                $(innerDiv).addClass('form-horizontal').append(
-                    modalHelper.gnrtDom('Name', inputName)
-                );
+	/** Find all well groups */
+	exports.prototype.calcListOfWroup = function () {
+		var needArr = [];
 
-                modalHelper.openModalWindow('Well region', innerDiv, function () {
-                    appDatacontext.saveNewWellRegion({
-                        Name: $(inputName).val(),
-                        CompanyId: ths.id
-                    }).done(function (result) {
-                        ths.wegions.push(new Wegion(result, ths));
-                    });
+		ko.unwrap(this.wegions).forEach(function (wegionItem) {
+			ko.unwrap(wegionItem.wields).forEach(function (wieldItem) {
+				ko.unwrap(wieldItem.wroups).forEach(function (wroupItem) {
+					needArr.push(wroupItem);
+				});
+			});
+		});
 
-                    modalHelper.closeModalWindow();
-                });
-            };
+		return needArr;
+	};
 
-            /** 
-            * Load wegions of this company
-            * @param {object} [initialData] - Initial data
-            */
-            this.loadWegions = function (initialData) {
-                initialData = initialData || {};
+	/** Find all wells */
+	exports.prototype.calcListOfWell = function () {
+		var needArr = [];
 
-                if (!ko.unwrap(ths.isLoadedWegions)) {
-                    appDatacontext.getWellRegionList({
-                        company_id: ths.id,
-                        is_inclusive: true
-                    }).done(function (response) {
-                        ths.wegions(importWegions(response, ths));
-                        ths.isLoadedWegions(true);
+		ko.unwrap(this.wegions).forEach(function (wegionItem) {
+			ko.unwrap(wegionItem.wields).forEach(function (wieldItem) {
+				ko.unwrap(wieldItem.wroups).forEach(function (wroupItem) {
+					ko.unwrap(wroupItem.wells).forEach(function (wellItem) {
+						needArr.push(wellItem);
+					});
+				});
+			});
+		});
 
-                        if ($.isNumeric(initialData.wegionId)) {
-                            ths.selectWegionById(initialData.wegionId, initialData);
-                        }
-                    });
-                }
-                else {
-                    if ($.isNumeric(initialData.wegionId)) {
-                        ths.selectWegionById(initialData.wegionId, initialData);
-                    }
-                }
-            };
-        };
+		return needArr;
+	};
 
-        return exports;
-    });
+	/** Save properties */
+	exports.prototype.save = function () {
+		companyService.put(this.id, this.toDto()).done(this.successSave.bind(this));
+	};
+
+	/** Success callback for saving this company */
+	exports.prototype.successSave = function (dataOfCompany) {
+		// Calculated properties on the server
+		var tmpFileSpecOfLogoProp = this.propSpecList.filter(function (elem) {
+				return elem.clientId === 'fileSpecOfLogo';
+			})[0];
+
+		if (!tmpFileSpecOfLogoProp) {
+			throw new ReferenceError('No fileSpecOfLogo property for company model');
+		}
+
+		// Value of logo file from server
+		var tmpValueOfFileSpecOfLogo = dataOfCompany[tmpFileSpecOfLogoProp.serverId];
+
+		if (tmpValueOfFileSpecOfLogo) {
+			this[tmpFileSpecOfLogoProp.clientId](new FileSpec(tmpValueOfFileSpecOfLogo));
+		} else {
+			this[tmpFileSpecOfLogoProp.clientId](null);
+		}
+	};
+
+	/** Create and post new well region */
+	exports.prototype.postWegion = function (tmpName, scsCallback) {
+		wegionService.post({
+			'Name' : tmpName,
+			'Description' : '',
+			'CompanyId' : this.id
+		}).done(scsCallback);
+	};
+
+	/**
+	 * Push a well region to the main list
+	 */
+	exports.prototype.pushWegion = function (dataOfWegion) {
+		this.wegions.push(new Wegion(dataOfWegion, this));
+	};
+
+	/**
+	 * Load a list of job types
+	 */
+	exports.prototype.loadJobTypeList = function () {
+		appDatacontext.getJobTypeList(this.id).done(this.importJobTypeList.bind(this));
+	};
+
+	/** Import job types for this company (joined with global types) */
+	exports.prototype.importJobTypeList = function (data) {
+		data = data || [];
+		this.jobTypeList(data.map(function (item) {
+				return new JobType(item);
+			}));
+	};
+
+	/**
+	 * Get guid of this company
+	 * @returns {string}
+	 */
+	exports.prototype.getIdOfCompany = function () {
+		return this.id;
+	};
+
+	return exports;
+});

@@ -1,0 +1,23 @@
+/* A header of a list of files */
+
+.lf-header {
+  padding-bottom: 4px;
+}
+
+.lf-header-column {
+  padding: 4px 4px 6px 12px;
+  border: 1px solid $lf-header-border-color; // #cecece; // 555
+  background-color: $lf-header-bg; //#efefef; //222
+  position: relative;
+}
+
+.lf-header-column__select-all {
+  margin: 0 0 0 0 !important;
+  position: absolute;
+  top: 8px;
+  left: 14px;
+}
+
+.lf-header-column__name-header {
+  margin-left: 26px;
+}

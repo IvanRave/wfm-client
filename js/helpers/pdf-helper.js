@@ -1,3 +1,22 @@
+// // define(['jspdf'], function () {
+// // 'use strict';
+
+// // /**
+// // * A PDF helper
+// // */
+// // var exports = {};
+
+// // exports.createPdf = function () {
+// // return new jsPDF();
+// // };
+
+// // exports.savePdf = function(pdfDoc){
+// // pdfDoc.save('Test.pdf');
+// // };
+
+// // return exports;
+// // });
+
 ////define(['jquery', 'moment',
 ////    'blob-js', 'blob-builder', 'filesaver'
 ////], function ($, appMoment) {
@@ -107,7 +126,7 @@
 ////            counterDate = new Date(counterDate.setMonth(counterDate.getMonth() + 1));
 ////        }
 
-////        // vertical data 
+////        // vertical data
 ////        // get min and max values (exclude zero index - date)
 ////        var minValue = 0;
 ////        var maxValue = graphData[0][1];
@@ -396,7 +415,7 @@
 ////            var oadateString = appMoment((parseFloat(elemValue.Id) - 25569) * 24 * 3600 * 1000).format('YYYY-MM');
 ////            pdfDoc.text(pdfPage.margin, pdStringPosition, oadateString);
 
-////            // TODO: restore without using self
+////            // TODO: restore without using slf
 ////            ////$.each(headerList, function (headerIndex, headerValue) {
 ////            ////    if (headerValue.IsCalc() === false) {
 ////            ////        if (elemValue[headerValue.Name] !== null) {
@@ -461,7 +480,7 @@
 ////        };
 
 ////        img.onload = function () {
-////            // inner data: 
+////            // inner data:
 ////            // img.width
 ////            // img.height
 
@@ -470,7 +489,7 @@
 
 ////            // img 700*900
 ////            // pdf 400*600
-////            // if 700 > 400 
+////            // if 700 > 400
 ////            // scale = 400/700
 ////            // height = 900 * 400/700
 ////            // width = 700 * 400/700

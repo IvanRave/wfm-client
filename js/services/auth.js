@@ -1,28 +1,27 @@
-define(['jquery', 'services/datacontext', 'helpers/ajax-request'], function ($, datacontext, ajaxRequest) {
-    'use strict';
+/** @module */
+define(['helpers/ajax-request'], function (ajaxRequest) {
+	'use strict';
+	
+	function accountInfoUrl() {
+		return '//wfm-report.herokuapp.com/api/account/info';
+	}
+  
+  function accountLogOffUrl() {
+		return '//wfm-report.herokuapp.com/api/account/logoff';
+	}
 
-    function accountLogoffUrl(uqp) {
-        return 'http://wfm-client.azurewebsites.net/api/account/logoff/' + (uqp ? ('?' + $.param(uqp)) : '');
-    }
-    function accountLogonUrl(uqp) {
-        return 'http://wfm-client.azurewebsites.net/api/account/logon/' + (uqp ? ('?' + $.param(uqp)) : '');
-    }
-    function accountInfoUrl() {
-        return 'http://wfm-client.azurewebsites.net/api/account/info';
-    }
+	/** Auth service */
+	var exports = {};
 
-    // Account logoff
-    datacontext.accountLogoff = function (uqp) {
-        return ajaxRequest('POST', accountLogoffUrl(uqp));
-    };
+	/** Get account info */
+	exports.getUserProfile = function () {
+		return ajaxRequest('GET', accountInfoUrl());
+	};
+  
+  /** End the session */
+  exports.accountLogOff = function() {
+    return ajaxRequest('GET', accountLogOffUrl());
+  };
 
-    // Account logon
-    datacontext.accountLogon = function (uqp, data) {
-        return ajaxRequest('POST', accountLogonUrl(uqp), data);
-    };
-
-    /** Get account info */
-    datacontext.getAccountInfo = function () {
-        return ajaxRequest('GET', accountInfoUrl());
-    };
+	return exports;
 });

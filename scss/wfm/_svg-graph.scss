@@ -1,0 +1,59 @@
+/* svg graph, zoom controls */
+
+.graph-wrap {
+  @include gradient-line($graph-wrap-start-bg, $graph-wrap-stop-bg);
+}
+
+.axis {
+}
+
+    .axis text {
+        font-size: $graph-axis-text-fsz;
+        font-family: 'Bookman Old Style', serif;
+        fill : $graph-axis-text-fill;
+    }
+
+    .axis line {
+        fill: none;
+        stroke: $graph-axis-line-stoke;
+        stroke-width: 1px;
+    }
+
+    .axis path {
+        fill: none;
+        stroke: $graph-axis-path-stroke;
+        stroke-width: 1px;
+    }
+
+.svg-graph-path {
+    fill: none;
+    stroke-width: 1.5px;
+    // During scaling - doesn't change stroke width
+    vector-effect: non-scaling-stroke;
+}
+
+.graph-zoom-rect {
+    fill: none;
+    pointer-events: all;
+    cursor: move;
+}
+
+.svg-zoom-controls {
+    stroke: #bbb;
+    cursor: pointer;
+    stroke-width: 1px;
+}
+
+    .svg-zoom-controls circle {
+        fill: none;
+        stroke: none;
+        pointer-events: all;
+    }
+
+        .svg-zoom-controls circle:hover {
+            stroke: none;
+        }
+
+    .svg-zoom-controls path {
+        fill: #bbb;
+    }

@@ -83,13 +83,17 @@ define([], function () {
         // 
         'emailisalreadytaken': 'email is already taken',
         // 
-        'confirmationemailfailedtosend': 'confirmation email failed to send. Please try register again later.',
+        'emailconfirmationfailedtosend': 'confirmation email failed to send. Please try register again later.',
         // 
         'validationerrors': 'validation errors',
         // 
         'wrongemailformat': 'wrong email format',
         // 
         'emailconfirmationisunsuccessful': 'email confirmation is unsuccessful',
+        // 
+        'checktoconfirmationtoken': 'registration step 2: please check your email to get confirmation code.',
+        // 
+        'confirmregistrationsuccessful': 'email confirmation is successful. Please login to enter to your cabinet.',
         // 
         'success': 'success',
         // 
@@ -189,6 +193,14 @@ define([], function () {
         // 
         'todeletewell': 'delete well',
         // 
+        'todeleteregion': 'delete region',
+        // 
+        'todeletefield': 'delete field',
+        // 
+        'todeletegroup': 'delete group',
+        // 
+        'todeletecompany': 'delete company',
+        // 
         'well': 'well',
         // 
         'dashboard': 'dashboard',
@@ -232,6 +244,36 @@ define([], function () {
         'toaddhour': 'add hour',
         // 
         'total': 'total',
+        // 
+        'volumeofwellalreadyexists': 'Volume with this file is already exists',
+        // 
+        'filespecofhistoryofwellalreadyexists': 'This file is already attached to this well history',
+        // 
+        'nodalanalysisofwellalreadyexists': 'Nodal analysis with this file is already exists',
+        // 
+        'integrityofwellalreadyexists': 'Integrity with this file is already exists',
+        // 
+        'toselectmapofwield': 'select map',
+        // 
+        'createmapofwieldfromfile': 'add map',
+        // 
+        'noselectedmapofwield': 'no maps',
+        // 
+        'isvisnameofmapofwield': 'name',
+        // 
+        'isvisimgofmapofwield': 'map',
+        // 
+        'maptoolruler': 'ruler',
+        // 
+        'maptoolmarker': 'marker',
+        // 
+        'maptoolarea': 'area',
+        // 
+        'maptoolscale': 'scale',
+        // 
+        'maptoolwellmarker': 'well marker',
+        // 
+        'isviswellactivity': 'well activity',
         // 
     };
 

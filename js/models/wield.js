@@ -1,300 +1,256 @@
 /** @module */
-define(['jquery',
-    'knockout',
-    'services/datacontext',
-    'helpers/file-helper',
-    'helpers/modal-helper',
-    'models/well-field-map',
-    'models/section-of-wield',
-    'models/wroup'], function ($, ko, datacontext,
-        fileHelper, bootstrapModal, WellFieldMap, SectionOfWield, WellGroup) {
-        'use strict';
+define(['knockout',
+		'services/datacontext',
+		'helpers/file-helper',
+		'base-models/stage-base',
+		'models/map-of-wield',
+		'services/map-of-wield',
+		'models/section-of-stage',
+		'models/wroup',
+		'models/prop-spec',
+		'services/wield',
+		'services/wroup',
+		'constants/stage-constants',
+		'helpers/app-helper'],
+	function (ko, datacontext,
+		fileHelper, StageBase, MapOfWield, mapOfWieldService, SectionOfWield, WellGroup,
+		PropSpec, wieldService, wroupService, stageCnst, appHelper) {
+	'use strict';
 
-        // 10. WellFieldMaps (convert data objects into array)
-        function importWellFieldMapsDto(data, parent) {
-            return $.map(data || [], function (item) {
-                return new WellFieldMap(item, parent);
-            });
-        }
+	// 10. WellFieldMaps (convert data objects into array)
+	function importWellFieldMapsDto(data, parent) {
+		return (data || []).map(function (item) {
+			return new MapOfWield(item, parent);
+		});
+	}
 
-        // 3. WellGroup (convert data objects into array)
-        function importWellGroupsDto(data, parent) {
-            return $.map(data || [], function (item) { return new WellGroup(item, parent); });
-        }
+	// 3. WellGroup (convert data objects into array)
+	function importWroupDtoList(data, parent) {
+		return (data || []).map(function (item) {
+			return new WellGroup(item, parent);
+		});
+	}
 
-        function importListOfSectionOfWieldDto(data, parent) {
-            return $.map(data || [], function (item) {
-                return new SectionOfWield(item, parent);
-            });
-        }
+	function importListOfSectionOfWieldDto(data, parent) {
+		return (data || []).map(function (item) {
+			return new SectionOfWield(item, parent);
+		});
+	}
 
-        /**
-        * Well field
-        * @constructor
-        * @param {object} data - Field data
-        * @param {module:models/wegion} wellRegion - Region (parent)
-        */
-        var exports = function (data, wellRegion) {
-            data = data || {};
+	/** Main properties for company: headers can be translated here if needed */
+	var wieldPropSpecList = [
+		new PropSpec('name', 'Name', 'Field name', 'SingleLine', {
+			maxLength : 255
+		}),
+		new PropSpec('description', 'Description', 'Description', 'MultiLine', {})
+	];
 
-            var self = this;
+	/**
+	 * Well field
+	 * @constructor
+	 * @param {object} data - Field data
+	 * @param {module:models/wegion} wellRegion - Region (parent)
+	 */
+	var exports = function (data, wellRegion) {
+		data = data || {};
 
-            /** Get region (parent) */
-            this.getWellRegion = function () {
-                return wellRegion;
-            };
+		var ths = this;
 
-            /**
-            * Field id
-            * @type {number}
-            */
-            this.Id = data.Id;
+		/** Get region (parent) */
+		this.getWellRegion = function () {
+			return wellRegion;
+		};
 
-            /**
-            * Field name
-            * @type {string}
-            */
-            this.Name = ko.observable(data.Name);
+		/** Get root view model */
+		this.getRootMdl = function () {
+			return this.getWellRegion().getRootMdl();
+		};
 
-            /**
-            * Id of region (parent): foreign key
-            * @type {number}
-            */
-            this.WellRegionId = data.WellRegionId;
+		this.propSpecList = wieldPropSpecList;
 
-            /** 
-            * List of sections
-            * @type {Array.<module:models/section-of-wield>}
-            */
-            this.ListOfSectionOfWieldDto = ko.observableArray();
+		// TODO: change to small id
+		/**
+		 * Field id
+		 * @type {number}
+		 */
+		this.Id = data.Id;
 
-            /**
-            * List of groups
-            * @type {Array.<module:models/wroup>}
-            */
-            this.WellGroups = ko.observableArray();
+		/** Alternative for Id */
+		this.id = data.Id;
 
-            /** Selected group */
-            this.selectedWroup = ko.observable();
+		/**
+		 * Id of region (parent): foreign key
+		 * @type {number}
+		 */
+		this.idOfWegion = data.WellRegionId;
 
-            this.selectWroup = function (wroupToSelect) {
-                ////window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
-                ////    region: self.getWellField().getWellRegion().Id,
-                ////    field: self.getWellField().Id,
-                ////    group: self.Id
-                ////});
+		/**
+		 * Stage key: equals file name
+		 * @type {string}
+		 */
+		this.stageKey = stageCnst.wield.id;
 
-                wroupToSelect.isOpenItem(true);
-                // Unselect all wells
-                wroupToSelect.selectedWell(null);
-                // Set group as selected
-                self.selectedWroup(wroupToSelect);
+		// Add identical properties for all stages (well, field, group, regions, company)
+		StageBase.call(this, data);
 
-                // Set all parents as selected
-                self.getWellRegion().selectedWield(self);
-                self.getWellRegion().getCompany().selectedWegion(self.getWellRegion());
-               
-                // get last approved scopes of every well (one request)
-                // insert in every well
-                // get all test data for every with total
+		/**
+		 * List of groups
+		 * @type {Array.<module:models/wroup>}
+		 */
+		this.wroups = ko.observableArray();
 
-                var wellIdList = wroupToSelect.Wells().map(function (el) {
-                    return el.Id;
-                });
+		/**
+		 * List of maps
+		 * @type {Array.<module:models/map-of-wield>}
+		 */
+		this.WellFieldMaps = ko.observableArray();
 
-                if (wellIdList.length === 0) { return; }
+		/**
+		 * Whether maps are loaded
+		 * @type {boolean}
+		 */
+		this.isLoadedMapsOfWield = ko.observable(false);
 
-                wroupToSelect.getWellGroupWfmParameterList();
+		/** Save non-reference properties, like groups, or region */
+		this.save = function () {
+			wieldService.put(ths.Id, ths.toDto());
+		};
 
-                datacontext.getTestScope({ wellIdList: wellIdList }).done(function (result) {
-                    if (result.length > 0) {
-                        //for (var w = 0, wMax = self.Wells().length; w < wMax; w++) {
-                        $.each(wroupToSelect.Wells(), function (wellIndex, wellValue) {
-                            //for (var i = 0, iMax = objSet.length; i < iMax; i++) {
-                            $.each(result, function (objIndex, objValue) {
-                                if (wellValue.Id === objValue.WellId) {
-                                    wellValue.lastTestScope(datacontext.createTestScope(objValue, wellValue));
-                                    return false;
-                                }
-                            });
-                        });
-                    }
-                });
-            };
+		/** Convert to data transfer object: only simple props */
+		this.toDto = function () {
+			var dtoObj = {
+				'Id' : ths.Id,
+				'WellRegionId' : ths.idOfWegion
+			};
 
-            /**
-            * List of maps
-            * @type {Array.<module:models/well-field-map>}
-            */
-            this.WellFieldMaps = ko.observableArray();
+			ths.propSpecList.forEach(function (prop) {
+				dtoObj[prop.serverId] = ko.unwrap(ths[prop.clientId]);
+			});
 
-            /** Selected map */
-            this.selectedWieldMap = ko.observable();
+			return dtoObj;
+		};
 
-            /**
-            * Selected section
-            * @type {module:models/section-of-wield}
-            */
-            this.selectedSection = ko.observable();
+		/** Load groups */
+		this.wroups(importWroupDtoList(data.WellGroupsDto, this));
 
-            /** Set this section as selected */
-            self.selectSection = function (sectionToSelect) {
-                if (sectionToSelect) {
-                    switch (sectionToSelect.SectionPatternId) {
-                        case 'wield-map':
-                            // Get all maps from this field
-                            self.getWellFieldMaps(function () {
-                                var arr = ko.unwrap(self.WellFieldMaps);
-                                if (arr.length > 0) {
-                                    arr[0].showWellFieldMap();
-                                }
-                            });
+		/** Load sections */
+		this.listOfSection(importListOfSectionOfWieldDto(data.ListOfSectionOfWieldDto, this));
+	};
 
-                            //self.initMapFileUpload();
-                            break;
-                    }
+	/** Inherit from a stage base model */
+	appHelper.inherits(exports, StageBase);
 
-                    self.selectedSection(sectionToSelect);
-                }
-            };
+	/** Load all maps for this field */
+	exports.prototype.loadMapsOfWield = function () {
+		if (ko.unwrap(this.isLoadedMapsOfWield)) {
+			return;
+		}
+		var ths = this;
+		mapOfWieldService.get(this.id).done(function (result) {
+			ths.isLoadedMapsOfWield(true);
+			ths.WellFieldMaps(importWellFieldMapsDto(result, ths));
+			console.log('maps are loaded', result, ko.unwrap(ths.WellFieldMaps));
+		});
+	};
 
-            self.deleteWellFieldMap = function (itemToDelete) {
-                if (confirm('Are you sure you want to delete "' + ko.unwrap(itemToDelete.FileSpec.Name) + '"?')) {
-                    datacontext.deleteWellFieldMap(self.Id, itemToDelete.Id).done(function () {
-                        self.WellFieldMaps.remove(itemToDelete);
-                    });
-                }
-            };
+	/** Send a map to the server */
+	exports.prototype.postMapOfWield = function (tmpIdOfFileSpec, tmpNameOfFileSpec, scsCallback) {
+		var ths = this;
+		// Create map on the server with this file
+		mapOfWieldService.post(ths.id, {
+			WellFieldId : ths.id,
+			ScaleCoefficient : 1,
+			Description : '',
+			// by default - map name = file name
+			Name : tmpNameOfFileSpec,
+			IdOfFileSpec : tmpIdOfFileSpec
+		}).done(function (r) {
+			ths.WellFieldMaps.push(new MapOfWield(r, ths));
 
-            self.getWellFieldMaps = function (callbackFunction) {
-                if (self.WellFieldMaps().length === 0) {
-                    datacontext.getWellFieldMaps(self.Id).done(function (result) {
-                        self.WellFieldMaps(importWellFieldMapsDto(result, self));
+			scsCallback();
+		});
+	};
 
-                        if ($.isFunction(callbackFunction) === true) {
-                            callbackFunction();
-                        }
-                    });
-                }
-                else {
-                    if ($.isFunction(callbackFunction) === true) {
-                        callbackFunction();
-                    }
-                }
-            };
+	/**
+	 * Get well group by id
+	 * @param {number} idOfWroup - Id of well group
+	 */
+	exports.prototype.getWroupById = function (idOfWroup) {
+		var tmpWroups = ko.unwrap(this.wroups);
+		return tmpWroups.filter(function (elem) {
+			return elem.id === idOfWroup;
+		})[0];
+	};
 
-            /** 
-            * Options for file loader (files loaded to the map-section)
-            */
-            self.mapFiloader = {
-                callback: function (result) {
-                    self.WellFieldMaps.push(new WellFieldMap(result[0], self));
-                },
-                url: datacontext.getWieldMapsUrl(self.Id),
-                fileFormats: ['image/jpeg', 'image/png']
-            };
+	/** Post well group */
+	exports.prototype.postWroup = function (tmpName) {
+		var ths = this;
+		wroupService.post({
+			'Name' : tmpName,
+			'Description' : '',
+			'WellFieldId' : ths.id
+		}).done(function (result) {
+			ths.wroups.push(new WellGroup(result, ths));
+		});
+	};
 
-            self.isOpenItem = ko.observable(false);
+	/** Remove a child */
+	exports.prototype.removeChild = function (wellGroupForDelete) {
+		var ths = this;
+		wroupService.remove(wellGroupForDelete.id).done(function () {
+			ths.wroups.remove(wellGroupForDelete);
+		});
+	};
 
-            self.toggleItem = function () {
-                self.isOpenItem(!self.isOpenItem());
-            };
+	/** Remove a map from the field */
+	exports.prototype.removeMapOfWield = function (itemToDelete) {
+		var ths = this;
+		mapOfWieldService.remove(ths.id, itemToDelete.id).done(function () {
+			ths.WellFieldMaps.remove(itemToDelete);
+		});
+	};
 
-            /** Whether item and parent are selected */
-            self.isSelectedItem = ko.computed({
-                read: function () {
-                    var tmpRegion = self.getWellRegion();
-                    if (ko.unwrap(tmpRegion.isSelectedItem)) {
-                        if (self === ko.unwrap(tmpRegion.selectedWield)) {
-                            return true;
-                        }
-                    }
-                },
-                deferEvaluation: true
-            });
+	/**
+	 * Find a list of cognate stages
+	 *    1. A list for selection box for new widget (name and id)
+	 *    2. A list to find specific stage by id: findCognateStage
+	 * @returns {Array.<Object>}
+	 */
+	exports.prototype.getListOfStageByKey = function (keyOfStage) {
+		switch (keyOfStage) {
+		case stageCnst.company.id:
+			return [this.getWellRegion().getCompany()];
+		case stageCnst.wegion.id:
+			return [this.getWellRegion()];
+		case stageCnst.wield.id:
+			return [this];
+		case stageCnst.wroup.id:
+			return ko.unwrap(this.wroups);
+		case stageCnst.well.id:
+			return this.calcListOfWell();
+		}
+	};
 
-            /** Is item selected and showed on the page */
-            self.isShowedItem = ko.computed({
-                read: function () {
-                    if (ko.unwrap(self.isSelectedItem)) {
-                        if (!ko.unwrap(self.selectedWroup)) {
-                            return true;
-                        }
-                    }
-                },
-                deferEvaluation: true
-            });
+	/** Calc all wells for this well field */
+	exports.prototype.calcListOfWell = function () {
+		var needArr = [];
 
-            self.addWellGroup = function () {
-                var inputName = document.createElement('input');
-                inputName.type = 'text';
-                $(inputName).prop({ 'required': true }).addClass('form-control');
+		ko.unwrap(this.wroups).forEach(function (wroupItem) {
+			ko.unwrap(wroupItem.wells).forEach(function (wellItem) {
+				needArr.push(wellItem);
+			});
+		});
 
-                var innerDiv = document.createElement('div');
-                $(innerDiv).addClass('form-horizontal').append(
-                    bootstrapModal.gnrtDom('Name', inputName)
-                );
+		return needArr;
+	};
 
-                function submitFunction() {
-                    datacontext.saveNewWellGroup({
-                        Name: $(inputName).val(),
-                        WellFieldId: self.Id
-                    }).done(function (result) {
-                        self.WellGroups.push(new WellGroup(result, self));
-                    });
+	/**
+	 * Get guid of a parent company
+	 * @returns {string}
+	 */
+	exports.prototype.getIdOfCompany = function () {
+		return this.getWellRegion().getCompany().id;
+	};
 
-                    bootstrapModal.closeModalWindow();
-                }
-
-                bootstrapModal.openModalWindow("Well group", innerDiv, submitFunction);
-            };
-
-            self.deleteWellGroup = function (wellGroupForDelete) {
-                if (confirm('Are you sure you want to delete "' + ko.unwrap(wellGroupForDelete.Name) + '"?')) {
-                    datacontext.deleteWellGroup(wellGroupForDelete).done(function () {
-                        self.WellGroups.remove(wellGroupForDelete);
-                        // Set parent as selected item
-                        self.getWellRegion().selectWield(self);
-                    });
-                }
-            };
-
-            self.editWellField = function () {
-                var inputName = document.createElement('input');
-                inputName.type = 'text';
-                $(inputName).val(self.Name()).prop({ 'required': true }).addClass('form-control');
-
-                var innerDiv = document.createElement('div');
-                $(innerDiv).addClass('form-horizontal').append(
-                    bootstrapModal.gnrtDom('Name', inputName)
-                );
-
-                bootstrapModal.openModalWindow("Well field", innerDiv, function () {
-                    self.Name($(inputName).val());
-                    datacontext.saveChangedWellField(self).done(function (result) { self.Name(result.Name); });
-                    bootstrapModal.closeModalWindow();
-                });
-            };
-
-            self.toPlainJson = function () {
-                var tmpPropList = ['Id', 'Name', 'WellRegionId'];
-                var objReady = {};
-                $.each(tmpPropList, function (propIndex, propValue) {
-                    // null can be sended to ovveride current value to null
-                    if (typeof ko.unwrap(self[propValue]) !== 'undefined') {
-                        objReady[propValue] = ko.unwrap(self[propValue]);
-                    }
-                });
-
-                return objReady;
-            };
-
-            /** Load groups */
-            self.WellGroups(importWellGroupsDto(data.WellGroupsDto, self));
-
-            /** Load sections */
-            self.ListOfSectionOfWieldDto(importListOfSectionOfWieldDto(data.ListOfSectionOfWieldDto, self));
-        };
-
-        return exports;
-    });
+	return exports;
+});

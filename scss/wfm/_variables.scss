@@ -1,0 +1,77 @@
+// WFM global variables for all templates
+
+//-- Redefine bootstrap properties (with !default)
+$icon-font-path: "../fonts/";
+
+$brand-primary:         #79a0c1;
+$brand-success:         #5cb85c;
+$brand-info:            #5bc0de;
+$brand-warning:         #f0ad4e;
+$brand-danger:          #d9534f;
+
+// WFM props
+
+//-- Z-index WFM list
+
+$zindex-loader-main: 9999;          // Loader for main ajax requests
+                                    // 1040: bootstrap modal window
+$zindex-sidebar-toggle: 1031;       // Button to show/hide sidebar
+$zindex-section-panel: 1031;        // Panel with sections (icons and titles)
+$zindex-top-tab-panel: 1031;        // Panel with file manager and dashboard buttons
+$zindex-fixed-panel: 1030;          // Top and bottom fixed panel, fixed wfm-nav menu
+                                    // 99: workspace sidebar trailer
+$zindex-sidebar-wrap-visible: 98;   // Sidebar with scroll (z-index for scroll - 99)
+$zindex-log-las-text-creator: 15;   // Log element to create text (over text block)
+$zindex-log-las-text: 11;           // Log text block (over base)
+$zindex-log-las-draw: 3;            // Log draw canvas (over base)
+$zindex-log-las-base: 2;            // Log base canvas
+$zindex-log-las-img: 1;             // Log image (under base)
+$zindex-log-las-wrap: 1;            // Log wrap (contain upper blocks)
+
+//-- Other properties
+
+@mixin gradient-line($first, $second) {
+  background: $second;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$first', endColorstr='$second');
+  background: -webkit-gradient(linear, left top, left bottom, from($first), to($second));
+  background: -moz-linear-gradient(top,  $first,  $second);
+}
+
+$wfm-nav-height: 32px;
+
+//-- Loader's pathes
+$loader-circle-medium-path: '../img/loader-circle-medium.gif';
+$loader-circle-large-path: '../img/loader-circle-large.gif';
+$loader-line-small-path: '../img/loader-line-small.gif';
+$loader-line-medium-path: '../img/loader-line-medium.gif';
+
+//-- Loader sizes
+$loader-circle-medium-width: 32px;
+$loader-circle-medium-height: 32px;
+$loader-circle-medium-margin-left: -($loader-circle-medium-width / 2);
+$loader-circle-medium-margin-top: -($loader-circle-medium-width / 2);
+
+$loader-circle-large-width: 100px;
+$loader-circle-large-height: 100px;
+$loader-circle-large-margin-left: -($loader-circle-large-width / 2);
+$loader-circle-large-margin-top: -($loader-circle-large-width / 2);
+
+$loader-line-small-width: 16px;
+$loader-line-small-height: 11px;
+
+$loader-line-medium-width: 126px;
+$loader-line-medium-height: 22px;
+
+//-- Input widths
+$input-width-xs: 16px;
+$input-width-sm: 32px;
+$input-width-md: 48px;
+
+//-- A footer and a section panel
+$footer-height: 50px;
+
+$pie-font-size: 0.7em;
+
+$company-logo-width: 100px;
+
+$wfm-section-item-color: #c0c0c0;

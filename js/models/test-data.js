@@ -1,52 +1,81 @@
-define(['jquery', 'knockout', 'services/datacontext'], function ($, ko, datacontext) {
-    'use strict';
+define(function (require, exports, module) {
+/**
+ * @module models/test-data
+ * @todo: feat: migrate to perfomance #MH!
+ *        after approving test data - put this data to the perfomance table and graph
+ *        when disapprove - remove this data from perfomance table and graph
+ * @todo: refactor: last approved well test in well group table #MM!
+ */
 
-    function TestData(data, testScopeItem) {
-        var self = this;
-        data = data || {};
+'use strict';
 
-        self.getTestScope = function () {
-            return testScopeItem;
-        };
+var $ = require('jquery');
+var ko = require('knockout');
+var testDataService = require('services/test-data');
 
-        self.hourNumber = data.HourNumber;
-        self.testScopeId = data.TestScopeId;
-        self.comment = ko.observable(data.Comment);
+/**
+ * Model: test data - test record from test scope
+ * @constructor
+ */
+exports = function (data, testScopeItem) {
+	data = data || {};
 
-        self.dict = data.Dict;
+	this.getTestScope = function () {
+		return testScopeItem;
+	};
 
-        self.isEdit = ko.observable(false);
+	this.hourNumber = data.HourNumber;
+	this.testScopeId = data.TestScopeId;
+	this.comment = ko.observable(data.Comment);
 
-        var cancelData;
-        self.editTestData = function () {
-            cancelData = {
-                comment: self.comment(),
-                dict: $.extend({}, self.dict)
-            };
+	this.dict = data.Dict;
 
-            self.isEdit(true);
-        };
+	this.isEdit = ko.observable(false);
 
-        self.saveTestData = function () {
-            datacontext.saveChangedTestData(self).done(function (response) {
-                self.getTestScope().testDataListUpdateDate(new Date());
-                self.comment(response.Comment);
-                self.dict = response.Dict;
-                self.isEdit(false);
-            });
-        };
+	/**
+	 * Data for cancelling saving
+	 */
+	this.cancelData = null;
+};
 
-        self.cancelEditTestData = function () {
-            self.comment(cancelData.comment);
-            self.dict = $.extend({}, cancelData.dict);
-            self.isEdit(false);
-        };
+/**
+ * Go to edit mode
+ */
+exports.prototype.editTestData = function () {
+	this.cancelData = {
+		comment : ko.unwrap(this.comment),
+		dict : $.extend({}, this.dict)
+	};
 
-        self.toPlainJson = function () { return ko.toJS(self); };
-    }
+	this.isEdit(true);
+};
 
-    // test data constructor
-    datacontext.createTestData = function (data, testScopeItem) {
-        return new TestData(data, testScopeItem);
-    };
+/**
+ * Cancel edit mode
+ */
+exports.prototype.cancelEditTestData = function () {
+	this.comment(this.cancelData.comment);
+	this.dict = $.extend({}, this.cancelData.dict);
+	this.isEdit(false);
+};
+
+/**
+ * Handle saving
+ * @private
+ */
+exports.prototype.cbkSaveTestData = function (response) {
+	this.getTestScope().testDataListUpdateDate(new Date());
+	this.comment(response.Comment);
+	this.dict = response.Dict;
+	this.isEdit(false);
+};
+
+/** Save a test record */
+exports.prototype.saveTestData = function () {
+	testDataService.put(this.testScopeId, this.hourNumber, ko.toJS(this))
+	.done(this.cbkSaveTestData.bind(this));
+};
+
+module.exports = exports;
+
 });

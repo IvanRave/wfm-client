@@ -1,181 +1,294 @@
-/** @module */
-define([
-    'jquery',
-    'knockout',
-    'services/datacontext',
-    'helpers/modal-helper',
-    'helpers/app-helper',
-    'models/user-profile',
-    'helpers/history-helper',
-    'helpers/knockout-lazy',
-    'models/wfm-param-squad'], function ($, ko, datacontext, bootstrapModal, appHelper, UserProfile, historyHelper) {
-        'use strict';
+define(function (require, exports, module) {
+/** @module viewmodels/workspace */
+'use strict';
 
-        /**
-        * Root view model
-        * @constructor
-        */
-        var exports = function () {
-            /** Alternative for this */
-            var ths = this;
+var $ = require('jquery');
+var ko = require('knockout');
+var historyHelper = require('helpers/history-helper');
+var cookieHelper = require('helpers/cookie-helper');
+var VwmUserProfile = require('viewmodels/user-profile');
+var globalCssCnst = require('constants/global-css-constants');
 
-            /** 
-            * Whether left tree menu with well regions, groups, fields, wells is visible
-            * @type {boolean}
-            */
-            this.isVisibleMenu = ko.observable(true);
+// http://stackoverflow.com/questions/8648892/convert-url-parameters-to-a-javascript-object
+function calcObjFromUrl(search) {
+	return search ? JSON.parse('{"' + search.replace(/&/g, '","').replace(/=/g, '":"') + '"}',
+		function (key, value) {
+		return key === "" ? value : decodeURIComponent(value);
+	}) : {};
+}
 
-            // Left tree menu with well regions, groups, fields, wells
-            this.toggleIsVisibleMenu = function () {
-                ths.isVisibleMenu(!ko.unwrap(ths.isVisibleMenu));
-            };
+function handleAuthResult(nextFunc, authResult) {
+	var resultObj = calcObjFromUrl(authResult);
+	console.log(resultObj);
+	// Send a code to the api (change to sid)
 
-            this.sidebarWrapCss = ko.computed({
-                read: function () {
-                    return ko.unwrap(ths.isVisibleMenu) ? 'sidebar-wrap-visible' : 'hidden';
-                },
-                deferEvaluation: true
-            });
+	var options = {
+		cache : false,
+		type : 'POST',
+		// need for CORS requests without preflight request
+		contentType : 'application/x-www-form-urlencoded; charset=UTF-8',
+		data : 'code=' + resultObj.code,
+		xhrFields : {
+			// For CORS request to send cookies
+			withCredentials : true
+		}
+	};
 
-            this.workAreaCss = ko.computed({
-                read: function () {
-                    return ko.unwrap(ths.isVisibleMenu) ? 'work-area' : '';
-                },
-                deferEvaluation: true
-            });
+	$.ajax('//wfm-report.herokuapp.com' + '/api/session-manager', options).done(function (rr) {
+		console.log('response from wfm-node', rr);
+		nextFunc();
+	}).fail(function (errr) {
+		console.log('error from wfm-node', errr);
+		//if (jqXhr.status === 422) {
+		//  err = langHelper.translate(jqXhr.responseJSON.errId) || 'unknown error');
+		//}
+	});
+}
 
-            this.sidebarToggleCss = ko.computed({
-                read: function () {
-                    return ko.unwrap(ths.isVisibleMenu) ? 'sidebar-toggle-visible' : 'sidebar-toggle-hidden';
-                },
-                deferEvaluation: true
-            });
+var cbkAuthInterval = function (redirectUri, authScope, next) {
+	var authLocation = authScope.authWindow.location;
 
-            // =====================================Wfm parameters begin==========================================================
-            this.wfmParamSquadList = ko.lazyObservableArray(function () {
-                datacontext.getWfmParamSquadList({ is_inclusive: true }).done(function (r) {
-                    // WfmParamSquadList (convert data objects into array)
-                    function importWfmParamSquadList(data) {
-                        return $.map(data || [], function (item) { return datacontext.createWfmParamSquad(item); });
-                    }
+	var authLocationHref;
+	// Uncaught SecurityError: Blocked a frame with origin "http://127.0.0.1:12345" from accessing
+	// a frame with origin "http://localhost:1337". Protocols, domains, and ports must match.
+	try {
+		authLocationHref = authLocation.href;
+	} catch (errSecurity) {}
 
-                    ths.wfmParamSquadList(importWfmParamSquadList(r));
-                });
-            }, this);
+	console.log(authLocationHref);
 
-            /** Get list of section patterns: lazy loading by first request */
-            this.ListOfSectionPatternDto = ko.lazyObservableArray(function () {
-                datacontext.getListOfSectionPattern().done(function (r) {
-                    require(['models/section-pattern'], function (SectionPattern) {
+	if (authLocationHref) {
+		var hrefParts = authLocationHref.split('?');
+    
+    // if https://some.ru -> //some.ru
+		if (hrefParts[0].indexOf(redirectUri) >= 0) {
+			// Get code or error
+			var authResponse = hrefParts[1];
 
-                        function importListOfSectionPattern(data) {
-                            return $.map(data || [], function (item) { return new SectionPattern(item); });
-                        }
+			clearInterval(authScope.authInterval);
+			// Close popup
+			authScope.authWindow.close();
 
-                        ths.ListOfSectionPatternDto(importListOfSectionPattern(r));
-                    });
-                });
-            }, this);
+			next(authResponse);
+		}
+	}
 
-            // Get all parameters from all groups as one dimensional array
-            this.wfmParameterList = ko.computed({
-                read: function () {
-                    return $.map(ko.unwrap(ths.wfmParamSquadList), function (sqdElem) {
-                        return $.map(ko.unwrap(sqdElem.wfmParameterList), function (prmElem) {
-                            return prmElem;
-                        });
-                    });
-                },
-                deferEvaluation: true
-            });
-            // =====================================Wfm parameters end==========================================================
+};
 
-            // Test company Id with Guid format (this checks retry server check in WorkSpace view of Home controller
-            ////if (!appHelper.isGuidValid(companyId)) {
-            ////    var errValidMsg = 'Company id is not valid GUID';
-            ////    alert(errValidMsg);
-            ////    throw new TypeError(errValidMsg);
-            ////}        
+var openAuthWindow = function (next) {
+	var redirectUri = '//wfm-client.azurewebsites.net' + '/handle-auth-code.html';
 
+	// Object to catch changes in bind method
+	var authScope = {
+		authWindow : null,
+		authInterval : null
+	};
 
-            // load list of well region, well field...
-            ////function loadStructure() {
-            ////    function getSucceeded(data) {
-            ////        var mappedStructure = $.map(data, function (list) {
-            ////            return new WellRegion(list, ths);
-            ////        });
+	authScope.authInterval = setInterval(cbkAuthInterval.bind(null, redirectUri, authScope, next), 1000);
 
-            ////        ths.wellRegionList(mappedStructure);
+	authScope.authWindow = window.open('//petrohelp-auth.herokuapp.com' + '/dialog/authorize?response_type=code&client_id=abc123&redirect_uri=' + redirectUri, '_blank',
+			'location=yes,height=570,width=520,scrollbars=yes,status=yes');
+};
 
-            ////        // route region/id/field/id/group/id/well/id
-            ////        ////var choosedObj = getChoosedIdFromHash();
-            ////        console.log(choosedObj);
-            ////        var tmpRegion = appHelper.getElementByPropertyValue(ths.wellRegionList(), 'Id', choosedObj.regionId);
-            ////        if (tmpRegion) {
-            ////            ths.selectedWellRegion(tmpRegion);
-            ////            tmpRegion.isOpenItem(true);
-            ////            var tmpField = appHelper.getElementByPropertyValue(ths.selectedWellRegion().WellFields(), 'Id', choosedObj.fieldId);
-            ////            if (tmpField) {
-            ////                ths.selectedWellRegion().selectedWield(tmpField);
-            ////                tmpField.isOpenItem(true);
-            ////                var tmpGroup = appHelper.getElementByPropertyValue(ths.selectedWellRegion().selectedWield().WellGroups(), 'Id', choosedObj.groupId);
-            ////                if (tmpGroup) {
-            ////                    ths.selectedWellRegion().selectedWield().selectedWroup(tmpGroup);
-            ////                    tmpGroup.isOpenItem(true);
-            ////                    var tmpWell = appHelper.getElementByPropertyValue(ths.selectedWellRegion().selectedWield().selectedWroup().Wells(), 'Id', choosedObj.wellId);
-            ////                    if (tmpWell) {
-            ////                        ths.selectedWellRegion().selectedWield().selectedWroup().selectedWell(tmpWell);
-            ////                        tmpWell.isOpenItem(true);
-            ////                        // todo: change logic - when change selected id - need to execute additional logic
-            ////                        if (choosedObj.sectionId) {
-            ////                            tmpWell.selectedSectionByPatternId(choosedObj.sectionId);
-            ////                        }
-            ////                        else {
-            ////                            // Null - show dashboard: load all widget layouts and data
-            ////                            tmpWell.unselectSection();
-            ////                        }
-            ////                        // Apchive: previously - set summary as a default page
-            ////                        ////else {
-            ////                        ////    tmpWell.selectedSectionId(tmpWell.sectionList[0].id);
-            ////                        ////}
+/**
+ * A workspace view model: a root for knockout
+ * @constructor
+ */
+exports = function (mdlWorkspace) {
+	/** Data model for this view */
+	this.mdlWorkspace = mdlWorkspace;
 
-            ////                        // this set selected well
-            ////                        ////console.log(ths.selectedWellRegion().selectedWield().selectedWroup().selectedWell());
-            ////                    }
-            ////                }
-            ////            }
-            ////        }
-            ////    }
+	/**
+	 * Whether left tree menu with well regions, groups, fields, wells is visible
+	 * @type {boolean}
+	 */
+	this.isVisibleMenu = ko.observable(true);
 
-            ////    datacontext.getWellRegionList({
-            ////        company_id: companyId,
-            ////        is_inclusive: true
-            ////    }).done(getSucceeded);
-            ////}
+	/**
+	 * List of global csses
+	 *    from constants
+	 * @type {Array.<Object>}
+	 */
+	this.listOfGlobalCss = globalCssCnst;
 
-            //     loadStructure();
+	/**
+	 * Current global css
+	 * @type {string}
+	 */
+	this.curGlobalCss = ko.observable(null);
 
-            /** 
-            * User profile
-            * @type {module:models/user-profile}
-            */
-            this.userProfile = new UserProfile(ths);
+	this.curGlobalCss.subscribe(this.changeGlobalCss, this);
 
-            //var initialData = getInitialData(document.location.hash);
+	// /**
+	// * Global css for the site
+	// * @type {string}
+	// */
+	// this.wfmGlobalCss = ko.computed({
+	// read : this.calcWfmGlobalCss,
+	// deferEvaluation : true,
+	// owner : this
+	// });
 
-            /** Auth user profile and load data if successful */
-            this.userProfile.loadAccountInfo(historyHelper.getInitialData(document.location.hash.substring(1)));
+	this.sidebarWrapCss = ko.computed({
+			read : this.calcSidebarWrapCss,
+			deferEvaluation : true,
+			owner : this
+		});
 
-            /** Back, forward, refresh browser navigation */
-            window.onpopstate = function () {
-                var stateData = historyHelper.getInitialData(document.location.hash.substring(1));
-                // When load any info - do not push info to history again
-                stateData.isHistory = true;
-                // Reload all data
-                ths.userProfile.loadAccountInfo(stateData);
-                console.log('location: ' + document.location.hash + ', state: ' + JSON.stringify(stateData));
-            };
-        };
+	this.workAreaCss = ko.computed({
+			read : this.calcWorkAreaCss,
+			deferEvaluation : true,
+			owner : this
+		});
 
-        return exports;
-    });
+	this.sidebarToggleCss = ko.computed({
+			read : this.calcSidebarToggleCss,
+			deferEvaluation : true,
+			owner : this
+		});
+
+	/**
+	 * Whether current employee in edit mode: fast access for view
+	 * @type {boolean}
+	 */
+	this.isEmployeeInEditMode = ko.computed({
+			read : this.calcIsEmployeeInEditMode,
+			deferEvaluation : true,
+			owner : this
+		});
+
+	/**
+	 * Data from url to select need stages and sections: initialUrlData
+	 * @private
+	 */
+	this.defaultSlcData_ = historyHelper.getInitialData(document.location.hash.substring(1));
+
+	/**
+	 * User profile view model
+	 * @type {module:viewmodels/user-profile}
+	 */
+	this.vwmUserProfile = ko.computed({
+			read : this.buildVwmUserProfile,
+			deferEvaluation : true,
+			owner : this
+		});
+
+	/**
+	 * Changes when you click to Login button
+	 *    Back to false, when login proccess is ended
+	 * @type {Boolean}
+	 */
+	this.isLoginInProgress = ko.observable(false);
+
+	/**
+	 * After initialization: try to load user
+	 * @todo #43! try to move to init commands, instead this model
+	 */
+	this.mdlWorkspace.tryToLoadUserProfile();
+
+	/** Back, forward, re   fresh browser navigation */
+	// TODO: back
+	////window.onpopstate = function () {
+	////    var stateData = historyHelper.getInitialData(document.location.hash.substring(1));
+	////    // When load any info - do not push info to history again
+	////    stateData.isHistory = true;
+	////    // Reload all data
+	////    ths.initialUrlData(stateData);
+
+	////    console.log('location: ' + document.location.hash + ', state: ' + JSON.stringify(stateData));
+
+	////    ths.userProfile.loadUserProfile();
+	////};
+};
+
+exports.prototype.openAuth = function () {
+	var ths = this;
+	this.isLoginInProgress(true);
+	openAuthWindow(handleAuthResult.bind(null, function () {
+			ths.mdlWorkspace.setUserProfile({
+				Id : null,
+				// TODO^ #33! get email from the server
+				Email : 'todo@change.email',
+				Roles : null
+			});
+			ths.isLoginInProgress(false);
+		}));
+};
+
+/**
+ * End the session
+ *    Logoff only from current cabinet (now, logic may changed)
+ */
+exports.prototype.accountLogOff = function () {
+	this.mdlWorkspace.accountLogOff();
+};
+
+/** Build a viewmodel for user profile */
+exports.prototype.buildVwmUserProfile = function () {
+	var tmpMdlUserProfile = ko.unwrap(this.mdlWorkspace.userProfile);
+	if (tmpMdlUserProfile) {
+		return new VwmUserProfile(tmpMdlUserProfile, this.defaultSlcData_);
+	}
+};
+
+// Left tree menu with well regions, groups, fields, wells
+exports.prototype.toggleIsVisibleMenu = function () {
+	this.isVisibleMenu(!ko.unwrap(this.isVisibleMenu));
+};
+
+/**
+ * Calculate, whether the employee in an edit mode
+ * @returns {boolean}
+ */
+exports.prototype.calcIsEmployeeInEditMode = function () {
+	var tmpVwmUserProfile = ko.unwrap(this.vwmUserProfile);
+	if (tmpVwmUserProfile) {
+		var tmpEmployee = ko.unwrap(tmpVwmUserProfile.slcVwmChild);
+		if (tmpEmployee) {
+			return ko.unwrap(tmpEmployee.isEditMode);
+		}
+	}
+};
+
+/**
+ * Calculate css for sidebar
+ * @returns {string}
+ */
+exports.prototype.calcSidebarToggleCss = function () {
+	return ko.unwrap(this.isVisibleMenu) ? 'sidebar-toggle-visible' : 'sidebar-toggle-hidden';
+};
+
+/**
+ * Calculate css for a work area
+ * @returns {string}
+ */
+exports.prototype.calcWorkAreaCss = function () {
+	return ko.unwrap(this.isVisibleMenu) ? 'work-area' : '';
+};
+
+/**
+ * Calculate css for a sidebar wrap
+ * @returns {string}
+ */
+exports.prototype.calcSidebarWrapCss = function () {
+	return ko.unwrap(this.isVisibleMenu) ? 'sidebar-wrap-visible' : 'hidden';
+};
+
+/**
+ * Change href of the link in the head of the site
+ *    change cookie
+ */
+exports.prototype.changeGlobalCss = function (choosedCss) {
+	if (!choosedCss) {
+		return;
+	}
+
+	var styleLinkElem = document.getElementById('wfm-style-link');
+	styleLinkElem.href = choosedCss.path + '?0.9.9';
+
+	cookieHelper.createCookie('wfmstylelink', choosedCss.path, 30);
+};
+
+module.exports = exports;
+
+});

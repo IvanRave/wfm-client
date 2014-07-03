@@ -1,0 +1,28 @@
+/* Calculator page */
+
+.slider-wrap {
+    padding-top: 7px;
+}
+
+    .slider-wrap .slider {
+        width: 500px;
+    }
+
+    .slider-wrap .slider-count {
+        margin-left: 16px;
+        font-weight: bold;
+        width: 60px;
+    }
+
+    .slider-wrap .slider-price {
+        margin-left: 16px;
+        font-weight: bold;
+    }
+
+.slider-total {
+    width: 500px;
+    text-align: center;
+    font-weight: bold;
+    border: 1px solid #ccc;
+    padding: 7px;
+}

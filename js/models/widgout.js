@@ -1,40 +1,74 @@
-define(['jquery', 'knockout', 'services/datacontext'], function ($, ko, appDatacontext) {
-    'use strict';
+/**
+ * @module
+ */
+define(['knockout',
+		'models/widgock',
+		'services/widgout',
+		'services/report'], function (ko,
+		Widgock,
+		widgoutService,
+		reportService) {
+	'use strict';
 
-    // Widget layout
-    function Widgout(data, parent) {
-        var self = this;
-        data = data || {};
+	/** Import widget block list to layout */
+	function importWidgocks(data, widgoutItem) {
+		return (data || []).map(function (item) {
+			return new Widgock(item, widgoutItem);
+		});
+	}
 
-        self.getParent = function () {
-            return parent;
-        };
+	/**
+	 * Widget layout
+	 * @constructor
+	 */
+	var exports = function (data, parent) {
+		data = data || {};
 
-        self.id = data.Id;
-        self.name = ko.observable(data.Name);
+		/**
+		 * Getter for a parent stage (well, group, field... )
+		 * @returns {module:base-models/stage-base}
+		 */
+		this.getParent = function () {
+			return parent;
+		};
 
-        self.putWellWidgout = function () {
-            // Get well id as parent
-            appDatacontext.putWellWidgout(self.getParent().Id, self.id, {
-                id: self.id,
-                name: ko.unwrap(self.name)
-            });
-        };
+		/**
+		 * Layout id (guid)
+		 * @type {string}
+		 */
+		this.id = data.Id;
 
-        self.name.subscribe(self.putWellWidgout);
+		/**
+		 * A name of the layout
+		 * @type {string}
+		 */
+		this.name = ko.observable(data.Name);
 
-        // Well widget block list
-        self.widgockList = ko.observableArray();
+		// Save, when a name is changed */
+		this.name.subscribe(this.saveWidgout, this);
 
-        // Load widget block list
-        require(['models/widgock'], function (Widgock) {
-            function importWidgockList(data, widgoutItem) {
-                return $.map(data || [], function (item) { return new Widgock(item, widgoutItem); });
-            }
+		/**
+		 * Well widget block list
+		 * @type {Array.<module:models/widgock>}
+		 */
+		this.widgocks = ko.observableArray(importWidgocks(data.WidgockDtoList, this));
+	};
 
-            self.widgockList(importWidgockList(data.WidgockDtoList, self));
-        });
-    }
+	/** Save a layout */
+	exports.prototype.saveWidgout = function () {
+		// Get well id as parent
+		var tmpStageId = this.getParent().Id || this.getParent().id;
 
-    return Widgout;
+		widgoutService.put(this.getParent().stageKey, tmpStageId, this.id, {
+			id : this.id,
+			name : ko.unwrap(this.name)
+		});
+	};
+
+	/** Post a request */
+	exports.prototype.postReport = function (nameOfReport, scsCallback, errCallback) {
+		reportService.post(this.id, nameOfReport).done(scsCallback).fail(errCallback);
+	};
+
+	return exports;
 });

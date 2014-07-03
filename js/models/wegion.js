@@ -1,182 +1,197 @@
 /** @module */
 define(['jquery',
-    'knockout',
-    'services/datacontext',
-    'helpers/modal-helper',
-    'models/wield'], function ($, ko, datacontext, bootstrapModal, WellField) {
-        'use strict';
+		'knockout',
+		'services/datacontext',
+		'models/wield',
+		'base-models/stage-base',
+		'models/section-of-stage',
+		'models/prop-spec',
+		'services/wegion',
+		'services/wield',
+		'constants/stage-constants',
+		'helpers/app-helper'],
+	function ($, ko, datacontext,
+		WellField, StageBase, SectionOfWegion,
+		PropSpec,
+		wegionService, wieldService, stageCnst,
+		appHelper) {
+	'use strict';
 
-        // 2. WellField (convert data objects into array)
-        function importWellFieldsDto(data, parent) {
-            return $.map(data || [], function (item) {
-                return new WellField(item, parent);
-            });
-        }
+	// 2. WellField (convert data objects into array)
+	function importWieldDtoList(data, parent) {
+		return data.map(function (item) {
+			return new WellField(item, parent);
+		});
+	}
 
-        /**
-        * Well region
-        * @constructor
-        * @param {object} data - Region data
-        * @param {module:models/company} company - Region company (parent)
-        */
-        var exports = function (data, company) {
-            data = data || {};
+	function importListOfSectionOfWegionDto(data, parent) {
+		return data.map(function (item) {
+			return new SectionOfWegion(item, parent);
+		});
+	}
 
-            var self = this;
+	/** Main properties for company: headers can be translated here if needed */
+	var wegionPropSpecList = [
+		new PropSpec('name', 'Name', 'Region name', 'SingleLine', {
+			maxLength : 255
+		}),
+		new PropSpec('description', 'Description', 'Description', 'MultiLine', {})
+	];
 
-            // Persisted properties
-            this.Id = data.Id;
-            this.CompanyId = data.CompanyId;
-            this.Name = ko.observable(data.Name);
-            this.WellFields = ko.observableArray();
+	/**
+	 * Well region
+	 * @constructor
+	 * @param {object} data - Region data
+	 * @param {module:models/company} company - Region company (parent)
+	 */
+	var exports = function (data, company) {
+		data = data || {};
 
-            this.getCompany = function () {
-                return company;
-            };
+		this.getCompany = function () {
+			return company;
+		};
 
-            this.getParentViewModel = function () {
-                return self.getCompany().getRootViewModel();
-            };
+		/** Get root view model */
+		this.getRootMdl = function () {
+			return this.getCompany().getRootMdl();
+		};
 
-            this.isOpenItem = ko.observable(false);
+		// Persisted properties
+		this.id = data.Id;
+		this.companyId = data.CompanyId;
+		this.wields = ko.observableArray([]);
+		/** Props specifications */
+		this.propSpecList = wegionPropSpecList;
 
-            // toggle item - only open menu tree (show inner object without content)
-            this.toggleItem = function () {
-                self.isOpenItem(!self.isOpenItem());
-            };
+		/**
+		 * Stage key: equals file name
+		 * @type {string}
+		 */
+		this.stageKey = stageCnst.wegion.id;
 
-            /** Is selected item */
-            this.isSelectedItem = ko.computed({
-                read: function () {
-                    return (self === ko.unwrap(self.getCompany().selectedWegion));
-                },
-                deferEvaluation: true
-            });
+		/** Base for all stages */
+		StageBase.call(this, data);
 
-            /** 
-            * Is item selected and showed on the page 
-            * @type {boolean}
-            */
-            this.isShowedItem = ko.computed({
-                read: function () {
-                    if (ko.unwrap(self.isSelectedItem)) {
-                        if (!ko.unwrap(self.selectedWield)) {
-                            return true;
-                        }
-                    }
-                },
-                deferEvaluation: true
-            });
+		/** load well fields */
+		this.wields(importWieldDtoList(data.WellFieldsDto, this));
 
-            self.selectedWield = ko.observable();
+		/** Load sections */
+		this.listOfSection(importListOfSectionOfWegionDto(data.ListOfSectionOfWegionDto, this));
+	};
 
-            self.selectWield = function (wieldToSelect) {
-                wieldToSelect.isOpenItem(true);
-                
-                // Unselect child
-                wieldToSelect.selectedWroup(null);
+	/** Inherit from a stage base model */
+	appHelper.inherits(exports, StageBase);
 
-                // Select self
-                self.selectedWield(wieldToSelect);
-                
-                // Select parents
-                self.getCompany().selectedWegion(self);
+	/** Remove a child from a server */
+	exports.prototype.removeChild = function (wieldForDelete) {
+		wieldService.remove(wieldForDelete.id).done(this.removeFromListOfWield.bind(this, wieldForDelete));
+	};
 
-                ////window.location.hash = window.location.hash.split('?')[0] + '?' + $.param({
-                ////    region: self.getWellRegion().Id,
-                ////    field: self.Id
-                ////});
+	/** Remove a child from a list */
+	exports.prototype.removeFromListOfWield = function (wieldForDelete) {
+		this.wields.remove(wieldForDelete);
+	};
 
-                // Select section by default (or selected section from prevous selected field)
-                var mapSection = $.grep(ko.unwrap(wieldToSelect.ListOfSectionOfWieldDto), function (arrElem) {
-                    return (arrElem.SectionPatternId === 'wield-map');
-                })[0];
+	// exports.prototype.findCognateStage = function(typeOfStage, idOfStage){
 
-                if (mapSection) {
-                    wieldToSelect.selectSection(mapSection);
-                }
-            };
+	// };
 
-            self.deleteWellField = function (wellFieldForDelete) {
-                if (confirm('Are you sure you want to delete "' + ko.unwrap(wellFieldForDelete.Name) + '"?')) {
-                    datacontext.deleteWellField(wellFieldForDelete.Id).done(function () {
-                        self.WellFields.remove(wellFieldForDelete);
-                        // Set parent as selected
-                        self.getCompany().selectWegion(self);
-                    });
-                }
-            };
+	/**
+	 * Convert model to plain json object without unnecessary properties.
+	 *    Can be used to send requests (with clean object) to the server.
+	 *    http://knockoutjs.com/documentation/json-data.html
+	 *    "ko.toJS — this clones your view model’s object graph, substituting for each observable the current value of that observable,
+	 *    so you get a plain copy that contains only your data and no Knockout-related artifacts"
+	 */
+	exports.prototype.toDto = function () {
+		var dtoObj = {
+			'Id' : this.id,
+			'CompanyId' : this.companyId
+		};
 
-            self.editWellRegion = function () {
-                var inputName = document.createElement('input');
-                inputName.type = 'text';
-                $(inputName).val(self.Name()).prop({ 'required': true }).addClass('form-control');
+		this.propSpecList.forEach(function (prop) {
+			dtoObj[prop.serverId] = ko.unwrap(this[prop.clientId]);
+		}, this);
 
-                var innerDiv = document.createElement('div');
-                $(innerDiv).addClass('form-horizontal').append(
-                    bootstrapModal.gnrtDom('Name', inputName)
-                );
+		return dtoObj;
+	};
 
-                bootstrapModal.openModalWindow("Well region", innerDiv, function () {
-                    self.Name($(inputName).val());
-                    datacontext.saveChangedWellRegion(self).done(function (result) { self.Name(result.Name); });
-                    bootstrapModal.closeModalWindow();
-                });
-            };
+	/** Post well field */
+	exports.prototype.postWield = function (tmpName) {
+		wieldService.post({
+			'Name' : tmpName,
+			'Description' : '',
+			'WellRegionId' : this.id
+		}).done(this.pushWield.bind(this));
+	};
 
-            /// <summary>
-            /// Convert model to plain json object without unnecessary properties. Can be used to send requests (with clean object) to the server
-            /// </summary>
-            /// <remarks>
-            /// http://knockoutjs.com/documentation/json-data.html
-            /// "ko.toJS — this clones your view model’s object graph, substituting for each observable the current value of that observable, 
-            /// so you get a plain copy that contains only your data and no Knockout-related artifacts"
-            /// </remarks>
-            self.toPlainJson = function () {
-                ////var copy = ko.toJS(self);
-                var tmpPropList = ['Id', 'CompanyId', 'Name'];
+	exports.prototype.pushWield = function (wieldData) {
+		this.wields.push(new WellField(wieldData, this));
+	};
 
-                var objReady = {};
-                $.each(tmpPropList, function (propIndex, propValue) {
-                    // null can be sended to ovveride current value to null
-                    if (typeof ko.unwrap(self[propValue]) !== 'undefined') {
-                        objReady[propValue] = ko.unwrap(self[propValue]);
-                    }
-                });
+	/** Save well region */
+	exports.prototype.save = function () {
+		wegionService.put(this.id, this.toDto());
+	};
 
-                return objReady;
-            };
+	/**
+	 * Find a list of cognate stages
+	 *    1. A list for selection box for new widget (name and id)
+	 *    2. A list to find specific stage by id: findCognateStage
+	 * @returns {Array.<Object>}
+	 */
+	exports.prototype.getListOfStageByKey = function (keyOfStage) {
+		switch (keyOfStage) {
+		case stageCnst.company.id:
+			return [this.getCompany()];
+		case stageCnst.wegion.id:
+			return [this];
+		case stageCnst.wield.id:
+			return ko.unwrap(this.wields);
+		case stageCnst.wroup.id:
+			return this.calcListOfWroup();
+		case stageCnst.well.id:
+			return this.calcListOfWell();
+		}
+	};
 
-            // load well fields
-            self.WellFields(importWellFieldsDto(data.WellFieldsDto, self));
-        };
+	/**
+	 * Calc a list of well groups for this region
+	 */
+	exports.prototype.calcListOfWroup = function () {
+		var needArr = [];
+		ko.unwrap(this.wields).forEach(function (wieldItem) {
+			ko.unwrap(wieldItem.wroups).forEach(function (wroupItem) {
+				needArr.push(wroupItem);
+			});
+		});
 
-        exports.prototype.addWellField = function () {
-            var parentItem = this;
+		return needArr;
+	};
 
-            var inputName = document.createElement('input');
-            inputName.type = 'text';
-            $(inputName).prop({ 'required': true }).addClass('form-control');
+	/**
+	 * Calc a list of well groups for this region
+	 */
+	exports.prototype.calcListOfWell = function () {
+		var needArr = [];
+		ko.unwrap(this.wields).forEach(function (wieldItem) {
+			ko.unwrap(wieldItem.wroups).forEach(function (wroupItem) {
+				ko.unwrap(wroupItem.wells).forEach(function (wellItem) {
+					needArr.push(wellItem);
+				});
+			});
+		});
 
-            var innerDiv = document.createElement('div');
+		return needArr;
+	};
 
-            $(innerDiv).addClass('form-horizontal').append(
-                bootstrapModal.gnrtDom('Name', inputName)
-            );
+	/**
+	 * Get guid of a parent company
+	 * @returns {string}
+	 */
+	exports.prototype.getIdOfCompany = function () {
+		return this.getCompany().id;
+	};
 
-            function submitFunction() {
-                datacontext.saveNewWellField({
-                    Name: $(inputName).val(),
-                    WellRegionId: parentItem.Id
-                }).done(function (result) {
-                    parentItem.WellFields.push(new WellField(result, parentItem));
-                });
-
-                bootstrapModal.closeModalWindow();
-            }
-
-            bootstrapModal.openModalWindow('Well field', innerDiv, submitFunction);
-        };
-
-        return exports;
-    });
+	return exports;
+});
