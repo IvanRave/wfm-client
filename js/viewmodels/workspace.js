@@ -78,6 +78,10 @@ var cbkAuthInterval = function (redirectUri, authScope, next) {
 var openAuthWindow = function (next) {
   // //wf.com or //localhost:123
   var appBase = '//' + window.location.host;
+  // hack for github hosting
+  if (appBase === '//ivanrave.github.io'){
+    appBase += '/wfm-client';
+  }
 	var redirectUri = appBase + '/handle-auth-code.html';
 
 	// Object to catch changes in bind method
