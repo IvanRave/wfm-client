@@ -76,7 +76,9 @@ var cbkAuthInterval = function (redirectUri, authScope, next) {
 };
 
 var openAuthWindow = function (next) {
-	var redirectUri = '//wfm-client.azurewebsites.net' + '/handle-auth-code.html';
+  // //wf.com or //localhost:123
+  var appBase = '//' + window.location.host;
+	var redirectUri = appBase + '/handle-auth-code.html';
 
 	// Object to catch changes in bind method
 	var authScope = {
