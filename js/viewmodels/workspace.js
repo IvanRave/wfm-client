@@ -8,6 +8,7 @@ var historyHelper = require('helpers/history-helper');
 var cookieHelper = require('helpers/cookie-helper');
 var VwmUserProfile = require('viewmodels/user-profile');
 var globalCssCnst = require('constants/global-css-constants');
+var langHelper = require('helpers/lang-helper');
 
 // http://stackoverflow.com/questions/8648892/convert-url-parameters-to-a-javascript-object
 function calcObjFromUrl(search) {
@@ -37,11 +38,16 @@ function handleAuthResult(nextFunc, authResult) {
 	$.ajax('//wfm-report.herokuapp.com' + '/api/session-manager', options).done(function (rr) {
 		console.log('response from wfm-node', rr);
 		nextFunc();
-	}).fail(function (errr) {
-		console.log('error from wfm-node', errr);
-		//if (jqXhr.status === 422) {
-		//  err = langHelper.translate(jqXhr.responseJSON.errId) || 'unknown error');
-		//}
+	}).fail(function (jqXhr) {
+		if (jqXhr.status === 422) {
+			alert(langHelper.translate(jqXhr.responseJSON.errId) || 'unknown error');
+			return;
+		} else {
+			alert('Error: status: ' + jqXhr.status + '; message: ' + jqXhr.responseText);
+			return;
+		}
+
+		console.log('error from wfm-node', jqXhr);
 	});
 }
 
@@ -59,8 +65,8 @@ var cbkAuthInterval = function (redirectUri, authScope, next) {
 
 	if (authLocationHref) {
 		var hrefParts = authLocationHref.split('?');
-    
-    // if https://some.ru -> //some.ru
+
+		// if https://some.ru -> //some.ru
 		if (hrefParts[0].indexOf(redirectUri) >= 0) {
 			// Get code or error
 			var authResponse = hrefParts[1];
@@ -76,13 +82,16 @@ var cbkAuthInterval = function (redirectUri, authScope, next) {
 };
 
 var openAuthWindow = function (next) {
-  // //wf.com or //localhost:123
-  var appBase = '//' + window.location.host;
-  // hack for github hosting
-  if (appBase === '//ivanrave.github.io'){
-    appBase += '/wfm-client';
-  }
-	var redirectUri = appBase + '/handle-auth-code.html';
+	// //wf.com or //localhost:123
+	// var appBase = '//' + window.location.host;
+	// // hack for github hosting
+	// if (appBase === '//ivanrave.github.io') {
+		// appBase += '/wfm-client';
+	// }
+	// var redirectUri = appBase + '/handle-auth-code.html';
+  
+  var idOfAuthClient = 'wfm-client';
+  var redirectUri = '//ivanrave.github.io/wfm-client/handle-auth-code.html';
 
 	// Object to catch changes in bind method
 	var authScope = {
@@ -92,7 +101,7 @@ var openAuthWindow = function (next) {
 
 	authScope.authInterval = setInterval(cbkAuthInterval.bind(null, redirectUri, authScope, next), 1000);
 
-	authScope.authWindow = window.open('//petrohelp-auth.herokuapp.com' + '/dialog/authorize?response_type=code&client_id=abc123&redirect_uri=' + redirectUri, '_blank',
+	authScope.authWindow = window.open('//petrohelp-auth.herokuapp.com' + '/dialog/authorize?response_type=code&client_id=' + idOfAuthClient + '&redirect_uri=' + redirectUri, '_blank',
 			'location=yes,height=570,width=520,scrollbars=yes,status=yes');
 };
 
