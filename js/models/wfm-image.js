@@ -32,7 +32,7 @@ define(['models/file-spec'], function (FileSpec) {
         * Cropped image url: creaded from file url and all coords
         * @type {string}
         */
-        this.croppedImageUrl = data.CroppedImageUrl;
+        this.croppedImageUrl = '//wfm-report.herokuapp.com' + data.CroppedImageUrl;
     };
 
     return exports;
