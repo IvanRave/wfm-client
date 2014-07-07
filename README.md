@@ -12,24 +12,26 @@
 ![WFMServicesStructure] (https://drive.google.com/uc?export=view&id=0B9c2LY35SH-cYk9POHE3UTM2Vjg "WFM services structure")
 
 ### WFM services
-* __WFM client__ http://wfm-client.azurewebsites.net/
+* __WFM client__ https://ivanrave.github.io/wfm-client/
 protected cabinet: manage companies, wells etc.
-* __WFM info__ http://wfm.azurewebsites.net/
+* __WFM info__ https://wfm.azurewebsites.net/
 public site with info about WFM: pricing, docs, contacts etc.
 * __WFM admin__ http://wfm-admin.azurewebsites.net/ protected service for database administration
 (will be moved to Intranet access to protect requests)
 * __WFM mobile client__ https://build.phonegap.com/apps/628274/ 
 mobile application created from WFM client using Phonegap
-* __WFM API__ http://wfm-client.azurewebsites.net/api/
+* __WFM API__ https://wfm-client.azurewebsites.net/api/
 methods to manage WFM data. Methods are secured and required authorization. 
 After getting auth token (after registration ang authentication) you can make requests to API
-* __WFM Rerport__ https://wfm-report.herokuapp.com
+* __WFM Report__ https://wfm-report.herokuapp.com
 Generate a report for WFM clients
+* __Petrohelp auth__ https://petrohelp-auth.herokuapp.com
+An OAUTH2 provider for Petrohelp services, like this WFM
 
 ### WFM data storage
-* Authentication data: relational database to store user profiles
-* Structured data: relational database to store structured WFM data, e.g. companies, well regions, groups, fields, wells
-* Unstructured data: non-relational storage to store dynamic data, e.g. well perfomance properties, units and data
+* Authentication data: a database to store user profiles
+* WFM structured data: relational database to store structured WFM data, e.g. companies, well regions, groups, fields, wells
+* WFM unstructured data: non-relational storage to store dynamic data, e.g. well perfomance, well monitoring data
 * File storage: secured blob storage to store WFM files
 
 ### WFM helpers
