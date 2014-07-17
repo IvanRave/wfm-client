@@ -28,9 +28,9 @@ function handleAuthResult(nextFunc, authResult) {
 		type : 'POST',
 		// need for CORS requests without preflight request
 		contentType : 'application/x-www-form-urlencoded; charset=UTF-8',
-		data : 'code=' + resultObj.code,
+		data : 'code=' + resultObj.code + '&client_id=' + 'wfm-client' + '&redirect_uri=' + '//ivanrave.github.io/wfm-client/handle-auth-code.html',
 		xhrFields : {
-			// For CORS request to send cookies
+			// For CORS request to send and receive cookies
 			withCredentials : true
 		}
 	};
@@ -55,7 +55,7 @@ var cbkAuthInterval = function (redirectUri, authScope, next) {
 	var authLocation = authScope.authWindow.location;
 
 	var authLocationHref;
-	// Uncaught SecurityError: Blocked a frame with origin "http://127.0.0.1:12345" from accessing
+	// Uncaught SecurityError: Blocked a frame with origin "http://localhost:12345" from accessing
 	// a frame with origin "http://localhost:1337". Protocols, domains, and ports must match.
 	try {
 		authLocationHref = authLocation.href;
@@ -82,16 +82,16 @@ var cbkAuthInterval = function (redirectUri, authScope, next) {
 };
 
 var openAuthWindow = function (next) {
-	// //wf.com or //localhost:123
+	// //wf.com or //localhost:12345
 	// var appBase = '//' + window.location.host;
 	// // hack for github hosting
 	// if (appBase === '//ivanrave.github.io') {
-		// appBase += '/wfm-client';
+	// appBase += '/wfm-client';
 	// }
 	// var redirectUri = appBase + '/handle-auth-code.html';
-  
-  var idOfAuthClient = 'wfm-client';
-  var redirectUri = '//ivanrave.github.io/wfm-client/handle-auth-code.html';
+
+	var idOfAuthClient = 'wfm-client';
+	var redirectUri = '//ivanrave.github.io/wfm-client/handle-auth-code.html';
 
 	// Object to catch changes in bind method
 	var authScope = {
