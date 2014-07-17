@@ -12,9 +12,11 @@ module.exports = function (grunt) {
 
 	// API url (prod and dev)
 	var requrl = isProd ? '//wfm-report.herokuapp.com' : 'http://localhost:3000';
-	var appUrl = isProd ? '//wfm-client.azurewebsites.net' : 'http://127.0.0.1:12345';
-  // Auth provider url: for openning popup window to auth
+	// Auth provider url: for openning popup window to auth
 	var authUrl = isProd ? '//petrohelp-auth.herokuapp.com' : 'http://localhost:1337';
+
+	var idOfAuthClient = isProd ? 'wfm-client' : 'client111';
+	var redirectUriOfAuthClient = isProd ? '//ivanrave.github.io/wfm-client/handle-auth-code.html' : '//localhost:12345/handle-auth-code.html';
 
 	// 'http://localhost:3000/api/session-manager'
 	////wfm-node.azurewebsites.net
@@ -49,7 +51,7 @@ module.exports = function (grunt) {
 		connect : {
 			main : {
 				options : {
-					open : true, // Or need url string
+					open : 'http://localhost:12345', // true Or url string
 					keepalive : true,
 					port : 12345,
 					base : '<%= trgt %>'
@@ -72,8 +74,8 @@ module.exports = function (grunt) {
 		gitlog : {
 			options : {
 				dest : 'doc/month.log',
-				afterDate : new Date(2014, 4, 1),
-				beforeDate : new Date(2014, 5, 1)
+				afterDate : new Date(2014, 5, 1),
+				beforeDate : new Date(2014, 6, 3)
 			}
 		},
 		jshint : {
@@ -236,9 +238,10 @@ module.exports = function (grunt) {
 					// if empty - the same domain (simple requests)
 					// Example {{requrl}}/api/values
 					requrl : requrl,
-					appUrl : appUrl,
-          authUrl: authUrl, 
-					isProd : isProd
+					authUrl : authUrl,
+					isProd : isProd,
+					idOfAuthClient : idOfAuthClient,
+          redirectUriOfAuthClient: redirectUriOfAuthClient
 					// isIpad: isIpad,
 					// isMetro: isMetro
 				}
@@ -485,12 +488,6 @@ module.exports = function (grunt) {
 				files : ['<%= src %>/scss/**/*.scss'],
 				tasks : ['compass:main']
 			}
-
-			// livereload server: http://127.0.0.1:35729/livereload.js
-			////livereload: {
-			////    options: { livereload: true },
-			////    files: ['<%= trgt %>/**/*']
-			////}
 		}
 	});
 

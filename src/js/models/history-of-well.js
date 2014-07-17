@@ -1,13 +1,12 @@
 ﻿/** @module */
-define(['jquery',
-		'knockout',
+define(['knockout',
 		'services/datacontext',
 		'helpers/app-helper',
 		'models/file-spec-of-history-of-well',
 		'services/file-spec-of-history-of-well',
 		'models/wfm-image',
 		'services/image-of-history-of-well'],
-	function ($, ko, datacontext, appHelper,
+	function (ko, datacontext, appHelper,
 		FileSpecOfHistoryOfWell, fileSpecOfHistoryOfWellService,
 		WfmImage, imageOfHistoryOfWellService) {
 	'use strict';

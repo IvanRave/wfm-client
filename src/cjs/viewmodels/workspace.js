@@ -7,6 +7,7 @@ var historyHelper = require('helpers/history-helper');
 var cookieHelper = require('helpers/cookie-helper');
 var VwmUserProfile = require('viewmodels/user-profile');
 var globalCssCnst = require('constants/global-css-constants');
+var langHelper = require('helpers/lang-helper');
 
 // http://stackoverflow.com/questions/8648892/convert-url-parameters-to-a-javascript-object
 function calcObjFromUrl(search) {
@@ -26,9 +27,9 @@ function handleAuthResult(nextFunc, authResult) {
 		type : 'POST',
 		// need for CORS requests without preflight request
 		contentType : 'application/x-www-form-urlencoded; charset=UTF-8',
-		data : 'code=' + resultObj.code,
+		data : 'code=' + resultObj.code + '&client_id=' + '{{conf.idOfAuthClient}}' + '&redirect_uri=' + '{{conf.redirectUriOfAuthClient}}',
 		xhrFields : {
-			// For CORS request to send cookies
+			// For CORS request to send and receive cookies
 			withCredentials : true
 		}
 	};
@@ -36,11 +37,16 @@ function handleAuthResult(nextFunc, authResult) {
 	$.ajax('{{conf.requrl}}' + '/api/session-manager', options).done(function (rr) {
 		console.log('response from wfm-node', rr);
 		nextFunc();
-	}).fail(function (errr) {
-		console.log('error from wfm-node', errr);
-		//if (jqXhr.status === 422) {
-		//  err = langHelper.translate(jqXhr.responseJSON.errId) || '{{lang.unknownError}}');
-		//}
+	}).fail(function (jqXhr) {
+		if (jqXhr.status === 422) {
+			alert(langHelper.translate(jqXhr.responseJSON.errId) || '{{lang.unknownError}}');
+			return;
+		} else {
+			alert('Error: status: ' + jqXhr.status + '; message: ' + jqXhr.responseText);
+			return;
+		}
+
+		console.log('error from wfm-node', jqXhr);
 	});
 }
 
@@ -48,7 +54,7 @@ var cbkAuthInterval = function (redirectUri, authScope, next) {
 	var authLocation = authScope.authWindow.location;
 
 	var authLocationHref;
-	// Uncaught SecurityError: Blocked a frame with origin "http://127.0.0.1:12345" from accessing
+	// Uncaught SecurityError: Blocked a frame with origin "http://localhost:12345" from accessing
 	// a frame with origin "http://localhost:1337". Protocols, domains, and ports must match.
 	try {
 		authLocationHref = authLocation.href;
@@ -58,8 +64,8 @@ var cbkAuthInterval = function (redirectUri, authScope, next) {
 
 	if (authLocationHref) {
 		var hrefParts = authLocationHref.split('?');
-    
-    // if https://some.ru -> //some.ru
+
+		// if https://some.ru -> //some.ru
 		if (hrefParts[0].indexOf(redirectUri) >= 0) {
 			// Get code or error
 			var authResponse = hrefParts[1];
@@ -75,7 +81,16 @@ var cbkAuthInterval = function (redirectUri, authScope, next) {
 };
 
 var openAuthWindow = function (next) {
-	var redirectUri = '{{conf.appUrl}}' + '/handle-auth-code.html';
+	// //wf.com or //localhost:12345
+	// var appBase = '//' + window.location.host;
+	// // hack for github hosting
+	// if (appBase === '//ivanrave.github.io') {
+	// appBase += '/wfm-client';
+	// }
+	// var redirectUri = appBase + '/handle-auth-code.html';
+
+	var idOfAuthClient = '{{conf.idOfAuthClient}}';
+	var redirectUri = '{{conf.redirectUriOfAuthClient}}';
 
 	// Object to catch changes in bind method
 	var authScope = {
@@ -85,7 +100,7 @@ var openAuthWindow = function (next) {
 
 	authScope.authInterval = setInterval(cbkAuthInterval.bind(null, redirectUri, authScope, next), 1000);
 
-	authScope.authWindow = window.open('{{conf.authUrl}}' + '/dialog/authorize?response_type=code&client_id=abc123&redirect_uri=' + redirectUri, '_blank',
+	authScope.authWindow = window.open('{{conf.authUrl}}' + '/dialog/authorize?response_type=code&client_id=' + idOfAuthClient + '&redirect_uri=' + redirectUri, '_blank',
 			'location=yes,height=570,width=520,scrollbars=yes,status=yes');
 };
 

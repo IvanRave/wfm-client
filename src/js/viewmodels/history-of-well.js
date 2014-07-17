@@ -185,6 +185,8 @@ define([
 				});
 			};
 
+      console.log('imageFileSpec', imageFileSpec);
+      
 			// Start load an image
 			historyImgElem.src = imageFileSpec.fileUrl;
 		}
