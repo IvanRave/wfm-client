@@ -1,216 +1,221 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>{{lang.wfm}}</title>
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {{> style-link-generator }}
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>{{lang.wfm}}</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {{> style-link-generator }}
 </head>
 <body>
-    <!--[if lt IE 10]><p class="chromeframe">You are using an <strong>outdated</strong> browser. Please upgrade your browser.</p><![endif]-->
-    <div class="hide" id="workspace-project">
-      <div>
-          <!-- current: vwmWorkspace-->
-          <nav class="wfm-nav clearfix navbar-inverse">
-            <div data-bind="ifnot: vwmUserProfile">
-              {{> style-link-selector }}
-            </div>
-            <div>
-              <div class="pull-left wfm-nav__block" data-bind="with: vwmUserProfile">
-                <span class="link-view-inverse" data-bind="click: deactivateVwmChild">{{lang.wfm}}</span>
+  <!--[if lt IE 10]><p class="chromeframe">You are using an <strong>outdated</strong> browser. Please upgrade your browser.</p><![endif]-->
+  <div class="hide" id="workspace-project">
+    <div>
+      <!-- current: vwmWorkspace-->
+      <nav class="wfm-nav clearfix navbar-inverse">
+        <div data-bind="ifnot: vwmUserProfile">
+          {{> style-link-selector }}
+        </div>
+        <div>
+          <div class="pull-left wfm-nav__block" data-bind="with: vwmUserProfile">
+            <span class="link-view-inverse wfm-brand-title" 
+              data-bind="click: deactivateVwmChild">{{lang.wfm}}</span>
+          </div>
+          <div class="pull-right wfm-nav__block" data-bind="if: vwmUserProfile">
+            <span class="min-right-margin" data-bind="with:vwmUserProfile">
+              <span class="link-view-inverse" data-bind="text: uname"></span>
+              <!-- todo #33! add dropdown menu to logout -->
+            </span>
+            <button class="btn btn-xs btn-inverse" type="button" data-bind="click: accountLogOff">
+              <i class="glyphicon glyphicon-off"></i>
+              {{capitalizeFirst lang.logOut}}
+            </button>
+          </div>
+        </div>
+      </nav>
+      <div class="wfm-content-wrap">
+        <div>
+          <div data-bind="visible: mdlWorkspace.isTriedToLoadUserProfile">
+            <div class="min-top-margin" data-bind="ifnot: vwmUserProfile">
+              <div class="clearfix">
+                <div class="col-sm-4"></div>
+                <div class="col-sm-4">
+                  <h3 class="text-center">Well file manager</h3>
+                  <!-- TODO: #22! Place a button -->
+                  <div class="text-center">
+                    <button class="btn btn-default" data-bind="click: openAuth, disable: isLoginInProgress">
+                      <span data-bind="hidden: isLoginInProgress">Login using PetrohelpAuth</span>
+                      <span data-bind="visible: isLoginInProgress">Login...</span>
+                    </button>
+                  </div>
+                  <div class="text-center">
+                    <small>secured authentication / register free / demo login</small>
+                  </div>
+                  <div class="min-top-margin">
+                    <p class="text-center">
+                      Petrohelp’s Well File Manager is specialized software used to manage well data, 
+                      production data, maps and to calculate many parameters.
+                    </p>
+                    <ul class="list-unstyled min-left-margin">
+                      <li>✓ Management of Drilling data and history of the well, including deviation survey and completion details.</li>
+                      <li>✓ Maps with well location, distance between wells and area calculations.</li>
+                      <li>✓ Management of Production data from the field. This can simply be loaded to the data base and visualized using a graph wherever you are.</li>
+                      <li>✓ Artificial lift method and gas lift calculations.</li> 
+                      <li>✓ Decline analysis.</li>
+                      <li>✓ PVT data review.</li>
+                      <li>✓ Nodal Analysis and Reservoir performance review.</li>
+                      <li>✓ and more...</li>
+                    </ul>
+                    <p class="text-center">
+                      Keep all the information for your asset always updated and organized as well as accessible worldwide thanks to WFM.
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div class="pull-right wfm-nav__block" data-bind="if: vwmUserProfile">
-                <button type="button" class="btn btn-xs btn-inverse" data-bind="click: accountLogOff">
-                  <i class="glyphicon glyphicon-off"></i>
-                  {{capitalizeFirst lang.logOut}}
-                </button>
-              </div>
             </div>
-          </nav>
-          <div class="wfm-content-wrap">
-              <div>
-                  <div data-bind="visible: mdlWorkspace.isTriedToLoadUserProfile">
-                      <div class="min-top-margin" data-bind="ifnot: vwmUserProfile">
-                        <div class="clearfix">
-                          <div class="col-sm-4"></div>
-                          <div class="col-sm-4">
-                            <h3 class="text-center">Well file manager</h3>
-                            <!-- TODO: #22! Place a button -->
-                            <div class="text-center">
-                              <button class="btn btn-default" data-bind="click: openAuth, disable: isLoginInProgress">
-                                <span data-bind="hidden: isLoginInProgress">Login using PetrohelpAuth</span>
-                                <span data-bind="visible: isLoginInProgress">Login...</span>
-                              </button>
-                            </div>
-                            <div class="text-center">
-                              <small>secured authentication / register free / demo login</small>
-                            </div>
-                            <div class="min-top-margin">
-                              <p class="text-center">
-                                Petrohelp’s Well File Manager is specialized software used to manage well data, 
-                                production data, maps and to calculate many parameters.
-                              </p>
-                              <ul class="list-unstyled min-left-margin">
-                                <li>✓ Management of Drilling data and history of the well, including deviation survey and completion details.</li>
-                                <li>✓ Maps with well location, distance between wells and area calculations.</li>
-                                <li>✓ Management of Production data from the field. This can simply be loaded to the data base and visualized using a graph wherever you are.</li>
-                                <li>✓ Artificial lift method and gas lift calculations.</li> 
-                                <li>✓ Decline analysis.</li>
-                                <li>✓ PVT data review.</li>
-                                <li>✓ Nodal Analysis and Reservoir performance review.</li>
-                                <li>✓ and more...</li>
-                              </ul>
-                              <p class="text-center">
-                                Keep all the information for your asset always updated and organized as well as accessible worldwide thanks to WFM.
-                              </p>
-                            </div>
-                          </div>
+            <div data-bind="with: vwmUserProfile">
+              <!-- current: vwmUserProfile -->
+              <div data-bind="ifnot: mdlStage.isLoadedEmployees">{{lang.loading}}</div>
+              <div data-bind="if: mdlStage.isLoadedEmployees">
+                <!-- If no selected employee: show list of employees -->
+                <div data-bind="ifnot: slcVwmChild">
+                  {{> employee-list }}
+                </div>
+                <div data-bind="with: slcVwmChild">
+                  <!-- current: vwmEmployee-->
+                  <div data-bind="if: mdlEmployee.canEditAll">
+                      {{> edit-mode-btn }}
+                  </div>
+                  <div>
+                    <div>
+                      <div class="clearfix">
+                        <div class="sidebar-toggle" data-bind="css: $root.sidebarToggleCss">
+                          <button type="button" data-bind="click: $root.toggleIsVisibleMenu.bind($root)" title="Hide/show menu">
+                            <i class="glyphicon glyphicon-chevron-left" data-bind="visible: $root.isVisibleMenu"></i>
+                            <i class="glyphicon glyphicon-chevron-right" data-bind="hidden: $root.isVisibleMenu"></i>
+                          </button>
                         </div>
-                      </div>
-                      <div data-bind="with: vwmUserProfile">
-                          <!-- current: vwmUserProfile -->
-                          <div data-bind="ifnot: mdlStage.isLoadedEmployees">{{lang.loading}}</div>
-                          <div data-bind="if: mdlStage.isLoadedEmployees">
-                              <!-- If no selected employee: show list of employees -->
-                              <div data-bind="ifnot: slcVwmChild">
-                                  {{> employee-list }}
-                              </div>
-                              <div data-bind="with: slcVwmChild">
-                                  <!-- current: vwmEmployee-->
-                                  <div data-bind="if: mdlEmployee.canEditAll">
-                                      {{> edit-mode-btn }}
+                        <!-- TODO: fix: slider scroll with page scroll #MH! -->
+                        <div class="sidebar-wrap" data-bind="css: $root.sidebarWrapCss">
+                            <div data-bind="scroller: { }">
+                                {{> workspace-menu }}
+                            </div>
+                        </div>
+                        <div class="workspace-container" data-bind="css: $root.workAreaCss, with: vwmCompany">
+                            <!-- current: vwmCompany-->
+                            <div data-bind="ifnot: slcVwmChild">
+                                <!-- if no selected wegion -->
+                                {{> section-panel-standard }}
+                                {{> dashboard-arousal }}
+                                {{> fmgr-arousal }}
+                                {{> fmgr-modal }}
+                                <div class="tab-content-pad">
+                                    {{> company }}
+                                </div>
+                            </div>
+                            <div data-bind="with: slcVwmChild">
+                                <!-- current: vwmWegion -->
+                                <div data-bind="ifnot: slcVwmChild">
+                                    {{> section-panel-standard }}
+                                    {{> dashboard-arousal }}
+                                    {{> fmgr-arousal }}
+                                    {{> fmgr-modal }}
+                                    <div class="tab-content-pad">
+                                      {{> wegion }}
+                                    </div>
+                                </div>
+                                <div data-bind="with: slcVwmChild">
+                                  <!-- current: vwmWield-->
+                                  <div data-bind="ifnot: slcVwmChild">
+                                    {{> section-panel-standard }}
+                                    {{> dashboard-arousal }}
+                                    {{> fmgr-arousal }}
+                                    {{> fmgr-modal }}
+                                    <div class="tab-content-pad">
+                                      {{> wield }}
+                                    </div>
                                   </div>
-                                  <div>
-                                      <div>
-                                          <div class="clearfix">
-                                              <div class="sidebar-toggle" data-bind="css: $root.sidebarToggleCss">
-                                                  <button type="button" data-bind="click: $root.toggleIsVisibleMenu.bind($root)" title="Hide/show menu">
-                                                      <i class="glyphicon glyphicon-chevron-left" data-bind="visible: $root.isVisibleMenu"></i>
-                                                      <i class="glyphicon glyphicon-chevron-right" data-bind="hidden: $root.isVisibleMenu"></i>
-                                                  </button>
-                                              </div>
-                                              <!-- TODO: fix: slider scroll with page scroll #MH! -->
-                                              <div class="sidebar-wrap" data-bind="css: $root.sidebarWrapCss">
-                                                  <div data-bind="scroller: { }">
-                                                      {{> workspace-menu }}
-                                                  </div>
-                                              </div>
-                                              <div class="workspace-container" data-bind="css: $root.workAreaCss, with: vwmCompany">
-                                                  <!-- current: vwmCompany-->
-                                                  <div data-bind="ifnot: slcVwmChild">
-                                                      <!-- if no selected wegion -->
-                                                      {{> section-panel-standard }}
-                                                      {{> dashboard-arousal }}
-                                                      {{> fmgr-arousal }}
-                                                      {{> fmgr-modal }}
-                                                      <div class="tab-content-pad">
-                                                          {{> company }}
-                                                      </div>
-                                                  </div>
-                                                  <div data-bind="with: slcVwmChild">
-                                                      <!-- current: vwmWegion -->
-                                                      <div data-bind="ifnot: slcVwmChild">
-                                                          {{> section-panel-standard }}
-                                                          {{> dashboard-arousal }}
-                                                          {{> fmgr-arousal }}
-                                                          {{> fmgr-modal }}
-                                                          <div class="tab-content-pad">
-                                                            {{> wegion }}
-                                                          </div>
-                                                      </div>
-                                                      <div data-bind="with: slcVwmChild">
-                                                          <!-- current: vwmWield-->
-                                                          <div data-bind="ifnot: slcVwmChild">
-                                                              {{> section-panel-standard }}
-                                                              {{> dashboard-arousal }}
-                                                              {{> fmgr-arousal }}
-                                                              {{> fmgr-modal }}
-                                                              <div class="tab-content-pad">
-                                                                {{> wield }}
-                                                              </div>
-                                                          </div>
-                                                          <div data-bind="with: slcVwmChild">
-                                                              <!-- current: vwmWroup -->
-                                                              <div data-bind="ifnot: slcVwmChild">
-                                                                  {{> section-panel-standard }}
-                                                                  {{> dashboard-arousal }}
-                                                                  {{> fmgr-arousal }}
-                                                                  {{> fmgr-modal }}
-                                                                  <div class="tab-content-pad">
-                                                                    {{> wroup }}
-                                                                  </div>
-                                                              </div>
-                                                              <div data-bind="with: slcVwmChild">
-                                                                  <!-- current: vwmWell -->
-                                                                  {{> section-panel-well }}
-                                                                  {{> dashboard-arousal }}
-                                                                  {{> fmgr-arousal }}
-                                                                  {{> fmgr-modal }}
-                                                                  <div class="tab-content-pad">
-                                                                    {{> well }}
-                                                                  </div>
-                                                              </div>
-                                                          </div>
-                                                      </div>
-                                                  </div>
-                                              </div>
-                                          </div>
+                                  <div data-bind="with: slcVwmChild">
+                                      <!-- current: vwmWroup -->
+                                      <div data-bind="ifnot: slcVwmChild">
+                                        {{> section-panel-standard }}
+                                        {{> dashboard-arousal }}
+                                        {{> fmgr-arousal }}
+                                        {{> fmgr-modal }}
+                                        <div class="tab-content-pad">
+                                          {{> wroup }}
+                                        </div>
+                                      </div>
+                                      <div data-bind="with: slcVwmChild">
+                                        <!-- current: vwmWell -->
+                                        {{> section-panel-well }}
+                                        {{> dashboard-arousal }}
+                                        {{> fmgr-arousal }}
+                                        {{> fmgr-modal }}
+                                        <div class="tab-content-pad">
+                                          {{> well }}
+                                        </div>
                                       </div>
                                   </div>
-                              </div>
-                          </div>
+                                </div>
+                            </div>
+                        </div>
                       </div>
+                    </div>
                   </div>
-                  <!-- end: isLoadedAccountInfo -->
+                </div>
               </div>
+            </div>
           </div>
-      </div>
-      {{> modal-standard }}
-      {{> modal-panzoom }}
-      {{> modal-wide }}
-      <!-- widget templates: loaded only once on the index page -->
-      {{> widget-default-summary }}
-      {{> widget-wield-map }}
-      {{> widget-wield-stat }}
-      {{> widget-well-sketch}}
-      {{> widget-well-history}}
-      {{> widget-well-perfomance}}
-      {{> widget-well-monitoring}}
-      {{> widget-well-map}}
-      <!-- clip path for svg blocks -->
-      {{> clip-path-graph }}
-    </div>
-    <footer class="wfm-footer navbar-fixed-bottom">
-      <div class="wfm-footer__logo-wrap">
-        <div class="wfm-footer__logo"></div>
-      </div>
-    </footer>
-    <!-- <div id="loader-main" class="loader-circle-large"></div> -->
-    <div id="loader-main">
-      <div class="f_circleG" id="frotateG_01">
-      </div>
-      <div class="f_circleG" id="frotateG_02">
-      </div>
-      <div class="f_circleG" id="frotateG_03">
-      </div>
-      <div class="f_circleG" id="frotateG_04">
-      </div>
-      <div class="f_circleG" id="frotateG_05">
-      </div>
-      <div class="f_circleG" id="frotateG_06">
-      </div>
-      <div class="f_circleG" id="frotateG_07">
-      </div>
-      <div class="f_circleG" id="frotateG_08">
+          <!-- end: isLoadedAccountInfo -->
+        </div>
       </div>
     </div>
-    <!-- Load main script file for page or default (with auth logic only) -->
-    {{#if conf.isProd}}
-    <script data-main="js/main-bundle-{{package.version}}" src="js/require.min.js"></script>
-    {{else}}
-    <script data-main="js/main" src="js/require.js"></script>
-    {{/if}}
+    {{> modal-standard }}
+    {{> modal-panzoom }}
+    {{> modal-wide }}
+    <!-- widget templates: loaded only once on the index page -->
+    {{> widget-default-summary }}
+    {{> widget-wield-map }}
+    {{> widget-wield-stat }}
+    {{> widget-well-sketch}}
+    {{> widget-well-history}}
+    {{> widget-well-perfomance}}
+    {{> widget-well-monitoring}}
+    {{> widget-well-map}}
+    <!-- clip path for svg blocks -->
+    {{> clip-path-graph }}
+  </div>
+  <footer class="wfm-footer navbar-fixed-bottom">
+    <div class="wfm-footer__logo-wrap">
+      <div class="wfm-footer__logo"></div>
+    </div>
+  </footer>
+  <!-- <div id="loader-main" class="loader-circle-large"></div> -->
+  <div id="loader-main">
+    <div class="f_circleG" id="frotateG_01">
+    </div>
+    <div class="f_circleG" id="frotateG_02">
+    </div>
+    <div class="f_circleG" id="frotateG_03">
+    </div>
+    <div class="f_circleG" id="frotateG_04">
+    </div>
+    <div class="f_circleG" id="frotateG_05">
+    </div>
+    <div class="f_circleG" id="frotateG_06">
+    </div>
+    <div class="f_circleG" id="frotateG_07">
+    </div>
+    <div class="f_circleG" id="frotateG_08">
+    </div>
+  </div>
+  <!-- Load main script file for page or default (with auth logic only) -->
+  {{#if conf.isProd}}
+  <script data-main="js/main-bundle-{{package.version}}" src="js/require.min.js"></script>
+  {{else}}
+  <script data-main="js/main" src="js/require.js"></script>
+  {{/if}}
 </body>
 </html>

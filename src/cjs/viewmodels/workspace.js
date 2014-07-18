@@ -1,13 +1,13 @@
 ﻿/** @module viewmodels/workspace */
 'use strict';
 
-var $ = require('jquery');
 var ko = require('knockout');
 var historyHelper = require('helpers/history-helper');
 var cookieHelper = require('helpers/cookie-helper');
 var VwmUserProfile = require('viewmodels/user-profile');
 var globalCssCnst = require('constants/global-css-constants');
 var langHelper = require('helpers/lang-helper');
+var sessionService = require('services/session');
 
 // http://stackoverflow.com/questions/8648892/convert-url-parameters-to-a-javascript-object
 function calcObjFromUrl(search) {
@@ -17,37 +17,12 @@ function calcObjFromUrl(search) {
 	}) : {};
 }
 
-function handleAuthResult(nextFunc, authResult) {
+function handleAuthResult(scsNext, failNext, authResult) {
 	var resultObj = calcObjFromUrl(authResult);
 	console.log(resultObj);
 	// Send a code to the api (change to sid)
 
-	var options = {
-		cache : false,
-		type : 'POST',
-		// need for CORS requests without preflight request
-		contentType : 'application/x-www-form-urlencoded; charset=UTF-8',
-		data : 'code=' + resultObj.code + '&client_id=' + '{{conf.idOfAuthClient}}' + '&redirect_uri=' + '{{conf.redirectUriOfAuthClient}}',
-		xhrFields : {
-			// For CORS request to send and receive cookies
-			withCredentials : true
-		}
-	};
-
-	$.ajax('{{conf.requrl}}' + '/api/session-manager', options).done(function (rr) {
-		console.log('response from wfm-node', rr);
-		nextFunc();
-	}).fail(function (jqXhr) {
-		if (jqXhr.status === 422) {
-			alert(langHelper.translate(jqXhr.responseJSON.errId) || '{{lang.unknownError}}');
-			return;
-		} else {
-			alert('Error: status: ' + jqXhr.status + '; message: ' + jqXhr.responseText);
-			return;
-		}
-
-		console.log('error from wfm-node', jqXhr);
-	});
+	sessionService.buildSession(resultObj.code).done(scsNext).fail(failNext);
 }
 
 var cbkAuthInterval = function (redirectUri, authScope, next) {
@@ -215,18 +190,36 @@ exports = function (mdlWorkspace) {
 	////};
 };
 
+/**
+ * Handle success session
+ */
+exports.prototype.handleSuccessSession = function (accountInfoData) {	
+	this.mdlWorkspace.setUserProfile(accountInfoData);
+	this.isLoginInProgress(false);
+};
+
+/**
+ * Handle failed session
+ */
+exports.prototype.handleFailedSession = function (jqXhr) {
+	if (jqXhr.status === 422) {
+		alert(langHelper.translate(jqXhr.responseJSON.errId) || '{{lang.unknownError}}');
+		return;
+	} else {
+		alert('Error: status: ' + jqXhr.status + '; message: ' + jqXhr.responseText);
+		return;
+	}
+
+	console.log('error from wfm-node', jqXhr);
+};
+
+/** Open the auth window, start authentication */
 exports.prototype.openAuth = function () {
-	var ths = this;
 	this.isLoginInProgress(true);
-	openAuthWindow(handleAuthResult.bind(null, function () {
-			ths.mdlWorkspace.setUserProfile({
-				Id : null,
-				// TODO^ #33! get email from the server
-				Email : 'todo@change.email',
-				Roles : null
-			});
-			ths.isLoginInProgress(false);
-		}));
+
+	openAuthWindow(handleAuthResult.bind(null,
+			this.handleSuccessSession.bind(this),
+			this.handleFailedSession.bind(this)));
 };
 
 /**

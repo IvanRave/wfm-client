@@ -44,8 +44,11 @@ define(['knockout',
 		 * Unique value of this viewmodel (user profile's guid)
 		 * @type {string}
 		 */
-		this.unq = this.mdlStage.id;
+		this.unq = this.mdlStage.id; // undefined for security, but need for structure
 
+    /** User name */
+    this.uname = this.mdlStage.uname;
+    
 		// 1. null - No default data to selection  (only one per website)
 		// 2. If no other userprofiles then this upro is selected always
 		VwmStageBase.call(this, null, ko.observable(this.unq), this.defaultSlcData_.companyId);
