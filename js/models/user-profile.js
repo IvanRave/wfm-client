@@ -28,14 +28,15 @@ define(['knockout',
 		});
 	}
 
+	// second property - roles (usually for wfm-admin cab)
 	/** Main properties for company: headers can be translated here if needed */
 	var userProfilePropSpecList = [
 		/**
-		 * User email (name)
+		 * User name
 		 * @type {string}
 		 */
-		new PropSpec('email', 'Email', 'Email', 'SingleLine', {
-			maxLength : 320
+		new PropSpec('uname', 'uname', 'uname', 'SingleLine', {
+			maxLength : 255
 		})
 	];
 
@@ -47,9 +48,6 @@ define(['knockout',
 	 */
 	var exports = function (data, rootMdl) {
 		data = data || {};
-
-		/** Alternative for this */
-		var ths = this;
 
 		/**
 		 * Stage key: user profile
@@ -64,11 +62,8 @@ define(['knockout',
 		/** Main observable properties of user profile */
 		this.propSpecList = userProfilePropSpecList;
 
-		/** User profile id (guid) */
-		this.id = data.Id;
-
 		/** Base for all stages: no server data in user profile */
-		StageBase.call(ths, data);
+		StageBase.call(this, data);
 
 		/**
 		 * User can be in many companies with access level for each company
@@ -88,6 +83,9 @@ define(['knockout',
 		 */
 		this.nameOfCreatedCompany = ko.observable('');
 
+    /** Alternative for this */
+		var ths = this;
+    
 		/** Add new employee with company */
 		this.postEmployee = function () {
 			// Post employee company
@@ -111,25 +109,27 @@ define(['knockout',
 		 * @type {boolean}
 		 */
 		ths.isOwnerAlready = ko.computed({
-				read : function () {
-					var result = false;
-
-					var tmpEmployees = ko.unwrap(ths.employees);
-
-					tmpEmployees.forEach(function (arrElem) {
-						if (ko.unwrap(arrElem.canManageAll)) {
-							result = true;
-						}
-					});
-
-					return result;
-				},
-				deferEvaluation : true
+				read : this.calcIsOwnerAlready,
+				deferEvaluation : true,
+				owner : this
 			});
 	};
 
 	/** Inherit from a stage base model */
 	appHelper.inherits(exports, StageBase);
+
+	/** Calculate - whether this user is owner of some company */
+	exports.prototype.calcIsOwnerAlready = function () {
+		var result = false;
+
+		ko.unwrap(this.employees).forEach(function (arrElem) {
+			if (ko.unwrap(arrElem.canManageAll)) {
+				result = true;
+			}
+		});
+
+		return result;
+	};
 
 	/**
 	 * Load employee list for this user

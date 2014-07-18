@@ -250,6 +250,11 @@ table {
     padding-left: 21px;
 }
 
+.wfm-brand-title {
+  font-size: 1.2em;
+  
+}
+
 @media screen and (min-width: 768px) {
     .wfm-top-tab-panel {
         position: fixed;
@@ -260,7 +265,7 @@ table {
 
         .wfm-top-tab-panel.edit-mode-block {
             top: 5px;
-            right: 100px;
+            left: 70px;
         }
 
         .wfm-top-tab-panel.dashboard-arousal {

@@ -64,7 +64,7 @@ var cbkFail = function (jqXHR, textStatus, errorThrown) {
 	}
 };
 
-exports = function (type, url, data) {
+exports = function (type, url, data, contentType) {
 	var options = {
 		////dataType: "json",
 		cache : false,
@@ -76,39 +76,45 @@ exports = function (type, url, data) {
 	};
 
 	if (data) {
-		// For CORS JSON request generate OPTION request
-		// Default content-type = url-encoded string
-		options.contentType = 'application/json; charset=utf-8';
-
-		// all knockout models need contain toPlainJson function,
-		// which converts knockout object to plain object (observables to plain objects etc.)
-		if ($.isFunction(data.toPlainJson)) {
-			////if (true) {
-			////    try {
-			////        options.data = $.param(data.toPlainJson());
-			////    }
-			////    catch (err) {
-			////        console.log(err);
-			////    }
-			////}
-			////else {
-			options.data = JSON.stringify(data.toPlainJson());
-			////}
-		} else if ($.isArray(data)) {
-			// each array element convert to plain json (it is not an appropriate way: would be better to convert each element to plain json before sending to ajaxRequest)
-			// for other libraries (not knockout models - for plain JSON objects)
-			options.data = JSON.stringify(data);
+		if (contentType) {
+			options.contentType = contentType;
+			options.data = data;
 		} else {
-			console.log('not ko object and not array');
-			console.log(data);
-			console.log(JSON.stringify(data));
-			// for other libraries (not knockout models - for plain JSON objects)
-			options.data = JSON.stringify(data);
-		}
+			// else JSON
+			// For CORS JSON request generate OPTION request
+			// Default content-type = url-encoded string
+			options.contentType = 'application/json; charset=utf-8';
 
-		// remove knockout dependency from this module
-		////data: JSON.stringify(ko.toJS(data))
-		////ko.toJSON(data)
+			// all knockout models need contain toPlainJson function,
+			// which converts knockout object to plain object (observables to plain objects etc.)
+			if ($.isFunction(data.toPlainJson)) {
+				////if (true) {
+				////    try {
+				////        options.data = $.param(data.toPlainJson());
+				////    }
+				////    catch (err) {
+				////        console.log(err);
+				////    }
+				////}
+				////else {
+				options.data = JSON.stringify(data.toPlainJson());
+				////}
+			} else if ($.isArray(data)) {
+				// each array element convert to plain json (it is not an appropriate way: would be better to convert each element to plain json before sending to ajaxRequest)
+				// for other libraries (not knockout models - for plain JSON objects)
+				options.data = JSON.stringify(data);
+			} else {
+				console.log('not ko object and not array');
+				console.log(data);
+				console.log(JSON.stringify(data));
+				// for other libraries (not knockout models - for plain JSON objects)
+				options.data = JSON.stringify(data);
+			}
+
+			// remove knockout dependency from this module
+			////data: JSON.stringify(ko.toJS(data))
+			////ko.toJSON(data)
+		}
 	}
 
 	// Generate time marker
