@@ -492,7 +492,7 @@ define(['jquery',
 						if (jqXhr.status === 422) {
 							var resJson = jqXhr.responseJSON;
 							require(['helpers/lang-helper'], function (langHelper) {
-								var tmpProcessError = (langHelper.translate(resJson.errId) || resJson.errId);
+								var tmpProcessError = (langHelper.translate(resJson.message) || resJson.message);
 								alert(tmpProcessError);
 							});
 						}
