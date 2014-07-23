@@ -204,7 +204,7 @@ exports.prototype.handleSuccessSession = function (accountInfoData) {
  */
 exports.prototype.handleFailedSession = function (jqXhr) {
 	if (jqXhr.status === 422) {
-		alert(langHelper.translate(jqXhr.responseJSON.errId) || 'unknown error');
+		alert(langHelper.translate(jqXhr.responseJSON.message) || 'unknown error');
 		return;
 	} else {
 		alert('Error: status: ' + jqXhr.status + '; message: ' + jqXhr.responseText);

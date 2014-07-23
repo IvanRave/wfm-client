@@ -120,7 +120,7 @@ define(['jquery',
 	 * A success callback for report generation
 	 */
 	exports.prototype.scsGenerateReport = function (res) {
-		this.idOfReportFileSpec(res.IdOfFileSpec);
+		this.idOfReportFileSpec(res.idOfFileSpec);
 
 		var tmpReportSection = ko.unwrap(this.getParentVwmStage().mdlStage.reportSection);
 
@@ -155,7 +155,7 @@ define(['jquery',
 		console.log(jqXhr);
 		if (jqXhr.status === 422) {
 			var resJson = jqXhr.responseJSON;
-			var tmpProcessError = (langHelper.translate(resJson.errId) || resJson.errId);
+			var tmpProcessError = (langHelper.translate(resJson.message) || resJson.message);
 			alert(tmpProcessError);
 		}
 	};

@@ -1,23 +1,27 @@
-/** @module */
-define(['helpers/ajax-request'], function (ajaxRequest) {
-	'use strict';
+define(function (require, exports, module) {
+/** @module services/report */
 
-	var reportUrl = function () {
-		return '//wfm-report.herokuapp.com/api/report';
-	};
+'use strict';
 
-	/**
-	 * A report service static methods
-	 */
-	var exports = {
-		post : function (idOfWidgout, nameOfReport) {
-			return ajaxRequest('POST', reportUrl(), {
-				idOfWidgout : idOfWidgout,
-				nameOfReport : nameOfReport
-				// desc, other data
-			});
-		}
-	};
+var ajaxRequest = require('helpers/ajax-request');
 
-	return exports;
+var reportUrl = function () {
+	return '//wfm-report.herokuapp.com/api/report';
+};
+
+/**
+ * A report service static methods
+ */
+exports = {
+	post : function (idOfWidgout, nameOfReport) {
+		return ajaxRequest('POST', reportUrl(), {
+			idOfWidgout : idOfWidgout,
+			nameOfReport : nameOfReport
+			// desc, other data
+		});
+	}
+};
+
+module.exports = exports;
+
 });

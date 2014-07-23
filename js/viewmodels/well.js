@@ -624,7 +624,7 @@ define([
 				if (jqXhr.status === 422) {
 					var resJson = jqXhr.responseJSON;
 					require(['helpers/lang-helper'], function (langHelper) {
-						var tmpProcessError = (langHelper.translate(resJson.errId) || 'unknown error');
+						var tmpProcessError = (langHelper.translate(resJson.message) || 'unknown error');
 						ths.fmgrModal.okError(tmpProcessError);
 					});
 				}
@@ -793,7 +793,7 @@ define([
 				if (jqXhr.status === 422) {
 					var resJson = jqXhr.responseJSON;
 					require(['helpers/lang-helper'], function (langHelper) {
-						var tmpProcessError = (langHelper.translate(resJson.errId) || 'unknown error');
+						var tmpProcessError = (langHelper.translate(resJson.message) || 'unknown error');
 						ths.fmgrModal.okError(tmpProcessError);
 					});
 				}
@@ -845,7 +845,7 @@ define([
 				if (jqXhr.status === 422) {
 					var resJson = jqXhr.responseJSON;
 					require(['helpers/lang-helper'], function (langHelper) {
-						var tmpProcessError = (langHelper.translate(resJson.errId) || 'unknown error');
+						var tmpProcessError = (langHelper.translate(resJson.message) || 'unknown error');
 						ths.fmgrModal.okError(tmpProcessError);
 					});
 				}

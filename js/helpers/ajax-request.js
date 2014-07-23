@@ -35,7 +35,7 @@ var cbkFail = function (jqXHR, textStatus, errorThrown) {
 	case 400:
 		var resJson = jqXHR.responseJSON;
 		console.log(resJson);
-		if (resJson.errId === 'validationErrors') {
+		if (resJson.message === 'validationErrors') {
 			// Show window - but modal window can be active already
 			// TODO: make realization for all cases, or show in alert
 
