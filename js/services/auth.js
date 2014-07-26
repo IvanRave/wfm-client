@@ -13,6 +13,10 @@ function accountLogOffUrl() {
 	return '//wfm-report.herokuapp.com/api/account/logoff';
 }
 
+function accountFullLogOffUrl() {
+	return '//wfm-report.herokuapp.com/api/account/full-logoff';
+}
+
 /** Auth service */
 exports = {};
 
@@ -24,6 +28,11 @@ exports.getUserProfile = function () {
 /** End the session */
 exports.accountLogOff = function () {
 	return ajaxRequest('GET', accountLogOffUrl());
+};
+
+/** End the WFM session and Petrohelp session */
+exports.accountFullLogOff = function () {
+	return ajaxRequest('GET', accountFullLogOffUrl());
 };
 
 module.exports = exports;

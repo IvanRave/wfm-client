@@ -194,7 +194,7 @@ exports = function (mdlWorkspace) {
 /**
  * Handle success session
  */
-exports.prototype.handleSuccessSession = function (accountInfoData) {	
+exports.prototype.handleSuccessSession = function (accountInfoData) {
 	this.mdlWorkspace.setUserProfile(accountInfoData);
 	this.isLoginInProgress(false);
 };
@@ -229,6 +229,14 @@ exports.prototype.openAuth = function () {
  */
 exports.prototype.accountLogOff = function () {
 	this.mdlWorkspace.accountLogOff();
+};
+
+/**
+ * End the session
+ *    Logoff from current cabinet and PetrohelpAuth
+ */
+exports.prototype.accountFullLogOff = function () {
+	this.mdlWorkspace.accountFullLogOff();
 };
 
 /** Build a viewmodel for user profile */
