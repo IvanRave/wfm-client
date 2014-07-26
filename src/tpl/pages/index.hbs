@@ -13,24 +13,37 @@
   <div class="hide" id="workspace-project">
     <div>
       <!-- current: vwmWorkspace-->
-      <nav class="wfm-nav clearfix navbar-inverse">
+      <nav class="wfm-nav clearfix navbar-inverse" role="navigation" data-bind="visible: mdlWorkspace.isTriedToLoadUserProfile">
         <div data-bind="ifnot: vwmUserProfile">
           {{> style-link-selector }}
         </div>
         <div>
           <div class="pull-left wfm-nav__block" data-bind="with: vwmUserProfile">
-            <span class="link-view-inverse wfm-brand-title" 
-              data-bind="click: deactivateVwmChild">{{lang.wfm}}</span>
+            <span class="link-view-inverse wfm-brand-title" data-bind="click: deactivateVwmChild">
+              {{lang.wfm}}
+            </span>
           </div>
           <div class="pull-right wfm-nav__block" data-bind="if: vwmUserProfile">
-            <span class="min-right-margin" data-bind="with:vwmUserProfile">
-              <span class="link-view-inverse" data-bind="text: uname"></span>
-              <!-- todo #33! add dropdown menu to logout -->
-            </span>
-            <button class="btn btn-xs btn-inverse" type="button" data-bind="click: accountLogOff">
-              <i class="glyphicon glyphicon-off"></i>
-              {{capitalizeFirst lang.logOut}}
-            </button>
+            <div class="dropdown" style="min-width: 200px">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" data-bind="drpdwn: {}">
+                  <span data-bind="with:vwmUserProfile">
+                    <span data-bind="text: uname"></span>
+                  </span>
+                  <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu" role="menu">
+                  <li>
+                    <a href="#" data-bind="click: accountLogOff">
+                      Logout (WFM)
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" data-bind="click: accountFullLogOff">
+                      Logout (WFM + Petrohelp)
+                    </a>
+                  </li>
+                </ul>
+            </div>            
           </div>
         </div>
       </nav>

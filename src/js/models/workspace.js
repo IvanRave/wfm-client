@@ -93,6 +93,16 @@ define([
 		userProfileService.accountLogOff();
     this.cleanUserProfile();
 	};
+  
+  /**
+	 * End the session (WFM + Petrohelp)
+	 *    Logoff from current cabinet and PetrohelpAuth
+	 */
+	exports.prototype.accountFullLogOff = function () {
+    // sync methods, no time to wait response
+		userProfileService.accountFullLogOff();
+    this.cleanUserProfile();
+	};
 
 	/**
 	 * Calculate parameters from squads

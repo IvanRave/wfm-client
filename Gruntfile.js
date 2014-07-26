@@ -159,7 +159,7 @@ module.exports = function (grunt) {
 						expand : true,
 						dot : true,
 						flatten : true,
-						cwd : '<%= bowerFolder %>/bootstrap-sass/vendor/assets/javascripts/bootstrap/',
+						cwd : '<%= bowerFolder %>/bootstrap-sass-official/assets/javascripts/bootstrap/',
 						dest : '<%= trgt %>/js/bootstrap/',
 						src : ['modal.js', 'dropdown.js', 'transition.js']
 					}
@@ -193,9 +193,19 @@ module.exports = function (grunt) {
 				files : [{
 						expand : true,
 						flatten : true,
-						cwd : '<%= bowerFolder %>/bootstrap-sass/vendor/assets/stylesheets/bootstrap/',
+						cwd : '<%= bowerFolder %>/bootstrap-sass-official/assets/stylesheets/bootstrap/',
 						src : ['*.scss'], // Redefined variables in project main scss file
 						dest : '<%= trgt %>/scss/bootstrap/'
+					}
+				]
+			},
+      bower_bootstrap_sass_mixins : {
+				files : [{
+						expand : true,
+						flatten : true,
+						cwd : '<%= bowerFolder %>/bootstrap-sass-official/assets/stylesheets/bootstrap/mixins/',
+						src : ['*.scss'], // Redefined variables in project main scss file
+						dest : '<%= trgt %>/scss/bootstrap/mixins/'
 					}
 				]
 			},
@@ -206,7 +216,7 @@ module.exports = function (grunt) {
 						flatten : true,
 						cwd : '<%= bowerFolder %>/',
 						dest : '<%= trgt %>/fonts/',
-						src : ['bootstrap-sass/vendor/assets/fonts/bootstrap/*', 'wfm-fonts/dst/fonts/*']
+						src : ['bootstrap-sass-official/assets/fonts/bootstrap/*', 'wfm-fonts/dst/fonts/*']
 					}
 				]
 			}
@@ -511,6 +521,7 @@ module.exports = function (grunt) {
 		'copy:bower_img',
 		'copy:bower_bootstrap_js', // Copy unchanged files from bootstrap-sass
 		'copy:bower_bootstrap_sass', // Copy bowe scss partials to main.css file may be import these partials
+    'copy:bower_bootstrap_sass_mixins',
 		'compass:main', // Make main sass file from copied file
 		'assemble:js', // After copy all files to destination - replace all {{value}} - rewrite the same files
 		'assemble:cjs', // Copy with assembling and transformation from commonjs module to requirejs modules
