@@ -17,7 +17,7 @@ module.exports = function (grunt) {
 
 	var idOfAuthClient = isProd ? 'wfm-client' : 'client111';
 	var redirectUriOfAuthClient = isProd ? '//ivanrave.github.io/wfm-client/handle-auth-code.html' : '//localhost:12345/handle-auth-code.html';
-
+  var redirectUriOfAuthLogOff = isProd ? '//ivanrave.github.io/wfm-client/handle-logoff.html' : '//localhost:12345/handle-logoff.html';
 	// 'http://localhost:3000/api/session-manager'
 	////wfm-node.azurewebsites.net
 
@@ -251,7 +251,8 @@ module.exports = function (grunt) {
 					authUrl : authUrl,
 					isProd : isProd,
 					idOfAuthClient : idOfAuthClient,
-          redirectUriOfAuthClient: redirectUriOfAuthClient
+          redirectUriOfAuthClient: redirectUriOfAuthClient,
+          redirectUriOfAuthLogOff: redirectUriOfAuthLogOff
 					// isIpad: isIpad,
 					// isMetro: isMetro
 				}
