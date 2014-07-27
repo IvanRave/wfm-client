@@ -100,8 +100,9 @@ define([
 	 */
 	exports.prototype.accountFullLogOff = function () {
     // sync methods, no time to wait response
-		userProfileService.accountFullLogOff();
-    this.cleanUserProfile();
+		userProfileService.accountFullLogOff(this.cleanUserProfile.bind(this));
+    // parallel request
+    userProfileService.accountLogOff();
 	};
 
 	/**

@@ -9,6 +9,7 @@ var VwmUserProfile = require('viewmodels/user-profile');
 var globalCssCnst = require('constants/global-css-constants');
 var langHelper = require('helpers/lang-helper');
 var sessionService = require('services/session');
+var authService = require('services/auth');
 
 // http://stackoverflow.com/questions/8648892/convert-url-parameters-to-a-javascript-object
 function calcObjFromUrl(search) {
@@ -25,60 +26,6 @@ function handleAuthResult(scsNext, failNext, authResult) {
 
 	sessionService.buildSession(resultObj.code).done(scsNext).fail(failNext);
 }
-
-var cbkAuthInterval = function (redirectUri, authScope, next) {
-	var authLocation = authScope.authWindow.location;
-
-	var authLocationHref;
-	// Uncaught SecurityError: Blocked a frame with origin "http://localhost:12345" from accessing
-	// a frame with origin "http://localhost:1337". Protocols, domains, and ports must match.
-	try {
-		authLocationHref = authLocation.href;
-	} catch (errSecurity) {}
-
-	console.log(authLocationHref);
-
-	if (authLocationHref) {
-		var hrefParts = authLocationHref.split('?');
-
-		// if https://some.ru -> //some.ru
-		if (hrefParts[0].indexOf(redirectUri) >= 0) {
-			// Get code or error
-			var authResponse = hrefParts[1];
-
-			clearInterval(authScope.authInterval);
-			// Close popup
-			authScope.authWindow.close();
-
-			next(authResponse);
-		}
-	}
-
-};
-
-var openAuthWindow = function (next) {
-	// //wf.com or //localhost:12345
-	// var appBase = '//' + window.location.host;
-	// // hack for github hosting
-	// if (appBase === '//ivanrave.github.io') {
-	// appBase += '/wfm-client';
-	// }
-	// var redirectUri = appBase + '/handle-auth-code.html';
-
-	var idOfAuthClient = 'wfm-client';
-	var redirectUri = '//ivanrave.github.io/wfm-client/handle-auth-code.html';
-
-	// Object to catch changes in bind method
-	var authScope = {
-		authWindow : null,
-		authInterval : null
-	};
-
-	authScope.authInterval = setInterval(cbkAuthInterval.bind(null, redirectUri, authScope, next), 1000);
-
-	authScope.authWindow = window.open('//petrohelp-auth.herokuapp.com' + '/dialog/authorize?response_type=code&client_id=' + idOfAuthClient + '&redirect_uri=' + redirectUri, '_blank',
-			'location=yes,height=570,width=520,scrollbars=yes,status=yes');
-};
 
 /**
  * A workspace view model: a root for knockout
@@ -218,7 +165,7 @@ exports.prototype.handleFailedSession = function (jqXhr) {
 exports.prototype.openAuth = function () {
 	this.isLoginInProgress(true);
 
-	openAuthWindow(handleAuthResult.bind(null,
+  authService.accountLogOn(handleAuthResult.bind(null,
 			this.handleSuccessSession.bind(this),
 			this.handleFailedSession.bind(this)));
 };
