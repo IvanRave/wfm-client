@@ -142,6 +142,12 @@ exports = function (mdlWorkspace) {
  * Handle success session
  */
 exports.prototype.handleSuccessSession = function (accountInfoData) {
+  // get sid for SAFARI
+  var cookieVal = accountInfoData['sid'];
+  console.log('cookieVal', cookieVal);
+  
+  cookieHelper.createCookie('wfmapi.sid', cookieVal, 10);
+
 	this.mdlWorkspace.setUserProfile(accountInfoData);
 	this.isLoginInProgress(false);
 };
