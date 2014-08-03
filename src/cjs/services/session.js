@@ -4,17 +4,19 @@
 
 var ajaxRequest = require('helpers/ajax-request');
 
-function sessionUrl() {
-	return '{{conf.requrl}}/api/account/session';
+function sessionUrl(code) {
+	return '{{conf.requrl}}/api/account/session' +
+	'?code=' + code +
+	'&client_id=' + '{{conf.idOfAuthClient}}' +
+	'&redirect_uri=' + encodeURIComponent('{{conf.redirectUriOfAuthClient}}');
 }
 
 /** Auth service */
 exports = {};
 
-/** Get account info */
+/** Create an access token */
 exports.buildSession = function (code) {
-	var dataStr = 'code=' + code + '&client_id=' + '{{conf.idOfAuthClient}}' + '&redirect_uri=' + '{{conf.redirectUriOfAuthClient}}';
-	return ajaxRequest('POST', sessionUrl(), dataStr, 'application/x-www-form-urlencoded; charset=UTF-8');
+	return ajaxRequest('POST', sessionUrl(code));
 };
 
 module.exports = exports;

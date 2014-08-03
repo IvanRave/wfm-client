@@ -5,10 +5,12 @@
  */
 define(['knockout',
 		'moment',
-		'helpers/file-helper'],
+		'helpers/file-helper',
+		'helpers/global-vars'],
 	function (ko,
 		appMoment,
-		fileHelper) {
+		fileHelper,
+		globalVars) {
 	'use strict';
 
 	/**
@@ -30,7 +32,7 @@ define(['knockout',
 		 *    without right part, like /api/sections/some-file-id
 		 * @type {string}
 		 */
-		this.fileUrl = '{{conf.requrl}}' + data.FileUrl;
+		this.fileUrl = '{{conf.requrl}}' + data.FileUrl + '?access_token=' + globalVars.sessionOfUser.accessToken;
 
 		/**
 		 * File name (255)

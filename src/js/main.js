@@ -4,7 +4,7 @@
 	require(['console-shim', 'es5-shim', 'es5-sham'], function () {
 		require(['jquery', 'knockout', 'viewmodels/workspace', 'models/workspace', 'bindings/all-bindings', 'bindings/svg-bindings', 'jquery.panzoom'], function ($, ko, VwmWorkspace, MdlWorkspace) {
 
-      // Can be added HasItems checker for all observable and computed arrays
+			// Can be added HasItems checker for all observable and computed arrays
 			// Usefull instead checking "arr().length > 0" in views
 			var funcTrackHasItem = function () {
 				this.hasItems = ko.computed({
@@ -19,13 +19,13 @@
 				return this;
 			};
 
-      // Only for arrays (with length property)
+			// Only for arrays (with length property)
 			ko.computed.fn.trackHasItems = funcTrackHasItem;
 			ko.observableArray.fn.trackHasItems = funcTrackHasItem;
-  
-      var mdlWorkspace = new MdlWorkspace();
+
+			var mdlWorkspace = new MdlWorkspace();
 			var vwmWorkspace = new VwmWorkspace(mdlWorkspace);
-  
+
 			$(function () {
 				// ======================================= pan zoom =======================
 				var $panzoom = $('.panzoom').panzoom({
