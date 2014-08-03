@@ -1,6 +1,5 @@
 /** @module
  * todo: #22! handle to remove
- *       this.setUserProfile
  *       this.cleanUserProfile
  */
 define([
@@ -53,10 +52,18 @@ define([
 		 */
 		this.userProfile = ko.observable();
 
+		// move to global vars at this moment
+		// it's hard to move access token by entire project
+		// /**
+		// * Session of an user: accessToken, expiredIn, uname
+		// * @type {Object}
+		// */
+		// this.sessionOfUser = ko.observable(); 
+
 		/**
 		 * Whether profile is loaded: profile can be loaded, but not exists (if user is not logged or registered)
 		 *    Existing of profile need to check, using ths.userProfile object
-		 * @type {boolean}
+		 * @type {Boolean}
 		 */
 		this.isTriedToLoadUserProfile = ko.observable(false);
 	};
@@ -89,20 +96,20 @@ define([
 	 *    Logoff only from current cabinet (now, logic may changed)
 	 */
 	exports.prototype.accountLogOff = function () {
-    // sync methods, no time to wait response
+		// sync methods, no time to wait response
 		userProfileService.accountLogOff();
-    this.cleanUserProfile();
+		this.cleanUserProfile();
 	};
-  
-  /**
+
+	/**
 	 * End the session (WFM + Petrohelp)
 	 *    Logoff from current cabinet and PetrohelpAuth
 	 */
 	exports.prototype.accountFullLogOff = function () {
-    // sync methods, no time to wait response
+		// sync methods, no time to wait response
 		userProfileService.accountFullLogOff(this.cleanUserProfile.bind(this));
-    // parallel request
-    userProfileService.accountLogOff();
+		// parallel request
+		userProfileService.accountLogOff();
 	};
 
 	/**

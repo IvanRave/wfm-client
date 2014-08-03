@@ -5,6 +5,8 @@ define(function (require, exports, module) {
 var $ = require('jquery');
 var langHelper = require('helpers/lang-helper');
 var loaderHelper = require('helpers/loader-helper');
+//var cookieHelper = require('helpers/cookie-helper');
+var globalVars = require('helpers/global-vars');
 
 var cbkAlways = function (marker) {
 	loaderHelper.toggleLoadingState(false, marker);
@@ -65,14 +67,21 @@ var cbkFail = function (jqXHR, textStatus, errorThrown) {
 };
 
 exports = function (type, url, data, contentType) {
+	// 1 option:
+	// get access_token from own cookies - add to the query param 'access_token'
+	// or to the authorization header (in this case need a pre-flight request)
+
+	// 2 option: store access_token in code
+
 	var options = {
 		////dataType: "json",
 		cache : false,
-		type : type,
-		xhrFields : {
-			// For CORS request to send cookies
-			withCredentials : true
-		}
+		type : type
+		// Oookies doesn't work in Safari with 3rd-side sites (by default settings)
+		// xhrFields : {
+		// // For CORS request to send cookies
+		// withCredentials : true
+		// }
 	};
 
 	if (data) {
@@ -120,6 +129,20 @@ exports = function (type, url, data, contentType) {
 	// Generate time marker
 	var marker = new Date().getTime();
 	loaderHelper.toggleLoadingState(true, marker);
+
+	var accessToken = globalVars.sessionOfUser.accessToken; // cookieHelper.getCookie('access_token');
+
+	if (accessToken) {
+		var isExistsQueryParams = url.indexOf('?') >= 0;
+
+		if (isExistsQueryParams) {
+			url += '&';
+		} else {
+			url += '?';
+		}
+
+		url += 'access_token=' + accessToken;
+	}
 
 	return $.ajax(url, options)
 	.fail(cbkFail)

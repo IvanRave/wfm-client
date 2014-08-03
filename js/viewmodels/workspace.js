@@ -10,6 +10,7 @@ var globalCssCnst = require('constants/global-css-constants');
 var langHelper = require('helpers/lang-helper');
 var sessionService = require('services/session');
 var authService = require('services/auth');
+var globalVars = require('helpers/global-vars');
 
 // http://stackoverflow.com/questions/8648892/convert-url-parameters-to-a-javascript-object
 function calcObjFromUrl(search) {
@@ -140,15 +141,19 @@ exports = function (mdlWorkspace) {
 
 /**
  * Handle success session
+ * @param {Object} sessionOfUser - { accessToken , expiredIn, uname }
  */
-exports.prototype.handleSuccessSession = function (accountInfoData) {
-  // get sid for SAFARI
-  var cookieVal = accountInfoData['sid'];
-  console.log('cookieVal', cookieVal);
-  
-  cookieHelper.createCookie('wfmapi.sid', cookieVal, 10);
+exports.prototype.handleSuccessSession = function (sessionOfUser) {
+	//cookieHelper.createCookie('access_token', sessionOfUser.accessToken, sessionOfUser.expiredIn);
 
-	this.mdlWorkspace.setUserProfile(accountInfoData);
+  ////this.mdlWorkspace.sessionOfUser(sessionOfUser);
+  
+  globalVars.sessionOfUser = sessionOfUser;
+  
+	this.mdlWorkspace.setUserProfile({
+		uname : sessionOfUser.uname
+	});
+
 	this.isLoginInProgress(false);
 };
 
@@ -171,7 +176,7 @@ exports.prototype.handleFailedSession = function (jqXhr) {
 exports.prototype.openAuth = function () {
 	this.isLoginInProgress(true);
 
-  authService.accountLogOn(handleAuthResult.bind(null,
+	authService.accountLogOn(handleAuthResult.bind(null,
 			this.handleSuccessSession.bind(this),
 			this.handleFailedSession.bind(this)));
 };

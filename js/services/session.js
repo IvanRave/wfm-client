@@ -5,17 +5,19 @@ define(function (require, exports, module) {
 
 var ajaxRequest = require('helpers/ajax-request');
 
-function sessionUrl() {
-	return '//wfm-report.herokuapp.com/api/account/session';
+function sessionUrl(code) {
+	return '//wfm-report.herokuapp.com/api/account/session' +
+	'?code=' + code +
+	'&client_id=' + 'wfm-client' +
+	'&redirect_uri=' + encodeURIComponent('//ivanrave.github.io/wfm-client/handle-auth-code.html');
 }
 
 /** Auth service */
 exports = {};
 
-/** Get account info */
+/** Create an access token */
 exports.buildSession = function (code) {
-	var dataStr = 'code=' + code + '&client_id=' + 'wfm-client' + '&redirect_uri=' + '//ivanrave.github.io/wfm-client/handle-auth-code.html';
-	return ajaxRequest('POST', sessionUrl(), dataStr, 'application/x-www-form-urlencoded; charset=UTF-8');
+	return ajaxRequest('POST', sessionUrl(code));
 };
 
 module.exports = exports;
