@@ -5,7 +5,6 @@ define(function (require, exports, module) {
 var $ = require('jquery');
 var langHelper = require('helpers/lang-helper');
 var loaderHelper = require('helpers/loader-helper');
-//var cookieHelper = require('helpers/cookie-helper');
 var globalVars = require('helpers/global-vars');
 
 var cbkAlways = function (marker) {
@@ -130,7 +129,7 @@ exports = function (type, url, data, contentType) {
 	var marker = new Date().getTime();
 	loaderHelper.toggleLoadingState(true, marker);
 
-	var accessToken = globalVars.sessionOfUser.accessToken; // cookieHelper.getCookie('access_token');
+	var accessToken = globalVars.sessionOfUser.accessToken; // localStorageHelper.getItem('access_token');
 
 	if (accessToken) {
 		var isExistsQueryParams = url.indexOf('?') >= 0;

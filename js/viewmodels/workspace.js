@@ -4,7 +4,7 @@ define(function (require, exports, module) {
 
 var ko = require('knockout');
 var historyHelper = require('helpers/history-helper');
-var cookieHelper = require('helpers/cookie-helper');
+var localStorageHelper = require('helpers/local-storage-helper');
 var VwmUserProfile = require('viewmodels/user-profile');
 var globalCssCnst = require('constants/global-css-constants');
 var langHelper = require('helpers/lang-helper');
@@ -260,7 +260,7 @@ exports.prototype.changeGlobalCss = function (choosedCss) {
 	var styleLinkElem = document.getElementById('wfm-style-link');
 	styleLinkElem.href = choosedCss.path + '?0.9.9';
 
-	cookieHelper.createCookie('wfmstylelink', choosedCss.path, 30);
+  localStorageHelper.setItem('wfmstylelink', choosedCss.path);
 };
 
 module.exports = exports;
