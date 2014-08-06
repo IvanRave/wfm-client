@@ -2,12 +2,12 @@
 
 WFM description: https://github.com/IvanRave/wfm
 
-* [Write notes] (#write-notes)
-* [Separate client development] (#separate-client-development)
+* [Code rules] (#code-rules)
+* [Separate development] (#separate-development)
 * [Build notes] (#build-notes)
 * [Publish notes] (#publish-notes)
 
-## Write notes
+## Code rules
 
 ### Guidelines
 * [Angular commit guidelines] (https://github.com/angular/angular.js/blob/master/CONTRIBUTING.md#commit-message-format)
@@ -41,21 +41,25 @@ Use a search (in all files) to find a need priority (search by a regular express
 * Do not use in production (IE9 doesn't support requests with json type and cookies)
 * Only for development (in modern browsers) and other project types (IOS, desktop etc.)
 
-## Separate client development
+## Separate development
 
-This is an example of a request to the WFM: http://jsfiddle.net/IvanRave/bkF48
+If you want to help us and create new features for WFM client, you may start with next steps:
 
-Tools for building new independent features (only last versions of tools):
-* pseudo classical pattern to organize JS code
+- Define a structure of data, required for your feature.
+- Create demo dataset: use JSON object, for example: {"monitoring" : [{"heat" : 45, "water": 29999}, {...}]}
+- Create representation for your module, using standard web technologies: HTML, JS, CSS
+- If required, use next libs and technologies to create representation:
 * http://jquery.com/ for requests to the WFM API and other needs
 * http://knockoutjs.com/ for two-way bindings, etc.
 * http://getbootstrap.com/ for a markup
 * CSS or SCSS for a style
+* pseudo classical pattern to organize JS code
 
-* Use http://jsfiddle.net/ or your local server to send request to the WFM API
-* If you need new API methods, firstly try to construct a test data as a simple JS object and use it for your purposes.
+- If you need current WFM API methods, go to WFM API docs, show format of data and generate demo data.
+(see a link to WFM API docs in a global WFM description)
 
-* After realization of your feauture we will integrate it to the main source
+* After realization of your independent feauture we will integrate it to the main source. 
+You can get some bonuses for development.
 
 ## Build notes
 
