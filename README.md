@@ -47,13 +47,13 @@ If you want to help us and create new features for WFM client, you may start wit
 
 - Define a structure of data, required for your feature.
 - Create demo dataset: use JSON object, for example: {"monitoring" : [{"heat" : 45, "water": 29999}, {...}]}
-- Create representation for your module, using standard web technologies: HTML, JS, CSS
-- If required, use next libs and technologies to create representation:
-** http://jquery.com/ for requests to the WFM API and other needs
-** http://knockoutjs.com/ for two-way bindings, etc.
-** http://getbootstrap.com/ for a markup
-** CSS or SCSS for a style
-** pseudo classical pattern to organize JS code
+- Create representation for your module, using standard web technologies: HTML, JS, CSS.
+If required, use next libs and technologies to create representation:
+  - http://jquery.com/ for requests to the WFM API and other needs
+  - http://knockoutjs.com/ for two-way bindings, etc.
+  - http://getbootstrap.com/ for a markup
+  - CSS or SCSS for a style
+  - pseudo classical pattern to organize JS code
 - If you need current WFM API methods, go to WFM API docs, show format of data and generate demo data.
 (see a link to WFM API docs in a global WFM description)
 - After realization of your independent feauture we will integrate it to the main source. 
