@@ -5,12 +5,8 @@ define(function (require, exports, module) {
 
 var ajaxRequest = require('helpers/ajax-request');
 
-function accountInfoUrl() {
-	return '//wfm-report.herokuapp.com/api/account/info';
-}
-
-function accountLogOffUrl() {
-	return '//wfm-report.herokuapp.com/api/account/logoff';
+function sessionOfUserUrl() {
+	return '//wfm-report.herokuapp.com/api/account/session';
 }
 
 function accountFullLogOffUrl(redirectUri) {
@@ -22,12 +18,12 @@ exports = {};
 
 /** Get account info */
 exports.getUserProfile = function () {
-	return ajaxRequest('GET', accountInfoUrl());
+	return ajaxRequest('GET', sessionOfUserUrl());
 };
 
 /** End the session */
 exports.accountLogOff = function () {
-	return ajaxRequest('GET', accountLogOffUrl());
+	return ajaxRequest('DELETE', sessionOfUserUrl());
 };
 
 var cbkAuthInterval = function (redirectUri, authScope, next) {
