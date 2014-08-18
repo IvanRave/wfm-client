@@ -10,6 +10,7 @@ var langHelper = require('helpers/lang-helper');
 var sessionService = require('services/session');
 var authService = require('services/auth');
 var globalVars = require('helpers/global-vars');
+var appHelper = require('helpers/app-helper');
 
 // http://stackoverflow.com/questions/8648892/convert-url-parameters-to-a-javascript-object
 function calcObjFromUrl(search) {
@@ -143,12 +144,25 @@ exports = function (mdlWorkspace) {
  * @param {Object} sessionOfUser - { accessToken , expiredIn, uname }
  */
 exports.prototype.handleSuccessSession = function (sessionOfUser) {
+	// save a session in a local storage
+
+	// add local utc created time to the session
+	sessionOfUser.created = appHelper.toInt(new Date().getTime() / 1000);
+	// end unix utc time (approximatelly equals) = created + expired
+
+	// to add possibility update a page or re-enter again in this browser
+	localStorageHelper.setItem("sessionOfUser", JSON.stringify(sessionOfUser), false);
+
+	// remove from a storage after
+	// for example
+	// The user close the page and the
+
 	//cookieHelper.createCookie('access_token', sessionOfUser.accessToken, sessionOfUser.expiredIn);
 
-  ////this.mdlWorkspace.sessionOfUser(sessionOfUser);
-  
-  globalVars.sessionOfUser = sessionOfUser;
-  
+	////this.mdlWorkspace.sessionOfUser(sessionOfUser);
+
+	globalVars.sessionOfUser = sessionOfUser;
+
 	this.mdlWorkspace.setUserProfile({
 		uname : sessionOfUser.uname
 	});
@@ -259,7 +273,7 @@ exports.prototype.changeGlobalCss = function (choosedCss) {
 	var styleLinkElem = document.getElementById('wfm-style-link');
 	styleLinkElem.href = choosedCss.path + '?{{package.version}}';
 
-  localStorageHelper.setItem('{{ syst.wfmStyleLinkCookie }}', choosedCss.path);
+	localStorageHelper.setItem('{{ syst.wfmStyleLinkCookie }}', choosedCss.path, true);
 };
 
 module.exports = exports;

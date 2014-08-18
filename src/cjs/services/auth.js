@@ -4,12 +4,8 @@
 
 var ajaxRequest = require('helpers/ajax-request');
 
-function accountInfoUrl() {
-	return '{{conf.requrl}}/api/account/info';
-}
-
-function accountLogOffUrl() {
-	return '{{conf.requrl}}/api/account/logoff';
+function sessionOfUserUrl() {
+	return '{{conf.requrl}}/api/account/session';
 }
 
 function accountFullLogOffUrl(redirectUri) {
@@ -21,12 +17,12 @@ exports = {};
 
 /** Get account info */
 exports.getUserProfile = function () {
-	return ajaxRequest('GET', accountInfoUrl());
+	return ajaxRequest('GET', sessionOfUserUrl());
 };
 
 /** End the session */
 exports.accountLogOff = function () {
-	return ajaxRequest('GET', accountLogOffUrl());
+	return ajaxRequest('DELETE', sessionOfUserUrl());
 };
 
 var cbkAuthInterval = function (redirectUri, authScope, next) {

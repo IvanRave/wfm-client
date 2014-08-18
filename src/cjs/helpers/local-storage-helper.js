@@ -16,14 +16,17 @@ exports.getItem = function (name) {
  * Add an item to a storage
  * @param {String} name - Name of an item
  * @param {String} value - Value of an item, only string
- * @param {Number} exp - Expired after, in seconds
+ * @param {Boolean} isPersistent - Whether the item is persistent or only this session
  */
-exports.setItem = function (name, value, exp) {
-	if (exp) {
-		console.log(exp);
+exports.setItem = function (name, value, isPersistent) {
+	var strg;
+	if (isPersistent) {
+		strg = window.localStorage;
+	} else {
+		strg = window.sessionStorage;
 	}
 
-	window.localStorage.setItem(name, value);
+	strg.setItem(name, value);
 	// var expires = '';
 	// if (days) {
 	// var date = new Date();
